@@ -438,20 +438,19 @@ export async function GET(req: Request) {
     try {
       const w = await buildWorld('mailient.xyz@gmail.com');
       return NextResponse.json({
-        build: 'world-v3-qualityfilter',
+        build: 'world-v4-classify',
         ms: Date.now() - t0,
         entities: w.entities.length,
         slipping: w.slipping.length,
         appsPresent: w.appsPresent,
         aiError: w.aiError ?? null,
-        names: w.entities.map(e => e.name),
         sample: w.entities.slice(0, 8).map(e => ({
-          name: e.name, kind: e.kind ?? null, status: e.status,
+          name: e.name, email: e.email, kind: e.kind ?? null, status: e.status,
           atRisk: e.atRisk, receiptCount: e.receipts?.length ?? 0,
         })),
       });
     } catch (e: any) {
-      return NextResponse.json({ build: 'world-v3-qualityfilter', ms: Date.now() - t0, threw: `${e?.name}: ${e?.message}`.slice(0, 300) });
+      return NextResponse.json({ build: 'world-v4-classify', ms: Date.now() - t0, threw: `${e?.name}: ${e?.message}`.slice(0, 300) });
     }
   }
 

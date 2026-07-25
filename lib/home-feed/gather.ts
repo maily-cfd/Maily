@@ -450,7 +450,7 @@ export async function gatherGmailRelationships(email: string, maxThreads = 8): P
   }));
 
   // Group by the OTHER party. For inbound: the From. For outbound (from me): the To.
-  const byParty = new Map<string, RelationshipThread & { _ts: number; _latestId?: string; _bulk?: boolean }>();
+  const byParty = new Map<string, RelationshipThread & { _ts: number; _latestId?: string; _hardBulk?: boolean; _listUnsub?: boolean; _sentToThem?: boolean }>();
   for (const m of msgs) {
     if (!m?.payload?.headers) continue;
     const h: any[] = m.payload.headers;
@@ -461,16 +461,17 @@ export async function gatherGmailRelationships(email: string, maxThreads = 8): P
     const ts = Number(m.internalDate) || new Date(get('Date')).getTime() || 0;
     const snippet = (m.snippet || '').trim();
 
-    // QUALITY GATE: bulk/list/automated mail is never a 1:1 relationship. Real
-    // human email carries none of these headers; newsletters, marketing blasts,
-    // shop/order notifications, and mailing lists all carry at least one. This is
-    // far more precise than keyword matching — it's the machine-readable "I am a
-    // broadcast, not a person" flag, so brand/newsletter noise never reaches a card.
+    // QUALITY GATE — two tiers, tuned to NEVER hide a real person (the worse bug):
+    //  · HARD (Precedence: bulk/list/junk, or Auto-Submitted): mailing-list /
+    //    machine mail, ~never on 1:1 human email → always dropped.
+    //  · SOFT (List-Unsubscribe): newsletters carry it — but so do real people who
+    //    send via a CRM / community tool, so alone it's too blunt. It only drops a
+    //    party the founder has NEVER written to (a pure inbound broadcast); anyone
+    //    they've emailed is a real relationship and is kept regardless.
     const precedence = get('Precedence').toLowerCase();
     const autoSub = get('Auto-Submitted').toLowerCase();
-    const bulk = !!get('List-Unsubscribe')
-      || precedence === 'bulk' || precedence === 'list' || precedence === 'junk'
-      || (!!autoSub && autoSub !== 'no');
+    const hardBulk = precedence === 'bulk' || precedence === 'list' || precedence === 'junk' || (!!autoSub && autoSub !== 'no');
+    const listUnsub = !!get('List-Unsubscribe');
 
     const outbound = from.email === me || (!from.email && !toRaw.includes(me));
     const party = outbound ? parseFrom(toRaw.split(',')[0] || '') : from;
@@ -479,7 +480,7 @@ export async function gatherGmailRelationships(email: string, maxThreads = 8): P
 
     const key = party.email;
     const prev = byParty.get(key);
-    const entry: RelationshipThread & { _ts: number; _latestId?: string; _bulk?: boolean } = {
+    const entry: RelationshipThread & { _ts: number; _latestId?: string; _hardBulk?: boolean; _listUnsub?: boolean; _sentToThem?: boolean } = {
       key,
       name: displayName(party.name, party.email),
       email: party.email,
@@ -492,13 +493,17 @@ export async function gatherGmailRelationships(email: string, maxThreads = 8): P
       messageCount: 1,
       _ts: ts,
       _latestId: m.id,
-      _bulk: bulk,
+      _hardBulk: hardBulk,
+      _listUnsub: listUnsub,
+      _sentToThem: outbound,   // did the founder write TO this party in this message?
     };
     if (!prev) {
       byParty.set(key, entry);
     } else {
       prev.messageCount += 1;
-      prev._bulk = prev._bulk || bulk;   // any bulk message taints the whole party
+      prev._hardBulk = prev._hardBulk || hardBulk;   // any hard-bulk message taints the party
+      prev._listUnsub = prev._listUnsub || listUnsub;
+      prev._sentToThem = prev._sentToThem || outbound; // ever emailed them → real relationship
       if (ts > prev._ts) {
         prev._ts = ts;
         prev.subject = subject;
@@ -511,7 +516,7 @@ export async function gatherGmailRelationships(email: string, maxThreads = 8): P
     }
   }
 
-  const ranked = [...byParty.values()].filter(c => !c._bulk).map(c => {
+  const ranked = [...byParty.values()].filter(c => !(c._hardBulk || (c._listUnsub && !c._sentToThem))).map(c => {
     const status: RelationshipThread['status'] = c.fromThem
       ? (c.daysSince <= 10 ? 'awaiting_you' : 'active')   // they wrote last, still warm → on you
       : (c.daysSince >= 2 ? 'waiting_on_them' : 'active'); // you wrote last, no reply yet
@@ -543,5 +548,5 @@ export async function gatherGmailRelationships(email: string, maxThreads = 8): P
     } catch { /* fail-soft */ }
   }));
 
-  return top.map(({ _ts, _latestId, _bulk, ...rest }) => rest);
+  return top.map(({ _ts, _latestId, _hardBulk, _listUnsub, _sentToThem, ...rest }) => rest);
 }
