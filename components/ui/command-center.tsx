@@ -27,7 +27,6 @@
  */
 
 import { useEffect, useMemo, useState, useCallback, useId, useRef, lazy, Suspense } from 'react';
-import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ResponsiveContainer, Cell, Tooltip as RTooltip,
@@ -149,7 +148,6 @@ export function CommandCenter({ userName, onOpenExistingDraft }: {
   // still render standalone (e.g. in a future test/story) without it.
   onOpenExistingDraft?: (draft: ExistingDraft) => void;
 }) {
-  const router = useRouter();
   const [today, setToday] = useState<TodayData | null>(() => readCache('cc_today'));
   const [week, setWeek] = useState<WeekData | null>(() => readCache('cc_week'));
   const [recs, setRecs] = useState<Rec[] | null>(null);
@@ -180,9 +178,11 @@ export function CommandCenter({ userName, onOpenExistingDraft }: {
   const [showConnectors, setShowConnectors] = useState(false);
 
   const openArcus = useCallback((prompt: string) => {
-    try { sessionStorage.setItem('arcus_prefill', prompt); } catch { /* incognito */ }
-    router.push('/dashboard/agent-talk');
-  }, [router]);
+    // ONE CLICK: open the Arcus command palette (the Ctrl+K panel) right here and
+    // auto-send the prompt — no redirect to /dashboard/agent-talk, no manual send.
+    // The globally-mounted ArcusCommandPalette listens for this event and does both.
+    window.dispatchEvent(new CustomEvent('arcus:submit', { detail: { prompt } }));
+  }, []);
 
   // Force a fresh Today recompute (bypasses the server cache) — the retry behind
   // the "Needs a reply" AI-error card.

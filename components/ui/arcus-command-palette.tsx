@@ -342,6 +342,21 @@ export function ArcusCommandPalette() {
             : '/dashboard/agent-talk';
     }, [setIsArcusOpen]);
 
+    // One-click handoff from anywhere in the app (the home feed's "Handle it"):
+    // open this panel AND send the prompt in a single action — no redirect, no
+    // manual send. Fired as window CustomEvent('arcus:submit', {detail:{prompt}}).
+    useEffect(() => {
+        const onExternalSubmit = (e: Event) => {
+            const prompt = (e as CustomEvent).detail?.prompt;
+            if (typeof prompt !== 'string' || !prompt.trim() || streaming) return;
+            setIsArcusOpen(true);
+            // Open first, then send — so the panel is visibly up as Arcus starts.
+            setTimeout(() => submit(prompt), 80);
+        };
+        window.addEventListener('arcus:submit', onExternalSubmit as EventListener);
+        return () => window.removeEventListener('arcus:submit', onExternalSubmit as EventListener);
+    }, [submit, streaming, setIsArcusOpen]);
+
     // Keyboard: Esc closes; arrows/Enter drive suggestions only before a conversation starts.
     useEffect(() => {
         if (!isArcusOpen) return;

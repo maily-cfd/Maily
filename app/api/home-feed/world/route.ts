@@ -430,30 +430,6 @@ async function writeCache(email: string, payload: WorldPayload): Promise<void> {
 }
 
 export async function GET(req: Request) {
-  // TEMPORARY owner diagnostic (?owner=1) — confirms the quality filter dropped
-  // brand/newsletter noise on the founder's real inbox. Names + kinds + counts
-  // only (precedent-approved), NEVER receipt/body/whyNow text. Removed after.
-  if (new URL(req.url).searchParams.get('owner') === '1') {
-    const t0 = Date.now();
-    try {
-      const w = await buildWorld('mailient.xyz@gmail.com');
-      return NextResponse.json({
-        build: 'world-v4-classify',
-        ms: Date.now() - t0,
-        entities: w.entities.length,
-        slipping: w.slipping.length,
-        appsPresent: w.appsPresent,
-        aiError: w.aiError ?? null,
-        sample: w.entities.slice(0, 8).map(e => ({
-          name: e.name, email: e.email, kind: e.kind ?? null, status: e.status,
-          atRisk: e.atRisk, receiptCount: e.receipts?.length ?? 0,
-        })),
-      });
-    } catch (e: any) {
-      return NextResponse.json({ build: 'world-v4-classify', ms: Date.now() - t0, threw: `${e?.name}: ${e?.message}`.slice(0, 300) });
-    }
-  }
-
   const session = await auth();
   const email = session?.user?.email?.toLowerCase();
   if (!email) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

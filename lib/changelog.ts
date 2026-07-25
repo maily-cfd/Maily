@@ -29,6 +29,13 @@ export const CHANGELOG: ChangelogGroup[] = [
     date: 'July 25, 2026',
     entries: [
       {
+        tag: 'Improved',
+        title: '“Handle it” now does it — in one click',
+        points: [
+          'Clicking “Handle it” on any card no longer bounces you to a new page with a prompt you still have to send. It opens Arcus right where you are and sends the request instantly — one click, and it’s already working.',
+        ],
+      },
+      {
         tag: 'New',
         title: 'See — and connect — your whole stack, right from home',
         points: [
