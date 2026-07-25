@@ -30,6 +30,14 @@ export const CHANGELOG: ChangelogGroup[] = [
     entries: [
       {
         tag: 'Improved',
+        title: '“Sift says…” now reads your whole table back to you',
+        points: [
+          'The morning “Sift says…” line is no longer a clipped one-liner. It gives a full short paragraph — who’s waiting on a reply, what’s gone quiet or is at risk, the meetings and promises coming up, and what’s already handled — ending on the single move that matters most today.',
+          'It no longer cuts off mid-sentence (an internal length limit was trimming it early), and it now always appears when Sift has something real to say — even on a day with no separate recommendations.',
+        ],
+      },
+      {
+        tag: 'Improved',
         title: '“Handle it” now does it — in one click',
         points: [
           'Clicking “Handle it” on any card no longer bounces you to a new page with a prompt you still have to send. It opens Arcus right where you are and sends the request instantly — one click, and it’s already working.',

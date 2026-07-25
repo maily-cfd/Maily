@@ -192,11 +192,14 @@ async function generate(items: InItem[], prefs: BriefingPrefs, founderModel = ''
     '- summary: ONE sentence, specific, naming the real person/subject and why it matters now.\n' +
     '- arcusPrompt: one self-contained instruction the user hands to their AI assistant (Arcus) to DO this with zero further typing (e.g. "Draft a warm, low-pressure follow-up to Sarah Chen about the Q3 proposal she hasn\'t replied to."). Grounded entirely in the referenced items.\n' +
     '- ctaLabel: 2-3 words for the button (e.g. "Draft nudge", "Prep me", "Clear it").\n\n' +
-    'ALSO write a "sift" object — a Siri-style spoken-aloud read of the founder\'s WHOLE connected ecosystem right now (not just the recommendations above): headline = ONE short punchy sentence (≤14 words) naming the single thing that matters most today. analysis = 4-5 sentences synthesizing the real state across every app that has items below (who needs a reply, what\'s going quiet, what\'s coming up, what\'s handled) — read like a sharp chief of staff briefing the founder in 20 seconds, not a bullet list. Ground both ENTIRELY in the numbered items; NEVER invent a person, count, or company.\n' +
+    'ALSO write a "sift" object — a spoken-aloud read of the founder\'s WHOLE connected ecosystem right now (not just the recommendations above):\n' +
+    '  · headline = ONE short punchy sentence (≤14 words) naming the single thing that matters most today.\n' +
+    '  · analysis = a FULL 3-4 sentence paragraph (aim for 3-4 lines, ~55-90 words) that reads the founder\'s table back to them: who is waiting on a reply, what has gone quiet or is at risk, which meetings or commitments are coming, and what is already handled — name the real people and subjects, and finish with the single move that matters most today. Flowing prose like a sharp chief of staff briefing them in 20 seconds, NOT a bullet list, and it must be a COMPLETE thought — never trail off mid-sentence.\n' +
+    'Ground both ENTIRELY in the numbered items; NEVER invent a person, count, or company. If there is little going on, say so honestly in 2-3 calm sentences rather than padding.\n' +
     'Return ONLY JSON: {"sift":{"headline","analysis"},"recommendations":[{"category","title","summary","arcusPrompt","ctaLabel","atRisk":true|false,"refIds":[numbers]}]}';
 
   const basePayload = {
-    max_tokens: 900,
+    max_tokens: 1050,   // room for the fuller 3-4 line Sift read + the recs
     temperature: 0.3,
     response_format: { type: 'json_object' },
     messages: [
@@ -270,9 +273,13 @@ async function generate(items: InItem[], prefs: BriefingPrefs, founderModel = ''
         }
         const raw: any[] = Array.isArray(parsed?.recommendations) ? parsed.recommendations : Array.isArray(parsed) ? parsed : [];
         const recs = validate(raw, items, max);
-        if (recs.length) {
-          console.log(`[recs] ${model} -> ${recs.length} recs`);
-          return { recs, sift: validateSift(parsed?.sift) };
+        const sift = validateSift(parsed?.sift);
+        // Return as soon as the model gave us EITHER real recs OR a real "Sift
+        // says…" read — a valid 3-4 line briefing should never be thrown away just
+        // because the recommendation refIds didn't line up this pass.
+        if (recs.length || sift) {
+          console.log(`[recs] ${model} -> ${recs.length} recs${sift ? ' + sift' : ''}`);
+          return { recs, sift };
         }
         lastError = `${m} → 0 valid recommendations after checks`;
         console.warn(`[recs] ${model} parsed but ${raw.length} raw -> 0 valid after refId check`);
@@ -313,13 +320,25 @@ function extractJsonObject(raw: string): any | null {
   return null;
 }
 
-// Same discipline as validate() below, just for the free-text sift fields:
-// reject anything empty/malformed rather than let a blank or truncated headline
-// through — the caller always has the deterministic sift to fall back to.
+// Trim to a whole sentence so the "Sift says…" read never ends mid-thought —
+// the 380-char hard slice was cutting a 3-4 sentence briefing off partway, which
+// is exactly why it felt incomplete. Falls back to the hard cap only if there's
+// no sentence break in the back half.
+function clampSentence(s: string, max: number): string {
+  const t = (s || '').trim();
+  if (t.length <= max) return t;
+  const cut = t.slice(0, max);
+  const end = Math.max(cut.lastIndexOf('. '), cut.lastIndexOf('! '), cut.lastIndexOf('? '));
+  return end > max * 0.5 ? cut.slice(0, end + 1).trim() : cut.trim();
+}
+
+// The 3-4 line analysis IS the point of "Sift says…" — require it (headline is a
+// nice-to-have the hero can fill from the today briefing). Give the analysis real
+// room (~700 chars ≈ 3-4 full lines) and end it on a sentence, never mid-word.
 function validateSift(raw: any): SiftSummary | null {
-  const headline = clampStr(raw?.headline, 90);
-  const analysis = clampStr(raw?.analysis, 380);
-  if (!headline || !analysis) return null;
+  const headline = clampStr(raw?.headline, 100);
+  const analysis = clampSentence(clampStr(raw?.analysis, 760), 700);
+  if (!analysis || analysis.length < 40) return null;
   return { headline, analysis };
 }
 

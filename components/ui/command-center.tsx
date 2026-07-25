@@ -461,11 +461,11 @@ export function CommandCenter({ userName, onOpenExistingDraft }: {
                       ? 'Nothing needs you right now — your inbox is handled.'
                       : 'Here’s what deserves your attention today.')}
           </p>
-          {/* The longer synthesis loads a beat later (it rides the same call as
-              Worth your time) — appears once ready rather than reserving empty
-              space up front, so the hero never shows a gap while waiting. */}
+          {/* The full 3-4 line read of the founder's table today — the point of
+              "Sift says…". Loads a beat after the headline (rides the recs call),
+              so the hero never shows a gap while waiting. */}
           {sift?.analysis && (
-            <p className="mt-1.5 text-[13.5px] leading-relaxed text-arcus-fg-secondary">{sift.analysis}</p>
+            <p className="mt-2 text-[14px] leading-[1.6] text-arcus-fg-secondary">{sift.analysis}</p>
           )}
         </div>
 
