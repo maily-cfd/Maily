@@ -430,38 +430,6 @@ async function writeCache(email: string, payload: WorldPayload): Promise<void> {
 }
 
 export async function GET(req: Request) {
-  // TEMPORARY owner diagnostic (?owner=1) — runs the real depth synthesis for the
-  // founder's account and returns ONLY shapes: names (precedent-approved), kinds,
-  // counts, and body-LENGTHS. NEVER receipt/whyNow/body TEXT. Removed after verify.
-  if (new URL(req.url).searchParams.get('owner') === '1') {
-    const t0 = Date.now();
-    const FOUNDER = 'mailient.xyz@gmail.com';
-    try {
-      const [w, threads] = await Promise.all([
-        buildWorld(FOUNDER),
-        gatherGmailRelationships(FOUNDER, MAX_ENTITIES),
-      ]);
-      return NextResponse.json({
-        build: 'world-v2-depth',
-        ms: Date.now() - t0,
-        entities: w.entities.length,
-        slipping: w.slipping.length,
-        appsPresent: w.appsPresent,
-        aiError: w.aiError ?? null,
-        threadsWithBody: threads.filter(t => (t.content || '').length > 0).length,
-        bodyLens: threads.map(t => (t.content || '').length),
-        sample: w.entities.slice(0, 8).map(e => ({
-          name: e.name, kind: e.kind ?? null, status: e.status,
-          atRisk: e.atRisk, riskScore: e.riskScore,
-          receiptCount: e.receipts?.length ?? 0, whyNowLen: e.whyNow.length,
-          appChips: e.apps.map(c => c.app),
-        })),
-      });
-    } catch (e: any) {
-      return NextResponse.json({ build: 'world-v2-depth', ms: Date.now() - t0, threw: `${e?.name}: ${e?.message}`.slice(0, 300) });
-    }
-  }
-
   const session = await auth();
   const email = session?.user?.email?.toLowerCase();
   if (!email) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
