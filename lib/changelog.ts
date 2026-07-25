@@ -36,6 +36,7 @@ export const CHANGELOG: ChangelogGroup[] = [
           'New “What’s slipping” — the things genuinely at risk right now, ranked by what it costs to miss: a deal gone quiet, a VIP you haven’t answered, a bounced email — pulled from across your apps, so you see a loss before it happens.',
           'New “Your world right now” — each important relationship shown as a living thing across every connected app at once: an email thread’s status fused with that same person’s calendar, Cal.com booking, Notion page, and Slack DM. One glance tells you everything, one click hands it to Arcus.',
           'It only ever joins signals it’s certain about (an exact email or exact name match), and a disconnected app simply never appears — nothing invented.',
+          'New “On your plate” — the commitments you made in meetings, with their due dates, so a promise never quietly slips. And “Your meetings” now reads your day back to you: how much of it is booked and whether it’s stacked back-to-back.',
           'The weekly agent-activity view didn’t go away — it’s now a single quiet “Handled quietly” line at the very bottom you can expand any time.',
         ],
       },

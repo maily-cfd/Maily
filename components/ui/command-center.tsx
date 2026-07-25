@@ -333,6 +333,46 @@ export function CommandCenter({ userName, onOpenExistingDraft }: {
     };
   }, [today]);
 
+  // ── Time intelligence (Phase 4) — a real read of the founder's day, computed
+  // from their actual calendar events: how much of today is meetings, whether
+  // they're stacked back-to-back, and how many are external. All derived, no AI.
+  const meetingIntel = useMemo(() => {
+    const items = today?.showUp || [];
+    const start0 = new Date(); start0.setHours(0, 0, 0, 0);
+    const end0 = new Date(start0); end0.setDate(end0.getDate() + 1);
+    const todays = items.filter(m => { const s = new Date(m.start).getTime(); return s >= start0.getTime() && s < end0.getTime(); });
+    let mins = 0;
+    for (const m of todays) {
+      if (!m.end) continue;
+      const d = (new Date(m.end).getTime() - new Date(m.start).getTime()) / 60000;
+      if (d > 0 && d < 600) mins += d;
+    }
+    const sorted = [...todays].sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
+    let backToBack = 0;
+    for (let i = 1; i < sorted.length; i++) {
+      const prevEnd = sorted[i - 1].end ? new Date(sorted[i - 1].end as string).getTime() : 0;
+      const curStart = new Date(sorted[i].start).getTime();
+      if (prevEnd && curStart - prevEnd <= 5 * 60000) backToBack++;
+    }
+    return {
+      today: todays.length,
+      hours: mins / 60,
+      backToBack,
+      external: items.filter(m => m.isExternal).length,
+    };
+  }, [today]);
+
+  const meetingsSub = useMemo(() => {
+    const parts: string[] = [];
+    if (meetingIntel.today > 0) {
+      parts.push(`${meetingIntel.today} today`);
+      if (meetingIntel.hours >= 0.5) parts.push(`${meetingIntel.hours.toFixed(1)}h in meetings`);
+      if (meetingIntel.backToBack > 0) parts.push(`${meetingIntel.backToBack} back-to-back`);
+    }
+    if (meetingIntel.external > 0) parts.push(`${meetingIntel.external} external`);
+    return parts.length ? parts.join(' · ') : 'Upcoming';
+  }, [meetingIntel]);
+
   const worldEntities = world?.entities || [];
   const slipping = world?.slipping || [];
 
@@ -463,11 +503,28 @@ export function CommandCenter({ userName, onOpenExistingDraft }: {
         </Section>
       )}
 
-      {/* 5 ── YOUR MEETINGS ─────────────────────────────────────────────────── */}
+      {/* 5 ── ON YOUR PLATE — the founder's own commitments (Phase 4). What THEY
+          promised, from their meeting notes — tracked with due dates + overdue.
+          The hero's "to close" number, made real and actionable. ────────────── */}
+      {today && today.actionItems.length > 0 && (
+        <Section title="On your plate" sub="Commitments you made — from your meetings">
+          <div className="space-y-2">
+            {today.actionItems.slice(0, 6).map((a: any) => (
+              <CommitmentRow
+                key={a.id}
+                item={a}
+                onDo={() => openArcus(`Help me handle this commitment: "${a.text}"${a.meetingTitle ? ` (from my "${a.meetingTitle}" meeting)` : ''}. Suggest the next step and draft anything needed.`)}
+              />
+            ))}
+          </div>
+        </Section>
+      )}
+
+      {/* 6 ── YOUR MEETINGS (with time-intelligence sub-line, Phase 4) ────────── */}
       {today && today.showUp.length > 0 && (
         <Section
           title="Your meetings"
-          sub="Upcoming"
+          sub={meetingsSub}
           action={{ label: 'Schedule something', onClick: () => openArcus('Find a free 30-minute slot this week and schedule a meeting. Ask me who with and what about.') }}
         >
           <div className="space-y-2">
@@ -486,7 +543,7 @@ export function CommandCenter({ userName, onOpenExistingDraft }: {
         </Section>
       )}
 
-      {/* 6 ── WORTH YOUR TIME (cross-app) ───────────────────────────────────── */}
+      {/* 7 ── WORTH YOUR TIME (cross-app) ───────────────────────────────────── */}
       {recsError ? (
         <Section title="Worth your time" sub="Across Gmail, Calendar, Notion & Slack">
           <FeedErrorCard message={recsError} onRetry={refreshAnalytics} />
@@ -501,7 +558,7 @@ export function CommandCenter({ userName, onOpenExistingDraft }: {
         </Section>
       ) : null}
 
-      {/* 7 ── HANDLED QUIETLY (demoted agent-activity footer) ──────────────────
+      {/* 8 ── HANDLED QUIETLY (demoted agent-activity footer) ──────────────────
           FRAME FLIP: this used to be TWO headline sections ("Your week" analytics
           + "While you were away") reporting what MAILIENT did — making the tool
           the protagonist of its own user's home. Founder feedback: "displays
@@ -768,6 +825,33 @@ function MeetingRow({ title, start, attendeeCount, isExternal, meetLink, onPrep 
           <Zap className="w-3.5 h-3.5" /> Prep me
         </button>
       </div>
+    </div>
+  );
+}
+
+// A commitment the founder made (from meeting notes) — real text, due date /
+// overdue flag, the meeting it came from, and one click to hand it to Arcus.
+function CommitmentRow({ item, onDo }: { item: any; onDo: () => void }) {
+  const due = item?.dueAt ? new Date(item.dueAt) : null;
+  const dueLabel = due && !isNaN(due.getTime()) ? due.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : null;
+  const overdue = !!item?.isOverdue;
+  return (
+    <div className={cn('rounded-2xl border p-4 flex items-start gap-3', overdue ? 'border-rose-500/30 bg-rose-500/[0.06]' : 'border-arcus-border bg-arcus-surface')}>
+      <div className={cn('w-9 h-9 rounded-xl flex items-center justify-center shrink-0', overdue ? 'bg-rose-500/10 text-rose-500' : 'bg-arcus-elevated text-arcus-fg-tertiary')}>
+        <CheckCircle2 className="w-4 h-4" />
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="text-[13.5px] text-arcus-fg leading-snug line-clamp-2">{item?.text}</p>
+        <div className="flex items-center gap-2 mt-1 flex-wrap">
+          {item?.meetingTitle && <span className="text-[11.5px] text-arcus-fg-tertiary truncate max-w-[220px]">from “{item.meetingTitle}”</span>}
+          {overdue
+            ? <span className="text-[11px] font-semibold text-rose-600 dark:text-rose-400">overdue</span>
+            : dueLabel && <span className="text-[11.5px] text-arcus-fg-muted">due {dueLabel}</span>}
+        </div>
+      </div>
+      <button onClick={onDo} className="shrink-0 inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border border-arcus-border text-arcus-fg-secondary text-[12.5px] font-medium hover:bg-arcus-surface-hover transition-colors">
+        <Zap className="w-3.5 h-3.5" /> Do it
+      </button>
     </div>
   );
 }

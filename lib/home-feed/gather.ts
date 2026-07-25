@@ -341,7 +341,22 @@ export async function gatherServerSignals(
 // The spine of the world view: per-counterparty threads with real humans over
 // the last 30 days, statused by who spoke last and how long ago.
 
-const NOISE_RE = /(no[-_.]?reply|do[-_.]?not[-_.]?reply|notification|mailer-daemon|postmaster|updates?@|newsletter|digest|team@|hello@|support@|billing@|receipts?@|via\b|automated|@.*\.(mailchimp|substack|beehiiv|sendgrid|mailgun|intercom|zendesk)\b)/i;
+// Keep REAL humans; drop bots, role addresses, and marketing/newsletter blasts.
+// Strengthened 2026-07-25 — a live run surfaced "F5Bot", "Marketing Guru", and a
+// shop newsletter as "relationships" (they aren't the founder's world). Matches on
+// BOTH the display name and the email, so a bot with a human-looking name is still
+// caught by its address and vice-versa.
+const NOISE_RE = new RegExp(
+  [
+    'no[-_.]?reply', 'do[-_.]?not[-_.]?reply', 'noreply', 'notifications?',
+    'mailer-daemon', 'postmaster', 'automated', 'via\\b',
+    'newsletter', 'digest', 'marketing', 'promo', 'campaign',
+    'bot\\b', 'bot@',                                   // F5Bot, chat/alert bots
+    '\\b(updates?|team|hello|hi|hey|info|contact|sales|support|billing|receipts?|alerts?|deals?|offers?|news|community|careers?|jobs|orders?|shop|store|help|feedback|hq)@',
+    '@.*\\.(mailchimp|substack|beehiiv|sendgrid|mailgun|intercom|zendesk|customer\\.io|hubspot|klaviyo|convertkit)\\b',
+  ].join('|'),
+  'i',
+);
 
 function parseFrom(header: string): { name: string; email: string } {
   const m = header.match(/^\s*"?([^"<]*?)"?\s*<([^>]+)>\s*$/) || header.match(/^\s*([^<>@\s]+@[^<>@\s]+)\s*$/);
