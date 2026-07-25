@@ -26,6 +26,22 @@ export interface ChangelogGroup {
 
 export const CHANGELOG: ChangelogGroup[] = [
   {
+    date: 'July 25, 2026',
+    entries: [
+      {
+        tag: 'New',
+        title: 'A home that shows YOUR world — across every app, not just email',
+        points: [
+          'The home feed no longer opens with what Mailient did for you. It opens with where your world stands: who’s waiting on you, what’s coming up, and what you owe — the state of your day, not a scoreboard of the software.',
+          'New “What’s slipping” — the things genuinely at risk right now, ranked by what it costs to miss: a deal gone quiet, a VIP you haven’t answered, a bounced email — pulled from across your apps, so you see a loss before it happens.',
+          'New “Your world right now” — each important relationship shown as a living thing across every connected app at once: an email thread’s status fused with that same person’s calendar, Cal.com booking, Notion page, and Slack DM. One glance tells you everything, one click hands it to Arcus.',
+          'It only ever joins signals it’s certain about (an exact email or exact name match), and a disconnected app simply never appears — nothing invented.',
+          'The weekly agent-activity view didn’t go away — it’s now a single quiet “Handled quietly” line at the very bottom you can expand any time.',
+        ],
+      },
+    ],
+  },
+  {
     date: 'July 23, 2026',
     entries: [
       {

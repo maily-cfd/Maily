@@ -28,7 +28,7 @@
 
 import { useEffect, useMemo, useState, useCallback, useId } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   ResponsiveContainer, Cell, Tooltip as RTooltip,
   AreaChart, Area, XAxis,
@@ -82,6 +82,21 @@ interface SiftSummary { headline: string; analysis: string; }
 // tab's draft-reply box so it can open pre-filled instead of going to Arcus.
 interface ExistingDraft { threadId: string; to: string; subject: string; body: string; isHtml: boolean; }
 
+// ── "Your world" — the cross-app synthesis from /api/home-feed/world. A relationship
+// rendered as a LIVING thing: its Gmail status fused with the same person's calendar,
+// Cal.com, Notion, and Slack signals (joined ONLY by exact email / exact full-name,
+// never guessed). This replaced the Gmail-only "Key conversations" scan.
+type WorldApp = 'gmail' | 'calendar' | 'notion' | 'slack' | 'calcom';
+interface WorldAppChip { app: WorldApp; label: string; evidence: string; }
+interface WorldEntry {
+  key: string; name: string; email: string;
+  status: ConvoStatus;
+  headline: string; whyNow: string; apps: WorldAppChip[];
+  atRisk: boolean; riskScore: number; riskReason?: string;
+  daysSince: number; lastActivityIso: string; messageCount: number; nextAction: string;
+}
+interface WorldData { entities: WorldEntry[]; slipping: WorldEntry[]; appsPresent: WorldApp[]; aiError?: string; error?: string; }
+
 // A person-keyed conversation with its current status. Derived, never invented.
 // 'active' = a genuinely ongoing thread that's neither on you nor gone quiet
 // (server /api/home-feed/conversations returns this whenever the latest message
@@ -89,27 +104,8 @@ interface ExistingDraft { threadId: string; to: string; subject: string; body: s
 // the server has always been able to send it, which meant STATUS_META[c.status]
 // silently returned undefined and crashed the card. Fixed here.
 type ConvoStatus = 'awaiting_you' | 'waiting_on_them' | 'meeting_booked' | 'active';
-interface Conversation {
-  key: string;
-  name: string;
-  email: string;
-  subject: string;
-  status: ConvoStatus;
-  context: string;        // the AI-written reason from the source item
-  when: string;           // relative time string
-  urgency: number;        // for sort: higher = more urgent
-  prompt: string;         // handed to Arcus on click
-  daysSince?: number;     // real days-silent, when known — powers the "going quiet" chart
-}
 
 // ── helpers ─────────────────────────────────────────────────────────────────
-function firstName(name?: string, email?: string): string {
-  const n = (name || '').trim();
-  if (n) return n.split(/\s+/)[0];
-  const local = (email || '').split('@')[0] || '';
-  const f = local.split(/[._-]/)[0];
-  return f ? f.charAt(0).toUpperCase() + f.slice(1) : 'Someone';
-}
 function relTime(iso: string): string {
   const t = new Date(iso).getTime();
   if (!t) return '';
@@ -127,9 +123,6 @@ function clockTime(iso: string): string {
   if (isNaN(d.getTime())) return '';
   return d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
 }
-
-// Conversations as returned by /api/home-feed/conversations (the real Gmail scan).
-interface ServerConvo { key: string; name: string; email: string; subject: string; status: ConvoStatus; summary: string; nextAction: string; lastActivityIso: string; daysSince: number; fromThem: boolean; messageCount: number; }
 
 // Instant-load cache: show the last snapshot the moment the tab paints, then
 // revalidate in the background. This is what SiftToday did and I'd dropped —
@@ -157,8 +150,8 @@ export function CommandCenter({ userName, onOpenExistingDraft }: {
   // in place of a masking fallback per founder directive ("no fallbacks on
   // anything in home-feed"). Never cached — an error is a live state, not data.
   const [recsError, setRecsError] = useState<string | null>(null);
-  const [convos, setConvos] = useState<ServerConvo[] | null>(() => readCache('cc_convos'));
-  const [convosLoading, setConvosLoading] = useState(true);
+  const [world, setWorld] = useState<WorldData | null>(() => readCache('cc_world'));
+  const [worldLoading, setWorldLoading] = useState(() => !readCache('cc_world'));
   // Only block on a skeleton when we have NOTHING cached to show.
   const [loading, setLoading] = useState(() => !readCache('cc_today'));
   // Separate from `week`/`appCounts` being null (which is also the genuine
@@ -183,6 +176,15 @@ export function CommandCenter({ userName, onOpenExistingDraft }: {
         const j = await r.json();
         if (j?.success !== false) { setToday(j); writeCache('cc_today', j); }
       }
+    } catch { /* leave the error card up */ }
+  }, []);
+
+  // Force a fresh cross-app world synthesis (bypasses the ::world cache) — the
+  // retry behind the "Your world" AI-error card.
+  const refetchWorld = useCallback(async () => {
+    try {
+      const r = await fetch('/api/home-feed/world?refresh=1');
+      if (r.ok) { const j = await r.json(); setWorld(j); writeCache('cc_world', j); }
     } catch { /* leave the error card up */ }
   }, []);
 
@@ -261,18 +263,17 @@ export function CommandCenter({ userName, onOpenExistingDraft }: {
       setWeekLoaded(true);
       setLoading(false);
     })();
-    // The real relationship scan runs on its own timeline (cached server-side),
-    // so it never blocks the hero/stats/chart. Its own skeleton covers the wait.
+    // The cross-app WORLD synthesis runs on its own timeline (cached server-side),
+    // so it never blocks the hero/stats. Its own skeleton covers the wait.
     (async () => {
       try {
-        const r = await fetch('/api/home-feed/conversations');
+        const r = await fetch('/api/home-feed/world');
         if (alive && r.ok) {
           const j = await r.json();
-          const list: ServerConvo[] = Array.isArray(j?.conversations) ? j.conversations : [];
-          setConvos(list); writeCache('cc_convos', list);
+          setWorld(j); writeCache('cc_world', j);
         }
-      } catch { /* keep cached / fall back to derived */ }
-      finally { if (alive) setConvosLoading(false); }
+      } catch { /* keep cached */ }
+      finally { if (alive) setWorldLoading(false); }
     })();
     return () => { alive = false; };
   }, []);
@@ -319,100 +320,28 @@ export function CommandCenter({ userName, onOpenExistingDraft }: {
     [],
   );
 
-  // ── Derive the four headline stats + the key-conversations list ───────────────
+  // ── The four headline stats — the state of the USER'S world, not Mailient's
+  // activity. "handled for you" (an agent-activity metric) was dropped from the
+  // hero (it's now the demoted "Handled quietly" strip at the bottom) and
+  // replaced with the founder's own open commitments — the things on their plate.
   const stats = useMemo(() => {
-    // "Handled for you" = the real work Arcus did this week. It USED to sum
-    // artifact_links, which is empty on most runs (the real signal is tool_calls,
-    // already totalled by /week-activity) — so it read 0 while the chart showed
-    // 77. Now it uses that same real total, with the artifact sum as a fallback.
-    const artifactHandled = (today?.agentRuns || []).reduce(
-      (n, r) => n + r.artifactCounts.gmail + r.artifactCounts.calendar + r.artifactCounts.notion + r.artifactCounts.slack, 0);
     return {
-      reply: today?.decide.length || 0,
-      meetings: today?.showUp.length || 0,
-      awaiting: today?.chase.length || 0,
-      handled: (week?.totalActions ?? 0) || artifactHandled,
+      reply: today?.decide.length || 0,       // emails waiting on your reply
+      meetings: today?.showUp.length || 0,     // meetings coming up
+      awaiting: today?.chase.length || 0,      // people YOU'RE waiting on
+      toClose: today?.actionItems?.length || 0, // your open commitments / to-dos
     };
-  }, [today, week]);
-
-  // Prefer the REAL Gmail relationship scan (server-side, cached). It surfaces
-  // important ongoing threads even when nothing is "actionable" — the whole
-  // point of the redesign. Until it lands (or if it's empty), fall back to
-  // deriving from the action pools so the section is never blank when there IS
-  // action to show.
-  const serverConversations = useMemo<Conversation[]>(() => {
-    if (!convos?.length) return [];
-    return convos.map(c => ({
-      key: c.key,
-      name: c.name,
-      email: c.email,
-      subject: c.subject,
-      status: c.status,
-      context: c.summary,
-      when: c.status === 'waiting_on_them' ? `${c.daysSince}d silent` : relTime(c.lastActivityIso),
-      urgency: c.status === 'awaiting_you' ? 100 : c.status === 'waiting_on_them' ? 50 : 20,
-      prompt: c.nextAction,
-      daysSince: c.daysSince,
-    }));
-  }, [convos]);
-
-  const derivedConversations = useMemo<Conversation[]>(() => {
-    if (!today) return [];
-    const byKey = new Map<string, Conversation>();
-    const put = (c: Conversation) => {
-      const existing = byKey.get(c.key);
-      // One card per person; keep the most urgent status if they recur.
-      if (!existing || c.urgency > existing.urgency) byKey.set(c.key, c);
-    };
-
-    for (const d of today.decide) {
-      put({
-        key: (d.sender.email || d.sender.name || d.id).toLowerCase(),
-        name: firstName(d.sender.name, d.sender.email),
-        email: d.sender.email,
-        subject: d.subject,
-        status: 'awaiting_you',
-        context: d.reason || 'Waiting on your reply.',
-        when: relTime(d.receivedAt),
-        urgency: 100,
-        prompt: `Draft a reply to ${d.sender.name || d.sender.email} about "${d.subject}". Read the thread first, then write it in my voice.`,
-      });
-    }
-    for (const s of today.showUp) {
-      put({
-        key: `mtg:${s.id}`,
-        name: s.title,
-        email: '',
-        subject: s.title,
-        status: 'meeting_booked',
-        context: s.reason || `${s.attendeeCount} attendee${s.attendeeCount === 1 ? '' : 's'}${s.isExternal ? ' · external' : ''}.`,
-        when: clockTime(s.start),
-        urgency: 60,
-        prompt: `Prep me for my meeting "${s.title}". Pull recent context on the attendees from my email and calendar.`,
-      });
-    }
-    for (const c of today.chase) {
-      put({
-        key: (c.recipient.email || c.recipient.name || c.id).toLowerCase(),
-        name: firstName(c.recipient.name, c.recipient.email),
-        email: c.recipient.email,
-        subject: c.subject,
-        status: 'waiting_on_them',
-        context: c.reason || `No reply in ${c.daysSilent} day${c.daysSilent === 1 ? '' : 's'}.`,
-        when: `${c.daysSilent}d silent`,
-        urgency: 40 + Math.min(c.daysSilent, 20),
-        prompt: `Draft a warm, low-pressure follow-up to ${c.recipient.name || c.recipient.email} about "${c.subject}" — it's been quiet for ${c.daysSilent} days.`,
-        daysSince: c.daysSilent,
-      });
-    }
-    return [...byKey.values()].sort((a, b) => b.urgency - a.urgency).slice(0, 6);
   }, [today]);
 
-  const conversations = serverConversations.length ? serverConversations : derivedConversations;
+  const worldEntities = world?.entities || [];
+  const slipping = world?.slipping || [];
 
   if (loading) return <CommandCenterSkeleton />;
 
   const nothingPressing = stats.reply === 0 && stats.meetings === 0 && stats.awaiting === 0;
+  // Overdue commitments push the 4th tile to "attn" tone — an overdue promise is
+  // exactly the kind of thing loss-aversion says should visually stand out.
+  const overdueCount = (today?.actionItems || []).filter((a: any) => a?.isOverdue).length;
   // A dead token used to be indistinguishable from a genuinely empty, handled
   // inbox — same 0/0/0 stats either way. This makes the difference visible
   // instead of telling the user "you're all set" when nothing could load.
@@ -467,38 +396,45 @@ export function CommandCenter({ userName, onOpenExistingDraft }: {
           <StatTile icon={<Reply className="w-4 h-4" />} value={stats.reply} label="need a reply" tone={stats.reply > 0 ? 'attn' : 'calm'} />
           <StatTile icon={<Calendar className="w-4 h-4" />} value={stats.meetings} label={stats.meetings === 1 ? 'meeting' : 'meetings'} tone="calm" />
           <StatTile icon={<Clock className="w-4 h-4" />} value={stats.awaiting} label="awaiting reply" tone="calm" />
-          <StatTile icon={<CheckCircle2 className="w-4 h-4" />} value={stats.handled} label="handled for you" tone="good" />
+          <StatTile icon={<CheckCircle2 className="w-4 h-4" />} value={stats.toClose} label="to close" tone={overdueCount > 0 ? 'attn' : 'calm'} />
         </div>
       </motion.section>
 
-      {/* 2 ── ANALYTICS — real weekly activity + live, connection-gated cross-app
-          signal counts, never a fixed Gmail/Calendar-only view. ─────────────── */}
-      <AnalyticsSection
-        week={week}
-        weekLoaded={weekLoaded}
-        appCounts={appCounts}
-        recsLoaded={recsLoaded}
-        recsError={recsError}
-        refreshing={analyticsRefreshing}
-        onRefresh={refreshAnalytics}
-        onSchedule={() => openArcus('Set up a scheduled agent that gives me a morning briefing every weekday at 8am.')}
-      />
-
-      {/* 3 ── KEY CONVERSATIONS (the new capability) ────────────────────────── */}
-      {conversations.length > 0 ? (
-        <Section title="Key conversations" sub="Where your important threads stand right now">
-          <ConversationPulse conversations={conversations} />
-          <div className="grid sm:grid-cols-2 gap-2.5">
-            {conversations.map(c => (
-              <ConversationCard key={c.key} c={c} onOpen={() => openArcus(c.prompt)} />
+      {/* 2 ── WHAT'S SLIPPING — the loss-aversion lane. What's genuinely at risk
+          ACROSS every app, ranked by cost-to-miss. A founder loses deals by never
+          SEEING them; this is the one thing a home can do that matters most. ─── */}
+      {slipping.length > 0 && (
+        <Section title="What’s slipping" sub="At risk across your apps — ranked by what it costs to miss">
+          <div className="space-y-2">
+            {slipping.slice(0, 4).map(e => (
+              <SlippingRow key={e.key} e={e} onHandle={() => openArcus(e.nextAction)} />
             ))}
           </div>
         </Section>
-      ) : convosLoading ? (
-        <Section title="Key conversations" sub="Reading your inbox for what matters…">
+      )}
+
+      {/* 3 ── YOUR WORLD RIGHT NOW — the cross-app relationship spine (replaced
+          the Gmail-only "Key conversations"). Each card is one person/company as
+          a LIVING thing: their email status FUSED with the same person's
+          calendar, Cal.com, Notion & Slack signals. ────────────────────────── */}
+      {worldEntities.length > 0 ? (
+        <Section title="Your world right now" sub={worldSubline(world)}>
+          {world?.aiError && <div className="mb-2.5"><FeedErrorCard message={world.aiError} onRetry={refetchWorld} /></div>}
           <div className="grid sm:grid-cols-2 gap-2.5">
-            {[0, 1, 2, 3].map(i => <div key={i} className="h-28 rounded-2xl bg-arcus-surface animate-pulse" />)}
+            {worldEntities.map(e => (
+              <WorldCard key={e.key} e={e} onHandle={() => openArcus(e.nextAction)} />
+            ))}
           </div>
+        </Section>
+      ) : worldLoading ? (
+        <Section title="Your world right now" sub="Reading across your connected apps…">
+          <div className="grid sm:grid-cols-2 gap-2.5">
+            {[0, 1, 2, 3].map(i => <div key={i} className="h-32 rounded-2xl bg-arcus-surface animate-pulse" />)}
+          </div>
+        </Section>
+      ) : world?.error ? (
+        <Section title="Your world right now" sub="Across your connected apps">
+          <FeedErrorCard message={world.error} onRetry={refetchWorld} />
         </Section>
       ) : null}
 
@@ -565,16 +501,25 @@ export function CommandCenter({ userName, onOpenExistingDraft }: {
         </Section>
       ) : null}
 
-      {/* 7 ── WHILE YOU WERE AWAY ───────────────────────────────────────────── */}
-      {today && today.agentRuns.length > 0 && (
-        <Section title="While you were away" sub="What your agents handled">
-          <div className="space-y-2">
-            {today.agentRuns.slice(0, 4).map(r => (
-              <AgentRunRow key={r.id} run={r} />
-            ))}
-          </div>
-        </Section>
-      )}
+      {/* 7 ── HANDLED QUIETLY (demoted agent-activity footer) ──────────────────
+          FRAME FLIP: this used to be TWO headline sections ("Your week" analytics
+          + "While you were away") reporting what MAILIENT did — making the tool
+          the protagonist of its own user's home. Founder feedback: "displays
+          tasks completed by Mailient rather than those performed by the user."
+          Collapsed to one quiet, honest reassurance line by default; the same
+          rich analytics (KPI pills, chart, cross-app donut) still live one click
+          away for anyone who wants them — nothing was deleted, just demoted. ─── */}
+      <HandledQuietlyStrip
+        week={week}
+        weekLoaded={weekLoaded}
+        appCounts={appCounts}
+        recsLoaded={recsLoaded}
+        recsError={recsError}
+        refreshing={analyticsRefreshing}
+        onRefresh={refreshAnalytics}
+        onSchedule={() => openArcus('Set up a scheduled agent that gives me a morning briefing every weekday at 8am.')}
+        agentRuns={today?.agentRuns || []}
+      />
     </div>
   );
 }
@@ -653,32 +598,116 @@ const STATUS_META: Record<ConvoStatus, { label: string; cls: string; fill: strin
   meeting_booked: { label: 'Meeting booked', cls: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20', fill: 'bg-indigo-500', Icon: Calendar },
   active: { label: 'Active thread', cls: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20', fill: 'bg-blue-500', Icon: MessageSquare },
 };
-// Fixed render order for the status bar/legend — status color is state, not
-// rank, but a stable left-to-right order still keeps repeat visits legible.
-const STATUS_ORDER: ConvoStatus[] = ['awaiting_you', 'waiting_on_them', 'active', 'meeting_booked'];
+// Per-app chip metadata — the icon + accent that renders each fused cross-app
+// signal on a world card. This is what makes "email quiet 8d · meets Thu · Slack
+// waiting" read as one relationship living across the founder's whole stack.
+const WORLD_APP_META: Record<WorldApp, { Icon: any; label: string; varName: string }> = {
+  gmail:    { Icon: Mail,         label: 'Gmail',    varName: '--arcus-chart-blue' },
+  calendar: { Icon: Calendar,     label: 'Calendar', varName: '--arcus-chart-green' },
+  calcom:   { Icon: CalendarPlus, label: 'Cal.com',  varName: '--arcus-chart-aqua' },
+  notion:   { Icon: FileText,     label: 'Notion',   varName: '--arcus-chart-magenta' },
+  slack:    { Icon: Hash,         label: 'Slack',    varName: '--arcus-chart-yellow' },
+};
+const APP_ORDER: WorldApp[] = ['gmail', 'calendar', 'calcom', 'notion', 'slack'];
 
-function ConversationCard({ c, onOpen }: { c: Conversation; onOpen: () => void }) {
-  const s = STATUS_META[c.status];
+// "Across Gmail, Calendar & Notion" — the honest sub-line naming ONLY the apps
+// that actually contributed a fused signal this pass (connection- + activity-gated).
+function worldSubline(world: WorldData | null): string {
+  const present = (world?.appsPresent || []).filter(a => a in WORLD_APP_META);
+  const names = APP_ORDER.filter(a => present.includes(a)).map(a => WORLD_APP_META[a].label);
+  if (names.length <= 1) return 'Where each relationship stands right now';
+  const last = names.pop();
+  return `Fused across ${names.join(', ')} & ${last}`;
+}
+
+// A single cross-app fusion chip (an app icon + a short real-fact label). The
+// full evidence line rides in `title` so a hover confirms exactly why it's here.
+function AppChip({ chip }: { chip: WorldAppChip }) {
+  const meta = WORLD_APP_META[chip.app];
+  if (!meta) return null;
+  const Icon = meta.Icon;
+  return (
+    <span
+      title={chip.evidence}
+      className="inline-flex items-center gap-1 text-[10.5px] px-2 py-0.5 rounded-full bg-arcus-elevated border border-arcus-border text-arcus-fg-tertiary"
+    >
+      <Icon className="w-3 h-3 shrink-0" style={{ color: `var(${meta.varName})` }} />
+      {chip.label}
+    </span>
+  );
+}
+
+// A world card — one person/company as a LIVING relationship: status, what it's
+// about, the AI "why now" line, and the fused cross-app chips. The whole card
+// hands its next move to Arcus on click.
+function WorldCard({ e, onHandle }: { e: WorldEntry; onHandle: () => void }) {
+  const s = STATUS_META[e.status];
+  const chips = [...e.apps].sort((a, b) => APP_ORDER.indexOf(a.app) - APP_ORDER.indexOf(b.app));
   return (
     <button
-      onClick={onOpen}
-      className="group text-left rounded-2xl border border-arcus-border bg-arcus-surface hover:bg-arcus-surface-hover hover:border-arcus-fg-muted/30 transition-all p-4"
+      onClick={onHandle}
+      className={cn(
+        'group text-left rounded-2xl border bg-arcus-surface hover:bg-arcus-surface-hover transition-all p-4',
+        e.atRisk ? 'border-rose-500/30 hover:border-rose-500/50' : 'border-arcus-border hover:border-arcus-fg-muted/30',
+      )}
     >
       <div className="flex items-center justify-between gap-2 mb-2">
-        <span className="text-[14px] font-semibold text-arcus-fg truncate">{c.name}</span>
-        <span className={cn('shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-[10.5px] font-medium', s.cls)}>
-          <s.Icon className="w-3 h-3" /> {s.label}
-        </span>
+        <span className="text-[14px] font-semibold text-arcus-fg truncate">{e.name}</span>
+        {e.atRisk ? (
+          <span className="shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-[10.5px] font-medium bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20">
+            <AlertTriangle className="w-3 h-3" /> at risk
+          </span>
+        ) : (
+          <span className={cn('shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-[10.5px] font-medium', s.cls)}>
+            <s.Icon className="w-3 h-3" /> {s.label}
+          </span>
+        )}
       </div>
-      <p className="text-[13px] text-arcus-fg-secondary line-clamp-1 mb-1">{c.subject}</p>
-      <p className="text-[12.5px] text-arcus-fg-tertiary line-clamp-2 leading-relaxed">{c.context}</p>
-      <div className="flex items-center justify-between mt-2.5">
-        <span className="text-[11.5px] text-arcus-fg-muted">{c.when}</span>
+      <p className="text-[13px] text-arcus-fg-secondary line-clamp-1 mb-1">{e.headline}</p>
+      <p className="text-[12.5px] text-arcus-fg-tertiary line-clamp-2 leading-relaxed">{e.whyNow}</p>
+      {chips.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 mt-2.5">
+          {chips.map((c, i) => <AppChip key={`${c.app}-${i}`} chip={c} />)}
+        </div>
+      )}
+      <div className="flex items-center justify-end mt-2.5">
         <span className="inline-flex items-center gap-1 text-[12px] font-medium text-arcus-fg-tertiary group-hover:text-arcus-fg transition-colors">
           Handle it <ChevronRight className="w-3.5 h-3.5" />
         </span>
       </div>
     </button>
+  );
+}
+
+// A "What's slipping" row — an at-risk relationship, its cost-to-miss reason
+// front and center, the fused apps behind it, one click to act.
+function SlippingRow({ e, onHandle }: { e: WorldEntry; onHandle: () => void }) {
+  const chips = [...e.apps].sort((a, b) => APP_ORDER.indexOf(a.app) - APP_ORDER.indexOf(b.app));
+  return (
+    <div className="rounded-2xl border border-rose-500/25 bg-rose-500/[0.06] p-4 flex items-start gap-3">
+      <div className="w-9 h-9 rounded-xl bg-rose-500/10 flex items-center justify-center shrink-0 text-rose-500">
+        <AlertTriangle className="w-4 h-4" />
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-[14px] font-semibold text-arcus-fg truncate">{e.name}</span>
+          <span className="text-[11px] text-rose-600 dark:text-rose-400 font-medium shrink-0">at risk</span>
+        </div>
+        <p className="text-[12.5px] text-arcus-fg-secondary mt-0.5 line-clamp-2 leading-relaxed">
+          {e.riskReason ? e.riskReason.replace(/^[^:]+:\s*/, '') : e.whyNow}
+        </p>
+        {chips.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mt-2">
+            {chips.map((c, i) => <AppChip key={`${c.app}-${i}`} chip={c} />)}
+          </div>
+        )}
+        <div className="flex items-center gap-2 mt-2.5">
+          <button onClick={onHandle} className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-arcus-fg text-arcus-fg-inverse text-[12.5px] font-semibold hover:opacity-90 transition-opacity">
+            <Zap className="w-3.5 h-3.5" /> Handle it
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -1157,78 +1186,78 @@ function AnalyticsSection({ week, weekLoaded, appCounts, recsLoaded, recsError, 
   );
 }
 
-// ── Conversation pulse — status breakdown + which relationships are going
-// quiet fastest. Two real, purely-derived signals rendered as bars rather than
-// a donut (house style: a pie/donut is for part-to-whole "at a glance" with
-// clearly separated segments — these statuses are frequently close in count,
-// which a segmented bar compares far more reliably). Renders nothing under 3
-// conversations: with that few there's nothing meaningful to compare.
-function ConversationPulse({ conversations }: { conversations: Conversation[] }) {
-  const total = conversations.length;
-  const segments = useMemo(() => {
-    const counts: Record<ConvoStatus, number> = { awaiting_you: 0, waiting_on_them: 0, active: 0, meeting_booked: 0 };
-    for (const c of conversations) counts[c.status] = (counts[c.status] || 0) + 1;
-    return STATUS_ORDER.map((s) => ({ status: s, count: counts[s] })).filter((s) => s.count > 0);
-  }, [conversations]);
+// ── "Handled quietly" — the demoted home for everything that reports what
+// MAILIENT did (was two headline sections: "Your week" analytics + "While you
+// were away"). FRAME FLIP (founder feedback: the feed showed "tasks completed
+// by Mailient rather than those performed by the user"): this collapses both
+// into ONE quiet reassurance line at the very bottom of the feed. Nothing is
+// deleted — AnalyticsSection (the glass KPI pills / chart / cross-app donut /
+// insights) and the agent-run list are exactly what shipped before, just
+// nested behind a click instead of being the page's visual anchor. Renders
+// nothing at all until there's real activity to report (never an empty
+// "Handled quietly" line with nothing behind it).
+function HandledQuietlyStrip({
+  week, weekLoaded, appCounts, recsLoaded, recsError, refreshing, onRefresh, onSchedule, agentRuns,
+}: {
+  week: WeekData | null; weekLoaded: boolean; appCounts: AppCounts | null; recsLoaded: boolean; recsError: string | null;
+  refreshing: boolean; onRefresh: () => void; onSchedule: () => void; agentRuns: AgentRunItem[];
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const hasWeek = !!week && week.hasData;
+  if (!weekLoaded) return null; // stay silent while loading rather than reserve footer space
+  if (!hasWeek && agentRuns.length === 0) return null; // genuinely nothing to report yet
 
-  const goingQuiet = useMemo(() => {
-    return conversations
-      .filter((c): c is Conversation & { daysSince: number } => c.status === 'waiting_on_them' && typeof c.daysSince === 'number')
-      .sort((a, b) => b.daysSince - a.daysSince)
-      .slice(0, 4);
-  }, [conversations]);
-  const maxQuiet = Math.max(...goingQuiet.map((c) => c.daysSince), 1);
-
-  if (total < 3) return null;
+  const totalRuns = week?.totalRuns ?? 0;
+  const totalActions = week?.totalActions ?? 0;
+  const summary = hasWeek
+    ? `${totalRuns} run${totalRuns === 1 ? '' : 's'}, ${totalActions} action${totalActions === 1 ? '' : 's'} this week`
+    : `${agentRuns.length} recent run${agentRuns.length === 1 ? '' : 's'}`;
 
   return (
-    <div className="rounded-2xl border border-arcus-border bg-arcus-surface p-4 mb-2.5 grid sm:grid-cols-2 gap-5">
-      <div>
-        <p className="text-[11px] font-semibold uppercase tracking-wide text-arcus-fg-tertiary mb-2.5">Where things stand</p>
-        <div className="h-2.5 w-full rounded-full overflow-hidden flex gap-0.5 bg-arcus-elevated">
-          {segments.map((seg) => (
-            <div
-              key={seg.status}
-              className={cn(STATUS_META[seg.status].fill, 'h-full first:rounded-l-full last:rounded-r-full')}
-              style={{ width: `${(seg.count / total) * 100}%` }}
-              title={`${STATUS_META[seg.status].label}: ${seg.count}`}
-            />
-          ))}
-        </div>
-        <div className="flex flex-wrap gap-x-3 gap-y-1.5 mt-2.5">
-          {segments.map((seg) => (
-            <span key={seg.status} className="inline-flex items-center gap-1.5 text-[11.5px] text-arcus-fg-tertiary">
-              <span className={cn('w-2 h-2 rounded-full shrink-0', STATUS_META[seg.status].fill)} />
-              {STATUS_META[seg.status].label} <span className="text-arcus-fg-secondary font-semibold tabular-nums">{seg.count}</span>
-            </span>
-          ))}
-        </div>
-      </div>
-
-      {goingQuiet.length > 0 && (
-        <div>
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-arcus-fg-tertiary mb-2.5">Going quiet</p>
-          <div className="space-y-2">
-            {goingQuiet.map((c) => (
-              <div key={c.key} tabIndex={0} className="group flex items-center gap-2.5 rounded-lg outline-none focus-visible:ring-1 focus-visible:ring-arcus-fg-muted">
-                <span className="text-[12.5px] text-arcus-fg-secondary w-20 shrink-0 truncate">{c.name}</span>
-                <div className="flex-1 h-2 rounded-full bg-arcus-elevated overflow-hidden">
-                  <div
-                    className="h-full rounded-full bg-amber-500 transition-[width] duration-500 ease-out"
-                    style={{ width: `${Math.max((c.daysSince / maxQuiet) * 100, 6)}%` }}
-                  />
+    <div className="pt-1 border-t border-arcus-border/60">
+      <button
+        onClick={() => setExpanded((v) => !v)}
+        aria-expanded={expanded}
+        className="w-full flex items-center justify-between gap-2 py-3 text-left group"
+      >
+        <span className="inline-flex items-center gap-2 text-[12.5px] text-arcus-fg-tertiary group-hover:text-arcus-fg-secondary transition-colors">
+          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500/70 shrink-0" />
+          Handled quietly · {summary}
+        </span>
+        <ChevronRight className={cn('w-3.5 h-3.5 text-arcus-fg-tertiary shrink-0 transition-transform duration-200', expanded && 'rotate-90')} />
+      </button>
+      <AnimatePresence initial={false}>
+        {expanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+            className="overflow-hidden"
+          >
+            <div className="pb-2 space-y-4">
+              {hasWeek && (
+                <AnalyticsSection
+                  week={week} weekLoaded={weekLoaded} appCounts={appCounts} recsLoaded={recsLoaded}
+                  recsError={recsError} refreshing={refreshing} onRefresh={onRefresh} onSchedule={onSchedule}
+                />
+              )}
+              {agentRuns.length > 0 && (
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-arcus-fg-tertiary mb-2">While you were away</p>
+                  <div className="space-y-2">
+                    {agentRuns.slice(0, 4).map((r) => <AgentRunRow key={r.id} run={r} />)}
+                  </div>
                 </div>
-                <span className="text-[11.5px] text-arcus-fg-tertiary tabular-nums w-9 text-right shrink-0 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity duration-200">
-                  {c.daysSince}d
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
+
 
 function CommandCenterSkeleton() {
   return (

@@ -17,12 +17,10 @@
 import { NextResponse } from 'next/server';
 // @ts-ignore — JS module
 import { auth } from '@/lib/auth.js';
-import { getGmailToken, getGcalToken, getNotionToken, getSlackToken, googleFetch } from '@/lib/arcus/tools/http-tokens';
-// @ts-ignore — JS module
-import { getSupabaseAdmin } from '@/lib/supabase.js';
-// @ts-ignore — JS module
-import { CalComService } from '@/lib/calcom.js';
 import { getBriefingPrefs, type BriefingPrefs } from '@/lib/arcus/briefing-prefs';
+// The five cross-app gatherers now live in the SHARED module so /world can fuse
+// them too — this route just consumes their output (unchanged behavior for it).
+import { gatherServerSignals, cleanName, type GatheredSignal } from '@/lib/home-feed/gather';
 import { logEvent } from "@/lib/logsso";
 
 export const dynamic = 'force-dynamic';
@@ -44,9 +42,6 @@ type Category = 'connect' | 'productivity';
 // integer is trivial to copy back, so matching is reliable.
 type SignalKind = 'decide' | 'chase' | 'promised' | 'meeting' | 'bounce' | 'booking' | 'notion' | 'slack';
 interface InItem { ref: number; kind: SignalKind; label: string; detail: string; metric?: number; }
-
-// A server-gathered cross-app signal (before it's assigned a numeric ref).
-interface RawSignal { kind: SignalKind; label: string; detail: string; metric?: number; }
 
 // Which app a kind belongs to — drives the "spanned N apps" footer and the prompt.
 const APP_OF: Record<SignalKind, string> = {
@@ -95,19 +90,6 @@ function keys(): string[] {
 
 function clampStr(v: any, max: number): string {
   return typeof v === 'string' ? v.trim().slice(0, max) : '';
-}
-
-// Display-clean a sender/recipient name: strip an email down to its local part,
-// drop quotes/extra whitespace, and Title-Case it so raw fragments like "nand"
-// or "ANAND.K" don't reach the UI looking broken.
-function cleanName(raw: any): string {
-  let s = clampStr(raw, 80).replace(/^["'<]+|["'>]+$/g, '').trim();
-  if (!s) return '';
-  if (s.includes('@')) s = s.split('@')[0].replace(/[._-]+/g, ' ').trim();
-  return s
-    .split(/\s+/)
-    .map(w => (w.length <= 3 && w === w.toUpperCase() ? w : w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()))
-    .join(' ');
 }
 
 // Build the real, id-tagged item list the model is allowed to reference.
@@ -375,208 +357,6 @@ function validate(raw: any[], items: InItem[], maxRecs: number): OutRec[] {
   return out;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Cross-app signal gathering — server-side, gated implicitly by token presence.
-// Each gatherer is fully self-contained, bounded, and fail-soft: if the app isn't
-// connected (no token) or the call errors/times out, it returns [] and never
-// blocks the others. Everything it surfaces is a REAL item the LLM may reference.
-// ─────────────────────────────────────────────────────────────────────────────
-
-const FETCH_TIMEOUT_MS = 3500;
-
-function raceTimeout<T>(p: Promise<T>, ms: number): Promise<T> {
-  return Promise.race([p, new Promise<T>((_, rej) => setTimeout(() => rej(new Error('timeout')), ms))]);
-}
-function daysSince(iso: string): number {
-  const t = new Date(iso).getTime();
-  if (!Number.isFinite(t)) return 0;
-  return Math.max(0, Math.floor((Date.now() - t) / 86_400_000));
-}
-function firstEmail(text: string): string {
-  const m = (text || '').match(/[\w.+-]+@[\w-]+\.[\w.-]+/);
-  return m ? m[0] : '';
-}
-
-// Gmail — bounced sends (mailer-daemon / delivery failures) in the last 5 days.
-async function gatherGmailBounces(userEmail: string): Promise<RawSignal[]> {
-  const token = await getGmailToken(userEmail);
-  if (!token) return [];
-  const auth = { Authorization: `Bearer ${token}` };
-  const q = encodeURIComponent('(from:mailer-daemon OR subject:"Delivery Status Notification" OR subject:"Undelivered") newer_than:5d');
-  const listRes = await googleFetch(userEmail, 'gmail', `https://gmail.googleapis.com/gmail/v1/users/me/messages?q=${q}&maxResults=4`, { headers: auth });
-  if (!listRes.ok) return [];
-  const list = await listRes.json();
-  const ids: string[] = (list.messages || []).map((m: any) => m.id).slice(0, 3);
-  const msgs = await Promise.all(ids.map(async (id) => {
-    try {
-      const r = await googleFetch(userEmail, 'gmail', `https://gmail.googleapis.com/gmail/v1/users/me/messages/${id}?format=metadata&metadataHeaders=Subject`, { headers: auth });
-      if (!r.ok) return null;
-      return await r.json();
-    } catch {
-      logEvent({ channel: "failures", event: "❌ API Error", description: "Unknown error" }); return null; }
-  }));
-  const out: RawSignal[] = [];
-  const seen = new Set<string>();
-  for (const m of msgs) {
-    const failed = firstEmail(m?.snippet || '');
-    if (!failed || failed.includes('mailer-daemon') || seen.has(failed)) continue;
-    seen.add(failed);
-    out.push({ kind: 'bounce', label: failed, detail: `Your email to ${failed} bounced (delivery failed) — likely a bad or mistyped address` });
-  }
-  return out;
-}
-
-// Google Calendar / Meet — upcoming meetings (next 2 days) that have a Meet link
-// but NO agenda/description: a real "walk in prepared" signal the client buckets lack.
-async function gatherCalendarPrep(userEmail: string): Promise<RawSignal[]> {
-  const token = await getGcalToken(userEmail);
-  if (!token) return [];
-  const now = new Date();
-  const end = new Date(now.getTime() + 2 * 86_400_000);
-  const url = `https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin=${now.toISOString()}&timeMax=${end.toISOString()}&singleEvents=true&orderBy=startTime&maxResults=12`;
-  const res = await googleFetch(userEmail, 'gcal', url, { headers: { Authorization: `Bearer ${token}` } });
-  if (!res.ok) return [];
-  const data = await res.json();
-  const out: RawSignal[] = [];
-  for (const ev of (data.items || [])) {
-    if (out.length >= 3) break;
-    if (!ev.start?.dateTime) continue; // skip all-day
-    const attendees = ev.attendees || [];
-    if (attendees.length === 0) continue; // skip solo blocks
-    const hasMeet = !!(ev.hangoutLink || ev.conferenceData?.entryPoints?.some((e: any) => e.entryPointType === 'video'));
-    const hasAgenda = !!(ev.description && String(ev.description).trim().length > 20);
-    if (!hasMeet || hasAgenda) continue; // only surface Meet calls with no agenda
-    const when = new Date(ev.start.dateTime).toLocaleString('en-US', { weekday: 'short', hour: 'numeric', minute: '2-digit' });
-    out.push({ kind: 'meeting', label: clampStr(ev.summary, 80) || 'A meeting', detail: `Google Meet "${clampStr(ev.summary, 80) || 'meeting'}" at ${when}, ${attendees.length} attendees — no agenda set` });
-  }
-  return out;
-}
-
-// Cal.com — upcoming bookings (next 7 days) that may need prep.
-async function getCalClientLocal(userEmail: string): Promise<any | null> {
-  try {
-    const supabase = getSupabaseAdmin();
-    const { data } = await supabase.from('integration_credentials').select('access_token').eq('user_email', userEmail.toLowerCase()).eq('provider', 'cal_com').maybeSingle();
-    const k = (data?.access_token || '').trim();
-    if (k) return new CalComService(k);
-  } catch {
-    logEvent({ channel: "failures", event: "❌ API Error", description: "Unknown error" }); /* fall through */ }
-  const shared = (process.env.CAL_API_KEY || '').trim();
-  return (shared && process.env.CAL_ALLOW_SHARED_KEY === 'true') ? new CalComService(shared) : null;
-}
-async function gatherCalcom(userEmail: string): Promise<RawSignal[]> {
-  const cal = await getCalClientLocal(userEmail);
-  if (!cal) return [];
-  let bookings: any[] = [];
-  try { bookings = await raceTimeout(cal.getBookings(), FETCH_TIMEOUT_MS); } catch {
-    logEvent({ channel: "failures", event: "❌ API Error", description: "Unknown error" }); return []; }
-  if (!Array.isArray(bookings)) return [];
-  const now = Date.now();
-  const horizon = now + 7 * 86_400_000;
-  const upcoming = bookings
-    .filter((b) => { const t = new Date(b.startTime || b.start).getTime(); return Number.isFinite(t) && t > now && t < horizon && (b.status || 'accepted') !== 'cancelled'; })
-    .sort((a, b) => new Date(a.startTime || a.start).getTime() - new Date(b.startTime || b.start).getTime())
-    .slice(0, 3);
-  return upcoming.map((b) => {
-    const who = cleanName(b.attendees?.[0]?.name || b.attendees?.[0]?.email) || 'someone';
-    const when = new Date(b.startTime || b.start).toLocaleString('en-US', { weekday: 'short', hour: 'numeric', minute: '2-digit' });
-    return { kind: 'booking', label: who, detail: `Cal.com booking "${clampStr(b.title, 80) || 'Meeting'}" with ${who} on ${when} (${b.status || 'accepted'})` };
-  });
-}
-
-// Notion — most recently edited pages (active context the LLM can join to email threads).
-function notionTitle(page: any): string {
-  const props = page?.properties || {};
-  for (const key of Object.keys(props)) {
-    const p = props[key];
-    if (p?.type === 'title' && Array.isArray(p.title)) {
-      const t = p.title.map((x: any) => x?.plain_text || '').join('').trim();
-      if (t) return t;
-    }
-  }
-  return '';
-}
-async function gatherNotion(userEmail: string): Promise<RawSignal[]> {
-  const token = await getNotionToken(userEmail);
-  if (!token) return [];
-  const res = await fetch('https://api.notion.com/v1/search', {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json', 'Notion-Version': '2022-06-28' },
-    body: JSON.stringify({ filter: { property: 'object', value: 'page' }, sort: { direction: 'descending', timestamp: 'last_edited_time' }, page_size: 6 }),
-    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
-  });
-  if (!res.ok) return [];
-  const data = await res.json();
-  const out: RawSignal[] = [];
-  for (const p of (data.results || [])) {
-    if (out.length >= 3) break;
-    const title = notionTitle(p);
-    if (!title) continue;
-    const days = daysSince(p.last_edited_time);
-    out.push({ kind: 'notion', label: clampStr(title, 80), detail: `Notion page "${clampStr(title, 80)}" — last edited ${days}d ago`, metric: days });
-  }
-  return out;
-}
-
-// Slack — DMs whose latest message is from someone else (awaiting your reply).
-async function gatherSlack(userEmail: string): Promise<RawSignal[]> {
-  const token = await getSlackToken(userEmail);
-  if (!token) return [];
-  const auth = { Authorization: `Bearer ${token}` };
-  let myId = '';
-  try {
-    const a = await (await fetch('https://slack.com/api/auth.test', { method: 'POST', headers: auth, signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) })).json();
-    if (!a.ok) return [];
-    myId = a.user_id;
-  } catch {
-    logEvent({ channel: "failures", event: "❌ API Error", description: "Unknown error" }); return []; }
-  let ims: any;
-  try {
-    ims = await (await fetch('https://slack.com/api/conversations.list?types=im&limit=20', { headers: auth, signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) })).json();
-  } catch {
-    logEvent({ channel: "failures", event: "❌ API Error", description: "Unknown error" }); return []; }
-  if (!ims?.ok) return [];
-  const channels = (ims.channels || []).slice(0, 6);
-  const checked = await Promise.all(channels.map(async (ch: any) => {
-    try {
-      const h = await (await fetch(`https://slack.com/api/conversations.history?channel=${ch.id}&limit=1`, { headers: auth, signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) })).json();
-      const last = h?.messages?.[0];
-      if (last && last.user && last.user !== myId && !last.bot_id) {
-        return { user: ch.user || last.user, text: String(last.text || '').replace(/<[^>]+>/g, '').trim() };
-      }
-    } catch {
-      logEvent({ channel: "failures", event: "❌ API Error", description: "Unknown error" }); /* ignore */ }
-    return null;
-  }));
-  const waiting = checked.filter(Boolean).slice(0, 3) as Array<{ user: string; text: string }>;
-  if (!waiting.length) return [];
-  // Resolve the sender names (one users.info each, in parallel, best-effort).
-  const named = await Promise.all(waiting.map(async (w) => {
-    try {
-      const u = await (await fetch(`https://slack.com/api/users.info?user=${w.user}`, { headers: auth, signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) })).json();
-      const name = u?.user?.real_name || u?.user?.profile?.display_name || '';
-      return { name: cleanName(name) || 'A teammate', text: w.text };
-    } catch {
-      logEvent({ channel: "failures", event: "❌ API Error", description: "Unknown error" }); return { name: 'A teammate', text: w.text }; }
-  }));
-  return named.map((n) => ({ kind: 'slack', label: n.name, detail: `Slack DM from ${n.name} is waiting on your reply: "${n.text.slice(0, 90)}"` }));
-}
-
-// Only fetch from the apps the user left enabled in Customize Briefing — saves
-// latency and respects the toggle. (No token → the gatherer returns [] anyway.)
-async function gatherServerSignals(userEmail: string, apps: BriefingPrefs['apps']): Promise<RawSignal[]> {
-  const tasks: Promise<RawSignal[]>[] = [];
-  if (apps.gmail) tasks.push(gatherGmailBounces(userEmail));
-  if (apps.calendar) tasks.push(gatherCalendarPrep(userEmail));
-  if (apps.calcom) tasks.push(gatherCalcom(userEmail));
-  if (apps.notion) tasks.push(gatherNotion(userEmail));
-  if (apps.slack) tasks.push(gatherSlack(userEmail));
-  const results = await Promise.allSettled(tasks);
-  const out: RawSignal[] = [];
-  for (const r of results) if (r.status === 'fulfilled' && Array.isArray(r.value)) out.push(...r.value);
-  return out;
-}
-
 // Drop client-bucket items for apps the user toggled off (promised/notes always
 // stay — they're the user's own commitments, not an app feed).
 function filterByApps(items: InItem[], apps: BriefingPrefs['apps']): InItem[] {
@@ -590,7 +370,7 @@ function filterByApps(items: InItem[], apps: BriefingPrefs['apps']): InItem[] {
 
 // Continue the numeric-ref counter from the client items so every signal — local
 // or cross-app — shares one ref space the model echoes back.
-function appendServerSignals(items: InItem[], signals: RawSignal[]): InItem[] {
+function appendServerSignals(items: InItem[], signals: GatheredSignal[]): InItem[] {
   let ref = items.length; // normalizeItems assigned refs 1..items.length
   const merged = [...items];
   for (const s of signals.slice(0, 12)) {
