@@ -29,6 +29,15 @@ export const CHANGELOG: ChangelogGroup[] = [
     date: 'July 25, 2026',
     entries: [
       {
+        tag: 'New',
+        title: 'See — and connect — your whole stack, right from home',
+        points: [
+          'A new “Your stack” strip shows every app that feeds your world — Gmail, Calendar, Meet, Notion, Slack, Cal.com — with the connected ones lit up and the rest one tap away. Connect more and your relationship cards start fusing those people’s meetings, docs, and messages automatically.',
+          'Newsletters, marketing blasts, and shop or order notifications no longer masquerade as relationships — they’re filtered out before they ever reach a card, so “your world” is only real people.',
+          'A cleaner, calmer, more premium home: frosted-glass cards, a soft textured backdrop behind the greeting, and lighter, more Apple-like spacing — less boxy, easier to scan.',
+        ],
+      },
+      {
         tag: 'Improved',
         title: 'Your world cards now read the actual conversation — not just the subject line',
         points: [

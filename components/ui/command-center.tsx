@@ -26,7 +26,7 @@
  * rather than reproducing a streaming editor here.
  */
 
-import { useEffect, useMemo, useState, useCallback, useId } from 'react';
+import { useEffect, useMemo, useState, useCallback, useId, useRef, lazy, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -37,10 +37,17 @@ import {
 import {
   Sparkles, Mail, Calendar, Clock, ArrowRight, MessageSquare,
   CheckCircle2, Reply, CalendarPlus, Inbox, Zap, ChevronRight, AlertTriangle,
-  FileText, Hash, RefreshCw, Quote,
+  FileText, Hash, RefreshCw, Quote, Check, Plus, Layers,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { TokenExpiryAlert } from './token-expiry-alert';
+import { ConnectorsModal, SUPPORTED_APPS } from './connectors-modal';
+
+// The dithering shader (WebGL, animates per frame) is the same premium texture
+// the landing CTA uses. Lazy + in-view gated so it never renders unseen.
+const Dithering = lazy(() =>
+  import('@paper-design/shaders-react').then((m) => ({ default: m.Dithering })),
+);
 
 // ── Data shapes (mirror /api/home-feed/today + week-activity) ───────────────────
 interface DecideItem { id: string; threadId: string; sender: { name: string; email: string }; subject: string; reason: string; receivedAt: string; gmailUrl: string; signals?: string[]; }
@@ -163,6 +170,14 @@ export function CommandCenter({ userName, onOpenExistingDraft }: {
   // request is still in flight.
   const [weekLoaded, setWeekLoaded] = useState(() => !!readCache('cc_week'));
   const [recsLoaded, setRecsLoaded] = useState(() => !!readCache('cc_appcounts') || !!readCache('cc_sift'));
+  // Cross-app connection state for the "Your stack" strip. null until the first
+  // status fetch resolves (slim skeleton instead of a wrong "0 connected" flash);
+  // cached as an array (a Set isn't JSON) so a revisit paints instantly.
+  const [connectedApps, setConnectedApps] = useState<Set<string> | null>(() => {
+    const c = readCache<string[]>('cc_stack');
+    return Array.isArray(c) ? new Set(c) : null;
+  });
+  const [showConnectors, setShowConnectors] = useState(false);
 
   const openArcus = useCallback((prompt: string) => {
     try { sessionStorage.setItem('arcus_prefill', prompt); } catch { /* incognito */ }
@@ -188,6 +203,23 @@ export function CommandCenter({ userName, onOpenExistingDraft }: {
       const r = await fetch('/api/home-feed/world?refresh=1');
       if (r.ok) { const j = await r.json(); setWorld(j); writeCache('cc_world', j); }
     } catch { /* leave the error card up */ }
+  }, []);
+
+  // Which apps are connected — powers the "Your stack" strip. Fail-soft: on any
+  // error, resolve to an empty set (strip renders, everything shows connectable)
+  // rather than leaving the strip stuck on its skeleton.
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        const r = await fetch('/api/integrations/status');
+        if (!r.ok) { if (alive) setConnectedApps(prev => prev ?? new Set()); return; }
+        const j = await r.json();
+        const set = new Set<string>((j?.integrations || []).filter((i: any) => i?.connected).map((i: any) => String(i.provider)));
+        if (alive) { setConnectedApps(set); writeCache('cc_stack', [...set]); }
+      } catch { if (alive) setConnectedApps(prev => prev ?? new Set()); }
+    })();
+    return () => { alive = false; };
   }, []);
 
   // "Needs a reply" → Draft reply: check for an already-existing Gmail draft on
@@ -403,8 +435,11 @@ export function CommandCenter({ userName, onOpenExistingDraft }: {
           />
         </div>
       )}
-      {/* 1 ── HERO ──────────────────────────────────────────────────────────── */}
-      <motion.section initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+      {/* 1 ── HERO — greeting + Sift line + world stats, over a faint dither
+          texture (the premium accent, in-view gated + reduced-motion safe). ─── */}
+      <motion.section initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="relative -mx-2 px-2 py-3 sm:-mx-4 sm:px-4">
+        <DitherAmbient />
+        <div className="relative z-10">
         <p className="text-[13px] font-medium text-arcus-fg-tertiary">{dateLabel}</p>
         <h1 className="mt-1 text-[28px] sm:text-[34px] font-semibold tracking-tight text-arcus-fg">
           {greeting}{userName ? `, ${userName}` : ''}.
@@ -440,7 +475,15 @@ export function CommandCenter({ userName, onOpenExistingDraft }: {
           <StatTile icon={<Clock className="w-4 h-4" />} value={stats.awaiting} label="awaiting reply" tone="calm" />
           <StatTile icon={<CheckCircle2 className="w-4 h-4" />} value={stats.toClose} label="to close" tone={overdueCount > 0 ? 'attn' : 'calm'} />
         </div>
+        </div>
       </motion.section>
+
+      {/* 1.5 ── YOUR STACK — cross-app connection surface. Makes the fusion
+          VISIBLE and one tap away: connected apps light up, the rest invite a
+          connect. Skeleton until the status fetch resolves. ────────────────── */}
+      {connectedApps
+        ? <YourStack connected={connectedApps} onManage={() => setShowConnectors(true)} />
+        : <div className="arcus-glass-card rounded-2xl h-[104px] animate-pulse" />}
 
       {/* 2 ── WHAT'S SLIPPING — the loss-aversion lane. What's genuinely at risk
           ACROSS every app, ranked by cost-to-miss. A founder loses deals by never
@@ -579,6 +622,25 @@ export function CommandCenter({ userName, onOpenExistingDraft }: {
         onSchedule={() => openArcus('Set up a scheduled agent that gives me a morning briefing every weekday at 8am.')}
         agentRuns={today?.agentRuns || []}
       />
+
+      {/* The connect flow itself — opened from the "Your stack" strip. Self-
+          contained (handles its own OAuth redirects + status). On close, refetch
+          status so a just-connected app flips to "connected" without a reload. */}
+      <ConnectorsModal
+        isOpen={showConnectors}
+        onClose={() => {
+          setShowConnectors(false);
+          fetch('/api/integrations/status')
+            .then(r => r.ok ? r.json() : null)
+            .then(j => {
+              if (!j?.integrations) return;
+              const set = new Set<string>(j.integrations.filter((i: any) => i?.connected).map((i: any) => String(i.provider)));
+              setConnectedApps(set);
+              writeCache('cc_stack', [...set]);
+            })
+            .catch(() => {});
+        }}
+      />
     </div>
   );
 }
@@ -630,7 +692,7 @@ function Section({ title, sub, action, children }: { title: string; sub?: string
 
 function StatTile({ icon, value, label, tone }: { icon: React.ReactNode; value: number; label: string; tone: 'attn' | 'calm' | 'good' }) {
   return (
-    <div className="rounded-2xl border border-arcus-border bg-arcus-surface px-4 py-3.5">
+    <div className="rounded-2xl arcus-glass-card px-4 py-3.5">
       <div className={cn(
         'inline-flex items-center justify-center w-8 h-8 rounded-xl mb-2',
         tone === 'attn' ? 'bg-amber-500/10 text-amber-500'
@@ -693,6 +755,104 @@ function ReceiptQuote({ text }: { text: string }) {
   );
 }
 
+// ── Dither ambient — a slow, faint, in-view-gated WebGL texture behind the hero.
+// The premium "dither" accent, kept low-opacity + slow so it reads as texture,
+// not motion. Honors prefers-reduced-motion by simply never mounting the shader,
+// and unmounts when scrolled away so it never animates unseen ([[landing-perf]]).
+function DitherAmbient() {
+  const ref = useRef<HTMLDivElement>(null);
+  const [active, setActive] = useState(false);
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches) return;
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => setActive(e.isIntersecting), { rootMargin: '120px' });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  return (
+    <div ref={ref} aria-hidden className="absolute inset-0 z-0 overflow-hidden rounded-3xl pointer-events-none">
+      {active && (
+        <Suspense fallback={null}>
+          <div
+            className="absolute -inset-x-[15%] -top-[60%] h-[240%] opacity-[0.07] dark:opacity-[0.12]"
+            style={{
+              maskImage: 'radial-gradient(115% 85% at 12% 25%, #000 0%, #000 38%, transparent 74%)',
+              WebkitMaskImage: 'radial-gradient(115% 85% at 12% 25%, #000 0%, #000 38%, transparent 74%)',
+            }}
+          >
+            <Dithering colorBack="#00000000" colorFront="#6f6f6f" shape="warp" type="4x4" speed={0.06} className="size-full" minPixelRatio={1} />
+          </div>
+        </Suspense>
+      )}
+    </div>
+  );
+}
+
+// ── Your stack — the cross-app connection surface. It makes the fusion VISIBLE:
+// which apps are wired into your world (full-color, checked) and which aren't
+// (dimmed, one tap to connect). This is what turns a Gmail-only feed into a
+// whole-workday command center — connect Calendar/Notion/Slack/Meet/Cal.com and
+// the world cards start fusing those people's signals. One tap opens the modal.
+const STACK_APP_IDS = ['gmail', 'google_calendar', 'google_meet', 'notion', 'slack', 'cal_com'];
+
+function YourStack({ connected, onManage }: { connected: Set<string>; onManage: () => void }) {
+  const apps = STACK_APP_IDS
+    .map(id => SUPPORTED_APPS.find(a => a.id === id))
+    .filter(Boolean) as typeof SUPPORTED_APPS;
+  const count = apps.filter(a => connected.has(a.id)).length;
+  const all = count === apps.length;
+  return (
+    <motion.section initial={{ opacity: 0, y: 8 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-40px' }} transition={{ duration: 0.4 }}>
+      <div className="arcus-glass-card rounded-2xl p-4 sm:p-[18px]">
+        <div className="flex items-center justify-between gap-3 mb-3.5">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <span className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-arcus-elevated text-arcus-fg-tertiary shrink-0">
+              <Layers className="w-3.5 h-3.5" />
+            </span>
+            <div className="min-w-0">
+              <h2 className="text-[14.5px] font-semibold tracking-tight text-arcus-fg leading-tight">Your stack</h2>
+              <p className="text-[12px] text-arcus-fg-tertiary leading-tight mt-0.5">
+                {all ? 'Every app is fused into your world' : `${count} of ${apps.length} connected · connect more to see your whole world fuse`}
+              </p>
+            </div>
+          </div>
+          <button onClick={onManage} className="shrink-0 inline-flex items-center gap-1 text-[12.5px] font-medium text-arcus-fg-secondary hover:text-arcus-fg transition-colors">
+            Manage <ArrowRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {apps.map(app => {
+            const on = connected.has(app.id);
+            const Icon = app.icon as any;
+            return (
+              <button
+                key={app.id}
+                onClick={onManage}
+                title={on ? `${app.name} — connected` : `Connect ${app.name}`}
+                className={cn(
+                  'group inline-flex items-center gap-2 h-9 pl-2.5 pr-2.5 rounded-xl border transition-all duration-200',
+                  on
+                    ? 'border-arcus-border bg-arcus-elevated/60'
+                    : 'border-arcus-border/60 hover:bg-arcus-elevated/40 hover:border-arcus-fg-muted/40 hover:-translate-y-px',
+                )}
+              >
+                <span className={cn('inline-flex items-center justify-center w-[18px] h-[18px] shrink-0 transition-all', on ? '' : 'grayscale opacity-40 group-hover:opacity-70')}>
+                  <Icon className="w-[18px] h-[18px]" />
+                </span>
+                <span className={cn('text-[12.5px] font-medium', on ? 'text-arcus-fg' : 'text-arcus-fg-tertiary')}>{app.name}</span>
+                {on
+                  ? <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0" strokeWidth={2.5} />
+                  : <Plus className="w-3.5 h-3.5 text-arcus-fg-muted shrink-0 group-hover:text-arcus-fg-tertiary" />}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </motion.section>
+  );
+}
+
 // "Across Gmail, Calendar & Notion" — the honest sub-line naming ONLY the apps
 // that actually contributed a fused signal this pass (connection- + activity-gated).
 function worldSubline(world: WorldData | null): string {
@@ -734,8 +894,8 @@ function WorldCard({ e, onHandle }: { e: WorldEntry; onHandle: () => void }) {
     <button
       onClick={onHandle}
       className={cn(
-        'group text-left rounded-2xl border bg-arcus-surface hover:bg-arcus-surface-hover transition-all duration-200 p-4 hover:-translate-y-0.5',
-        e.atRisk ? 'border-rose-500/30 hover:border-rose-500/50' : 'border-arcus-border hover:border-arcus-fg-muted/30',
+        'group text-left rounded-2xl arcus-glass-card arcus-glass-hover p-4',
+        e.atRisk && 'ring-1 ring-rose-500/30',
       )}
     >
       <div className="flex items-center justify-between gap-2 mb-2">
@@ -782,7 +942,7 @@ function SlippingRow({ e, onHandle }: { e: WorldEntry; onHandle: () => void }) {
   const chips = e.apps.filter(c => c.app !== 'gmail').sort((a, b) => APP_ORDER.indexOf(a.app) - APP_ORDER.indexOf(b.app));
   const receipt = e.receipts?.[0];
   return (
-    <div className="rounded-2xl border border-rose-500/25 bg-rose-500/[0.06] p-4 flex items-start gap-3">
+    <div className="rounded-2xl border border-rose-500/25 bg-rose-500/[0.07] backdrop-blur-xl p-4 flex items-start gap-3 shadow-[0_16px_40px_-24px_rgba(225,29,72,0.25)]">
       <div className="w-9 h-9 rounded-xl bg-rose-500/10 flex items-center justify-center shrink-0 text-rose-500">
         <AlertTriangle className="w-4 h-4" />
       </div>
@@ -819,7 +979,7 @@ function SlippingRow({ e, onHandle }: { e: WorldEntry; onHandle: () => void }) {
 
 function ReplyRow({ who, subject, reason, when, signals, onDraft, onOpen }: { who: string; subject: string; reason: string; when: string; signals?: string[]; onDraft: () => void; onOpen: () => void }) {
   return (
-    <div className="rounded-2xl border border-arcus-border bg-arcus-surface p-4 flex items-start gap-3">
+    <div className="rounded-2xl arcus-glass-card p-4 flex items-start gap-3">
       <div className="w-9 h-9 rounded-xl bg-arcus-elevated flex items-center justify-center shrink-0 text-arcus-fg-tertiary">
         <Mail className="w-4 h-4" />
       </div>
@@ -852,7 +1012,7 @@ function ReplyRow({ who, subject, reason, when, signals, onDraft, onOpen }: { wh
 
 function MeetingRow({ title, start, attendeeCount, isExternal, meetLink, onPrep }: { title: string; start: string; attendeeCount: number; isExternal: boolean; meetLink: string | null; onPrep: () => void }) {
   return (
-    <div className="rounded-2xl border border-arcus-border bg-arcus-surface p-4 flex items-center gap-3">
+    <div className="rounded-2xl arcus-glass-card p-4 flex items-center gap-3">
       <div className="flex flex-col items-center justify-center w-14 shrink-0">
         <span className="text-[15px] font-semibold text-arcus-fg tabular-nums leading-none">{clockTime(start)}</span>
         <span className="text-[10.5px] text-arcus-fg-muted mt-1">{relTime(start)}</span>
@@ -907,7 +1067,7 @@ function CommitmentRow({ item, onDo }: { item: any; onDo: () => void }) {
 
 function RecCard({ r, onDo }: { r: Rec; onDo: () => void }) {
   return (
-    <button onClick={onDo} className="group text-left rounded-2xl border border-arcus-border bg-arcus-surface hover:bg-arcus-surface-hover transition-all p-4">
+    <button onClick={onDo} className="group text-left rounded-2xl arcus-glass-card arcus-glass-hover p-4">
       <div className="flex items-start justify-between gap-2 mb-1.5">
         <span className="text-[14px] font-semibold text-arcus-fg leading-snug">{r.title}</span>
         {r.atRisk && (
@@ -929,7 +1089,7 @@ function AgentRunRow({ run }: { run: AgentRunItem }) {
   const chips = (['gmail', 'calendar', 'notion', 'slack'] as const)
     .map(k => ({ k, n: run.artifactCounts[k] })).filter(x => x.n > 0);
   return (
-    <div className="rounded-2xl border border-arcus-border bg-arcus-surface p-4 flex items-start gap-3">
+    <div className="rounded-2xl arcus-glass-card p-4 flex items-start gap-3">
       <div className={cn('w-9 h-9 rounded-xl flex items-center justify-center shrink-0',
         run.status === 'error' || run.status === 'transient_error' ? 'bg-rose-500/10 text-rose-500' : 'bg-emerald-500/10 text-emerald-500')}>
         {run.status === 'running' ? <Clock className="w-4 h-4 animate-pulse" /> : <CheckCircle2 className="w-4 h-4" />}
