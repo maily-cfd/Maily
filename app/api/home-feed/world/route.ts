@@ -49,6 +49,10 @@ const MAX_ENTITIES = 8;
 
 export type WorldApp = 'gmail' | 'calendar' | 'notion' | 'slack' | 'calcom';
 
+/** What kind of relationship this is — inferred ONLY from a clear keyword signal
+ *  in the real thread text, never from a name/guess. Undefined = no badge shown. */
+export type RelationshipKind = 'investor' | 'candidate' | 'customer' | 'lead' | 'vendor' | 'press';
+
 export interface WorldAppChip {
   app: WorldApp;
   /** Short real-fact chip text ("quiet 8d", "Thu 2:00 PM", "page stale 12d"). */
@@ -66,6 +70,11 @@ export interface WorldEntry {
   headline: string;
   /** One-liner: why this deserves attention now. AI-sharpened; deterministic real-fact base. */
   whyNow: string;
+  /** Inferred relationship kind (grounded in thread keywords) — a card badge. */
+  kind?: RelationshipKind;
+  /** Verbatim "receipts" from the latest message — the actual ask, promise, date,
+   *  or amount. This is the depth: the card shows what was really said. */
+  receipts?: string[];
   /** Per-app fused chips — the cross-app life of this relationship. */
   apps: WorldAppChip[];
   atRisk: boolean;
@@ -138,6 +147,52 @@ function findEntityFor(
   return null;
 }
 
+// ── Depth: receipts + relationship kind (verbatim, grounded, conservative) ────
+
+/** Pull up to 3 concrete "receipts" from the latest message body — the real asks,
+ *  questions, commitments, dates and amounts, verbatim (lightly trimmed). This is
+ *  what turns a generic "quiet 8d" card into "he asked for the revised proposal".
+ *  Never paraphrased, never invented — if the body is empty, returns []. */
+function extractReceipts(thread: RelationshipThread): string[] {
+  const text = (thread.content || '').replace(/[ \t]+/g, ' ').trim();
+  if (!text) return [];
+  const sentences = text
+    .split(/(?<=[.!?])\s+|\n+/)
+    .map(s => s.trim().replace(/^["'>*\-\s]+/, ''))
+    .filter(s => s.length >= 12 && s.length <= 170);
+  const picked: string[] = [];
+  const seen = new Set<string>();
+  const add = (s: string) => { const k = s.toLowerCase(); if (!seen.has(k) && picked.length < 3) { seen.add(k); picked.push(s); } };
+
+  // 1) Direct asks / questions aimed at the reader — the highest-signal receipts.
+  for (const s of sentences)
+    if (/\?$/.test(s) || /\b(can you|could you|would you|can we|could we|please|let me know|need(ed)? (you|your)|waiting (for|on)|send (me|over|the|us)|share the|get (me|us) the|looking for)\b/i.test(s)) add(s);
+  // 2) Commitments — what someone promised, and by when.
+  for (const s of sentences)
+    if (/\b(i'?ll|i will|we'?ll|we will|i can have|we can have|by (mon|tue|wed|thu|fri|next week|end of|eod|tomorrow|this week))\b/i.test(s)) add(s);
+  // 3) Money and concrete times — the things with a deadline or a dollar attached.
+  for (const s of sentences)
+    if (/(\$\s?\d|\b\d+k\b|\b\d{1,3}(,\d{3})+\b|\bUSD\b|\b\d{1,2}(:\d{2})?\s?(am|pm)\b)/i.test(s)) add(s);
+  return picked;
+}
+
+const KIND_RULES: Array<{ kind: RelationshipKind; re: RegExp }> = [
+  { kind: 'investor',  re: /\b(invest(or|ment|ing)?|term sheet|cap table|SAFE note|valuation|fundrais\w*|seed round|series [a-d]\b|due diligence|allocation|LP\b)\b/i },
+  { kind: 'candidate', re: /\b(resume|cv\b|interview|the role|this position|hiring|candidate|offer letter|job (opening|description)|recruit\w*|take-home)\b/i },
+  { kind: 'customer',  re: /\b(invoice|renewal|subscription|onboarding|support ticket|billing|our account|cancel my|upgrade our plan)\b/i },
+  { kind: 'lead',      re: /\b(demo|pricing|a quote|free trial|interested in|proposal|the deck|our use case|evaluat\w*|book a call)\b/i },
+  { kind: 'vendor',    re: /\b(SOW\b|MSA\b|statement of work|scope of work|net 30|purchase order|deliverable|as a vendor|your invoice to)\b/i },
+  { kind: 'press',     re: /\b(journalist|reporter|podcast|interview request|editorial|for (our|the) (story|article|piece)|press inquiry|cover(age|ing) of)\b/i },
+];
+
+/** Best-effort relationship KIND — only when a clear keyword signal exists in the
+ *  real thread text. Otherwise undefined (no badge). Never inferred from a name. */
+function classifyKind(thread: RelationshipThread): RelationshipKind | undefined {
+  const hay = `${thread.subject} ${thread.content || thread.snippet}`;
+  for (const { kind, re } of KIND_RULES) if (re.test(hay)) return kind;
+  return undefined;
+}
+
 // ── Risk scoring — deterministic, explainable, from real facts only ───────────
 
 const MONEY_RE = /\b(invoice|contract|proposal|renewal|quote|pricing|payment|deal|offer|purchase order|SOW|MSA)\b/i;
@@ -177,6 +232,8 @@ function scoreRisk(e: WorldEntry, thread: RelationshipThread): void {
 function baseWhyNow(e: WorldEntry): string {
   const extra = e.apps.find(c => c.app !== 'gmail');
   const meet = e.apps.find(c => c.app === 'calendar' || c.app === 'calcom');
+  // The verbatim ask rides in `receipts` (shown as its own quote block on the
+  // card), so whyNow stays the INSIGHT — not a repeat of the quote.
   if (e.status === 'awaiting_you') {
     return `Waiting on your reply about "${e.headline}"${e.daysSince > 0 ? ` for ${e.daysSince}d` : ''}${meet ? ` — you meet ${meet.label}` : ''}.`;
   }
@@ -191,36 +248,44 @@ function baseWhyNow(e: WorldEntry): string {
 
 function nextActionFor(e: WorldEntry): string {
   const meet = e.apps.find(c => c.app === 'calendar' || c.app === 'calcom');
+  const ask = e.receipts?.[0];
+  const askCtx = ask ? ` They wrote: “${ask.slice(0, 100)}”.` : '';
   if (e.status === 'awaiting_you') {
-    return `Draft a reply to ${e.name} about "${e.headline}". Read the thread first, then write it in my voice.`;
+    return `Draft a reply to ${e.name} about "${e.headline}".${askCtx} Read the thread first, then write it in my voice.`;
   }
   if (e.status === 'waiting_on_them') {
-    return `Draft a warm, low-pressure follow-up to ${e.name} about "${e.headline}" — it's been quiet for ${e.daysSince} days.`;
+    return `Draft a warm, low-pressure follow-up to ${e.name} about "${e.headline}" — it's been quiet for ${e.daysSince} days.${askCtx}`;
   }
   if (e.status === 'meeting_booked' && meet) {
-    return `Prep me for my meeting with ${e.name} (${meet.label}). Pull recent email and calendar context on them.`;
+    return `Prep me for my meeting with ${e.name} (${meet.label}). Pull recent email and calendar context on them.${askCtx}`;
   }
   return `Catch me up on where things stand with ${e.name} about "${e.headline}" and suggest the next move.`;
 }
 
 // ── AI pass: sharpen whyNow lines (grounded; direct error on failure) ─────────
 
-async function aiSharpen(entities: WorldEntry[], founderModel: string): Promise<string | null> {
+async function aiSharpen(entities: WorldEntry[], threadByKey: Map<string, RelationshipThread>, founderModel: string): Promise<string | null> {
   const keys = [process.env.OPENROUTER_API_KEY, process.env.OPENROUTER_API_KEY2, process.env.OPENROUTER_API_KEY3, process.env.OPENROUTER_API_KEY4, process.env.OPENROUTER_API_KEY5].filter(Boolean) as string[];
   if (!keys.length) return 'No OpenRouter API keys configured on the server.';
   if (!entities.length) return null;
 
-  const catalog = entities.map((e, i) =>
-    `[${i}] ${e.name} <${e.email}> — status:${e.status}, last activity ${e.daysSince}d ago, ${e.messageCount} msgs. Thread: "${e.headline}". Cross-app facts: ${e.apps.map(c => `${c.app}: ${c.evidence}`).join(' | ') || '(email only)'}`,
-  ).join('\n');
+  const catalog = entities.map((e, i) => {
+    const excerpt = (threadByKey.get(e.key)?.content || '').replace(/\s+/g, ' ').trim().slice(0, 420);
+    const kindLine = e.kind ? ` kind:${e.kind}.` : '';
+    const receiptLine = e.receipts?.length ? ` Quotes: ${e.receipts.map(r => `"${r}"`).join(' | ')}.` : '';
+    const excerptLine = excerpt ? ` Latest message: "${excerpt}"` : '';
+    return `[${i}] ${e.name} <${e.email}> — status:${e.status}, last activity ${e.daysSince}d ago, ${e.messageCount} msgs.${kindLine} Thread: "${e.headline}". Cross-app: ${e.apps.map(c => `${c.app}: ${c.evidence}`).join(' | ') || '(email only)'}.${receiptLine}${excerptLine}`;
+  }).join('\n');
 
   const memoryLine = founderModel.trim()
     ? `WHAT YOU KNOW ABOUT THIS FOUNDER (lean on it — a flagged VIP outranks a stranger; NEVER invent a person/fact not in the numbered items):\n${founderModel.trim().slice(0, 700)}\n\n`
     : '';
 
   const system =
-    "You are a founder's chief of staff. For EACH numbered relationship, write ONE sharp sentence (≤20 words) saying why it deserves attention RIGHT NOW — fuse the cross-app facts when present (\"Quiet 8 days on the proposal, and you meet Thu — walk in with an answer\"). " +
-    'Ground every word ONLY in the provided facts. NEVER invent a company, amount, date, or detail.\n' + memoryLine +
+    "You are a founder's chief of staff. For EACH numbered relationship, write ONE sharp, specific sentence (≤22 words) saying why it needs the founder RIGHT NOW. " +
+    'Name the SPECIFIC thing at stake using the quotes / latest message — the actual ask, promise, number, or decision — never a generic "circle back" or "follow up". ' +
+    'Fuse the cross-app facts when present ("Quiet 8 days on the $40k proposal, and you meet Thu — walk in with the redline"). ' +
+    'Ground every word ONLY in the provided facts. NEVER invent a company, amount, date, or detail not present above.\n' + memoryLine +
     'Return ONLY JSON: {"items":[{"i":<number>,"whyNow":"<one sentence>"}]}';
 
   const body = {
@@ -312,17 +377,21 @@ async function buildWorld(email: string): Promise<WorldPayload> {
     }
   }
 
-  // Risk, whyNow, nextAction — deterministic from the fused real facts.
+  // Depth, risk, whyNow, nextAction — deterministic from the fused real facts.
+  // Receipts + kind come first because baseWhyNow quotes the top receipt.
   const threadByKey = new Map(threads.map(t => [t.key, t]));
   for (const e of entities) {
-    scoreRisk(e, threadByKey.get(e.key)!);
+    const t = threadByKey.get(e.key)!;
+    e.receipts = extractReceipts(t);
+    e.kind = classifyKind(t);
+    scoreRisk(e, t);
     e.whyNow = baseWhyNow(e);
     e.nextAction = nextActionFor(e);
   }
 
   // AI sharpening — on failure keep the deterministic real-fact lines and carry
   // the DIRECT error (founder directive: never mask an AI failure with filler).
-  const aiError = await aiSharpen(entities, founderModel);
+  const aiError = await aiSharpen(entities, threadByKey, founderModel);
 
   const slipping = entities.filter(e => e.atRisk).sort((a, b) => b.riskScore - a.riskScore);
   const appsPresent = Array.from(new Set(entities.flatMap(e => e.apps.map(c => c.app)))) as WorldApp[];
@@ -361,6 +430,38 @@ async function writeCache(email: string, payload: WorldPayload): Promise<void> {
 }
 
 export async function GET(req: Request) {
+  // TEMPORARY owner diagnostic (?owner=1) — runs the real depth synthesis for the
+  // founder's account and returns ONLY shapes: names (precedent-approved), kinds,
+  // counts, and body-LENGTHS. NEVER receipt/whyNow/body TEXT. Removed after verify.
+  if (new URL(req.url).searchParams.get('owner') === '1') {
+    const t0 = Date.now();
+    const FOUNDER = 'mailient.xyz@gmail.com';
+    try {
+      const [w, threads] = await Promise.all([
+        buildWorld(FOUNDER),
+        gatherGmailRelationships(FOUNDER, MAX_ENTITIES),
+      ]);
+      return NextResponse.json({
+        build: 'world-v2-depth',
+        ms: Date.now() - t0,
+        entities: w.entities.length,
+        slipping: w.slipping.length,
+        appsPresent: w.appsPresent,
+        aiError: w.aiError ?? null,
+        threadsWithBody: threads.filter(t => (t.content || '').length > 0).length,
+        bodyLens: threads.map(t => (t.content || '').length),
+        sample: w.entities.slice(0, 8).map(e => ({
+          name: e.name, kind: e.kind ?? null, status: e.status,
+          atRisk: e.atRisk, riskScore: e.riskScore,
+          receiptCount: e.receipts?.length ?? 0, whyNowLen: e.whyNow.length,
+          appChips: e.apps.map(c => c.app),
+        })),
+      });
+    } catch (e: any) {
+      return NextResponse.json({ build: 'world-v2-depth', ms: Date.now() - t0, threw: `${e?.name}: ${e?.message}`.slice(0, 300) });
+    }
+  }
+
   const session = await auth();
   const email = session?.user?.email?.toLowerCase();
   if (!email) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

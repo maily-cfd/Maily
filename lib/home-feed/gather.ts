@@ -58,11 +58,65 @@ export interface RelationshipThread {
   email: string;
   subject: string;          // latest subject, Re:/Fwd: stripped
   snippet: string;          // latest message preview (≤200 chars)
+  /** Real body text of the latest message (top relationships only) — this is what
+   *  turns a generic "quiet 8d" into "you owe the revised proposal he asked for". */
+  content?: string;
   status: 'awaiting_you' | 'waiting_on_them' | 'active';
   lastActivityIso: string;
   daysSince: number;
   fromThem: boolean;        // was the latest message inbound?
   messageCount: number;
+}
+
+// ── Gmail message-body extraction (for real depth, not just a 200-char snippet) ─
+
+function b64urlDecode(data: string): string {
+  try { return Buffer.from(String(data).replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString('utf8'); } catch { return ''; }
+}
+
+/** Recursively pull the first body of a given MIME type out of a Gmail payload. */
+function pickMime(payload: any, mime: string): string {
+  if (!payload) return '';
+  if (payload.mimeType === mime && payload.body?.data) return b64urlDecode(payload.body.data);
+  if (Array.isArray(payload.parts)) {
+    for (const p of payload.parts) { const t = pickMime(p, mime); if (t) return t; }
+  }
+  return '';
+}
+
+/** Strip an HTML email body to readable text — for HTML-only messages with no
+ *  text/plain part, so their receipts still work and never render as raw tags. */
+function stripHtml(html: string): string {
+  return html
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<\/(p|div|li|tr|h[1-6])>|<br\s*\/?>/gi, '\n')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/gi, ' ').replace(/&amp;/gi, '&').replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>').replace(/&#39;|&apos;/gi, "'").replace(/&quot;/gi, '"');
+}
+
+/** The latest message's readable body: prefer text/plain, fall back to stripped
+ *  HTML. Empty when neither exists (fail-soft — the snippet still carries). */
+function extractPlainText(payload: any): string {
+  const plain = pickMime(payload, 'text/plain');
+  if (plain) return plain;
+  const html = pickMime(payload, 'text/html');
+  if (html) return stripHtml(html);
+  return '';
+}
+
+/** Trim a raw email body to the meat: drop quoted replies, reply headers, and
+ *  signature blocks, collapse whitespace, cap length. Never AI — pure cleanup. */
+function cleanBody(raw: string): string {
+  if (!raw) return '';
+  let t = raw.replace(/\r/g, '');
+  const onWrote = t.search(/\n\s*On .{0,80}\bwrote:/);
+  if (onWrote > 40) t = t.slice(0, onWrote);
+  t = t.split('\n').filter(line => !/^\s*>/.test(line)).join('\n');
+  const sig = t.search(/\n\s*(--\s*\n|Sent from my |Best regards|Best,|Thanks,|Cheers,|Regards,)/i);
+  if (sig > 60) t = t.slice(0, sig);
+  return t.replace(/\n{3,}/g, '\n\n').replace(/[ \t]{2,}/g, ' ').trim().slice(0, 900);
 }
 
 // ── Small shared helpers ──────────────────────────────────────────────────────
@@ -396,7 +450,7 @@ export async function gatherGmailRelationships(email: string, maxThreads = 8): P
   }));
 
   // Group by the OTHER party. For inbound: the From. For outbound (from me): the To.
-  const byParty = new Map<string, RelationshipThread & { _ts: number }>();
+  const byParty = new Map<string, RelationshipThread & { _ts: number; _latestId?: string }>();
   for (const m of msgs) {
     if (!m?.payload?.headers) continue;
     const h: any[] = m.payload.headers;
@@ -414,7 +468,7 @@ export async function gatherGmailRelationships(email: string, maxThreads = 8): P
 
     const key = party.email;
     const prev = byParty.get(key);
-    const entry: RelationshipThread & { _ts: number } = {
+    const entry: RelationshipThread & { _ts: number; _latestId?: string } = {
       key,
       name: displayName(party.name, party.email),
       email: party.email,
@@ -426,6 +480,7 @@ export async function gatherGmailRelationships(email: string, maxThreads = 8): P
       fromThem: !outbound,
       messageCount: 1,
       _ts: ts,
+      _latestId: m.id,
     };
     if (!prev) {
       byParty.set(key, entry);
@@ -438,24 +493,42 @@ export async function gatherGmailRelationships(email: string, maxThreads = 8): P
         prev.lastActivityIso = entry.lastActivityIso;
         prev.daysSince = entry.daysSince;
         prev.fromThem = entry.fromThem;
+        prev._latestId = m.id;
       }
     }
   }
 
-  const threads = [...byParty.values()].map(c => {
+  const ranked = [...byParty.values()].map(c => {
     const status: RelationshipThread['status'] = c.fromThem
       ? (c.daysSince <= 10 ? 'awaiting_you' : 'active')   // they wrote last, still warm → on you
       : (c.daysSince >= 2 ? 'waiting_on_them' : 'active'); // you wrote last, no reply yet
-    const { _ts, ...rest } = c;
-    return { ...rest, status };
+    return { ...c, status };
   });
 
-  threads.sort((a, b) => {
+  ranked.sort((a, b) => {
     const rank = (s: RelationshipThread['status']) => (s === 'awaiting_you' ? 2 : s === 'waiting_on_them' ? 1 : 0);
     if (rank(b.status) !== rank(a.status)) return rank(b.status) - rank(a.status);
     if (b.messageCount !== a.messageCount) return b.messageCount - a.messageCount;
     return new Date(b.lastActivityIso).getTime() - new Date(a.lastActivityIso).getTime();
   });
 
-  return threads.slice(0, maxThreads);
+  const top = ranked.slice(0, maxThreads);
+
+  // DEPTH: pull the real body of the latest message for the top relationships, so
+  // synthesis reasons from what was actually said — not a 200-char preview. Bounded
+  // (only the cards we'll show), parallel, fail-soft (snippet still carries on error).
+  await Promise.all(top.map(async (t) => {
+    if (!t._latestId) return;
+    try {
+      const r = await googleFetch(email, 'gmail',
+        `https://gmail.googleapis.com/gmail/v1/users/me/messages/${t._latestId}?format=full`,
+        { headers });
+      if (!r.ok) return;
+      const full = await r.json();
+      const body = cleanBody(extractPlainText(full.payload));
+      if (body) t.content = body;
+    } catch { /* fail-soft */ }
+  }));
+
+  return top.map(({ _ts, _latestId, ...rest }) => rest);
 }

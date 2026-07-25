@@ -37,7 +37,7 @@ import {
 import {
   Sparkles, Mail, Calendar, Clock, ArrowRight, MessageSquare,
   CheckCircle2, Reply, CalendarPlus, Inbox, Zap, ChevronRight, AlertTriangle,
-  FileText, Hash, RefreshCw,
+  FileText, Hash, RefreshCw, Quote,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { TokenExpiryAlert } from './token-expiry-alert';
@@ -87,11 +87,13 @@ interface ExistingDraft { threadId: string; to: string; subject: string; body: s
 // Cal.com, Notion, and Slack signals (joined ONLY by exact email / exact full-name,
 // never guessed). This replaced the Gmail-only "Key conversations" scan.
 type WorldApp = 'gmail' | 'calendar' | 'notion' | 'slack' | 'calcom';
+type RelationshipKind = 'investor' | 'candidate' | 'customer' | 'lead' | 'vendor' | 'press';
 interface WorldAppChip { app: WorldApp; label: string; evidence: string; }
 interface WorldEntry {
   key: string; name: string; email: string;
   status: ConvoStatus;
   headline: string; whyNow: string; apps: WorldAppChip[];
+  kind?: RelationshipKind; receipts?: string[];
   atRisk: boolean; riskScore: number; riskReason?: string;
   daysSince: number; lastActivityIso: string; messageCount: number; nextAction: string;
 }
@@ -667,6 +669,30 @@ const WORLD_APP_META: Record<WorldApp, { Icon: any; label: string; varName: stri
 };
 const APP_ORDER: WorldApp[] = ['gmail', 'calendar', 'calcom', 'notion', 'slack'];
 
+// Relationship-kind badge styling. The kind itself is inferred server-side ONLY
+// from a clear keyword signal in the real thread (never a name), so a badge is a
+// fact the founder can trust — it tells them what this person is at a glance.
+const KIND_META: Record<RelationshipKind, { label: string; cls: string }> = {
+  investor:  { label: 'Investor',  cls: 'bg-violet-500/12 text-violet-600 dark:text-violet-300 border-violet-500/25' },
+  candidate: { label: 'Candidate', cls: 'bg-sky-500/12 text-sky-600 dark:text-sky-300 border-sky-500/25' },
+  customer:  { label: 'Customer',  cls: 'bg-emerald-500/12 text-emerald-600 dark:text-emerald-300 border-emerald-500/25' },
+  lead:      { label: 'Lead',      cls: 'bg-teal-500/12 text-teal-600 dark:text-teal-300 border-teal-500/25' },
+  vendor:    { label: 'Vendor',    cls: 'bg-slate-500/12 text-slate-600 dark:text-slate-300 border-slate-500/25' },
+  press:     { label: 'Press',     cls: 'bg-pink-500/12 text-pink-600 dark:text-pink-300 border-pink-500/25' },
+};
+
+// The verbatim quote that proves the insight — the actual ask/promise/number
+// pulled from the real message body. Rendered as a subtle receipt so the founder
+// sees what was *said*, not a paraphrase. Empty bodies simply render nothing.
+function ReceiptQuote({ text }: { text: string }) {
+  return (
+    <div className="mt-2.5 flex gap-2 rounded-xl bg-arcus-elevated/70 border border-arcus-border/70 px-2.5 py-2">
+      <Quote className="w-3.5 h-3.5 text-arcus-fg-muted shrink-0 mt-[1px]" />
+      <p className="text-[12px] text-arcus-fg-secondary italic leading-relaxed line-clamp-2">{text}</p>
+    </div>
+  );
+}
+
 // "Across Gmail, Calendar & Notion" — the honest sub-line naming ONLY the apps
 // that actually contributed a fused signal this pass (connection- + activity-gated).
 function worldSubline(world: WorldData | null): string {
@@ -699,17 +725,28 @@ function AppChip({ chip }: { chip: WorldAppChip }) {
 // hands its next move to Arcus on click.
 function WorldCard({ e, onHandle }: { e: WorldEntry; onHandle: () => void }) {
   const s = STATUS_META[e.status];
-  const chips = [...e.apps].sort((a, b) => APP_ORDER.indexOf(a.app) - APP_ORDER.indexOf(b.app));
+  const kind = e.kind ? KIND_META[e.kind] : null;
+  // Gmail status is already the pill + whyNow — showing only the CROSS-app chips
+  // keeps the card about fusion, not a restatement of the email row.
+  const chips = e.apps.filter(c => c.app !== 'gmail').sort((a, b) => APP_ORDER.indexOf(a.app) - APP_ORDER.indexOf(b.app));
+  const receipt = e.receipts?.[0];
   return (
     <button
       onClick={onHandle}
       className={cn(
-        'group text-left rounded-2xl border bg-arcus-surface hover:bg-arcus-surface-hover transition-all p-4',
+        'group text-left rounded-2xl border bg-arcus-surface hover:bg-arcus-surface-hover transition-all duration-200 p-4 hover:-translate-y-0.5',
         e.atRisk ? 'border-rose-500/30 hover:border-rose-500/50' : 'border-arcus-border hover:border-arcus-fg-muted/30',
       )}
     >
       <div className="flex items-center justify-between gap-2 mb-2">
-        <span className="text-[14px] font-semibold text-arcus-fg truncate">{e.name}</span>
+        <div className="flex items-center gap-1.5 min-w-0">
+          <span className="text-[14px] font-semibold text-arcus-fg truncate">{e.name}</span>
+          {kind && (
+            <span className={cn('shrink-0 px-1.5 py-0.5 rounded-md border text-[9.5px] font-semibold uppercase tracking-wide', kind.cls)}>
+              {kind.label}
+            </span>
+          )}
+        </div>
         {e.atRisk ? (
           <span className="shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-[10.5px] font-medium bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20">
             <AlertTriangle className="w-3 h-3" /> at risk
@@ -722,12 +759,14 @@ function WorldCard({ e, onHandle }: { e: WorldEntry; onHandle: () => void }) {
       </div>
       <p className="text-[13px] text-arcus-fg-secondary line-clamp-1 mb-1">{e.headline}</p>
       <p className="text-[12.5px] text-arcus-fg-tertiary line-clamp-2 leading-relaxed">{e.whyNow}</p>
+      {receipt && <ReceiptQuote text={receipt} />}
       {chips.length > 0 && (
         <div className="flex flex-wrap gap-1.5 mt-2.5">
           {chips.map((c, i) => <AppChip key={`${c.app}-${i}`} chip={c} />)}
         </div>
       )}
-      <div className="flex items-center justify-end mt-2.5">
+      <div className="flex items-center justify-between mt-3">
+        <span className="text-[11px] text-arcus-fg-muted">{e.messageCount} msg{e.messageCount === 1 ? '' : 's'} · {relTime(e.lastActivityIso)}</span>
         <span className="inline-flex items-center gap-1 text-[12px] font-medium text-arcus-fg-tertiary group-hover:text-arcus-fg transition-colors">
           Handle it <ChevronRight className="w-3.5 h-3.5" />
         </span>
@@ -739,7 +778,9 @@ function WorldCard({ e, onHandle }: { e: WorldEntry; onHandle: () => void }) {
 // A "What's slipping" row — an at-risk relationship, its cost-to-miss reason
 // front and center, the fused apps behind it, one click to act.
 function SlippingRow({ e, onHandle }: { e: WorldEntry; onHandle: () => void }) {
-  const chips = [...e.apps].sort((a, b) => APP_ORDER.indexOf(a.app) - APP_ORDER.indexOf(b.app));
+  const kind = e.kind ? KIND_META[e.kind] : null;
+  const chips = e.apps.filter(c => c.app !== 'gmail').sort((a, b) => APP_ORDER.indexOf(a.app) - APP_ORDER.indexOf(b.app));
+  const receipt = e.receipts?.[0];
   return (
     <div className="rounded-2xl border border-rose-500/25 bg-rose-500/[0.06] p-4 flex items-start gap-3">
       <div className="w-9 h-9 rounded-xl bg-rose-500/10 flex items-center justify-center shrink-0 text-rose-500">
@@ -747,12 +788,20 @@ function SlippingRow({ e, onHandle }: { e: WorldEntry; onHandle: () => void }) {
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex items-center justify-between gap-2">
-          <span className="text-[14px] font-semibold text-arcus-fg truncate">{e.name}</span>
+          <div className="flex items-center gap-1.5 min-w-0">
+            <span className="text-[14px] font-semibold text-arcus-fg truncate">{e.name}</span>
+            {kind && (
+              <span className={cn('shrink-0 px-1.5 py-0.5 rounded-md border text-[9.5px] font-semibold uppercase tracking-wide', kind.cls)}>
+                {kind.label}
+              </span>
+            )}
+          </div>
           <span className="text-[11px] text-rose-600 dark:text-rose-400 font-medium shrink-0">at risk</span>
         </div>
         <p className="text-[12.5px] text-arcus-fg-secondary mt-0.5 line-clamp-2 leading-relaxed">
           {e.riskReason ? e.riskReason.replace(/^[^:]+:\s*/, '') : e.whyNow}
         </p>
+        {receipt && <ReceiptQuote text={receipt} />}
         {chips.length > 0 && (
           <div className="flex flex-wrap gap-1.5 mt-2">
             {chips.map((c, i) => <AppChip key={`${c.app}-${i}`} chip={c} />)}

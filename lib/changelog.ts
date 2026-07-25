@@ -29,6 +29,15 @@ export const CHANGELOG: ChangelogGroup[] = [
     date: 'July 25, 2026',
     entries: [
       {
+        tag: 'Improved',
+        title: 'Your world cards now read the actual conversation — not just the subject line',
+        points: [
+          'Each relationship card now understands what was really said. It pulls the real ask, promise, or number out of the latest message and shows it to you in quotes — so instead of “quiet 8 days,” you see the actual line: “can you send the signed SOW by Friday?”',
+          'Cards now tell you what a relationship is when the thread makes it clear — Investor, Customer, Lead, Candidate, Vendor, or Press — so you can read the room at a glance.',
+          'The “why this needs you now” line is sharper: it names the specific thing at stake from the real message, never a generic “follow up.” When a card can’t be certain, it stays quiet rather than guess.',
+        ],
+      },
+      {
         tag: 'New',
         title: 'A home that shows YOUR world — across every app, not just email',
         points: [
