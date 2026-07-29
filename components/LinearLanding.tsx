@@ -47,7 +47,7 @@ import { WordBlurStream } from "@/src/WordBlurStream";
 import { SpecialText } from "@/components/ui/special-text";
 import { BlurFade } from "@/components/ui/blur-fade";
 import NumberFlow from "@number-flow/react";
-import { EtheralShadow } from "@/components/ui/etheral-shadow";
+import dynamic from "next/dynamic";
 import { CircleExpandButton } from "@/components/CircleExpandButton";
 import { FloatingNavbar } from "@/components/FloatingNavbar";
 import { SectionHeader } from "@/components/ui/section-header";
@@ -56,6 +56,11 @@ import { WordBlurReveal } from "@/components/ui/word-blur-reveal";
 import { DemoVideo } from "@/components/ui/demo-video";
 import { LeadCapture } from "@/components/ui/lead-capture";
 import { landingFaqs } from "@/lib/landing-faqs";
+
+const EtheralShadow = dynamic(
+  () => import("@/components/ui/etheral-shadow").then((m) => m.EtheralShadow),
+  { ssr: false },
+);
 
 function ActiveCounter({ target = 1420 }: { target?: number }) {
   const [count, setCount] = useState(0);
@@ -92,17 +97,32 @@ function ActiveCounter({ target = 1420 }: { target?: number }) {
 
 // landingFaqs moved to lib/landing-faqs.ts (shared with homepage FAQPage JSON-LD)
 
-/** Hero texture — same EtheralShadow as shape-landing-hero, not full-blast. */
+/** Hero texture — deferred + tuned; skips heavy SVG work until after first paint. */
 function HeroEtheralShadow() {
   const reduce = useReducedMotion();
+  const [show, setShow] = useState(false);
+
+  useEffect(() => {
+    if (reduce) return;
+    const start = () => setShow(true);
+    if (typeof window.requestIdleCallback === "function") {
+      const id = window.requestIdleCallback(start, { timeout: 2000 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const t = window.setTimeout(start, 400);
+    return () => window.clearTimeout(t);
+  }, [reduce]);
+
+  if (reduce || !show) return null;
+
   return (
-    <div className="absolute inset-0 z-0 pointer-events-none opacity-50 mix-blend-screen select-none">
+    <div className="absolute inset-0 z-0 pointer-events-none opacity-45 mix-blend-screen select-none">
       <EtheralShadow
-        color="rgba(100, 100, 120, 0.8)"
-        animation={reduce ? undefined : { scale: 35, speed: 25 }}
-        noise={{ opacity: 0.3, scale: 1.5 }}
+        color="rgba(100, 100, 120, 0.75)"
+        animation={{ scale: 28, speed: 22 }}
+        noise={{ opacity: 0.22, scale: 1.5 }}
         sizing="fill"
-        className="opacity-70"
+        className="opacity-65"
       />
     </div>
   );
@@ -219,6 +239,7 @@ function HeroVideoPlayer() {
         loop
         muted={isMuted}
         playsInline
+        preload="none"
         onPlay={() => setIsPlaying(true)}
         onPause={() => setIsPlaying(false)}
         onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}

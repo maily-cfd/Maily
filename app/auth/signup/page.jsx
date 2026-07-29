@@ -47,22 +47,19 @@ function SignUpContent() {
   const [error, setError] = useState(null);
   const emailInputRef = useRef(null);
 
-  const handleEmailSubmit = (e) => {
-    e.preventDefault();
-    const trimmed = email.trim().toLowerCase();
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(trimmed)) {
-      setError("Please enter a valid email address.");
+  const onEmailChange = (value) => {
+    setEmail(value);
+    const trimmed = value.trim().toLowerCase();
+    if (!trimmed.includes('@')) {
+      setIsGmail(false);
+      setIsWorkspace(null);
+      setEmailDomain('');
       return;
     }
-
-    // Show the Google continue step first — never jump straight into OAuth.
     const domain = trimmed.split('@')[1] || '';
     setEmailDomain(domain);
     setIsGmail(domain === 'gmail.com' || domain === 'googlemail.com');
     setIsWorkspace(!PERSONAL_DOMAINS.includes(domain));
-    setError(null);
-    setStep(2);
   };
 
   const handleGoogleSignUp = async () => {
@@ -79,10 +76,14 @@ function SignUpContent() {
       // With Composio carrying only Gmail (not login), login is identity-only
       // and the Gmail grant is the next onboarding step.
       const composioGmail = process.env.NEXT_PUBLIC_COMPOSIO_GMAIL === '1';
-      const result = await signIn('google', {
+      const hint = email.trim().toLowerCase();
+      const signInOptions = {
         callbackUrl: composioGmail ? '/onboarding?step=2' : '/onboarding',
-        login_hint: email.trim().toLowerCase()
-      });
+      };
+      if (hint && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(hint)) {
+        signInOptions.login_hint = hint;
+      }
+      const result = await signIn('google', signInOptions);
       if (result?.error) {
         handleAuthError(result.error);
         setIsLoading(false);
@@ -150,7 +151,7 @@ function SignUpContent() {
       <div className="flex gap-3">
         <Shield className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" strokeWidth={2} />
         <div className="space-y-1">
-          <h4 className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-widest">Gmail Notice</h4>
+          <h4 className="text-[12px] font-medium text-amber-700 dark:text-amber-300">Gmail notice</h4>
           <p className="text-[11px] text-amber-900/70 dark:text-amber-100/60 block leading-relaxed font-light tracking-tight">
             Mailient is optimized for <span className="text-zinc-900 dark:text-white font-semibold">Google Workspace</span>. 
             Personal accounts may experience limited functionality or security warnings.
@@ -219,9 +220,9 @@ function SignUpContent() {
           {step === 1 && (
             <motion.div key="step1" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} transition={{ duration: 0.4 }} className="space-y-6">
               <StepIndicator currentStep={1} />
-              <div className="mb-8">
+              <div className="mb-6">
                 <h2 className="text-foreground text-lg font-medium tracking-tight mb-2">Create account</h2>
-                <p className="text-muted-foreground text-xs font-medium tracking-tight">Join the community of founders using AI to master their communication.</p>
+                <p className="text-muted-foreground text-sm">Continue with Google to start your 3-day trial.</p>
               </div>
 
               {error && (
@@ -231,83 +232,38 @@ function SignUpContent() {
                 </div>
               )}
 
-              <form onSubmit={handleEmailSubmit} className="space-y-5">
-                <div className="animate-element animate-delay-300">
-                   <label className="text-[11px] font-bold text-zinc-400 dark:text-white/20 uppercase tracking-widest mb-2 block">Work Email</label>
-                   <GlassInputWrapper>
-                    <input ref={emailInputRef} type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Work email address" className="w-full bg-transparent text-sm p-4 rounded-2xl focus:outline-none text-foreground placeholder:text-zinc-400 dark:placeholder:text-white/10 font-medium" autoFocus required />
-                  </GlassInputWrapper>
-                </div>
+              {isGmail && email.includes('@') && <GmailWarning />}
 
-                <div className="animate-element animate-delay-500 flex items-center justify-between text-[12px]">
-                  <button type="button" onClick={() => router.push('/auth/signin')} className="text-zinc-400 hover:text-foreground transition-colors tracking-tight">
-                    already registered? <span className="text-zinc-500 dark:text-white/40 border-b border-zinc-300 dark:border-white/10 ml-1">sign in</span>
-                  </button>
-                </div>
+              <PremiumGoogleButton />
 
-                <button type="submit" disabled={!email.includes('@')} className="animate-element animate-delay-600 w-full h-[56px] bg-zinc-900 text-white dark:bg-white dark:text-black rounded-2xl font-bold text-sm hover:bg-zinc-800 dark:hover:bg-[#F5F5F5] hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2 shadow-sm dark:shadow-[0_20px_40px_rgba(255,255,255,0.1)] disabled:opacity-50 active:scale-[0.98]">
-                  Continue <ArrowRight className="w-4 h-4" />
+              <div className="pt-2 space-y-2">
+                <label className="text-[12px] text-zinc-500 dark:text-white/35 block">Work email (optional)</label>
+                <GlassInputWrapper>
+                  <input
+                    ref={emailInputRef}
+                    type="email"
+                    value={email}
+                    onChange={(e) => onEmailChange(e.target.value)}
+                    placeholder="Helps Google pick the right account"
+                    className="w-full bg-transparent text-sm p-4 rounded-2xl focus:outline-none text-foreground placeholder:text-zinc-400 dark:placeholder:text-white/10 font-medium"
+                  />
+                </GlassInputWrapper>
+              </div>
+
+              <div className="text-[12px] pt-2">
+                <button type="button" onClick={() => router.push('/auth/signin')} className="text-zinc-400 hover:text-foreground transition-colors">
+                  Already registered? <span className="text-zinc-500 dark:text-white/40 border-b border-zinc-300 dark:border-white/10 ml-1">Sign in</span>
                 </button>
-              </form>
-            </motion.div>
-          )}
-
-          {step === 2 && (
-            <motion.div key="step2" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} transition={{ duration: 0.4 }} className="space-y-6">
-              <StepIndicator currentStep={2} />
-              <button onClick={backToStep1} className="flex items-center gap-2 text-zinc-400 hover:text-foreground dark:text-white/30 dark:hover:text-white transition-colors text-xs font-light mb-8 group w-fit">
-                <ArrowLeft className="w-3 h-3 group-hover:-translate-x-0.5 transition-transform" />
-                use different email
-              </button>
-              <div className="mb-6">
-                <h2 className="text-foreground text-lg font-medium tracking-tight mb-2">Continue with Google</h2>
-                <p className="text-muted-foreground text-xs font-medium tracking-tight leading-relaxed">
-                  Next you’ll sign in with Google to securely connect Gmail. That’s how Mailient reads, drafts, and runs your inbox — nothing starts until you approve access.
-                </p>
               </div>
-              <div className="p-5 bg-zinc-50 border border-zinc-200 dark:bg-white/[0.02] dark:border-white/[0.05] rounded-2xl mb-8 group hover:bg-zinc-100 dark:hover:bg-white/[0.04] transition-all">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 dark:text-white/20">Identity</span>
-                  <span className={`text-[10px] font-bold uppercase tracking-[0.2em] ${isGmail ? 'text-amber-600 dark:text-amber-500/60' : 'text-zinc-400 dark:text-white/20'}`}>{isGmail ? 'Personal Gmail' : (isWorkspace ? 'Workspace' : 'Personal')}</span>
-                </div>
-                <div className="text-foreground font-semibold truncate text-sm tracking-tight">{email}</div>
-              </div>
-
-              {error && (
-                <div className="mb-6 p-3 bg-red-500/5 border border-red-500/20 rounded-xl flex gap-3 items-center">
-                  <AlertCircle className="w-4 h-4 text-red-500 dark:text-red-400 shrink-0" strokeWidth={1.5} />
-                  <p className="text-[11px] text-red-755 dark:text-red-200/60 font-medium tracking-tight">{error}</p>
-                </div>
-              )}
-
-              {isGmail ? (
-                <div className="space-y-6">
-                  <GmailWarning />
-                  <PremiumGoogleButton />
-                </div>
-              ) : (
-                <div className="p-6 bg-zinc-50 border border-zinc-200 dark:bg-white/[0.02] dark:border-white/[0.08] rounded-2xl space-y-6">
-                  <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-zinc-100 border border-zinc-200 dark:bg-white/[0.04] dark:border-white/[0.08] flex items-center justify-center shrink-0">
-                      <Building2 className="w-5 h-5 text-zinc-400 dark:text-white/40" strokeWidth={1.5} />
-                    </div>
-                    <div>
-                      <h3 className="text-foreground text-sm font-semibold tracking-tight mb-2">Workspace Required</h3>
-                      <p className="text-muted-foreground text-[11px] leading-relaxed font-light tracking-tight">Mailient is optimized for Google Workspace.</p>
-                    </div>
-                  </div>
-                  <div className="border-t border-zinc-200 dark:border-white/[0.06] pt-6"><PremiumGoogleButton /></div>
-                </div>
-              )}
             </motion.div>
           )}
 
           {step === 3 && (
             <motion.div key="step3" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} transition={{ duration: 0.4 }} className="space-y-6">
               <StepIndicator currentStep={3} />
-              <button onClick={() => setStep(2)} className="flex items-center gap-2 text-zinc-400 hover:text-foreground dark:text-white/30 dark:hover:text-white transition-colors text-xs font-light mb-8 group w-fit">
+              <button onClick={() => setStep(1)} className="flex items-center gap-2 text-zinc-400 hover:text-foreground dark:text-white/30 dark:hover:text-white transition-colors text-xs font-light mb-8 group w-fit">
                 <ArrowLeft className="w-3 h-3 group-hover:-translate-x-0.5 transition-transform" />
-                back to connection
+                Back to sign up
               </button>
               <div className="mb-8">
                 <div className="flex items-center gap-3 mb-3">

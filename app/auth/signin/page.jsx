@@ -56,7 +56,7 @@ function SignInContent() {
     if (urlError) {
       if (urlError === 'access-denied' || urlError === 'org_internal') {
         setShowAdminModal(true);
-        setStep(2);
+        setStep(3);
       } else {
         setError(urlError === 'configuration' ? 'Authentication configuration error.' : 'An authentication error occurred.');
       }
@@ -77,23 +77,18 @@ function SignInContent() {
     checkSession();
   }, [router, callbackUrl, searchParams]);
 
-  const handleEmailSubmit = (e) => {
-    e.preventDefault();
-    const trimmed = email.trim().toLowerCase();
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(trimmed)) {
-      setError("Please enter a valid email address.");
+  const onEmailChange = (value) => {
+    setEmail(value);
+    const trimmed = value.trim().toLowerCase();
+    if (!trimmed.includes('@')) {
+      setIsGmail(false);
+      setIsWorkspace(null);
       return;
     }
-
-    // Show the Google continue step first — never jump straight into OAuth.
-    // Visitors were confused when email → Composio/Google fired with no explanation.
     const domain = trimmed.split('@')[1] || '';
     setEmailDomain(domain);
     setIsGmail(domain === 'gmail.com' || domain === 'googlemail.com');
     setIsWorkspace(!PERSONAL_DOMAINS.includes(domain));
-    setError(null);
-    setStep(2);
   };
 
   const handleGoogleSignIn = async () => {
@@ -107,10 +102,12 @@ function SignInContent() {
         window.location.href = '/api/auth/composio-login/start';
         return;
       }
-      const result = await signIn('google', {
-        callbackUrl: '/onboarding',
-        login_hint: email.trim().toLowerCase()
-      });
+      const hint = email.trim().toLowerCase();
+      const signInOptions = { callbackUrl: '/onboarding' };
+      if (hint && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(hint)) {
+        signInOptions.login_hint = hint;
+      }
+      const result = await signIn('google', signInOptions);
       if (result?.error) {
         handleAuthError(result.error);
         setIsLoading(false);
@@ -177,7 +174,7 @@ function SignInContent() {
       <div className="flex gap-3">
         <Shield className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" strokeWidth={2} />
         <div className="space-y-1">
-          <h4 className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-widest">Gmail Notice</h4>
+          <h4 className="text-[12px] font-medium text-amber-700 dark:text-amber-300">Gmail notice</h4>
           <p className="text-[11px] text-amber-900/70 dark:text-amber-100/60 block leading-relaxed font-light tracking-tight">
             Mailient is optimized for <span className="text-zinc-900 dark:text-white font-semibold">Google Workspace</span>. 
             Personal <span className="text-zinc-900 dark:text-white font-semibold">@gmail.com</span> accounts may see security warnings.
@@ -243,7 +240,7 @@ function SignInContent() {
     >
       <div className="w-full">
         <AnimatePresence mode="wait">
-          {/* STEP 1: Email Entry */}
+          {/* STEP 1: Google sign-in */}
           {step === 1 && (
             <motion.div
               key="step1"
@@ -254,90 +251,9 @@ function SignInContent() {
               className="space-y-6"
             >
               <StepIndicator currentStep={1} />
-              <div className="mb-8">
-                <h2 className="text-foreground text-lg font-medium tracking-tight mb-2">Welcome back</h2>
-                <p className="text-muted-foreground text-xs font-medium tracking-tight">Enter your email address to access your workspace.</p>
-              </div>
-
-              {error && (
-                <div className="mb-6 p-3 bg-red-500/5 border border-red-500/20 rounded-xl flex gap-3 items-center">
-                  <AlertCircle className="w-4 h-4 text-red-500 dark:text-red-400 shrink-0" strokeWidth={1.5} />
-                  <p className="text-[11px] text-red-750 dark:text-red-200/60 font-medium tracking-tight">{error}</p>
-                </div>
-              )}
-
-              <form onSubmit={handleEmailSubmit} className="space-y-5">
-                <div className="animate-element animate-delay-300">
-                   <label className="text-[11px] font-bold text-zinc-400 dark:text-white/20 uppercase tracking-widest mb-2 block">Email Address</label>
-                   <GlassInputWrapper>
-                    <input 
-                      ref={emailInputRef}
-                      type="email" 
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="Enter your email address" 
-                      className="w-full bg-transparent text-sm p-4 rounded-2xl focus:outline-none text-foreground placeholder:text-zinc-400 dark:placeholder:text-white/20 font-medium" 
-                      autoFocus
-                      required
-                    />
-                  </GlassInputWrapper>
-                </div>
-
-                <div className="animate-element animate-delay-500 flex items-center justify-between text-[12px]">
-                  <label className="flex items-center gap-3 cursor-pointer group">
-                    <input type="checkbox" name="rememberMe" className="custom-checkbox" />
-                    <span className="text-muted-foreground group-hover:text-foreground transition-colors tracking-tight">Keep me signed in</span>
-                  </label>
-                  <button 
-                    type="button"
-                    onClick={() => router.push('/auth/signup')}
-                    className="text-zinc-400 hover:text-foreground transition-colors tracking-tight"
-                  >
-                    no account? <span className="text-zinc-500 dark:text-white/40 border-b border-zinc-300 dark:border-white/10 ml-1">create one</span>
-                  </button>
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={!email.includes('@')}
-                  className="animate-element animate-delay-600 w-full h-[56px] bg-zinc-900 text-white dark:bg-white dark:text-black rounded-2xl font-bold text-sm hover:bg-zinc-800 dark:hover:bg-[#F5F5F5] hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2 shadow-sm dark:shadow-[0_20px_40px_rgba(255,255,255,0.1)] disabled:opacity-50 active:scale-[0.98]"
-                >
-                  Continue
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-              </form>
-            </motion.div>
-          )}
-
-          {/* STEP 2: Identity Handling */}
-          {step === 2 && (
-            <motion.div
-              key="step2"
-              initial={{ opacity: 0, x: 10 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -10 }}
-              transition={{ duration: 0.4 }}
-              className="space-y-6"
-            >
-              <StepIndicator currentStep={2} />
-              <button onClick={backToStep1} className="flex items-center gap-2 text-zinc-400 hover:text-foreground dark:text-white/30 dark:hover:text-white transition-colors text-xs font-light mb-8 group w-fit">
-                <ArrowLeft className="w-3 h-3 group-hover:-translate-x-0.5 transition-transform" />
-                use different email
-              </button>
               <div className="mb-6">
-                <h2 className="text-foreground text-lg font-medium tracking-tight mb-2">Continue with Google</h2>
-                <p className="text-muted-foreground text-xs font-medium tracking-tight leading-relaxed">
-                  Next you’ll sign in with Google to securely connect Gmail. That’s how Mailient reads, drafts, and runs your inbox — nothing starts until you approve access.
-                </p>
-              </div>
-              <div className="p-5 bg-zinc-50 border border-zinc-200 dark:bg-white/[0.02] dark:border-white/[0.05] rounded-2xl mb-8 group hover:bg-zinc-100 dark:hover:bg-white/[0.04] transition-all">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 dark:text-white/20">Identity</span>
-                  <span className={`text-[10px] font-bold uppercase tracking-[0.2em] ${isGmail ? 'text-amber-600 dark:text-amber-500/60' : 'text-zinc-400 dark:text-white/20'}`}>
-                    {isGmail ? 'Personal Gmail' : (isWorkspace ? 'Workspace' : 'Personal')}
-                  </span>
-                </div>
-                <div className="text-foreground font-semibold truncate text-sm tracking-tight">{email}</div>
+                <h2 className="text-foreground text-lg font-medium tracking-tight mb-2">Welcome back</h2>
+                <p className="text-muted-foreground text-sm">Sign in with Google to connect Gmail.</p>
               </div>
 
               {error && (
@@ -347,25 +263,37 @@ function SignInContent() {
                 </div>
               )}
 
-              {isGmail ? (
-                <div className="space-y-6">
-                  <GmailWarning />
-                  <PremiumGoogleButton />
-                </div>
-              ) : (
-                <div className="p-6 bg-zinc-50 border border-zinc-200 dark:bg-white/[0.02] dark:border-white/[0.08] rounded-2xl space-y-6">
-                  <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-zinc-100 border border-zinc-200 dark:bg-white/[0.04] dark:border-white/[0.08] flex items-center justify-center shrink-0">
-                      <Building2 className="w-5 h-5 text-zinc-400 dark:text-white/40" strokeWidth={1.5} />
-                    </div>
-                    <div>
-                      <h3 className="text-foreground text-sm font-semibold tracking-tight mb-2">Workspace Preferred</h3>
-                      <p className="text-muted-foreground text-[11px] leading-relaxed font-light tracking-tight">Mailient is optimized for Google Workspace.</p>
-                    </div>
-                  </div>
-                  <div className="border-t border-zinc-200 dark:border-white/[0.06] pt-6"><PremiumGoogleButton /></div>
-                </div>
-              )}
+              {isGmail && email.includes('@') && <GmailWarning />}
+
+              <PremiumGoogleButton />
+
+              <div className="pt-2 space-y-2">
+                <label className="text-[12px] text-zinc-500 dark:text-white/35 block">Work email (optional)</label>
+                <GlassInputWrapper>
+                  <input
+                    ref={emailInputRef}
+                    type="email"
+                    value={email}
+                    onChange={(e) => onEmailChange(e.target.value)}
+                    placeholder="Helps Google pick the right account"
+                    className="w-full bg-transparent text-sm p-4 rounded-2xl focus:outline-none text-foreground placeholder:text-zinc-400 dark:placeholder:text-white/20 font-medium"
+                  />
+                </GlassInputWrapper>
+              </div>
+
+              <div className="flex items-center justify-between text-[12px] pt-2">
+                <label className="flex items-center gap-3 cursor-pointer group">
+                  <input type="checkbox" name="rememberMe" className="custom-checkbox" />
+                  <span className="text-muted-foreground group-hover:text-foreground transition-colors">Keep me signed in</span>
+                </label>
+                <button
+                  type="button"
+                  onClick={() => router.push('/auth/signup')}
+                  className="text-zinc-400 hover:text-foreground transition-colors"
+                >
+                  No account? <span className="text-zinc-500 dark:text-white/40 border-b border-zinc-300 dark:border-white/10 ml-1">Create one</span>
+                </button>
+              </div>
             </motion.div>
           )}
 
@@ -380,9 +308,9 @@ function SignInContent() {
               className="space-y-6"
             >
               <StepIndicator currentStep={3} />
-              <button onClick={() => setStep(2)} className="flex items-center gap-2 text-zinc-400 hover:text-foreground dark:text-white/30 dark:hover:text-white transition-colors text-xs font-light mb-8 group w-fit">
+              <button onClick={() => setStep(1)} className="flex items-center gap-2 text-zinc-400 hover:text-foreground dark:text-white/30 dark:hover:text-white transition-colors text-xs font-light mb-8 group w-fit">
                 <ArrowLeft className="w-3 h-3 group-hover:-translate-x-0.5 transition-transform" />
-                back to connection
+                Back to sign in
               </button>
               <div className="mb-8">
                 <div className="flex items-center gap-3 mb-3">

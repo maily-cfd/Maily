@@ -114,6 +114,7 @@ export default function OnboardingPage() {
                       router.replace('/home-feed');
                     } else {
                       console.log('🔒 [Onboarding] Completed but UNPAID — parking on paywall (step 13).');
+                      localStorage.removeItem('onboarding_completed');
                       const stepParam = new URLSearchParams(window.location.search).get('step');
                       if (stepParam !== '13') router.replace('/onboarding?step=13');
                     }
@@ -125,6 +126,7 @@ export default function OnboardingPage() {
                   }
                   return;
                 } else if (data.lastStep && data.lastStep >= 1) {
+                  if (localDone) localStorage.removeItem('onboarding_completed');
                   // Not completed, resume at the last step they reached (1-indexed flow)
                   const currentParam = new URLSearchParams(window.location.search).get('step');
                   if (currentParam === null || parseInt(currentParam) !== data.lastStep) {
@@ -137,6 +139,7 @@ export default function OnboardingPage() {
                   }
                 } else {
                   console.log('⏳ [Onboarding] Staying here: Onboarding is NOT complete');
+                  if (localDone) localStorage.removeItem('onboarding_completed');
                 }
               } else {
                 console.error('❌ [Onboarding] Status API failed:', response.status);

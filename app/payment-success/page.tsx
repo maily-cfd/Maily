@@ -43,6 +43,7 @@ function PaymentSuccessContent() {
             const ret = localStorage.getItem('mailient_checkout_return');
             if (ret) dest = ret;
             localStorage.removeItem('mailient_checkout_return');
+            localStorage.setItem('onboarding_completed', 'true');
         } catch { /* */ }
         setTimeout(() => {
             router.push(dest);
@@ -53,7 +54,6 @@ function PaymentSuccessContent() {
         // Clear any stale localStorage data
         localStorage.removeItem('pending_plan');
         localStorage.removeItem('pending_plan_timestamp');
-        localStorage.setItem('onboarding_completed', 'true');
 
         let currentRetry = 0;
         let timeoutId: NodeJS.Timeout;

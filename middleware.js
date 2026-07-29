@@ -16,7 +16,7 @@ export async function middleware(request) {
 
     if (sessionToken) {
       const url = request.nextUrl.clone();
-      url.pathname = '/home-feed';
+      url.pathname = '/onboarding';
       const response = NextResponse.redirect(url);
       if (ref) response.cookies.set('mailient_referral', ref, { maxAge: 60 * 60 * 24 * 30, path: '/' });
       addSecurityHeaders(response);

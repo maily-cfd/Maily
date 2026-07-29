@@ -1104,6 +1104,7 @@ function S9Arcus({ scan, firstName, onContinue, reduce }: { scan: ScanResult | n
   const [phase, setPhase] = useState<'idle' | 'working' | 'done' | 'error'>('idle');
   const [moments, setMoments] = useState<Moment[]>([]);
   const [drafts, setDrafts] = useState(0);
+  const [errorDetail, setErrorDetail] = useState<string | null>(null);
   const scroller = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -1113,23 +1114,35 @@ function S9Arcus({ scan, firstName, onContinue, reduce }: { scan: ScanResult | n
   const push = (m: Moment) => setMoments((prev) => [...prev, m]);
 
   const run = async () => {
-    setPhase('working'); setMoments([]); setDrafts(0);
+    setPhase('working'); setMoments([]); setDrafts(0); setErrorDetail(null);
     try {
-      const res = await fetch('/api/arcus/chat', {
+      const res = await fetch('/api/onboarding/arcus-demo', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: `Find my ${count} oldest unread emails in the inbox that look like they need a reply, and draft a reply to each one in my voice. Save each as a Gmail draft — do NOT send anything.`,
-          actionMode: 'auto',
-        }),
+        body: JSON.stringify({ count }),
       });
-      if (!res.ok || !res.body) throw new Error('stream failed');
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => ({}));
+        setErrorDetail(
+          typeof errBody?.message === 'string'
+            ? errBody.message
+            : 'Arcus could not run right now. Check that Gmail is connected and try again.',
+        );
+        setPhase('error');
+        return;
+      }
+      if (!res.body) {
+        setErrorDetail('Arcus returned an empty response. Try again.');
+        setPhase('error');
+        return;
+      }
 
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let buffer = '';
       let finalText = '';
       let errored = false;
+      let streamError = '';
 
       while (true) {
         const { done, value } = await reader.read();
@@ -1144,14 +1157,24 @@ function S9Arcus({ scan, firstName, onContinue, reduce }: { scan: ScanResult | n
           const type = evLine.slice(6).trim();
           let data: any = {};
           try { data = JSON.parse(dataLine.slice(5).trim()); } catch { /* */ }
-          if (type === 'error') { errored = true; continue; }
+          if (type === 'error') {
+            errored = true;
+            const msg = (data?.message || data?.error || '').toString().trim();
+            if (msg) streamError = msg;
+            continue;
+          }
           handleEvent(type, data, (t) => { finalText = t; });
         }
       }
-      if (errored && !finalText) { setPhase('error'); return; }
+      if (errored && !finalText) {
+        setErrorDetail(streamError || 'Arcus hit an error while drafting. Try again.');
+        setPhase('error');
+        return;
+      }
       if (finalText) push({ kind: 'final', text: finalText });
       setPhase('done');
     } catch {
+      setErrorDetail('Connection lost while Arcus was working. Try again.');
       setPhase('error');
     }
   };
@@ -1182,7 +1205,8 @@ function S9Arcus({ scan, firstName, onContinue, reduce }: { scan: ScanResult | n
         break;
       }
       case 'connector_required': {
-        push({ kind: 'decision', text: 'Needs Gmail reconnected to continue' });
+        push({ kind: 'decision', text: 'Gmail needs to be reconnected' });
+        setErrorDetail('Gmail connection is missing permissions. Reconnect Gmail, then run this again.');
         break;
       }
       default: break;
@@ -1262,8 +1286,13 @@ function S9Arcus({ scan, firstName, onContinue, reduce }: { scan: ScanResult | n
 
       {phase === 'error' && (
         <div className="text-center">
-          <Body className="text-[14px] mb-5">Arcus couldn’t finish that run — it may have timed out. You can try this again from your dashboard.</Body>
-          <PrimaryButton onClick={onContinue}>Continue <ArrowRight className="w-4 h-4" /></PrimaryButton>
+          <Body className="text-[14px] mb-5 max-w-sm mx-auto text-[#0A0A0A]/70">
+            {errorDetail || 'Something went wrong while Arcus was drafting.'}
+          </Body>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <PrimaryButton onClick={run}>Try again</PrimaryButton>
+            <SkipLink onClick={onContinue}>Skip this step</SkipLink>
+          </div>
         </div>
       )}
     </div>
