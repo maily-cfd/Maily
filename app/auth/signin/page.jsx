@@ -86,9 +86,14 @@ function SignInContent() {
       return;
     }
 
-    // Continue → start the real Google sign-in (lands on /onboarding). The old
-    // Tally waitlist redirect was a pre-launch gate and is gone now.
-    handleGoogleSignIn();
+    // Show the Google continue step first — never jump straight into OAuth.
+    // Visitors were confused when email → Composio/Google fired with no explanation.
+    const domain = trimmed.split('@')[1] || '';
+    setEmailDomain(domain);
+    setIsGmail(domain === 'gmail.com' || domain === 'googlemail.com');
+    setIsWorkspace(!PERSONAL_DOMAINS.includes(domain));
+    setError(null);
+    setStep(2);
   };
 
   const handleGoogleSignIn = async () => {
@@ -200,7 +205,7 @@ function SignInContent() {
               <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
             </svg>
           </div>
-          <span>Sign in with Google</span>
+          <span>Continue with Google</span>
         </>
       )}
     </button>
@@ -319,11 +324,17 @@ function SignInContent() {
                 <ArrowLeft className="w-3 h-3 group-hover:-translate-x-0.5 transition-transform" />
                 use different email
               </button>
+              <div className="mb-6">
+                <h2 className="text-foreground text-lg font-medium tracking-tight mb-2">Continue with Google</h2>
+                <p className="text-muted-foreground text-xs font-medium tracking-tight leading-relaxed">
+                  Next you’ll sign in with Google to securely connect Gmail. That’s how Mailient reads, drafts, and runs your inbox — nothing starts until you approve access.
+                </p>
+              </div>
               <div className="p-5 bg-zinc-50 border border-zinc-200 dark:bg-white/[0.02] dark:border-white/[0.05] rounded-2xl mb-8 group hover:bg-zinc-100 dark:hover:bg-white/[0.04] transition-all">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 dark:text-white/20">Identity</span>
                   <span className={`text-[10px] font-bold uppercase tracking-[0.2em] ${isGmail ? 'text-amber-600 dark:text-amber-500/60' : 'text-zinc-400 dark:text-white/20'}`}>
-                    {isGmail ? 'Personal Gmail' : 'Personal'}
+                    {isGmail ? 'Personal Gmail' : (isWorkspace ? 'Workspace' : 'Personal')}
                   </span>
                 </div>
                 <div className="text-foreground font-semibold truncate text-sm tracking-tight">{email}</div>

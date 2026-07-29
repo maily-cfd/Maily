@@ -23,10 +23,10 @@
 
 ## Pricing (single plan, everything included)
 
-- Monthly: $29/month (3-day free trial).
+- Monthly: $29/month with a 3-day free trial (card required at Polar checkout; cancel before day 3 to avoid charge).
 - Annual: $199/year.
 - Lifetime Founder: $499 one-time.
-- All tiers include the full product with unlimited use; they differ only in how you pay. No free tier. No hidden API or overage fees.
+- All tiers include the full product with unlimited use; they differ only in how you pay. No free forever tier. No hidden API or overage fees.
 
 ## Security & privacy (verifiable claims only)
 

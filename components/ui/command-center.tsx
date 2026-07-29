@@ -176,6 +176,9 @@ export function CommandCenter({ userName, onOpenExistingDraft }: {
     return Array.isArray(c) ? new Set(c) : null;
   });
   const [showConnectors, setShowConnectors] = useState(false);
+  const [integrationsNudgeDismissed, setIntegrationsNudgeDismissed] = useState(() => {
+    try { return localStorage.getItem('mailient_integrations_nudge_dismissed') === '1'; } catch { return false; }
+  });
 
   const openArcus = useCallback((prompt: string) => {
     // ONE CLICK: open the Arcus command palette (the Ctrl+K panel) right here and
@@ -220,6 +223,18 @@ export function CommandCenter({ userName, onOpenExistingDraft }: {
       } catch { if (alive) setConnectedApps(prev => prev ?? new Set()); }
     })();
     return () => { alive = false; };
+  }, []);
+
+  const needsIntegrationsNudge = useMemo(() => {
+    if (integrationsNudgeDismissed || !connectedApps) return false;
+    const hasNotion = connectedApps.has('notion');
+    const hasSlack = connectedApps.has('slack');
+    return !hasNotion || !hasSlack;
+  }, [connectedApps, integrationsNudgeDismissed]);
+
+  const dismissIntegrationsNudge = useCallback(() => {
+    setIntegrationsNudgeDismissed(true);
+    try { localStorage.setItem('mailient_integrations_nudge_dismissed', '1'); } catch { /* */ }
   }, []);
 
   // "Needs a reply" → Draft reply: check for an already-existing Gmail draft on
@@ -477,6 +492,33 @@ export function CommandCenter({ userName, onOpenExistingDraft }: {
         </div>
         </div>
       </motion.section>
+
+      {needsIntegrationsNudge && (
+        <div className="arcus-glass-card rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+          <div className="min-w-0 flex-1">
+            <p className="text-[14px] font-semibold text-arcus-fg tracking-tight">Connect Slack &amp; Notion when you’re ready</p>
+            <p className="text-[12.5px] text-arcus-fg-secondary mt-0.5 leading-relaxed">
+              Optional — briefings in Slack, deals and notes in Notion. Skip anytime; you can always connect from Your stack.
+            </p>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={dismissIntegrationsNudge}
+              className="h-9 px-3.5 rounded-xl border border-arcus-border text-[12.5px] font-medium text-arcus-fg-tertiary hover:text-arcus-fg hover:bg-arcus-surface-hover transition-colors"
+            >
+              Not now
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowConnectors(true)}
+              className="h-9 px-3.5 rounded-xl bg-arcus-fg text-arcus-fg-inverse text-[12.5px] font-medium hover:opacity-90 transition-opacity inline-flex items-center gap-1.5"
+            >
+              Connect <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* 1.5 ── YOUR STACK — cross-app connection surface. Makes the fusion
           VISIBLE and one tap away: connected apps light up, the rest invite a

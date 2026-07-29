@@ -85,21 +85,26 @@ export function CTASection() {
             </p>
 
             {/* Buttons row matching the screenshot */}
-            <div className="flex flex-wrap items-center justify-center gap-4">
-              {/* Left Button: Obsidian Pill */}
-              <CircleExpandButton href="/auth/signup" variant="primary">
-                Get started free
-              </CircleExpandButton>
+            <div className="flex flex-col items-center gap-3">
+              <div className="flex flex-wrap items-center justify-center gap-4">
+                {/* Left Button: Obsidian Pill */}
+                <CircleExpandButton href="/auth/signup" variant="primary">
+                  Get started free
+                </CircleExpandButton>
 
-              {/* Right Button: Transparent/Black Pill */}
-              <CircleExpandButton
-                href="https://x.com/maulik_5"
-                target="_blank"
-                rel="noopener noreferrer"
-                variant="secondary"
-              >
-                Talk to Founder
-              </CircleExpandButton>
+                {/* Right Button: Transparent/Black Pill */}
+                <CircleExpandButton
+                  href="https://x.com/maulik_5"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  variant="secondary"
+                >
+                  Talk to Founder
+                </CircleExpandButton>
+              </div>
+              <p className="text-[13px] text-[#8a8f98]/80 tracking-wide select-none">
+                3-day free trial · cancel anytime
+              </p>
             </div>
           </div>
         </div>

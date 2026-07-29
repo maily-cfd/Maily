@@ -5,8 +5,11 @@ import { Analytics } from "@vercel/analytics/next";
 
 export const metadata = {
   title: "Mailient — Runs your inbox while you build your company",
-  description: "Mailient removes email from a solo founder's to-do list entirely. It reads, prioritizes, drafts replies in your voice, books meetings, and follows up — you wake up to one morning briefing instead of an inbox.",
+  description:
+    "AI inbox employee for solo founders. Reads, prioritizes, drafts in your voice, books meetings — wake up to one morning briefing. 3-day free trial.",
   metadataBase: new URL('https://mailient.xyz'),
+  alternates: { canonical: 'https://mailient.xyz' },
+  robots: { index: true, follow: true },
   icons: {
     icon: [
       { url: "/favicon.png?v=10", type: "image/png" },
@@ -16,7 +19,8 @@ export const metadata = {
   },
   openGraph: {
     title: "Mailient — Runs your inbox while you build your company",
-    description: "Reads your email. Prioritizes what matters. Drafts replies in your voice. Books meetings. Follows up automatically. You wake up to one morning briefing instead of an inbox.",
+    description:
+      "AI inbox employee for solo founders. Reads, prioritizes, drafts in your voice, books meetings — wake up to one morning briefing. 3-day free trial.",
     url: "https://mailient.xyz",
     siteName: "Mailient",
     images: [
@@ -33,7 +37,8 @@ export const metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Mailient — Runs your inbox while you build your company",
-    description: "You wake up to one morning briefing instead of an inbox.",
+    description:
+      "AI inbox employee for solo founders. Reads, prioritizes, drafts in your voice, books meetings — wake up to one morning briefing. 3-day free trial.",
     images: ["/og-image.png"],
   },
 };
@@ -65,9 +70,15 @@ const softwareJsonLd = {
   applicationCategory: "BusinessApplication",
   operatingSystem: "Web",
   description:
-    "Mailient removes email from your to-do list entirely. An autonomous AI inbox employee for solo founders: it reads, prioritizes, drafts replies in your voice, books meetings, and follows up while you sleep — you wake up to one morning briefing instead of an inbox.",
+    "AI inbox employee for solo founders. Reads, prioritizes, drafts replies in your voice, books meetings — wake up to one morning briefing. 3-day free trial.",
   offers: [
-    { "@type": "Offer", name: "Monthly", price: "29", priceCurrency: "USD" },
+    {
+      "@type": "Offer",
+      name: "Monthly",
+      price: "29",
+      priceCurrency: "USD",
+      description: "3-day free trial, then $29/month. Cancel anytime.",
+    },
     { "@type": "Offer", name: "Annual", price: "199", priceCurrency: "USD" },
     { "@type": "Offer", name: "Lifetime Founder", price: "499", priceCurrency: "USD" },
   ],

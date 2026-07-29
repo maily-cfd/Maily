@@ -35,6 +35,10 @@ const COMPARISON_FEATURES = [
 
 const PRICING_FAQS = [
   {
+    q: "Is there a free trial?",
+    a: "Yes. The monthly plan includes a 3-day free trial via Polar checkout (card required). You won’t be charged during the trial — cancel anytime before day 3. After that it’s $29/month. Annual and Lifetime start immediately at checkout."
+  },
+  {
     q: "How does the Weekly plan work?",
     a: "It's $8.99 per week for the complete product — nothing is held back compared to the larger plans. It renews every 7 days until you cancel, and you can cancel from your billing portal at any time; access runs to the end of the week you've already paid for. It's the lowest-commitment way to find out whether Mailient earns its place in your week."
   },
@@ -55,7 +59,7 @@ const PRICING_FAQS = [
 export default function PricingPage() {
   const { data: session } = useSession();
   const router = useRouter();
-  
+
   const [currentPlan, setCurrentPlan] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
@@ -117,7 +121,7 @@ export default function PricingPage() {
 
       {/* Global Background Grid & Noise */}
       <div className="absolute inset-0 z-0 pointer-events-none select-none overflow-hidden">
-        <div 
+        <div
           className="absolute inset-0 opacity-[0.015]"
           style={{
             backgroundImage: `radial-gradient(circle, #fff 1px, transparent 1px)`,
@@ -130,10 +134,10 @@ export default function PricingPage() {
 
 
       {/* Modular Pricing Component */}
-      <PricingSection3 
-        isLoading={isLoading} 
-        currentPlan={currentPlan} 
-        handleSelectPlan={handleSelectPlan} 
+      <PricingSection3
+        isLoading={isLoading}
+        currentPlan={currentPlan}
+        handleSelectPlan={handleSelectPlan}
       />
 
       {/* FEATURE COMPARISON TABLE */}
@@ -160,8 +164,8 @@ export default function PricingPage() {
             </thead>
             <tbody className="divide-y divide-white/[0.04]">
               {COMPARISON_FEATURES.map((feat, idx) => (
-                <tr 
-                  key={idx} 
+                <tr
+                  key={idx}
                   className="hover:bg-white/[0.01] transition-colors"
                 >
                   <td className="py-4 px-6 font-medium text-white">{feat.name}</td>
@@ -191,8 +195,8 @@ export default function PricingPage() {
           {PRICING_FAQS.map((faq, idx) => {
             const isOpen = activeFaq === idx;
             return (
-              <div 
-                key={idx} 
+              <div
+                key={idx}
                 className="rounded-[24px] border border-white/[0.04] bg-[#070707] overflow-hidden transition-all duration-300"
               >
                 <button

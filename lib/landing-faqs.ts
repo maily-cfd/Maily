@@ -3,8 +3,8 @@
 // JSON-LD on the homepage (server), so copy edits update both.
 export const landingFaqs: Array<{ q: string; a: string }> = [
   {
-    q: "Is there a free plan?",
-    a: "No — Mailient is a single plan with full access to everything. You can choose monthly at $29, annual at $199 (two months free), or grab a Lifetime Founding Member seat for $499 while they last. Every plan includes the full product: the AI that runs your inbox, replies in your voice, automations that work while you sleep, and end-to-end encryption. No free tier, no feature gating, no surprises."
+    q: "Is there a free trial?",
+    a: "Yes — the monthly plan includes a 3-day free trial. You start checkout with Polar (card required), aren’t charged during the trial, and can cancel anytime before day 3. After the trial it’s $29/month. Annual ($199/year) and Lifetime Founder ($499 once) are also available. Every plan includes the full product — no feature gating.",
   },
   {
     q: "Does Mailient replace Gmail?",
@@ -20,12 +20,12 @@ export const landingFaqs: Array<{ q: string; a: string }> = [
   },
   {
     q: "Can I cancel anytime?",
-    a: "Monthly plan cancels at the end of your billing period. Annual plan can be cancelled anytime — you keep full access for the year you paid for. No retention calls. No dark patterns. One click in settings."
+    a: "Yes. Cancel during the 3-day trial and you won’t be charged. Monthly plan cancels at the end of your billing period. Annual plan can be cancelled anytime — you keep full access for the year you paid for. No retention calls. No dark patterns. One click in settings."
   },
 
   {
     q: "How long does setup take?",
-    a: "Two minutes. Connect your Google account, grant Gmail and Calendar access, and Mailient starts working immediately. There is nothing to configure. It begins learning your voice in the background from the moment you connect."
+    a: "A few minutes to connect Google and walk through a short setup. Connect Gmail (and optionally Calendar), and Mailient starts learning your voice and reading your inbox in the background. Slack and Notion can be connected later from the app whenever you’re ready."
   },
   {
     q: "Does Mailient work for teams?",

@@ -132,7 +132,7 @@ export default function PricingSection3({
     {
       id: "subscription" as const,
       name: "Autonomous Subscription",
-      description: "Scale your email operations autonomously. Triages, drafts in your voice, and logs CRM entries in real time.",
+      description: "Scale your email operations autonomously. Triages, drafts in your voice, and logs CRM entries in real time. Monthly includes a 3-day free trial.",
       price: 29,
       yearlyPrice: 16.58,
       buttonText: "Start Subscription",
@@ -145,7 +145,7 @@ export default function PricingSection3({
         "Gold Founding Badge status",
         "Gold Slack channel entry"
       ],
-      tag: "Flexible Membership"
+      tag: "3-day free trial"
     },
     {
       id: "lifetime" as const,
@@ -197,7 +197,7 @@ export default function PricingSection3({
             Your next hire costs $29 a month.
           </VerticalCutReveal>
         }
-        subtitle="One plan, everything included — you just pick how you pay."
+        subtitle="One plan, everything included — monthly includes a 3-day free trial."
       />
 
       <TimelineContent
@@ -248,12 +248,21 @@ export default function PricingSection3({
                 <CardContent className="pt-0 relative z-10 flex-grow">
                   <div className="flex items-center justify-between mb-8">
                     <span className="text-[9px] font-black uppercase tracking-widest text-neutral-400">
-                      {plan.tag}
+                      {plan.id === "subscription" && !isYearly
+                        ? "3-day free trial"
+                        : plan.id === "subscription" && isYearly
+                          ? "Flexible Membership"
+                          : plan.tag}
                     </span>
                     {plan.popular && (
                       <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-white text-black text-[9px] font-black uppercase tracking-wider shadow-xl">
                         <Crown className="w-3 h-3 text-black" />
                         Prioritized
+                      </span>
+                    )}
+                    {plan.id === "subscription" && !isYearly && !plan.popular && (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/25 text-emerald-300 text-[9px] font-black uppercase tracking-wider">
+                        Free trial
                       </span>
                     )}
                   </div>
@@ -334,6 +343,10 @@ export default function PricingSection3({
                       "Processing..."
                     ) : isCurrentPlanActive ? (
                       "Current Active Plan"
+                    ) : plan.id === "subscription" && !isYearly ? (
+                      "Start 3-day free trial"
+                    ) : plan.id === "subscription" && isYearly ? (
+                      "Start Annual"
                     ) : (
                       plan.buttonText
                     )}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence, useMotionValue, useMotionTemplate } from "framer-motion";
+import { motion, AnimatePresence, useMotionValue, useMotionTemplate, useReducedMotion } from "framer-motion";
 import {
   Zap,
   Bot,
@@ -91,6 +91,22 @@ function ActiveCounter({ target = 1420 }: { target?: number }) {
 }
 
 // landingFaqs moved to lib/landing-faqs.ts (shared with homepage FAQPage JSON-LD)
+
+/** Hero texture — same EtheralShadow as shape-landing-hero, not full-blast. */
+function HeroEtheralShadow() {
+  const reduce = useReducedMotion();
+  return (
+    <div className="absolute inset-0 z-0 pointer-events-none opacity-50 mix-blend-screen select-none">
+      <EtheralShadow
+        color="rgba(100, 100, 120, 0.8)"
+        animation={reduce ? undefined : { scale: 35, speed: 25 }}
+        noise={{ opacity: 0.3, scale: 1.5 }}
+        sizing="fill"
+        className="opacity-70"
+      />
+    </div>
+  );
+}
 
 const DESCRIPTIONS = [
   "Mailient removes email from your to-do list entirely.",
@@ -397,15 +413,8 @@ export function LinearLanding() {
         {/* White-grey glow from the bottom of the hero section spreading up */}
         <div className="absolute inset-x-0 bottom-0 h-[250px] bg-[radial-gradient(ellipse_at_bottom,rgba(255,255,255,0.08),transparent_70%)] pointer-events-none z-10" />
 
-        {/* Etheral Shadow Background Layer */}
-        <div className="absolute inset-0 z-0 pointer-events-none opacity-40 mix-blend-screen select-none">
-          <EtheralShadow
-            color="rgba(128, 128, 128, 1)"
-            animation={{ scale: 100, speed: 90 }}
-            noise={{ opacity: 1, scale: 1.2 }}
-            sizing="fill"
-          />
-        </div>
+        {/* Etheral Shadow — tuned to match shape-landing-hero (not full-blast) */}
+        <HeroEtheralShadow />
 
         <div className="w-full flex flex-col items-center max-w-5xl z-10 mx-auto px-6">
           
@@ -426,17 +435,22 @@ export function LinearLanding() {
 
           {/* Premium CTAs */}
           <BlurFade delay={0.3} duration={0.8} inView>
-            <div className="flex flex-wrap items-center justify-center gap-4 mt-12">
-              <CircleExpandButton href="/auth/signup">
-                Get started free
-              </CircleExpandButton>
+            <div className="flex flex-col items-center gap-3 mt-12">
+              <div className="flex flex-wrap items-center justify-center gap-4">
+                <CircleExpandButton href="/auth/signup">
+                  Get started free
+                </CircleExpandButton>
 
-              {/* Points at #demos (the real product-demo videos), not
-                  #sample-brief — that anchor is the illustrative before/after
-                  panel, so the old link promised footage and delivered a mockup. */}
-              <CircleExpandButton href="#demos" variant="secondary">
-                Watch Mailient handle a real inbox
-              </CircleExpandButton>
+                {/* Points at #demos (the real product-demo videos), not
+                    #sample-brief — that anchor is the illustrative before/after
+                    panel, so the old link promised footage and delivered a mockup. */}
+                <CircleExpandButton href="#demos" variant="secondary">
+                  Watch Mailient handle a real inbox
+                </CircleExpandButton>
+              </div>
+              <p className="text-[13px] text-[#8a8f98]/80 tracking-wide">
+                3-day free trial · cancel anytime
+              </p>
             </div>
           </BlurFade>
 
@@ -725,7 +739,7 @@ export function LinearLanding() {
                     autoPlay
                     muted
                     playsInline
-                    preload="auto"
+                    preload="none"
                     onEnded={() => setActiveStep((prev) => (prev + 1) % 3)}
                     aria-label="The Mailient home feed showing only the emails that need a decision"
                     className="w-full h-full object-cover"
@@ -749,7 +763,7 @@ export function LinearLanding() {
                     autoPlay
                     muted
                     playsInline
-                    preload="auto"
+                    preload="none"
                     onEnded={() => setActiveStep((prev) => (prev + 1) % 3)}
                     aria-label="Mailient drafting an email reply in your voice"
                     className="w-full h-full object-contain lg:object-cover"
@@ -773,7 +787,7 @@ export function LinearLanding() {
                     autoPlay
                     muted
                     playsInline
-                    preload="auto"
+                    preload="none"
                     onEnded={() => setActiveStep((prev) => (prev + 1) % 3)}
                     aria-label="Creating a background scheduling agent in plain English"
                     className="w-full h-full object-cover"

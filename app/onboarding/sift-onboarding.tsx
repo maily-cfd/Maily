@@ -32,6 +32,15 @@ const FIRST = 1;
 const LAST = 15;
 type Step = number; // 1..15
 
+/** Notion/Slack deferred to in-app nudge — skip these step numbers in the flow. */
+const SKIP_STEPS = new Set([10, 11]);
+
+function bypassSkipped(n: number, dir: 1 | -1): Step {
+  let s = n;
+  while (SKIP_STEPS.has(s)) s += dir;
+  return Math.min(LAST, Math.max(FIRST, s)) as Step;
+}
+
 // When Composio carries the Gmail grant, step 2 logs the user in with
 // identity-only scopes (no cap) and connects Gmail via a Composio popup.
 // Client-readable public mirror of COMPOSIO_GMAIL_AUTH_CONFIG_ID — set
@@ -147,7 +156,21 @@ export default function SiftOnboardingPage() {
   const reduce = useReducedMotion();
 
   const urlStep = Number(searchParams?.get('step') || FIRST);
-  const [step, setStep] = useState<Step>(urlStep >= FIRST && urlStep <= LAST ? urlStep : FIRST);
+  const [step, setStep] = useState<Step>(() => {
+    const raw = urlStep >= FIRST && urlStep <= LAST ? urlStep : FIRST;
+    return bypassSkipped(raw, 1);
+  });
+
+  // Deep links / resume on Notion or Slack steps → jump to First Agent.
+  useEffect(() => {
+    if (SKIP_STEPS.has(step)) {
+      const next = bypassSkipped(step, 1);
+      setStep(next);
+      const params = new URLSearchParams(Array.from(searchParams?.entries() || []));
+      params.set('step', String(next));
+      window.history.replaceState(null, '', `?${params.toString()}`);
+    }
+  }, [step, searchParams]);
 
   // Keep the UI step in sync with ROUTER-driven URL changes. The paywall
   // return path (abandoned checkout → router.replace('?step=13')) and the
@@ -156,7 +179,9 @@ export default function SiftOnboardingPage() {
   // frozen on step 15. commit() uses history.replaceState, which does NOT
   // update useSearchParams — so normal forward navigation never re-fires this.
   useEffect(() => {
-    if (urlStep >= FIRST && urlStep <= LAST && urlStep !== step) setStep(urlStep);
+    if (urlStep >= FIRST && urlStep <= LAST && urlStep !== step) {
+      setStep(bypassSkipped(urlStep, 1));
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [urlStep]);
 
@@ -246,7 +271,7 @@ export default function SiftOnboardingPage() {
         if (st.briefChannel) setBriefChannel(st.briefChannel);
         // Only honor server step if the URL didn't pin one explicitly.
         if (!searchParams?.get('step') && typeof d.step === 'number' && d.step >= FIRST && d.step <= LAST) {
-          setStep(d.step);
+          setStep(bypassSkipped(d.step, 1));
         }
       } catch { /* non-fatal */ }
     })();
@@ -265,13 +290,23 @@ export default function SiftOnboardingPage() {
   }, [searchParams]);
 
   const go = useCallback((next: Step, patch?: Record<string, unknown>) => {
-    setStep(next);
-    commit(next, patch);
-    if (next === 3 || next === 10 || next === 11) fetchIntegrations();
-  }, [commit, fetchIntegrations]);
+    const resolved = bypassSkipped(next, next >= step ? 1 : -1);
+    setStep(resolved);
+    commit(resolved, patch);
+    if (resolved === 3) fetchIntegrations();
+  }, [commit, fetchIntegrations, step]);
 
-  const next = useCallback((patch?: Record<string, unknown>) => go(Math.min(LAST, step + 1), patch), [go, step]);
-  const back = useCallback(() => go(Math.max(FIRST, step - 1)), [go, step]);
+  const next = useCallback((patch?: Record<string, unknown>) => {
+    go(bypassSkipped(Math.min(LAST, step + 1), 1), patch);
+  }, [go, step]);
+  const back = useCallback(() => {
+    go(bypassSkipped(Math.max(FIRST, step - 1), -1));
+  }, [go, step]);
+
+  // Scan results require a scan — if we landed here after a soft-fail skip, move on.
+  useEffect(() => {
+    if (step === 5 && !scan) go(6);
+  }, [step, scan, go]);
 
   // ── In-flow popup OAuth (keeps the user inside onboarding) ──
   // In-flow popup OAuth. `provider` is the integrations provider name
@@ -430,14 +465,14 @@ export default function SiftOnboardingPage() {
                 }
               }} onContinue={() => next()} />}
               {step === 3  && <S3Calendar connected={isConnected('gcal') || isConnected('google_calendar')} onConnect={() => connectViaPopup('google_calendar')} onContinue={() => next()} onSkip={() => next()} />}
-              {step === 4  && <S4Scan scan={scan} setScan={setScan} onDone={(s) => next({ scan: s })} onSkip={() => next()} reduce={!!reduce} />}
-              {step === 5  && <S5ScanResults scan={scan} onContinue={() => next()} />}
+              {step === 4  && <S4Scan scan={scan} setScan={setScan} onDone={(s) => next({ scan: s })} onSkip={() => go(6)} reduce={!!reduce} />}
+              {step === 5  && (scan
+                ? <S5ScanResults scan={scan} onContinue={() => next()} />
+                : null)}
               {step === 6  && <S6BuildVoice done={voiceDone} setDone={setVoiceDone} onDone={() => next({ voiceDone: true })} />}
               {step === 7  && <S7VoicePreview onContinue={() => next()} />}
               {step === 8  && <S8MeetArcus onContinue={() => next()} />}
               {step === 9  && <S9Arcus scan={scan} firstName={firstName} onContinue={() => next()} reduce={!!reduce} />}
-              {step === 10 && <S10Notion connected={isConnected('notion')} onConnect={() => connectViaPopup('notion')} onContinue={() => next()} onSkip={() => next()} />}
-              {step === 11 && <S11Slack connected={isConnected('slack')} onConnect={() => connectViaPopup('slack')} onContinue={() => next()} onSkip={() => next()} />}
               {step === 12 && <S12Agent spec={agentSpec} setSpec={setAgentSpec} created={createdAgent} setCreated={setCreatedAgent} onContinue={(c) => next(c ? { agent: c, agentSpec } : undefined)} onSkip={() => next()} />}
               {step === 13 && <S13Plan firstName={firstName} plan={planChoice} onChoose={(p) => { try { posthog.capture('paywall_plan_chosen', { plan: p }); } catch { /* analytics never blocks */ } setPlanChoice(p); next({ plan: p }); }} />}
               {step === 14 && <S14Notifications time={briefTime} setTime={setBriefTime} channel={briefChannel} setChannel={setBriefChannel} hasSlack={isConnected('slack')} agent={createdAgent} onUpdate={setCreatedAgent} onContinue={() => next({ briefTime, briefChannel })} />}
@@ -624,30 +659,6 @@ function GCalMark({ size = 22 }: { size?: number }) {
   );
 }
 
-function NotionMark({ size = 22 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true">
-      <path fill="#fff" stroke="#E8EAED" strokeWidth="0.5" d="M3.3 3.2 15.9 2.3c1.5-.1 1.9.0 2.9.7l3.1 2.2c.6.5.8.6.8 1.1v14.1c0 1-.4 1.6-1.6 1.7l-14.6.9c-1 .1-1.5-.1-2-.8L1.6 19.6c-.6-.8-.8-1.4-.8-2.1V4.9c0-.8.4-1.5 1.5-1.6z"/>
-      <path fill="#000" d="M15.9 2.3 3.3 3.2C2.2 3.3 1.8 4 1.8 4.9v12.6c0 .7.2 1.3.8 2.1l1.3 1.3c.5.7 1 .9 2 .8l14.6-.9c1.2-.1 1.6-.7 1.6-1.7V6.3c0-.5-.2-.7-.8-1.1L18.8 3c-1-.7-1.4-.8-2.9-.7zM6.7 5.3c-1.1.1-1.4.1-2-.4L3.2 3.7c-.2-.2-.1-.4.3-.5L15.6 2.3c1-.1 1.4.3 1.8.6l1.8 1.3c.1.1.3.4 0 .4L7 5.3h-.3zm-1.3 16V8.4c0-.6.2-.8.7-.9l13.7-.8c.5 0 .7.3.7.8V19c0 .6-.1 1.1-.9 1.1l-13.1.8c-.8 0-1.1-.3-1.1-1zm12.1-12.1c.1.4 0 .8-.4.8l-.6.1v9.3c-.5.3-1 .4-1.4.4-.7 0-.8-.2-1.3-.8l-4.1-6.5v6.3l1.3.3s0 .8-1 .8l-2.9.2c-.1-.2 0-.6.3-.7l.7-.2V9.7l-1-.1c-.1-.4.1-.9.7-1l3.1-.2 4.3 6.6V9.2l-1.1-.1c-.1-.5.3-.8.7-.9l2.7-.1z"/>
-    </svg>
-  );
-}
-
-function SlackMark({ size = 22 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 122.8 122.8" aria-hidden="true">
-      <path fill="#E01E5A" d="M25.8 77.6c0 7.1-5.8 12.9-12.9 12.9S0 84.7 0 77.6s5.8-12.9 12.9-12.9h12.9v12.9z" />
-      <path fill="#E01E5A" d="M32.3 77.6c0-7.1 5.8-12.9 12.9-12.9s12.9 5.8 12.9 12.9v32.3c0 7.1-5.8 12.9-12.9 12.9s-12.9-5.8-12.9-12.9V77.6z" />
-      <path fill="#36C5F0" d="M45.2 25.8c-7.1 0-12.9-5.8-12.9-12.9S38.1 0 45.2 0s12.9 5.8 12.9 12.9v12.9H45.2z" />
-      <path fill="#36C5F0" d="M45.2 32.3c7.1 0 12.9 5.8 12.9 12.9s-5.8 12.9-12.9 12.9H12.9C5.8 58.1 0 52.3 0 45.2s5.8-12.9 12.9-12.9h32.3z" />
-      <path fill="#2EB67D" d="M97 45.2c0-7.1 5.8-12.9 12.9-12.9s12.9 5.8 12.9 12.9-5.8 12.9-12.9 12.9H97V45.2z" />
-      <path fill="#2EB67D" d="M90.5 45.2c0 7.1-5.8 12.9-12.9 12.9s-12.9-5.8-12.9-12.9V12.9C64.7 5.8 70.5 0 77.6 0s12.9 5.8 12.9 12.9v32.3z" />
-      <path fill="#ECB22E" d="M77.6 97c7.1 0 12.9 5.8 12.9 12.9s-5.8 12.9-12.9 12.9-12.9-5.8-12.9-12.9V97h12.9z" />
-      <path fill="#ECB22E" d="M77.6 90.5c-7.1 0-12.9-5.8-12.9-12.9s5.8-12.9 12.9-12.9h32.3c7.1 0 12.9 5.8 12.9 12.9s-5.8 12.9-12.9 12.9H77.6z" />
-    </svg>
-  );
-}
-
 /* ═══════════════════════════ 1 · WELCOME ═══════════════════════════ */
 
 function S1Welcome({ onBegin }: { onBegin: () => void }) {
@@ -796,14 +807,21 @@ function S4Scan({ scan, setScan, onDone, onSkip, reduce }: { scan: ScanResult | 
     return () => clearTimeout(t);
   }, [phase, scan, onDone, reduce]);
 
+  // Soft fail — don't park the user on an error screen.
+  useEffect(() => {
+    if (phase !== 'error') return;
+    const t = setTimeout(() => (scan ? onDone(scan) : onSkip()), reduce ? 800 : 2000);
+    return () => clearTimeout(t);
+  }, [phase, scan, onDone, onSkip, reduce]);
+
   if (phase === 'error') {
     return (
       <div className="text-center">
         <IconBadge><Inbox className="w-5 h-5 text-[#0A0A0A]" strokeWidth={1.75} /></IconBadge>
-        <Display className="text-[26px] mb-3">The scan didn’t finish</Display>
-        <Body className="text-[15px] max-w-sm mx-auto mb-7">It may have timed out. We can do this later — your inbox is safe.</Body>
-        {/* Must advance even with NO scan — `scan && onDone(scan)` was a dead
-            button in exactly the case this screen exists for. */}
+        <Display className="text-[26px] mb-3">We’ll finish this in the background</Display>
+        <Body className="text-[15px] max-w-sm mx-auto mb-7">
+          Your inbox is safe. You can keep going — Mailient will catch up on the scan shortly.
+        </Body>
         <PrimaryButton onClick={() => (scan ? onDone(scan) : onSkip())}>Continue <ArrowRight className="w-4 h-4" /></PrimaryButton>
       </div>
     );
@@ -1280,57 +1298,6 @@ function humanTool(name: string): string {
   if (/draft/i.test(name)) return 'Drafting a reply in your voice';
   if (/search|read/i.test(name)) return 'Reading your inbox';
   return '';
-}
-
-/* ═══════════════════════════ 10 · NOTION (skippable) ═══════════════════════════ */
-
-function S10Notion({ connected, onConnect, onContinue, onSkip }: { connected: boolean; onConnect: () => Promise<boolean>; onContinue: () => void; onSkip: () => void }) {
-  return (
-    <ConnectScreen
-      icon={<NotionMark size={24} />}
-      title="Connect Notion"
-      subtitle="Mailient can log every contact, deal, and decision to Notion automatically."
-      connected={connected} onConnect={onConnect} onContinue={onContinue} onSkip={onSkip}
-    />
-  );
-}
-
-/* ═══════════════════════════ 11 · SLACK (skippable) ═══════════════════════════ */
-
-function S11Slack({ connected, onConnect, onContinue, onSkip }: { connected: boolean; onConnect: () => Promise<boolean>; onContinue: () => void; onSkip: () => void }) {
-  return (
-    <ConnectScreen
-      icon={<SlackMark size={24} />}
-      title="Connect Slack"
-      subtitle="Get your morning briefing in Slack."
-      connected={connected} onConnect={onConnect} onContinue={onContinue} onSkip={onSkip}
-    />
-  );
-}
-
-function ConnectScreen({ icon, title, subtitle, connected, onConnect, onContinue, onSkip }: {
-  icon: React.ReactNode; title: string; subtitle: string;
-  connected: boolean; onConnect: () => Promise<boolean>; onContinue: () => void; onSkip: () => void;
-}) {
-  const [busy, setBusy] = useState(false);
-  const handle = async () => { setBusy(true); const ok = await onConnect(); setBusy(false); if (ok) onContinue(); };
-  return (
-    <div className="text-center">
-      <IconBadge>{icon}</IconBadge>
-      <Display className="text-[28px] sm:text-[34px] mb-3">{title}</Display>
-      <Body className="text-[15px] max-w-sm mx-auto mb-8">{subtitle}</Body>
-      {connected ? (
-        <PrimaryButton onClick={onContinue}>Continue <ArrowRight className="w-4 h-4" /></PrimaryButton>
-      ) : (
-        <div className="flex flex-col items-center gap-4">
-          <PrimaryButton onClick={handle} disabled={busy}>
-            {busy ? <><Loader2 className="w-4 h-4 animate-spin" /> Connecting…</> : <>Connect <ArrowRight className="w-4 h-4" /></>}
-          </PrimaryButton>
-          <SkipLink onClick={onSkip} />
-        </div>
-      )}
-    </div>
-  );
 }
 
 /* ═══════════════════════════ 12 · FIRST AGENT (real create, skippable) ═══════════════════════════ */
