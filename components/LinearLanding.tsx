@@ -484,19 +484,19 @@ export function LinearLanding() {
                 treatment — they had their own one-off fill and radius. */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-10">
               <div className="linear-grid-card-inner linear-grid-card-lift p-6 space-y-2">
-                <span className="text-xs font-mono text-neutral-500">PAIN POINT 01</span>
+                <span className="text-xs font-mono text-neutral-400">PAIN POINT 01</span>
                 <p className="text-sm text-neutral-200">The email that sat in your inbox for three days while you meant to reply.</p>
               </div>
               <div className="linear-grid-card-inner linear-grid-card-lift p-6 space-y-2">
-                <span className="text-xs font-mono text-neutral-500">PAIN POINT 02</span>
+                <span className="text-xs font-mono text-neutral-400">PAIN POINT 02</span>
                 <p className="text-sm text-neutral-200">The client who went cold because you got buried in other threads.</p>
               </div>
               <div className="linear-grid-card-inner linear-grid-card-lift p-6 space-y-2">
-                <span className="text-xs font-mono text-neutral-500">PAIN POINT 03</span>
+                <span className="text-xs font-mono text-neutral-400">PAIN POINT 03</span>
                 <p className="text-sm text-neutral-200">The meeting that never got booked because the scheduling back-and-forth took a week.</p>
               </div>
               <div className="linear-grid-card-inner linear-grid-card-lift p-6 space-y-2">
-                <span className="text-xs font-mono text-neutral-500">PAIN POINT 04</span>
+                <span className="text-xs font-mono text-neutral-400">PAIN POINT 04</span>
                 <p className="text-sm text-neutral-200">The Sunday night dread of opening Gmail and seeing 200 unread messages staring back.</p>
               </div>
             </div>
@@ -514,7 +514,7 @@ export function LinearLanding() {
             <p className="text-white font-normal text-xl md:text-2xl tracking-tight leading-snug text-center">
               <span className="text-white font-medium">13 hours a week</span>, gone to your inbox.
               <br className="hidden md:block" />
-              <span className="text-neutral-500"> A part-time job you never hired for.</span>
+              <span className="text-neutral-400"> A part-time job you never hired for.</span>
             </p>
 
             <WordBlurReveal
@@ -568,7 +568,7 @@ export function LinearLanding() {
               >
               <span className={cn(
                 "font-mono text-[10px] tracking-[0.2em] font-medium block transition-all duration-300",
-                activeStep === 0 ? "text-[#c8ccd4] mb-3" : "text-neutral-500 group-hover:text-neutral-400 mb-1"
+                activeStep === 0 ? "text-[#c8ccd4] mb-3" : "text-neutral-400 group-hover:text-neutral-400 mb-1"
               )}>
                 01 // Only what needs you
               </span>
@@ -614,7 +614,7 @@ export function LinearLanding() {
               >
               <span className={cn(
                 "font-mono text-[10px] tracking-[0.2em] font-medium block transition-all duration-300",
-                activeStep === 1 ? "text-[#c8ccd4] mb-3" : "text-neutral-500 group-hover:text-neutral-400 mb-1"
+                activeStep === 1 ? "text-[#c8ccd4] mb-3" : "text-neutral-400 group-hover:text-neutral-400 mb-1"
               )}>
                 02 // Sounds exactly like you
               </span>
@@ -660,7 +660,7 @@ export function LinearLanding() {
               >
               <span className={cn(
                 "font-mono text-[10px] tracking-[0.2em] font-medium block transition-all duration-300",
-                activeStep === 2 ? "text-[#c8ccd4] mb-3" : "text-neutral-500 group-hover:text-neutral-400 mb-1"
+                activeStep === 2 ? "text-[#c8ccd4] mb-3" : "text-neutral-400 group-hover:text-neutral-400 mb-1"
               )}>
                 03 // While you sleep
               </span>
@@ -814,7 +814,7 @@ export function LinearLanding() {
               <span className="gradient-tile w-12 h-12 relative z-10">
                 <Mail className="w-5 h-5 text-white" />
               </span>
-              <span className="font-mono text-[10px] tracking-[0.2em] text-neutral-600 font-bold block relative z-10">STEP 1</span>
+              <span className="font-mono text-[10px] tracking-[0.2em] text-neutral-400 font-bold block relative z-10">STEP 1</span>
               <h3 className="text-lg font-semibold text-white relative z-10">Connect Gmail.</h3>
               <WordBlurReveal
                 text="Two minutes, secure Google sign-in. Your email stays in Gmail — nothing moves, nothing to configure."
@@ -825,7 +825,7 @@ export function LinearLanding() {
               <span className="gradient-tile w-12 h-12 relative z-10">
                 <Eye className="w-5 h-5 text-white" />
               </span>
-              <span className="font-mono text-[10px] tracking-[0.2em] text-neutral-600 font-bold block relative z-10">STEP 2</span>
+              <span className="font-mono text-[10px] tracking-[0.2em] text-neutral-400 font-bold block relative z-10">STEP 2</span>
               <h3 className="text-lg font-semibold text-white relative z-10">It learns how you write.</h3>
               <WordBlurReveal
                 text="From your last 90 days of sent mail: your greetings, your rhythm, your sign-offs. Drafts start sounding like you, not like AI."
@@ -836,7 +836,7 @@ export function LinearLanding() {
               <span className="gradient-tile w-12 h-12 relative z-10">
                 <Inbox className="w-5 h-5 text-white" />
               </span>
-              <span className="font-mono text-[10px] tracking-[0.2em] text-neutral-600 font-bold block relative z-10">STEP 3</span>
+              <span className="font-mono text-[10px] tracking-[0.2em] text-neutral-400 font-bold block relative z-10">STEP 3</span>
               <h3 className="text-lg font-semibold text-white relative z-10">Mornings arrive organized.</h3>
               <WordBlurReveal
                 text="Overnight it reads everything, drafts the replies, books the meetings, chases the silence — and leaves you one briefing. Nothing sends without your approval."
@@ -915,7 +915,7 @@ export function LinearLanding() {
                 ))}
               </ul>
 
-              <p className="text-sm text-neutral-500 font-light font-sans max-w-xl">
+              <p className="text-sm text-neutral-400 font-light font-sans max-w-xl">
                 Then shows you the few things that still need you.
               </p>
 
@@ -1250,10 +1250,10 @@ export function LinearLanding() {
               one glance, and it was more made-up telemetry. Deleted — the
               contrast is stronger without a paragraph explaining it. */}
           <div className="flex flex-col items-center text-center select-none">
-            <span className="font-mono text-[11px] tracking-[0.2em] uppercase text-neutral-600 mb-2">Yesterday</span>
-            <span className="text-5xl md:text-7xl font-medium tracking-tight text-neutral-600 line-through decoration-red-500/60 decoration-2">246 unread</span>
+            <span className="font-mono text-[11px] tracking-[0.2em] uppercase text-neutral-400 mb-2">Yesterday</span>
+            <span className="text-5xl md:text-7xl font-medium tracking-tight text-neutral-400 line-through decoration-red-500/60 decoration-2">246 unread</span>
             <span className="text-neutral-700 text-3xl my-6 font-light">↓</span>
-            <span className="font-mono text-[11px] tracking-[0.2em] uppercase text-neutral-500 mb-2">Today</span>
+            <span className="font-mono text-[11px] tracking-[0.2em] uppercase text-neutral-400 mb-2">Today</span>
             <span className="text-6xl md:text-8xl font-medium tracking-tight bg-gradient-to-b from-white via-neutral-100 to-neutral-400 bg-clip-text text-transparent">3 decisions.</span>
           </div>
 
@@ -1308,7 +1308,7 @@ export function LinearLanding() {
                 <span className="text-3xl md:text-4xl font-semibold tracking-tight text-white relative z-10">
                   {value}
                 </span>
-                <span className="text-[11px] text-neutral-500 font-light font-sans relative z-10 mt-auto">
+                <span className="text-[11px] text-neutral-400 font-light font-sans relative z-10 mt-auto">
                   {caption}
                 </span>
               </div>
@@ -1325,7 +1325,7 @@ export function LinearLanding() {
               labeled product claims. */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-left mb-12 md:mb-24">
             <div className="linear-grid-card linear-grid-card-lift p-8 relative text-left">
-              <span className="font-mono text-[10px] tracking-[0.2em] text-neutral-500 uppercase block mb-4 relative z-10">
+              <span className="font-mono text-[10px] tracking-[0.2em] text-neutral-400 uppercase block mb-4 relative z-10">
                 What mornings become
               </span>
               <p className="text-sm text-neutral-300 font-light leading-relaxed font-sans relative z-10">
@@ -1334,7 +1334,7 @@ export function LinearLanding() {
             </div>
 
             <div className="linear-grid-card linear-grid-card-lift p-8 relative text-left">
-              <span className="font-mono text-[10px] tracking-[0.2em] text-neutral-500 uppercase block mb-4 relative z-10">
+              <span className="font-mono text-[10px] tracking-[0.2em] text-neutral-400 uppercase block mb-4 relative z-10">
                 Why it&apos;s different
               </span>
               <p className="text-sm text-neutral-300 font-light leading-relaxed font-sans relative z-10">
@@ -1415,7 +1415,7 @@ export function LinearLanding() {
                   className="w-full flex items-center justify-between gap-4 py-4 cursor-pointer text-sm font-semibold text-white text-left hover:text-neutral-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/40 rounded-sm"
                 >
                   <span>{faq.q}</span>
-                  <span aria-hidden="true" className="text-xs text-neutral-500 font-mono shrink-0">{activeAccordion === index ? "[-]" : "[+]"}</span>
+                  <span aria-hidden="true" className="text-xs text-neutral-400 font-mono shrink-0">{activeAccordion === index ? "[-]" : "[+]"}</span>
                 </button>
                 <AnimatePresence>
                   {activeAccordion === index && (

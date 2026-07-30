@@ -1,12 +1,7 @@
 import Script from "next/script";
 import "./globals.css";
 import Providers from "./providers";
-import dynamic from "next/dynamic";
-
-const Analytics = dynamic(
-  () => import("@vercel/analytics/react").then((m) => m.Analytics),
-  { ssr: false }
-);
+import { Analytics } from "@vercel/analytics/next";
 
 export const metadata = {
   title: "Mailient — Runs your inbox while you build your company",
