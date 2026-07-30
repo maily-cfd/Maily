@@ -1,5 +1,4 @@
-/* Satoshi loads asynchronously from app/layout.jsx — do NOT @import it here
-   (render-blocking CSS import was a major LCP/FCP hit on mobile). */
+@import url('https://api.fontshare.com/v2/css?f[]=satoshi@900,800,700,600,500,400,300,200,100&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
@@ -188,8 +187,9 @@ html {
   }
 }
 
-/* NOTE: Satoshi is loaded asynchronously from app/layout.jsx (non-blocking).
-   DO NOT @import Fontshare CSS here — that was render-blocking first paint. */
+/* NOTE: Satoshi is loaded via @import url('...fontshare...') at the top.
+   That import contains the REAL @font-face declarations with proper .woff2 URLs.
+   DO NOT add manual @font-face blocks pointing to the CSS URL — they will silently fail. */
 
 html,
 body,
@@ -204,9 +204,7 @@ body,
 .font-mono,
 .satoshi-app,
 .arcus-typography {
-  /* System UI only on the critical path — including 'Satoshi' here caused a
-     late font-swap that re-stamped mobile LCP at ~4s after FCP at 1.4s. */
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-family: 'Satoshi', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
 }
 
 /* Ensure inherit works for pseudo-elements */
@@ -217,16 +215,7 @@ body,
 }
 
 .satoshi-app {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-}
-
-/* Applied after Fontshare loads — optional enhancement, never on LCP path. */
-html.fonts-satoshi .font-sans,
-html.fonts-satoshi .font-serif,
-html.fonts-satoshi .font-mono,
-html.fonts-satoshi .satoshi-app,
-html.fonts-satoshi .arcus-typography {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Satoshi', sans-serif !important;
+  font-family: 'Satoshi', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
 }
 
 @theme inline {

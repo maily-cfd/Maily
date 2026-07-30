@@ -54,10 +54,7 @@ export function FloatingNavbar() {
             className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[100] w-fit px-4 pointer-events-none"
           >
             <LayoutGroup>
-              <nav
-                aria-label="Quick links"
-                className="relative flex items-center gap-1.5 p-1.5 rounded-[26px] pointer-events-auto transition-all duration-700 hover:scale-[1.02] shadow-[0_6px_6px_rgba(0,0,0,0.2),0_0_20px_rgba(0,0,0,0.1)] overflow-hidden"
-              >
+              <nav className="relative flex items-center gap-1.5 p-1.5 rounded-[26px] pointer-events-auto transition-all duration-700 hover:scale-[1.02] shadow-[0_6px_6px_rgba(0,0,0,0.2),0_0_20px_rgba(0,0,0,0.1)] overflow-hidden">
                 
                 {/* Liquid Glass Layers — plain backdrop blur; an SVG displacement
                     filter chained on top forced a full re-raster every scroll frame */}
@@ -81,8 +78,6 @@ export function FloatingNavbar() {
                       <Link
                         key={item.id}
                         href={item.href}
-                        aria-label={item.label}
-                        aria-current={isActive ? "page" : undefined}
                         onMouseEnter={() => setHoveredId(item.id)}
                         onMouseLeave={() => setHoveredId(null)}
                         className="relative flex items-center no-underline"
@@ -110,7 +105,7 @@ export function FloatingNavbar() {
                               isActive ? "bg-black/5 dark:bg-white/10" : ""
                             )}
                           >
-                            <Icon className={cn("w-[18px] h-[18px]", "text-current")} aria-hidden="true" />
+                            <Icon className={cn("w-[18px] h-[18px]", "text-current")} />
                           </div>
                           
                           <AnimatePresence initial={false}>

@@ -90,13 +90,11 @@ export function Navbar({ theme = "light" }: NavbarProps) {
         />
 
         {/* Logo */}
-        <Link href="/" aria-label="Mailient home" className="flex items-center gap-2.5 group relative z-10">
+        <Link href="/" className="flex items-center gap-2.5 group relative z-10">
           <div className="relative w-7 h-7 rounded-[25%] overflow-hidden transition-all duration-500 group-hover:scale-105 border border-white/10 shadow-md bg-white">
             <img 
-              src="/mailient-logo-sm.png" 
-              alt="" 
-              width={28}
-              height={28}
+              src="/mailient-logo-premium.png" 
+              alt="Mailient Logo" 
               className="w-full h-full object-cover"
             />
           </div>
@@ -119,22 +117,16 @@ export function Navbar({ theme = "light" }: NavbarProps) {
             onMouseEnter={() => setDropdownOpen(true)}
             onMouseLeave={() => setDropdownOpen(false)}
           >
-            <button
-              type="button"
-              aria-expanded={dropdownOpen}
-              aria-haspopup="true"
-              className={cn(
-                "flex items-center gap-1 transition-colors focus:outline-none",
-                isDark ? "hover:text-white" : "hover:text-neutral-950"
-              )}
-            >
+            <button className={cn(
+              "flex items-center gap-1 transition-colors focus:outline-none",
+              isDark ? "hover:text-white" : "hover:text-neutral-950"
+            )}>
               Product
               <ChevronDown
                 className={cn(
                   "w-3 h-3 transition-transform duration-300",
                   dropdownOpen && "rotate-180"
                 )}
-                aria-hidden="true"
               />
             </button>
 
@@ -329,12 +321,11 @@ export function Navbar({ theme = "light" }: NavbarProps) {
                   crawlable as a link to /auth/signup. */}
               <Link href="/auth/signup" aria-label="Get started with Mailient">
                 <LiquidButton
-                  as="span"
                   variant={isDark ? "default" : "light"}
                   size="sm"
                   className="rounded-full !h-8.5 px-4 font-bold text-[11px] tracking-tight hover:shadow-[0_0_30px_rgba(255,255,255,0.15)] flex items-center gap-1.5"
                 >
-                  <Mail className="w-3.5 h-3.5" aria-hidden="true" />
+                  <Mail className="w-3.5 h-3.5" />
                   Get started
                 </LiquidButton>
               </Link>

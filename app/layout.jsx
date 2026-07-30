@@ -1,7 +1,7 @@
+import Script from "next/script";
 import "./globals.css";
 import Providers from "./providers";
 import { Analytics } from "@vercel/analytics/next";
-import { DeferredAnalytics } from "../components/deferred-analytics";
 
 export const metadata = {
   title: "Mailient — Runs your inbox while you build your company",
@@ -134,24 +134,30 @@ export default function RootLayout({ children }) {
             });
           })();
         ` }} />
-        {/* Google Analytics loads after idle via DeferredAnalytics — keeps
-            ~180KB off the landing critical path (PSI unused JavaScript). */}
-        {/* DataFast removed: script returned HTTP 403 and failed Best Practices
-            (console errors). Re-add once the domain is authorized in DataFast. */}
-        {/* Brand font is optional enhancement — never on the critical path.
-            System UI paints FCP/LCP; Satoshi swaps in after idle if at all. */}
-        <link rel="preconnect" href="https://api.fontshare.com" crossOrigin="anonymous" />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(){function load(){var l=document.createElement('link');l.rel='stylesheet';l.href='https://api.fontshare.com/v2/css?f[]=satoshi@500,400&display=optional';document.head.appendChild(l);}if('requestIdleCallback'in window)requestIdleCallback(load,{timeout:8000});else setTimeout(load,4000);})();`,
-          }}
+        <Script
+          async
+          src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID || 'G-M03D6M49N8'}`}
+          strategy="afterInteractive"
         />
-        <noscript>
-          <link
-            rel="stylesheet"
-            href="https://api.fontshare.com/v2/css?f[]=satoshi@500,400&display=swap"
-          />
-        </noscript>
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('consent', 'default', {
+              ad_storage: 'denied',
+              ad_user_data: 'denied',
+              ad_personalization: 'denied',
+              analytics_storage: 'denied'
+            });
+            gtag('js', new Date());
+            gtag('config', '${process.env.NEXT_PUBLIC_GA_ID || 'G-M03D6M49N8'}');
+          `}
+        </Script>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://api.fontshare.com/v2/css?f[]=satoshi@900,700,500,400,300,200,100&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Strichpunkt+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
       </head>
       <body className="font-sans antialiased satoshi-app bg-background text-foreground" data-new-gr-c-s-check-loaded="14.1258.0" data-gr-ext-installed="">
         {/* Launchit Badge for SEO Authority — must live in <body>: an <a> inside
@@ -167,7 +173,6 @@ export default function RootLayout({ children }) {
         </a>
         <Providers>
           {children}
-          <DeferredAnalytics />
           <Analytics />
         </Providers>
       </body>

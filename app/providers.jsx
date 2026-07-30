@@ -2,89 +2,17 @@
 
 import { SessionProvider } from "next-auth/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { usePathname } from "next/navigation";
-import dynamic from "next/dynamic";
 import { ThemeProvider } from "../components/ui/theme-provider";
 import { OfflineToast } from "../components/offline-toast";
 import { Toaster } from "../components/ui/sonner";
 import { DashboardSettingsProvider } from "../lib/DashboardSettingsContext";
+import { ArcusCommandPalette } from "../components/ui/arcus-command-palette";
+import { SoundSystem } from "../components/ui/sound-system";
 import { LenisProvider } from "../components/providers/LenisProvider";
-
-const ArcusCommandPalette = dynamic(
-  () => import("../components/ui/arcus-command-palette").then((m) => m.ArcusCommandPalette),
-  { ssr: false }
-);
-const SoundSystem = dynamic(
-  () => import("../components/ui/sound-system").then((m) => m.SoundSystem),
-  { ssr: false }
-);
 
 const queryClient = new QueryClient();
 
-const APP_ONLY_PREFIXES = [
-  "/home-feed",
-  "/dashboard",
-  "/onboarding",
-  "/settings",
-  "/arcus",
-  "/inbox",
-  "/compose",
-];
-
-/** Public marketing routes — strip auth/query/settings chrome from the JS path. */
-const MARKETING_EXACT = new Set([
-  "/",
-  "/pricing",
-  "/security",
-  "/changelog",
-  "/contact",
-  "/privacy-policy",
-  "/terms-of-service",
-  "/blogs",
-]);
-
-function isAppRoute(pathname) {
-  if (!pathname) return false;
-  return APP_ONLY_PREFIXES.some(
-    (p) => pathname === p || pathname.startsWith(`${p}/`)
-  );
-}
-
-function isMarketingRoute(pathname) {
-  if (!pathname) return false;
-  if (MARKETING_EXACT.has(pathname)) return true;
-  return pathname.startsWith("/product/") || pathname.startsWith("/blogs/");
-}
-
 export default function Providers({ children }) {
-  const pathname = usePathname();
-  const loadAppChrome = isAppRoute(pathname);
-  const marketing = isMarketingRoute(pathname);
-
-  // Marketing: Theme + Session only. Pricing/blogs/product pages mount Navbar
-  // which calls useSession — omitting SessionProvider crashes prerender
-  // ("Cannot destructure property 'data'"). Skip React Query, Lenis,
-  // dashboard settings, toasts, and app chrome to keep the JS path light.
-  // Landing (`/`) uses LandingHeader (no session) so SessionProvider stays off.
-  if (marketing && !loadAppChrome) {
-    const shell = (
-      <ThemeProvider
-        attribute="class"
-        defaultTheme="dark"
-        enableSystem
-        disableTransitionOnChange
-      >
-        {children}
-      </ThemeProvider>
-    );
-    if (pathname === "/") return shell;
-    return (
-      <SessionProvider refetchInterval={0} refetchOnWindowFocus={false}>
-        {shell}
-      </SessionProvider>
-    );
-  }
-
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider
@@ -98,8 +26,8 @@ export default function Providers({ children }) {
             <LenisProvider>
               {children}
             </LenisProvider>
-            {loadAppChrome && <SoundSystem />}
-            {loadAppChrome && <ArcusCommandPalette />}
+            <SoundSystem />
+            <ArcusCommandPalette />
             <OfflineToast />
             <Toaster position="top-center" theme="dark" closeButton />
           </DashboardSettingsProvider>

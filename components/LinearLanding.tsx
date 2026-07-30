@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { motion, AnimatePresence, useMotionValue, useMotionTemplate } from "framer-motion";
 import {
   Zap,
   Bot,
@@ -34,39 +34,28 @@ import {
   Briefcase,
   AlertCircle
 } from "lucide-react";
+import { Navbar } from "@/components/Navbar";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import PricingSection3 from "@/components/ui/pricing-section-3";
 import { useRouter } from "next/navigation";
-import dynamic from "next/dynamic";
-import { CircleExpandButton } from "@/components/CircleExpandButton";
-import { SectionHeader } from "@/components/ui/section-header";
-import { DemoVideo } from "@/components/ui/demo-video";
-import { landingFaqs } from "@/lib/landing-faqs";
+import { ProgressiveBlur } from "@/components/ui/progressive-blur";
+import { Features8 } from "@/components/ui/features-8";
+import { CTASection } from "@/components/ui/hero-dithering-card";
 import { Footer } from "@/components/Footer";
-import { BlurFade } from "@/components/ui/blur-fade";
 import { WordBlurStream } from "@/src/WordBlurStream";
-
-const PricingSection3 = dynamic(() => import("@/components/ui/pricing-section-3"), { ssr: false });
-const Features8 = dynamic(() => import("@/components/ui/features-8").then((m) => m.Features8), { ssr: false });
-const CTASection = dynamic(() => import("@/components/ui/hero-dithering-card").then((m) => m.CTASection), { ssr: false });
-const TestimonialsSection = dynamic(() => import("@/components/ui/testimonials-section").then((m) => m.TestimonialsSection), { ssr: false });
-const LeadCapture = dynamic(() => import("@/components/ui/lead-capture").then((m) => m.LeadCapture), { ssr: false });
-const WordBlurReveal = dynamic(() => import("@/components/ui/word-blur-reveal").then((m) => m.WordBlurReveal), { ssr: false });
-
-/** Desktop-only hero media — never SSR'd so mobile HTML has no poster preload
- *  competing with the H1 for LCP. */
-function DesktopHeroVideo() {
-  const [show, setShow] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia("(min-width: 768px)");
-    const sync = () => setShow(mq.matches);
-    sync();
-    mq.addEventListener("change", sync);
-    return () => mq.removeEventListener("change", sync);
-  }, []);
-  if (!show) return null;
-  return <HeroVideoPlayer />;
-}
+import { SpecialText } from "@/components/ui/special-text";
+import { BlurFade } from "@/components/ui/blur-fade";
+import NumberFlow from "@number-flow/react";
+import { EtheralShadow } from "@/components/ui/etheral-shadow";
+import { CircleExpandButton } from "@/components/CircleExpandButton";
+import { FloatingNavbar } from "@/components/FloatingNavbar";
+import { SectionHeader } from "@/components/ui/section-header";
+import { TestimonialsSection } from "@/components/ui/testimonials-section";
+import { WordBlurReveal } from "@/components/ui/word-blur-reveal";
+import { DemoVideo } from "@/components/ui/demo-video";
+import { LeadCapture } from "@/components/ui/lead-capture";
+import { landingFaqs } from "@/lib/landing-faqs";
 
 function ActiveCounter({ target = 1420 }: { target?: number }) {
   const [count, setCount] = useState(0);
@@ -76,7 +65,9 @@ function ActiveCounter({ target = 1420 }: { target?: number }) {
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) setIsInView(true);
+        if (entry.isIntersecting) {
+          setIsInView(true);
+        }
       },
       { threshold: 0.1 }
     );
@@ -85,59 +76,75 @@ function ActiveCounter({ target = 1420 }: { target?: number }) {
   }, []);
 
   useEffect(() => {
-    setCount(isInView ? target : 0);
+    if (isInView) {
+      setCount(target);
+    } else {
+      setCount(0);
+    }
   }, [target, isInView]);
 
   return (
-    <span ref={ref} className="inline-flex items-center tabular-nums">
-      {count}
+    <span ref={ref} className="inline-flex items-center">
+      <NumberFlow value={count} />
     </span>
+  );
+}
+
+// landingFaqs moved to lib/landing-faqs.ts (shared with homepage FAQPage JSON-LD)
+
+const DESCRIPTIONS = [
+  "Mailient removes email from your to-do list entirely.",
+  "The most expensive email in your inbox is the one you never opened.",
+  "Wake up. Read one briefing. Never dread Gmail again.",
+];
+
+// Isolated so its 5s rotation re-renders this span, not the whole page.
+function RotatingTagline() {
+  const [descIndex, setDescIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setDescIndex((prev) => (prev + 1) % DESCRIPTIONS.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const currentText = DESCRIPTIONS[descIndex];
+  const dynamicSpeed = Math.max(4, Math.floor(750 / (currentText.length * 4)));
+
+  return (
+    <SpecialText speed={dynamicSpeed} delay={0} className="text-lg md:text-[22px] text-[#8a8f98] font-sans font-light tracking-wide text-center">
+      {currentText}
+    </SpecialText>
   );
 }
 
 // Isolated so timeupdate ticks (~4/s while playing) re-render only the player,
 // not the whole page; also pauses itself whenever it scrolls offscreen.
-// Click-to-play only — never autoplay. A 24MB founder clip + continuous decode
-// on top of any animated background tanks desktop Lighthouse (main-thread,
-// LCP, network). Src is attached only after the first play intent.
 function HeroVideoPlayer() {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(true);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isMuted, setIsMuted] = useState(true);
-  const [mediaReady, setMediaReady] = useState(false);
-  const userPausedRef = useRef(true);
+  const userPausedRef = useRef(false);
 
   useEffect(() => {
     const video = videoRef.current;
-    if (!video || !mediaReady) return;
-
-    if (!userPausedRef.current) {
-      video.play().then(() => setIsPlaying(true)).catch(() => {});
-    }
-
+    if (!video) return;
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (!entry.isIntersecting && !video.paused) {
-          video.pause();
-          setIsPlaying(false);
+        if (!entry.isIntersecting) {
+          if (!video.paused) video.pause();
+        } else if (!userPausedRef.current && video.paused) {
+          video.play().catch(() => {});
         }
       },
-      { threshold: 0.35 }
+      { threshold: 0.1 }
     );
     observer.observe(video);
     return () => observer.disconnect();
-  }, [mediaReady]);
-
-  const ensureSrcAndPlay = () => {
-    userPausedRef.current = false;
-    if (!mediaReady) {
-      setMediaReady(true);
-      return;
-    }
-    videoRef.current?.play().then(() => setIsPlaying(true)).catch(() => {});
-  };
+  }, []);
 
   const togglePlay = (e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
@@ -147,7 +154,10 @@ function HeroVideoPlayer() {
       videoRef.current.pause();
       setIsPlaying(false);
     } else {
-      ensureSrcAndPlay();
+      userPausedRef.current = false;
+      videoRef.current.play().then(() => {
+        setIsPlaying(true);
+      }).catch(err => console.log("Play failed:", err));
     }
   };
 
@@ -163,7 +173,9 @@ function HeroVideoPlayer() {
     if (e) e.stopPropagation();
     if (!videoRef.current) return;
     if (!document.fullscreenElement) {
-      videoRef.current.requestFullscreen().catch(() => {});
+      videoRef.current.requestFullscreen().catch((err) => {
+        console.error("Error attempting to enable full-screen mode:", err);
+      });
     } else {
       document.exitFullscreen();
     }
@@ -184,58 +196,38 @@ function HeroVideoPlayer() {
         isPlaying ? "shadow-none" : "shadow-[0_50px_100px_rgba(0,0,0,0.85)]"
       )}
     >
-      {/* Explicit <img> poster — video poster attrs are poorly discovered for
-          LCP; a real image with fetchPriority paints earlier and reserves space. */}
-      {!isPlaying && (
-        <img
-          src="/demos/home-feed-demo.webp"
-          alt=""
-          width={1226}
-          height={720}
-          decoding="async"
-          className="absolute inset-0 z-[5] w-full h-full object-cover pointer-events-none"
-        />
-      )}
       <video
         ref={videoRef}
-        src={mediaReady ? "/demos/home-feed-demo.mp4" : undefined}
+        src="/founder-demo.mp4"
+        autoPlay
         loop
         muted={isMuted}
         playsInline
-        preload="none"
         onPlay={() => setIsPlaying(true)}
         onPause={() => setIsPlaying(false)}
         onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
         onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
         className="w-full h-full object-cover relative z-10"
-        aria-label="Mailient product demo video"
       />
-
-      {!isPlaying && (
-        <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
-          <span className="flex items-center justify-center w-16 h-16 rounded-full bg-white/10 border border-white/20 backdrop-blur-sm">
-            <Play className="w-7 h-7 fill-white text-white ml-1" aria-hidden="true" />
-          </span>
-        </div>
-      )}
 
       {/* Custom Video Controls Overlay */}
       <div
         onClick={(e) => e.stopPropagation()}
         className="absolute inset-x-0 bottom-0 p-4 pb-0 flex flex-col justify-end z-35 transition-all duration-300 opacity-0 group-hover:opacity-100 group-hover:bg-gradient-to-t group-hover:from-black/90 group-hover:via-black/40 group-hover:to-transparent select-none"
       >
+
+        {/* Buttons Row */}
         <div className="flex items-center justify-between px-2 pb-3 text-white/90">
+          {/* Left: Play/Pause & Time */}
           <div className="flex items-center gap-4">
             <button
-              type="button"
               onClick={(e) => togglePlay(e)}
-              aria-label={isPlaying ? "Pause video" : "Play video"}
-              className="hover:text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 rounded"
+              className="hover:text-white transition-colors focus:outline-none"
             >
               {isPlaying ? (
-                <Pause className="w-4 h-4 fill-white stroke-none" aria-hidden="true" />
+                <Pause className="w-4 h-4 fill-white stroke-none" />
               ) : (
-                <Play className="w-4 h-4 fill-white stroke-none" aria-hidden="true" />
+                <Play className="w-4 h-4 fill-white stroke-none" />
               )}
             </button>
             <span className="text-[11px] font-mono tracking-wider opacity-85">
@@ -243,46 +235,46 @@ function HeroVideoPlayer() {
             </span>
           </div>
 
+          {/* Right: Mute & Fullscreen */}
           <div className="flex items-center gap-4">
             <button
-              type="button"
               onClick={(e) => toggleMute(e)}
-              aria-label={isMuted ? "Unmute video" : "Mute video"}
-              className="hover:text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 rounded"
+              className="hover:text-white transition-colors focus:outline-none"
             >
               {isMuted ? (
-                <VolumeX className="w-4.5 h-4.5" aria-hidden="true" />
+                <VolumeX className="w-4.5 h-4.5" />
               ) : (
-                <Volume2 className="w-4.5 h-4.5" aria-hidden="true" />
+                <Volume2 className="w-4.5 h-4.5" />
               )}
             </button>
             <button
-              type="button"
               onClick={(e) => toggleFullscreen(e)}
-              aria-label="Enter fullscreen"
-              className="hover:text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 rounded"
+              className="hover:text-white transition-colors focus:outline-none"
             >
-              <Maximize className="w-4 h-4" aria-hidden="true" />
+              <Maximize className="w-4 h-4" />
             </button>
           </div>
         </div>
 
-        <input
-          type="range"
-          min={0}
-          max={Math.max(1, duration || 1)}
-          step={0.1}
-          value={currentTime}
-          aria-label="Video progress"
-          onChange={(e) => {
-            if (!videoRef.current) return;
-            const t = Number(e.target.value);
-            videoRef.current.currentTime = t;
-            setCurrentTime(t);
+        {/* Custom Progress Bar / Scrubber at the very bottom */}
+        <div
+          onClick={(e) => {
+            e.stopPropagation();
+            if (!videoRef.current || !duration) return;
+            const rect = e.currentTarget.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const percentage = clickX / rect.width;
+            const newTime = percentage * duration;
+            videoRef.current.currentTime = newTime;
+            setCurrentTime(newTime);
           }}
-          onClick={(e) => e.stopPropagation()}
-          className="w-full h-1 accent-white bg-white/20 cursor-pointer relative z-40 appearance-none rounded-full [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-2.5 [&::-webkit-slider-thumb]:h-2.5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white"
-        />
+          className="w-full h-1 bg-white/20 hover:h-1.5 transition-all duration-200 cursor-pointer relative z-40"
+        >
+          <div
+            className="h-full bg-white relative transition-all duration-100"
+            style={{ width: `${(currentTime / (duration || 1)) * 100}%` }}
+          />
+        </div>
       </div>
     </div>
   );
@@ -304,6 +296,15 @@ export function LinearLanding() {
   const [activeStep, setActiveStep] = useState(0);
   const threeThingsRef = useRef<HTMLElement>(null);
   const [threeThingsInView, setThreeThingsInView] = useState(false);
+
+  // Mouse position tracker for cursor-reactive lighting on cards
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const { left, top } = e.currentTarget.getBoundingClientRect();
+    mouseX.set(e.clientX - left);
+    mouseY.set(e.clientY - top);
+  };
 
   useEffect(() => {
     const el = threeThingsRef.current;
@@ -346,13 +347,118 @@ export function LinearLanding() {
   }, []);
 
   return (
-    <>
-      {/* Hero + header live in app/page.jsx (Server Components) so LCP text
-          paints before this client bundle hydrates. Desktop demo mounts here
-          so mobile never SSR/preloads the poster. */}
-      <div className="w-full flex justify-center px-6 -mt-4 md:mt-0 mb-8">
-        <DesktopHeroVideo />
+    <div className="min-h-screen bg-[#000000] text-white flex flex-col items-center justify-start overflow-x-hidden font-inter strichpunkt-theme relative selection:bg-white selection:text-black">
+      
+      {/* 0. Custom Radar & Orbital Keyframes */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        .strichpunkt-theme {
+          font-family: 'Strichpunkt Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        }
+        .strichpunkt-theme :not(.font-mono):not([class*="font-mono"]):not(code):not(pre) {
+          font-family: 'Strichpunkt Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        }
+        @keyframes radar-pulse {
+          0% { transform: scale(0.95); opacity: 0.8; }
+          50% { transform: scale(1.05); opacity: 0.4; }
+          100% { transform: scale(0.95); opacity: 0.8; }
+        }
+        @keyframes orb-float {
+          0%, 100% { transform: translateY(0px) scale(1) rotate(0deg); }
+          50% { transform: translateY(-12px) scale(1.03) rotate(3deg); }
+        }
+        @keyframes laser-pulse {
+          from { stroke-dashoffset: 170; }
+          to { stroke-dashoffset: 0; }
+        }
+        @keyframes drift-left {
+          0% { transform: translateX(0) scaleY(1); }
+          50% { transform: translateX(-25%) scaleY(1.05); }
+          100% { transform: translateX(-50%) scaleY(1); }
+        }
+        @keyframes drift-right {
+          0% { transform: translateX(-50%) scaleY(1); }
+          50% { transform: translateX(-25%) scaleY(1.08); }
+          100% { transform: translateX(0) scaleY(1); }
+        }
+      `}} />
+
+      {/* Atmospheric lighting */}
+      <div className="absolute inset-0 z-0 pointer-events-none select-none overflow-hidden">
+        <div className="absolute top-[4%] left-1/2 -translate-x-1/2 w-[1000px] h-[500px] rounded-full bg-neutral-900/10 blur-[180px]" />
+        <div className="absolute top-[25%] left-[5%] w-[500px] h-[500px] rounded-full bg-white/[0.005] blur-[150px]" />
+        <div className="absolute bottom-[20%] right-[5%] w-[800px] h-[800px] rounded-full bg-neutral-950/20 blur-[200px]" />
       </div>
+
+      {/* Sticky Translucent Header */}
+      <Navbar theme="dark" />
+
+      {/* 1. HERO SECTION */}
+      <section className="relative w-full pt-40 pb-0 md:pt-48 flex flex-col items-center text-center z-10 bg-gradient-to-b from-[#000000] via-[#09090b] to-[#16161a] overflow-hidden">
+        {/* White-grey glow from the bottom of the hero section spreading up */}
+        <div className="absolute inset-x-0 bottom-0 h-[250px] bg-[radial-gradient(ellipse_at_bottom,rgba(255,255,255,0.08),transparent_70%)] pointer-events-none z-10" />
+
+        {/* Etheral Shadow Background Layer */}
+        <div className="absolute inset-0 z-0 pointer-events-none opacity-40 mix-blend-screen select-none">
+          <EtheralShadow
+            color="rgba(128, 128, 128, 1)"
+            animation={{ scale: 100, speed: 90 }}
+            noise={{ opacity: 1, scale: 1.2 }}
+            sizing="fill"
+          />
+        </div>
+
+        <div className="w-full flex flex-col items-center max-w-5xl z-10 mx-auto px-6">
+          
+          {/* Headline & Subtitle */}
+          <BlurFade delay={0.1} duration={0.8} inView>
+            <h1 className="text-4xl md:text-[60px] font-medium tracking-[-0.035em] leading-[1.08] max-w-3xl bg-gradient-to-b from-white via-neutral-100 to-neutral-400 bg-clip-text text-transparent pb-2">
+              You run your company,
+              <br />
+              We run your inbox.
+            </h1>
+          </BlurFade>
+
+          <BlurFade delay={0.2} duration={0.8} inView>
+            <p className="text-lg md:text-[22px] text-[#8a8f98] leading-relaxed max-w-4xl mt-8 font-light min-h-[4rem] flex items-center justify-center">
+              <RotatingTagline />
+            </p>
+          </BlurFade>
+
+          {/* Premium CTAs */}
+          <BlurFade delay={0.3} duration={0.8} inView>
+            <div className="flex flex-wrap items-center justify-center gap-4 mt-12">
+              <CircleExpandButton href="/auth/signup">
+                Get started free
+              </CircleExpandButton>
+
+              {/* Points at #demos (the real product-demo videos), not
+                  #sample-brief — that anchor is the illustrative before/after
+                  panel, so the old link promised footage and delivered a mockup. */}
+              <CircleExpandButton href="#demos" variant="secondary">
+                Watch Mailient handle a real inbox
+              </CircleExpandButton>
+            </div>
+          </BlurFade>
+
+          {/* 16:9 Floating Obsidian Demo Video Window */}
+          <BlurFade delay={0.4} duration={1.0} inView>
+            <HeroVideoPlayer />
+          </BlurFade>
+
+      </div>
+
+      {/* Clear Separation Line at the bottom of the Metallic Hero */}
+      <div className="w-full h-px bg-gradient-to-r from-transparent via-white/[0.12] to-transparent relative z-25 mt-16 md:mt-24" />
+
+      {/* NOTE: a PerspectiveMarquee sat here as a "trusted by" wall. It was
+          mounted with no `items` prop, so it fell through to that component's
+          DEFAULT_ITEMS placeholder and scrolled Vercel / Linear / Stripe /
+          Figma / Notion / Raycast / Arc / Cursor — none of whom are customers.
+          Removed outright rather than relabeled: the integrations story is
+          already told properly by the #connectors orbit section below, and
+          pre-launch we have no customer logos to show. Nothing beats fake
+          social proof except no social proof. */}
+    </section>
 
       {/* 1.5 THE PROBLEM — WHY MAILIENT MANIFESTO (moved up: problem right after hero, per positioning spec) */}
       <section className="py-16 md:py-32 px-6 w-full max-w-4xl mx-auto border-t border-white/[0.06] z-10 relative flex flex-col items-center text-left">
@@ -371,19 +477,19 @@ export function LinearLanding() {
                 treatment — they had their own one-off fill and radius. */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-10">
               <div className="linear-grid-card-inner linear-grid-card-lift p-6 space-y-2">
-                <span className="text-xs font-mono text-neutral-400">PAIN POINT 01</span>
+                <span className="text-xs font-mono text-neutral-500">PAIN POINT 01</span>
                 <p className="text-sm text-neutral-200">The email that sat in your inbox for three days while you meant to reply.</p>
               </div>
               <div className="linear-grid-card-inner linear-grid-card-lift p-6 space-y-2">
-                <span className="text-xs font-mono text-neutral-400">PAIN POINT 02</span>
+                <span className="text-xs font-mono text-neutral-500">PAIN POINT 02</span>
                 <p className="text-sm text-neutral-200">The client who went cold because you got buried in other threads.</p>
               </div>
               <div className="linear-grid-card-inner linear-grid-card-lift p-6 space-y-2">
-                <span className="text-xs font-mono text-neutral-400">PAIN POINT 03</span>
+                <span className="text-xs font-mono text-neutral-500">PAIN POINT 03</span>
                 <p className="text-sm text-neutral-200">The meeting that never got booked because the scheduling back-and-forth took a week.</p>
               </div>
               <div className="linear-grid-card-inner linear-grid-card-lift p-6 space-y-2">
-                <span className="text-xs font-mono text-neutral-400">PAIN POINT 04</span>
+                <span className="text-xs font-mono text-neutral-500">PAIN POINT 04</span>
                 <p className="text-sm text-neutral-200">The Sunday night dread of opening Gmail and seeing 200 unread messages staring back.</p>
               </div>
             </div>
@@ -401,7 +507,7 @@ export function LinearLanding() {
             <p className="text-white font-normal text-xl md:text-2xl tracking-tight leading-snug text-center">
               <span className="text-white font-medium">13 hours a week</span>, gone to your inbox.
               <br className="hidden md:block" />
-              <span className="text-neutral-400"> A part-time job you never hired for.</span>
+              <span className="text-neutral-500"> A part-time job you never hired for.</span>
             </p>
 
             <WordBlurReveal
@@ -440,33 +546,37 @@ export function LinearLanding() {
 
           {/* Left panel: Vertical connected capability selectors */}
           <BlurFade delay={0.1} duration={0.8} inView className="lg:col-span-4 w-full">
-            <div className="space-y-12">
-              {/* Plain toggle buttons — not tablist/radiogroup. Those roles forbid
-                  non-option children, but each step expands a body that includes
-                  a link (CircleExpandButton). aria-pressed is enough. */}
+            <div className="space-y-12" role="tablist" aria-label="Product demos">
+              {/* Step 1 */}
+              {/* Tab semantics: these three selectors drive the demo panel on
+                  the right, so they are a tablist, not decorative divs. They
+                  were div+onClick — keyboard users could not switch demos at
+                  all. NOTE the button wraps only the label+heading: the expanded
+                  body contains a CircleExpandButton, which renders an <a>, and
+                  an anchor nested inside a button is invalid HTML. */}
               <div className="text-left">
               <button
                 type="button"
-                id="demo-tab-0"
-                aria-pressed={activeStep === 0}
+                role="tab"
+                aria-selected={activeStep === 0}
                 aria-controls="demo-panel"
                 onClick={() => setActiveStep(0)}
                 className="group cursor-pointer select-none text-left w-full focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/40 rounded-lg"
               >
               <span className={cn(
                 "font-mono text-[10px] tracking-[0.2em] font-medium block transition-all duration-300",
-                activeStep === 0 ? "text-[#c8ccd4] mb-3" : "text-neutral-400 group-hover:text-neutral-400 mb-1"
+                activeStep === 0 ? "text-[#8a8f98] mb-3" : "text-neutral-700 group-hover:text-neutral-500 mb-1"
               )}>
                 01 // Only what needs you
               </span>
-              <span className={cn(
-                "font-medium tracking-tight leading-tight transition-all duration-500 block",
+              <h3 className={cn(
+                "font-medium tracking-tight leading-tight transition-all duration-500",
                 activeStep === 0
                   ? "text-2xl md:text-[34px] text-white"
-                  : "text-xl md:text-2xl text-neutral-400 group-hover:text-neutral-300"
+                  : "text-xl md:text-2xl text-neutral-600 group-hover:text-neutral-400"
               )}>
                 Only the emails that deserve your attention.
-              </span>
+              </h3>
               </button>
               {activeStep === 0 && (
                 <motion.div
@@ -493,26 +603,26 @@ export function LinearLanding() {
             <div className="text-left">
               <button
                 type="button"
-                id="demo-tab-1"
-                aria-pressed={activeStep === 1}
+                role="tab"
+                aria-selected={activeStep === 1}
                 aria-controls="demo-panel"
                 onClick={() => setActiveStep(1)}
                 className="group cursor-pointer select-none text-left w-full focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/40 rounded-lg"
               >
               <span className={cn(
                 "font-mono text-[10px] tracking-[0.2em] font-medium block transition-all duration-300",
-                activeStep === 1 ? "text-[#c8ccd4] mb-3" : "text-neutral-400 group-hover:text-neutral-400 mb-1"
+                activeStep === 1 ? "text-[#8a8f98] mb-3" : "text-neutral-700 group-hover:text-neutral-500 mb-1"
               )}>
                 02 // Sounds exactly like you
               </span>
-              <span className={cn(
-                "font-medium tracking-tight leading-tight transition-all duration-500 block",
+              <h3 className={cn(
+                "font-medium tracking-tight leading-tight transition-all duration-500",
                 activeStep === 1
                   ? "text-2xl md:text-[34px] text-white"
-                  : "text-xl md:text-2xl text-neutral-400 group-hover:text-neutral-300"
+                  : "text-xl md:text-2xl text-neutral-600 group-hover:text-neutral-400"
               )}>
                 Replies that sound like you.
-              </span>
+              </h3>
               </button>
               {activeStep === 1 && (
                 <motion.div
@@ -539,26 +649,26 @@ export function LinearLanding() {
             <div className="text-left">
               <button
                 type="button"
-                id="demo-tab-2"
-                aria-pressed={activeStep === 2}
+                role="tab"
+                aria-selected={activeStep === 2}
                 aria-controls="demo-panel"
                 onClick={() => setActiveStep(2)}
                 className="group cursor-pointer select-none text-left w-full focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/40 rounded-lg"
               >
               <span className={cn(
                 "font-mono text-[10px] tracking-[0.2em] font-medium block transition-all duration-300",
-                activeStep === 2 ? "text-[#c8ccd4] mb-3" : "text-neutral-400 group-hover:text-neutral-400 mb-1"
+                activeStep === 2 ? "text-[#8a8f98] mb-3" : "text-neutral-700 group-hover:text-neutral-500 mb-1"
               )}>
                 03 // While you sleep
               </span>
-              <span className={cn(
-                "font-medium tracking-tight leading-tight transition-all duration-500 block",
+              <h3 className={cn(
+                "font-medium tracking-tight leading-tight transition-all duration-500",
                 activeStep === 2
                   ? "text-2xl md:text-[34px] text-white"
-                  : "text-xl md:text-2xl text-neutral-400 group-hover:text-neutral-300"
+                  : "text-xl md:text-2xl text-neutral-600 group-hover:text-neutral-400"
               )}>
                 Repetitive work happens while you sleep.
-              </span>
+              </h3>
               </button>
               {activeStep === 2 && (
                 <motion.div
@@ -585,12 +695,7 @@ export function LinearLanding() {
 
           {/* Right panel: dynamic high-contrast visual display */}
           <BlurFade delay={0.25} duration={0.8} inView className="lg:col-span-8 w-full h-[440px] md:h-[580px]">
-            <div
-              id="demo-panel"
-              role="region"
-              aria-labelledby={`demo-tab-${activeStep}`}
-              className="bg-[#050505] border border-white/[0.08] rounded-[28px] p-5 md:p-10 shadow-2xl h-full flex flex-col justify-between relative overflow-hidden"
-            >
+            <div id="demo-panel" role="tabpanel" className="bg-[#050505] border border-white/[0.08] rounded-[28px] p-5 md:p-10 shadow-2xl h-full flex flex-col justify-between relative overflow-hidden">
             {/* Custom Dither Dot Grid Overlay */}
             <div className="absolute inset-y-0 left-0 w-[45%] pointer-events-none opacity-[0.08] mix-blend-screen select-none"
                  style={{
@@ -616,11 +721,11 @@ export function LinearLanding() {
                       and a fabricated screenshot is the one thing that can't prove it. */}
                   <video
                     src="/demos/home-feed-demo.mp4"
-                    poster="/demos/home-feed-demo.webp"
+                    poster="/demos/home-feed-demo.jpg"
                     autoPlay
                     muted
                     playsInline
-                    preload="none"
+                    preload="auto"
                     onEnded={() => setActiveStep((prev) => (prev + 1) % 3)}
                     aria-label="The Mailient home feed showing only the emails that need a decision"
                     className="w-full h-full object-cover"
@@ -640,11 +745,11 @@ export function LinearLanding() {
                   {/* Live demo — Arcus drafting a reply in your voice */}
                   <video
                     src="/demos/voice-demo.mp4"
-                    poster="/demos/voice-demo.webp"
+                    poster="/demos/voice-demo.jpg"
                     autoPlay
                     muted
                     playsInline
-                    preload="none"
+                    preload="auto"
                     onEnded={() => setActiveStep((prev) => (prev + 1) % 3)}
                     aria-label="Mailient drafting an email reply in your voice"
                     className="w-full h-full object-contain lg:object-cover"
@@ -664,11 +769,11 @@ export function LinearLanding() {
                   {/* Live demo — creating a background scheduling agent in plain English */}
                   <video
                     src="/demos/agent-demo.mp4"
-                    poster="/demos/agent-demo.webp"
+                    poster="/demos/agent-demo.jpg"
                     autoPlay
                     muted
                     playsInline
-                    preload="none"
+                    preload="auto"
                     onEnded={() => setActiveStep((prev) => (prev + 1) % 3)}
                     aria-label="Creating a background scheduling agent in plain English"
                     className="w-full h-full object-cover"
@@ -701,7 +806,7 @@ export function LinearLanding() {
               <span className="gradient-tile w-12 h-12 relative z-10">
                 <Mail className="w-5 h-5 text-white" />
               </span>
-              <span className="font-mono text-[10px] tracking-[0.2em] text-neutral-400 font-bold block relative z-10">STEP 1</span>
+              <span className="font-mono text-[10px] tracking-[0.2em] text-neutral-600 font-bold block relative z-10">STEP 1</span>
               <h3 className="text-lg font-semibold text-white relative z-10">Connect Gmail.</h3>
               <WordBlurReveal
                 text="Two minutes, secure Google sign-in. Your email stays in Gmail — nothing moves, nothing to configure."
@@ -712,7 +817,7 @@ export function LinearLanding() {
               <span className="gradient-tile w-12 h-12 relative z-10">
                 <Eye className="w-5 h-5 text-white" />
               </span>
-              <span className="font-mono text-[10px] tracking-[0.2em] text-neutral-400 font-bold block relative z-10">STEP 2</span>
+              <span className="font-mono text-[10px] tracking-[0.2em] text-neutral-600 font-bold block relative z-10">STEP 2</span>
               <h3 className="text-lg font-semibold text-white relative z-10">It learns how you write.</h3>
               <WordBlurReveal
                 text="From your last 90 days of sent mail: your greetings, your rhythm, your sign-offs. Drafts start sounding like you, not like AI."
@@ -723,7 +828,7 @@ export function LinearLanding() {
               <span className="gradient-tile w-12 h-12 relative z-10">
                 <Inbox className="w-5 h-5 text-white" />
               </span>
-              <span className="font-mono text-[10px] tracking-[0.2em] text-neutral-400 font-bold block relative z-10">STEP 3</span>
+              <span className="font-mono text-[10px] tracking-[0.2em] text-neutral-600 font-bold block relative z-10">STEP 3</span>
               <h3 className="text-lg font-semibold text-white relative z-10">Mornings arrive organized.</h3>
               <WordBlurReveal
                 text="Overnight it reads everything, drafts the replies, books the meetings, chases the silence — and leaves you one briefing. Nothing sends without your approval."
@@ -755,7 +860,7 @@ export function LinearLanding() {
             <div className="rounded-[20px] overflow-hidden aspect-[1280/708] relative z-10">
               <DemoVideo
                 src="/demos/connect-gmail-demo.mp4"
-                poster="/demos/connect-gmail-demo.webp"
+                poster="/demos/connect-gmail-demo.jpg"
                 label="Connecting a Gmail account to Mailient with a single Google sign-in"
               />
             </div>
@@ -776,7 +881,15 @@ export function LinearLanding() {
         <BlurFade delay={0.2} duration={0.9} inView>
           <div
             className="w-full linear-grid-card p-6 md:p-16 flex flex-col lg:flex-row gap-10 lg:gap-16 items-center relative group"
+            onMouseMove={handleMouseMove}
           >
+            {/* Card Cursor Lighting Glow spotlight */}
+            <motion.div
+              className="absolute inset-0 z-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+              style={{
+                background: useMotionTemplate`radial-gradient(800px circle at ${mouseX}px ${mouseY}px, rgba(255,255,255,0.015), transparent 80%)`,
+              }}
+            />
 
             {/* Heading and pill lifted out to the SectionHeader above; this
                 column keeps only the body copy and the CTA. */}
@@ -802,7 +915,7 @@ export function LinearLanding() {
                 ))}
               </ul>
 
-              <p className="text-sm text-neutral-400 font-light font-sans max-w-xl">
+              <p className="text-sm text-neutral-500 font-light font-sans max-w-xl">
                 Then shows you the few things that still need you.
               </p>
 
@@ -829,7 +942,7 @@ export function LinearLanding() {
               <div className="rounded-[10px] overflow-hidden aspect-[1280/758] relative z-10">
                 <DemoVideo
                   src="/demos/arcus-demo.mp4"
-                  poster="/demos/arcus-demo.webp"
+                  poster="/demos/arcus-demo.jpg"
                   label="Arcus triaging an inbox, drafting replies and booking meetings on request"
                 />
               </div>
@@ -990,7 +1103,7 @@ export function LinearLanding() {
               {/* Soft background glow */}
               <div className="absolute w-24 h-24 rounded-[26px] bg-white/[0.01] blur-md pointer-events-none group-hover:bg-white/[0.02] transition-colors" />
               <img 
-                src="/mailient-logo-sm.png" 
+                src="/mailient-logo-premium.png" 
                 alt="Mailient Hub" 
                 className="w-12 h-12 object-cover relative z-10 transition-transform duration-500 group-hover:scale-105"
               />
@@ -1035,7 +1148,7 @@ export function LinearLanding() {
                 <div className="glass-button group">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="94.5 88 312.85 325" className="w-10 h-10 transition-transform duration-300 group-hover:scale-105 relative z-10">
                     <path d="M398.579 135.841C404.242 141.152 407.35 148.439 407.35 156.355V372.638C407.35 372.725 407.347 372.812 407.343 372.9C407.329 373.178 407.3 373.455 407.3 373.733L407.325 373.859C407.325 386.91 397.107 398.225 384.27 399.798C383.352 399.948 382.433 400.062 381.489 400.125L169.818 412.937C169.151 412.975 168.497 413 167.842 413C167.767 413 167.695 412.994 167.622 412.987C167.55 412.981 167.477 412.975 167.402 412.975C167.251 412.975 167.103 412.981 166.955 412.987C166.807 412.994 166.659 413 166.508 413C158.97 413 151.91 410.231 146.461 405.109C140.559 399.559 137.275 391.944 137.275 383.688V373.405C137.275 371.316 136.872 370.196 134.443 370.196C134.443 370.196 127.786 370.322 127.094 370.322C118.687 370.322 110.822 367.227 104.744 361.513C98.1621 355.32 94.5378 346.837 94.5378 337.638L94.5 136.495C94.5 117.806 109.677 101.658 128.327 100.501L329.264 88.066C338.438 87.4996 347.134 90.5956 353.716 96.7752C360.297 102.955 363.921 111.425 363.921 120.637V126.993C363.921 126.993 363.795 129.12 366.552 129.032L377.563 128.365C385.453 127.861 392.916 130.53 398.579 135.841Z" fill="white"/>
-                    <path d="M128.454 357.071C122.803 357.008 117.782 355.562 113.881 351.924C113.881 351.924 113.868 351.924 113.856 351.899C113.403 351.458 112.975 350.552 109.489 347.028L107.815 337.627L107.777 136.484C107.777 124.843 117.593 114.397 129.209 113.679L330.12 101.245C330.561 101.22 330.988 101.207 331.429 101.207C336.45 101.207 341.132 103.019 344.706 106.392C345.196 106.858 345.662 107.336 346.09 107.84C346.837 108.692 347.5 109.602 348.08 110.564C347.501 109.609 346.834 108.702 346.09 107.852C349.098 111.351 350.746 115.806 350.746 120.639V125.787C350.746 125.787 350.872 130.003 346.694 130.28L346.719 130.305L161.928 141.884C148.375 142.727 137.364 154.469 137.364 168.049C137.364 168.049 137.288 353.699 137.275 354C137.137 357.071 134.607 357.071 132.518 357.071H128.454Z" fill="black"/>
+                    <path d="M128.454 357.071C122.803 357.008 117.782 355.562 113.881 351.924C113.881 351.924 113.868 351.924 113.856 351.899C113.403 351.458 112.975 350.552C109.489 347.028 107.815 342.51 107.815 337.627L107.777 136.484C107.777 124.843 117.593 114.397 129.209 113.679L330.12 101.245C330.561 101.22 330.988 101.207 331.429 101.207C336.45 101.207 341.132 103.019 344.706 106.392C345.196 106.858 345.662 107.336 346.09 107.84C346.837 108.692 347.5 109.602 348.08 110.564C347.501 109.609 346.834 108.702 346.09 107.852C349.098 111.351 350.746 115.806 350.746 120.639V125.787C350.746 125.787 350.872 130.003 346.694 130.28L346.719 130.305L161.928 141.884C148.375 142.727 137.364 154.469 137.364 168.049C137.364 168.049 137.288 353.699 137.275 354C137.137 357.071 134.607 357.071 132.518 357.071H128.454Z" fill="black"/>
                     <path d="M394.126 373.546C394.151 373.244 394.176 372.941 394.176 372.639L394.126 155.274C394.05 154.129 393.861 153.009 393.546 151.939C392.817 149.434 391.457 147.182 389.532 145.382C386.776 142.802 383.177 141.405 379.313 141.405C378.974 141.405 378.633 141.417 378.294 141.443L163.854 154.884C163.779 154.889 163.703 154.902 163.628 154.914C163.527 154.93 163.426 154.947 163.326 154.947C156.505 155.652 150.792 161.617 150.326 168.451C150.301 168.753 150.301 169.043 150.301 169.345V382.318C150.301 382.42 150.307 382.519 150.314 382.616C150.32 382.711 150.326 382.804 150.326 382.896C150.464 387.667 152.365 392.021 155.75 395.205C158.77 398.049 162.646 399.66 166.837 399.875H167.504L381.83 386.899C381.893 386.899 381.956 386.88 382.019 386.88C382.065 386.873 382.111 386.866 382.158 386.862C382.174 386.862 382.191 386.861 382.208 386.861C388.538 385.691 393.684 380.002 394.126 373.546ZM183.927 376.339C176.59 376.855 170.096 374.364 170.297 364.748V215.08C170.297 209.946 174.526 206.661 179.194 206.421L365.747 195.233C370.404 194.994 374.216 198.367 374.216 203.036V352.968C374.216 358.455 372.845 365.516 363.406 365.881H363.381L363.368 365.893L183.927 376.339Z" fill="black"/>
                     <path d="M227.066 252.787C218.406 253.322 215.462 259.932 215.474 270.09V271.876C214.441 272.119 213.576 272.349 212.53 272.41C206.291 272.799 201.79 267.733 201.778 258.644C201.766 244.744 214.221 231.658 237.952 230.188C259.081 228.875 272.631 257.089C272.643 270.636 261.392 280.247 250.311 283.26C271.098 284.282 279.771 295.873 279.795 310.66C279.819 335.97 261.307 350.319 232.722 352.106L232.029 352.154C210.547 353.491 195.465 345.338 195.453 331.255C195.453 323.236 201.327 316.444 210.159 315.897C210.852 315.849 211.545 315.994 212.238 315.946C213.99 330.283 223.697 335.557 233.391 334.961C242.745 334.378 249.325 328.084 249.313 319.165V318.813C249.301 304.901 237.685 304.209 220.193 303.516L217.408 286.93C233.683 283.954 241.82 278.631 241.808 269.008C241.808 258.668 236.067 252.253 227.066 252.811V252.787Z" fill="black"/>
                     <path d="M305.181 245.959C287.859 250.965 284.041 243.358 285.938 235.388C296.325 232.958 323.341 224.854 333.558 221.196L333.68 327.987L352.57 330.732C352.57 337.683 348.605 342.032 341.501 342.482C335.614 342.846 321.93 343.345 315.349 343.758C305.132 344.39 286.424 345.921 286.424 345.921C285.901 344.524 285.731 341.862C285.731 338.472 287.105 334.998 291.606 333.478L305.29 329.056L305.193 245.971L305.181 245.959Z" fill="black"/>
@@ -1137,10 +1250,10 @@ export function LinearLanding() {
               one glance, and it was more made-up telemetry. Deleted — the
               contrast is stronger without a paragraph explaining it. */}
           <div className="flex flex-col items-center text-center select-none">
-            <span className="font-mono text-[11px] tracking-[0.2em] uppercase text-neutral-400 mb-2">Yesterday</span>
-            <span className="text-5xl md:text-7xl font-medium tracking-tight text-neutral-400 line-through decoration-red-500/60 decoration-2">246 unread</span>
+            <span className="font-mono text-[11px] tracking-[0.2em] uppercase text-neutral-600 mb-2">Yesterday</span>
+            <span className="text-5xl md:text-7xl font-medium tracking-tight text-neutral-600 line-through decoration-red-500/60 decoration-2">246 unread</span>
             <span className="text-neutral-700 text-3xl my-6 font-light">↓</span>
-            <span className="font-mono text-[11px] tracking-[0.2em] uppercase text-neutral-400 mb-2">Today</span>
+            <span className="font-mono text-[11px] tracking-[0.2em] uppercase text-neutral-500 mb-2">Today</span>
             <span className="text-6xl md:text-8xl font-medium tracking-tight bg-gradient-to-b from-white via-neutral-100 to-neutral-400 bg-clip-text text-transparent">3 decisions.</span>
           </div>
 
@@ -1174,14 +1287,14 @@ export function LinearLanding() {
               { icon: Inbox, label: "By 7am", value: <ActiveCounter target={3} />, caption: "Decisions left. It handled the rest." },
               { icon: Check, label: "You owe", value: <ActiveCounter target={0} />, caption: "Emails. Follow-ups chased for you." },
             ].map(({ icon: StatIcon, label, value, caption }, i) => (
-              <BlurFade key={label} inView duration={0.6} delay={i * 0.07} blur="6px" className="h-full">
+              <BlurFade key={label} inView repeat duration={0.6} delay={i * 0.07} blur="6px" className="h-full">
               <div
                 className="linear-grid-card linear-grid-card-lift p-6 flex flex-col gap-4 h-full"
               >
                 <span className="gradient-tile w-10 h-10 relative z-10">
                   <StatIcon className="w-4 h-4 text-white" />
                 </span>
-                <span className="font-mono text-[9px] tracking-[0.2em] text-[#c8ccd4] uppercase font-bold relative z-10">
+                <span className="font-mono text-[9px] tracking-[0.2em] text-[#8a8f98] uppercase font-bold relative z-10">
                   {label}
                 </span>
                 {/* SOLID white, not gradient text. `bg-clip-text
@@ -1195,7 +1308,7 @@ export function LinearLanding() {
                 <span className="text-3xl md:text-4xl font-semibold tracking-tight text-white relative z-10">
                   {value}
                 </span>
-                <span className="text-[11px] text-neutral-400 font-light font-sans relative z-10 mt-auto">
+                <span className="text-[11px] text-neutral-500 font-light font-sans relative z-10 mt-auto">
                   {caption}
                 </span>
               </div>
@@ -1212,7 +1325,7 @@ export function LinearLanding() {
               labeled product claims. */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-left mb-12 md:mb-24">
             <div className="linear-grid-card linear-grid-card-lift p-8 relative text-left">
-              <span className="font-mono text-[10px] tracking-[0.2em] text-neutral-400 uppercase block mb-4 relative z-10">
+              <span className="font-mono text-[10px] tracking-[0.2em] text-neutral-500 uppercase block mb-4 relative z-10">
                 What mornings become
               </span>
               <p className="text-sm text-neutral-300 font-light leading-relaxed font-sans relative z-10">
@@ -1221,7 +1334,7 @@ export function LinearLanding() {
             </div>
 
             <div className="linear-grid-card linear-grid-card-lift p-8 relative text-left">
-              <span className="font-mono text-[10px] tracking-[0.2em] text-neutral-400 uppercase block mb-4 relative z-10">
+              <span className="font-mono text-[10px] tracking-[0.2em] text-neutral-500 uppercase block mb-4 relative z-10">
                 Why it&apos;s different
               </span>
               <p className="text-sm text-neutral-300 font-light leading-relaxed font-sans relative z-10">
@@ -1302,7 +1415,7 @@ export function LinearLanding() {
                   className="w-full flex items-center justify-between gap-4 py-4 cursor-pointer text-sm font-semibold text-white text-left hover:text-neutral-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/40 rounded-sm"
                 >
                   <span>{faq.q}</span>
-                  <span aria-hidden="true" className="text-xs text-neutral-400 font-mono shrink-0">{activeAccordion === index ? "[-]" : "[+]"}</span>
+                  <span aria-hidden="true" className="text-xs text-neutral-500 font-mono shrink-0">{activeAccordion === index ? "[-]" : "[+]"}</span>
                 </button>
                 <AnimatePresence>
                   {activeAccordion === index && (
@@ -1316,7 +1429,7 @@ export function LinearLanding() {
                       transition={{ duration: 0.3 }}
                       className="overflow-hidden"
                     >
-                      <div className="text-sm text-[#c8ccd4] font-light leading-relaxed font-sans pb-4 min-h-[3rem]">
+                      <div className="text-sm text-[#8a8f98] font-light leading-relaxed font-sans pb-4 min-h-[3rem]">
                         <WordBlurStream
                           text={faq.a}
                           msPerWord={20}
@@ -1343,6 +1456,19 @@ export function LinearLanding() {
       </BlurFade>
 
       <Footer />
-    </>
+
+      {/* Edge blurs, both shorter than the 120px/80px they started at — enough
+          to soften content passing under the fixed chrome without eating the
+          viewport. The bottom blur reads as intentional again now that the
+          floating nav is back: it gives that bar a surface to sit against
+          instead of leaving it floating on bare black. Both sit at z-40, under
+          the floating nav's z-[100]. */}
+      <ProgressiveBlur position="top" backgroundColor="#000000" height="72px" blurAmount="10px" className="fixed z-40" />
+      <ProgressiveBlur position="bottom" backgroundColor="#000000" height="96px" blurAmount="10px" className="fixed z-40" />
+
+      {/* Floating navigation — restored at the founder's request after being
+          pulled in 4918b3b. */}
+      <FloatingNavbar />
+    </div>
   );
 }

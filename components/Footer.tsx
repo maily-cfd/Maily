@@ -124,11 +124,11 @@ export function Footer() {
         <div className="flex flex-col gap-5 max-w-xs">
           <div className="flex items-center gap-2.5">
             <div className="w-7 h-7 rounded-[25%] overflow-hidden border border-white/10 bg-white shadow-md shrink-0">
-              <img src="/mailient-logo-sm.png" alt="" width={28} height={28} className="w-full h-full object-cover" />
+              <img src="/mailient-logo-premium.png" alt="Mailient" className="w-full h-full object-cover" />
             </div>
             <span className="font-extrabold text-[15px] tracking-tight text-white font-satoshi">Mailient</span>
           </div>
-          <p className="text-[13px] text-neutral-400 leading-relaxed font-light">
+          <p className="text-[13px] leading-relaxed text-neutral-500 font-light">
             Mailient removes email from your to-do list entirely. You go build — we&apos;ll handle the inbox.
           </p>
           {/* Socials */}
@@ -140,7 +140,7 @@ export function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={s.label}
-                className="text-neutral-400 hover:text-white transition-colors duration-200"
+                className="text-neutral-500 hover:text-white transition-colors duration-200"
               >
                 {s.icon}
               </a>
@@ -155,7 +155,7 @@ export function Footer() {
 
           {/* Product column */}
           <div className="relative z-10">
-            <p className="text-[10px] font-bold tracking-[0.18em] uppercase text-neutral-400 mb-5">Product</p>
+            <p className="text-[10px] font-bold tracking-[0.18em] uppercase text-neutral-600 mb-5">Product</p>
             <ul className="space-y-3">
               {PRODUCT_LINKS.map((l) => (
                 <li key={l.href}>
@@ -172,7 +172,7 @@ export function Footer() {
 
           {/* Resources column */}
           <div className="relative z-10">
-            <p className="text-[10px] font-bold tracking-[0.18em] uppercase text-neutral-400 mb-5">Resources</p>
+            <p className="text-[10px] font-bold tracking-[0.18em] uppercase text-neutral-600 mb-5">Resources</p>
             <ul className="space-y-3">
               {RESOURCES_LINKS.map((l) => (
                 <li key={l.href}>
@@ -189,7 +189,7 @@ export function Footer() {
 
           {/* Join Us column */}
           <div className="relative z-10">
-            <p className="text-[10px] font-bold tracking-[0.18em] uppercase text-neutral-400 mb-5">Join Us</p>
+            <p className="text-[10px] font-bold tracking-[0.18em] uppercase text-neutral-600 mb-5">Join Us</p>
             <ul className="space-y-3">
               <li>
                 <button
@@ -198,7 +198,7 @@ export function Footer() {
                 >
                   Apply as Creator
                 </button>
-                <span className="text-[9px] text-neutral-400 font-mono block mt-0.5">Build AI Agents (RevShare)</span>
+                <span className="text-[9px] text-neutral-650 font-mono block mt-0.5">Build AI Agents (RevShare)</span>
               </li>
               <li>
                 <button
@@ -207,26 +207,30 @@ export function Footer() {
                 >
                   Apply as Affiliate
                 </button>
-                <span className="text-[9px] text-neutral-400 font-mono block mt-0.5">Earn recurring commissions</span>
+                <span className="text-[9px] text-neutral-650 font-mono block mt-0.5">Earn recurring commissions</span>
               </li>
             </ul>
           </div>
         </div>
       </div>
 
-      {/* Big brand text removed — near-invisible #0f0f0f on #0a0a0a failed
-          color-contrast even with aria-hidden (PSI Accessibility 96). */}
+      {/* Big brand text */}
+      <div className="w-full flex justify-center items-center pointer-events-none select-none pt-12 pb-6 overflow-hidden max-w-7xl mx-auto">
+        <span className="text-[20vw] lg:text-[15rem] leading-none font-bold tracking-tighter text-white/[0.02]">
+          mailient
+        </span>
+      </div>
 
       {/* Bottom bar */}
       <div className="border-t border-white/[0.05] px-8 py-5 max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
-        <p className="text-[11px] text-neutral-400 font-mono">
+        <p className="text-[11px] text-neutral-600 font-mono">
           &copy; {new Date().getFullYear()} Mailient Inc. All rights reserved.
         </p>
         <div className="flex items-center gap-5">
-          <Link href="/terms-of-service" className="text-[11px] text-neutral-400 hover:text-neutral-200 transition-colors">
+          <Link href="/terms-of-service" className="text-[11px] text-neutral-600 hover:text-neutral-300 transition-colors">
             Terms of Service
           </Link>
-          <Link href="/privacy-policy" className="text-[11px] text-neutral-400 hover:text-neutral-200 transition-colors">
+          <Link href="/privacy-policy" className="text-[11px] text-neutral-600 hover:text-neutral-300 transition-colors">
             Privacy Policy
           </Link>
         </div>
@@ -234,29 +238,22 @@ export function Footer() {
 
       {/* Premium Application Modal */}
       {modalType && (
-        <div
-          className="fixed inset-0 z-[10000] flex items-center justify-center p-6 bg-black/80 backdrop-blur-md transition-all duration-500"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="partner-modal-title"
-        >
-          <div className="absolute inset-0 z-0" onClick={handleClose} aria-hidden="true" />
+        <div className="fixed inset-0 z-[10000] flex items-center justify-center p-6 bg-black/80 backdrop-blur-md transition-all duration-500">
+          <div className="absolute inset-0 z-0" onClick={handleClose} />
           
           <div className="relative z-10 w-full max-w-[440px] rounded-[2.5rem] bg-[#0A0A0A] border border-[#2A2A2A] p-8 md:p-10 shadow-[0_32px_128px_-16px_rgba(0,0,0,0.8)] text-left flex flex-col gap-6">
-            <button
-              type="button"
+            <button 
               onClick={handleClose}
-              aria-label="Close"
-              className="absolute top-6 right-6 p-2 rounded-full bg-white/5 hover:bg-white/10 text-neutral-400 hover:text-white transition-all shadow-sm focus:outline-none"
+              className="absolute top-6 right-6 p-2 rounded-full bg-white/5 hover:bg-white/10 text-white/20 hover:text-white transition-all shadow-sm focus:outline-none"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
 
             <div className="space-y-2 mt-4">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/[0.03] border border-white/[0.08] text-[9px] font-mono tracking-wider uppercase text-neutral-400">
                 Partner Loop // {modalType === "creator" ? "Creator" : "Affiliate"}
               </span>
-              <h3 id="partner-modal-title" className="text-xl font-bold text-white tracking-tight">
+              <h3 className="text-xl font-bold text-white tracking-tight">
                 {modalType === "creator" ? "Apply as Creator" : "Apply as Affiliate"}
               </h3>
             </div>

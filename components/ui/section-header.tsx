@@ -63,7 +63,7 @@ export function SectionHeader({
           over the page's atmospheric radial glows, so there is something behind
           these to refract. Cards elsewhere use gradient instead — blurring flat
           black just produces black. */}
-      <BlurFade inView duration={0.5} blur="6px">
+      <BlurFade inView repeat duration={0.5} blur="6px">
         <span className="gradient-pill inline-flex items-center gap-2 rounded-full px-4 py-1.5">
           {Icon ? (
             <Icon className="w-3 h-3 text-neutral-400 shrink-0" aria-hidden="true" />
@@ -74,7 +74,7 @@ export function SectionHeader({
         </span>
       </BlurFade>
 
-      <BlurFade inView duration={0.6} delay={0.08} blur="8px">
+      <BlurFade inView repeat duration={0.6} delay={0.08} blur="8px">
         <h2 className="mt-6 text-3xl md:text-[44px] font-medium tracking-[-0.025em] leading-tight max-w-3xl bg-gradient-to-b from-white via-neutral-100 to-neutral-500 bg-clip-text text-transparent">
           {heading}
         </h2>
@@ -88,11 +88,11 @@ export function SectionHeader({
         <WordBlurReveal
           text={subtitle}
           delayMs={160}
-          className="mt-4 text-sm md:text-base text-[#c8ccd4] font-light leading-relaxed font-sans max-w-xl"
+          className="mt-4 text-sm md:text-base text-[#8a8f98] font-light leading-relaxed font-sans max-w-xl"
         />
       ) : subtitle ? (
-        <BlurFade inView duration={0.6} delay={0.16} blur="6px">
-          <p className="mt-4 text-sm md:text-base text-[#c8ccd4] font-light leading-relaxed font-sans max-w-xl">
+        <BlurFade inView repeat duration={0.6} delay={0.16} blur="6px">
+          <p className="mt-4 text-sm md:text-base text-[#8a8f98] font-light leading-relaxed font-sans max-w-xl">
             {subtitle}
           </p>
         </BlurFade>
