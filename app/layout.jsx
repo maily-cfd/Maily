@@ -143,7 +143,7 @@ export default function RootLayout({ children }) {
         <link rel="preconnect" href="https://api.fontshare.com" crossOrigin="anonymous" />
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){function load(){var l=document.createElement('link');l.rel='stylesheet';l.href='https://api.fontshare.com/v2/css?f[]=satoshi@500,400&display=swap';document.head.appendChild(l);}if('requestIdleCallback'in window)requestIdleCallback(load,{timeout:4000});else setTimeout(load,2000);})();`,
+            __html: `(function(){function load(){var l=document.createElement('link');l.rel='stylesheet';l.href='https://api.fontshare.com/v2/css?f[]=satoshi@500,400&display=swap';l.onload=function(){document.documentElement.classList.add('fonts-satoshi');};document.head.appendChild(l);}if('requestIdleCallback'in window)requestIdleCallback(load,{timeout:8000});else setTimeout(load,4000);})();`,
           }}
         />
         <noscript>

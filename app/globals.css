@@ -204,8 +204,9 @@ body,
 .font-mono,
 .satoshi-app,
 .arcus-typography {
-  /* System UI first so LCP never waits on Fontshare; Satoshi enhances after load. */
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Satoshi', sans-serif !important;
+  /* System UI only on the critical path — including 'Satoshi' here caused a
+     late font-swap that re-stamped mobile LCP at ~4s after FCP at 1.4s. */
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
 }
 
 /* Ensure inherit works for pseudo-elements */
@@ -216,6 +217,15 @@ body,
 }
 
 .satoshi-app {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+
+/* Applied after Fontshare loads — optional enhancement, never on LCP path. */
+html.fonts-satoshi .font-sans,
+html.fonts-satoshi .font-serif,
+html.fonts-satoshi .font-mono,
+html.fonts-satoshi .satoshi-app,
+html.fonts-satoshi .arcus-typography {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Satoshi', sans-serif !important;
 }
 
