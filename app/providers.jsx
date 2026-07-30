@@ -61,10 +61,13 @@ export default function Providers({ children }) {
   const loadAppChrome = isAppRoute(pathname);
   const marketing = isMarketingRoute(pathname);
 
-  // Landing / marketing: Theme only. No SessionProvider, React Query, or
-  // dashboard settings — those were ~100KB+ of unused JS on mobile Lighthouse.
+  // Marketing: Theme + Session only. Pricing/blogs/product pages mount Navbar
+  // which calls useSession — omitting SessionProvider crashes prerender
+  // ("Cannot destructure property 'data'"). Skip React Query, Lenis,
+  // dashboard settings, toasts, and app chrome to keep the JS path light.
+  // Landing (`/`) uses LandingHeader (no session) so SessionProvider stays off.
   if (marketing && !loadAppChrome) {
-    return (
+    const shell = (
       <ThemeProvider
         attribute="class"
         defaultTheme="dark"
@@ -73,6 +76,12 @@ export default function Providers({ children }) {
       >
         {children}
       </ThemeProvider>
+    );
+    if (pathname === "/") return shell;
+    return (
+      <SessionProvider refetchInterval={0} refetchOnWindowFocus={false}>
+        {shell}
+      </SessionProvider>
     );
   }
 
