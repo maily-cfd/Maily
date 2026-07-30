@@ -1,4 +1,6 @@
 import { LinearLanding } from "@/components/LinearLanding";
+import { LandingHero } from "@/components/landing-hero";
+import { LandingHeader } from "@/components/LandingHeader";
 import { landingFaqs } from "@/lib/landing-faqs";
 
 // FAQPage structured data — built from the SAME array the landing accordion
@@ -22,7 +24,13 @@ export default function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
-      <LinearLanding />
+      <div className="min-h-screen bg-[#000000] text-white flex flex-col items-center justify-start overflow-x-hidden font-sans relative selection:bg-white selection:text-black">
+        <LandingHeader />
+        <main id="main-content" className="w-full flex flex-col items-center">
+          <LandingHero />
+          <LinearLanding />
+        </main>
+      </div>
     </>
   );
 }

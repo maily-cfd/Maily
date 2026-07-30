@@ -34,7 +34,6 @@ import {
   Briefcase,
   AlertCircle
 } from "lucide-react";
-import { LandingHeader } from "@/components/LandingHeader";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
@@ -92,32 +91,6 @@ function ActiveCounter({ target = 1420 }: { target?: number }) {
   return (
     <span ref={ref} className="inline-flex items-center tabular-nums">
       {count}
-    </span>
-  );
-}
-
-const DESCRIPTIONS = [
-  "Mailient removes email from your to-do list entirely.",
-  "The most expensive email in your inbox is the one you never opened.",
-  "Wake up. Read one briefing. Never dread Gmail again.",
-];
-
-/** Soft fade rotation — no scramble glyphs (those tanked LCP / INP / trust). */
-function RotatingTagline() {
-  const [descIndex, setDescIndex] = useState(0);
-  const reduce = useReducedMotion();
-
-  useEffect(() => {
-    if (reduce) return;
-    const timer = setInterval(() => {
-      setDescIndex((prev) => (prev + 1) % DESCRIPTIONS.length);
-    }, 5000);
-    return () => clearInterval(timer);
-  }, [reduce]);
-
-  return (
-    <span className="text-lg md:text-[22px] text-[#c8ccd4] font-sans font-light tracking-wide text-center">
-      {DESCRIPTIONS[descIndex]}
     </span>
   );
 }
@@ -373,96 +346,13 @@ export function LinearLanding() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#000000] text-white flex flex-col items-center justify-start overflow-x-hidden font-sans relative selection:bg-white selection:text-black">
-      
-      {/* 0. Custom Radar & Orbital Keyframes */}
-      <style dangerouslySetInnerHTML={{ __html: `
-        @keyframes radar-pulse {
-          0% { transform: scale(0.95); opacity: 0.8; }
-          50% { transform: scale(1.05); opacity: 0.4; }
-          100% { transform: scale(0.95); opacity: 0.8; }
-        }
-        @keyframes orb-float {
-          0%, 100% { transform: translateY(0px) scale(1) rotate(0deg); }
-          50% { transform: translateY(-12px) scale(1.03) rotate(3deg); }
-        }
-        @keyframes laser-pulse {
-          from { stroke-dashoffset: 170; }
-          to { stroke-dashoffset: 0; }
-        }
-        @keyframes drift-left {
-          0% { transform: translateX(0) scaleY(1); }
-          50% { transform: translateX(-25%) scaleY(1.05); }
-          100% { transform: translateX(-50%) scaleY(1); }
-        }
-        @keyframes drift-right {
-          0% { transform: translateX(-50%) scaleY(1); }
-          50% { transform: translateX(-25%) scaleY(1.08); }
-          100% { transform: translateX(0) scaleY(1); }
-        }
-      `}} />
-
-      {/* Atmospheric lighting baked into backgrounds below — the old absolute
-          blur orbs were the dominant CLS culprits (~0.15) in mobile PSI. */}
-
-      {/* Sticky header — no next-auth session fetch on the critical path */}
-      <LandingHeader />
-
-      <main id="main-content" className="w-full flex flex-col items-center">
-
-      {/* 1. HERO — static LCP text; no scramble glyphs / BlurFade delay / EtheralShadow */}
-      <section className="relative w-full pt-40 pb-0 md:pt-48 flex flex-col items-center text-center z-10 bg-gradient-to-b from-[#000000] via-[#09090b] to-[#16161a] overflow-hidden">
-        <div className="absolute inset-x-0 bottom-0 h-[250px] bg-[radial-gradient(ellipse_at_bottom,rgba(255,255,255,0.08),transparent_70%)] pointer-events-none z-10" />
-
-        <div className="w-full flex flex-col items-center max-w-5xl z-10 mx-auto px-6">
-          <h1 className="text-4xl md:text-[60px] font-medium tracking-[-0.035em] leading-[1.08] max-w-3xl text-white pb-2">
-            You run your company,
-            <br />
-            We run your inbox.
-          </h1>
-
-          <p className="text-lg md:text-[22px] text-[#c8ccd4] leading-relaxed max-w-4xl mt-8 font-light min-h-[4rem] flex items-center justify-center">
-            <RotatingTagline />
-          </p>
-
-          <div className="flex flex-col items-center gap-3 mt-12">
-            <div className="flex flex-wrap items-center justify-center gap-4">
-              <CircleExpandButton href="/auth/signup">
-                Get started free
-              </CircleExpandButton>
-              <CircleExpandButton href="#demos" variant="secondary">
-                Watch Mailient handle a real inbox
-              </CircleExpandButton>
-            </div>
-            <p className="text-[13px] text-[#c8ccd4] tracking-wide">
-              3-day free trial · cancel anytime
-            </p>
-          </div>
-
-          {/* Desktop only, client-mounted — SSR would still emit the poster
-              <img>/preload and steal mobile LCP even inside hidden md:block. */}
-          <DesktopHeroVideo />
-          <a
-            href="#demos"
-            className="md:hidden mt-14 inline-flex items-center gap-2 text-sm font-semibold text-white underline underline-offset-4 decoration-white/30 hover:decoration-white"
-          >
-            Watch Mailient handle a real inbox
-            <ArrowRight className="w-4 h-4" aria-hidden="true" />
-          </a>
-        </div>
-
-      {/* Clear Separation Line at the bottom of the Metallic Hero */}
-      <div className="w-full h-px bg-gradient-to-r from-transparent via-white/[0.12] to-transparent relative z-25 mt-16 md:mt-24" />
-
-      {/* NOTE: a PerspectiveMarquee sat here as a "trusted by" wall. It was
-          mounted with no `items` prop, so it fell through to that component's
-          DEFAULT_ITEMS placeholder and scrolled Vercel / Linear / Stripe /
-          Figma / Notion / Raycast / Arc / Cursor — none of whom are customers.
-          Removed outright rather than relabeled: the integrations story is
-          already told properly by the #connectors orbit section below, and
-          pre-launch we have no customer logos to show. Nothing beats fake
-          social proof except no social proof. */}
-    </section>
+    <>
+      {/* Hero + header live in app/page.jsx (Server Components) so LCP text
+          paints before this client bundle hydrates. Desktop demo mounts here
+          so mobile never SSR/preloads the poster. */}
+      <div className="w-full flex justify-center px-6 -mt-4 md:mt-0 mb-8">
+        <DesktopHeroVideo />
+      </div>
 
       {/* 1.5 THE PROBLEM — WHY MAILIENT MANIFESTO (moved up: problem right after hero, per positioning spec) */}
       <section className="py-16 md:py-32 px-6 w-full max-w-4xl mx-auto border-t border-white/[0.06] z-10 relative flex flex-col items-center text-left">
@@ -1453,7 +1343,6 @@ export function LinearLanding() {
       </BlurFade>
 
       <Footer />
-      </main>
-    </div>
+    </>
   );
 }

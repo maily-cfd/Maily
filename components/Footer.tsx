@@ -214,12 +214,8 @@ export function Footer() {
         </div>
       </div>
 
-      {/* Big brand text */}
-      <div className="w-full flex justify-center items-center pointer-events-none select-none pt-12 pb-6 overflow-hidden max-w-7xl mx-auto">
-        <span className="text-[20vw] lg:text-[15rem] leading-none font-bold tracking-tighter text-white/[0.02]" aria-hidden="true">
-          mailient
-        </span>
-      </div>
+      {/* Big brand text removed — near-invisible #0f0f0f on #0a0a0a failed
+          color-contrast even with aria-hidden (PSI Accessibility 96). */}
 
       {/* Bottom bar */}
       <div className="border-t border-white/[0.05] px-8 py-5 max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
