@@ -63,10 +63,38 @@ export async function POST(request: NextRequest) {
   const userName = session.user.name?.split(' ')[0] || userId.split('@')[0] || 'there';
 
   const db = new DatabaseService(true);
-  const profile = await db.getUserProfile(userId);
-  if (profile?.onboarding_completed) {
+
+  // Demo is for the signup/paywall funnel. Blocking on onboarding_completed was
+  // wrong: unpaid users stay on /onboarding (incl. force-redo / step resume)
+  // with that flag already true, so "Watch Arcus work" 403'd. Only paid users
+  // should be steered to the real (paywalled) Arcus path.
+  let isPaid = false;
+  try {
+    const { data: subscription } = await db.supabase
+      .from('user_subscriptions')
+      .select('status, plan_type, subscription_ends_at')
+      .ilike('user_id', userId)
+      .maybeSingle();
+    if (subscription) {
+      const endDate = subscription.subscription_ends_at
+        ? new Date(subscription.subscription_ends_at)
+        : null;
+      const isNotExpired = !endDate || endDate > new Date();
+      isPaid =
+        (subscription.status === 'active' || subscription.status === 'trialing') &&
+        !!subscription.plan_type &&
+        subscription.plan_type !== 'free' &&
+        subscription.plan_type !== 'none' &&
+        isNotExpired;
+    }
+  } catch { /* treat as unpaid */ }
+
+  if (isPaid) {
     return new Response(
-      JSON.stringify({ error: 'onboarding_complete', message: 'This demo is only available during setup.' }),
+      JSON.stringify({
+        error: 'paid_user',
+        message: 'You’re already on a plan — open Arcus from the app instead.',
+      }),
       { status: 403, headers: { 'Content-Type': 'application/json' } },
     );
   }
