@@ -1,7 +1,12 @@
 import Script from "next/script";
 import "./globals.css";
 import Providers from "./providers";
-import { Analytics } from "@vercel/analytics/next";
+import dynamic from "next/dynamic";
+
+const Analytics = dynamic(
+  () => import("@vercel/analytics/react").then((m) => m.Analytics),
+  { ssr: false }
+);
 
 export const metadata = {
   title: "Mailient — Runs your inbox while you build your company",
@@ -155,10 +160,13 @@ export default function RootLayout({ children }) {
         </Script>
         {/* DataFast removed: script returned HTTP 403 and failed Best Practices
             (console errors). Re-add once the domain is authorized in DataFast. */}
-        {/* Fonts: non-blocking. media=print then switch to all so the CSS
-            download does not block first paint (Lighthouse: ~3.5s savings).
-            Fewer Satoshi weights; Inter/Strichpunkt removed from critical path. */}
-        <link rel="preconnect" href="https://api.fontshare.com" crossOrigin="anonymous" />
+        {/* Fonts: load after first paint. Satoshi is brand, not LCP — system UI
+            paints the hero immediately (mobile CrUX LCP was 5.2s with remote font). */}
+        <link
+          rel="preload"
+          as="style"
+          href="https://api.fontshare.com/v2/css?f[]=satoshi@500,400&display=swap"
+        />
         <link
           id="satoshi-font"
           rel="stylesheet"
@@ -167,7 +175,7 @@ export default function RootLayout({ children }) {
         />
         <script
           dangerouslySetInnerHTML={{
-            __html: `document.getElementById('satoshi-font').media='all';`,
+            __html: `requestAnimationFrame(function(){var l=document.getElementById('satoshi-font');if(l)l.media='all';});`,
           }}
         />
         <noscript>

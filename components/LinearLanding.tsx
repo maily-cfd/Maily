@@ -34,7 +34,7 @@ import {
   Briefcase,
   AlertCircle
 } from "lucide-react";
-import { Navbar } from "@/components/Navbar";
+import { LandingHeader } from "@/components/LandingHeader";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
@@ -103,7 +103,7 @@ function RotatingTagline() {
   }, [reduce]);
 
   return (
-    <span className="text-lg md:text-[22px] text-[#b0b4bc] font-sans font-light tracking-wide text-center">
+    <span className="text-lg md:text-[22px] text-[#c8ccd4] font-sans font-light tracking-wide text-center">
       {DESCRIPTIONS[descIndex]}
     </span>
   );
@@ -198,10 +198,22 @@ function HeroVideoPlayer() {
         isPlaying ? "shadow-none" : "shadow-[0_50px_100px_rgba(0,0,0,0.85)]"
       )}
     >
+      {/* Explicit <img> poster — video poster attrs are poorly discovered for
+          LCP; a real image with fetchPriority paints earlier and reserves space. */}
+      {!isPlaying && (
+        <img
+          src="/demos/home-feed-demo.webp"
+          alt=""
+          width={1226}
+          height={720}
+          fetchPriority="high"
+          decoding="async"
+          className="absolute inset-0 z-[5] w-full h-full object-cover pointer-events-none"
+        />
+      )}
       <video
         ref={videoRef}
         src={mediaReady ? "/demos/home-feed-demo.mp4" : undefined}
-        poster="/demos/home-feed-demo.webp"
         loop
         muted={isMuted}
         playsInline
@@ -270,45 +282,22 @@ function HeroVideoPlayer() {
           </div>
         </div>
 
-        <div
-          role="slider"
-          tabIndex={0}
+        <input
+          type="range"
+          min={0}
+          max={Math.max(1, duration || 1)}
+          step={0.1}
+          value={currentTime}
           aria-label="Video progress"
-          aria-valuemin={0}
-          aria-valuemax={Math.max(1, Math.round(duration) || 1)}
-          aria-valuenow={Math.round(currentTime)}
-          aria-orientation="horizontal"
-          onClick={(e) => {
-            e.stopPropagation();
-            if (!videoRef.current || !duration) return;
-            const rect = e.currentTarget.getBoundingClientRect();
-            const clickX = e.clientX - rect.left;
-            const percentage = clickX / rect.width;
-            const newTime = percentage * duration;
-            videoRef.current.currentTime = newTime;
-            setCurrentTime(newTime);
+          onChange={(e) => {
+            if (!videoRef.current) return;
+            const t = Number(e.target.value);
+            videoRef.current.currentTime = t;
+            setCurrentTime(t);
           }}
-          onKeyDown={(e) => {
-            if (!videoRef.current || !duration) return;
-            if (e.key === "ArrowRight") {
-              e.preventDefault();
-              const t = Math.min(duration, currentTime + 5);
-              videoRef.current.currentTime = t;
-              setCurrentTime(t);
-            } else if (e.key === "ArrowLeft") {
-              e.preventDefault();
-              const t = Math.max(0, currentTime - 5);
-              videoRef.current.currentTime = t;
-              setCurrentTime(t);
-            }
-          }}
-          className="w-full h-1 bg-white/20 hover:h-1.5 transition-all duration-200 cursor-pointer relative z-40"
-        >
-          <div
-            className="h-full bg-white relative transition-all duration-100"
-            style={{ width: `${(currentTime / (duration || 1)) * 100}%` }}
-          />
-        </div>
+          onClick={(e) => e.stopPropagation()}
+          className="w-full h-1 accent-white bg-white/20 cursor-pointer relative z-40 appearance-none rounded-full [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-2.5 [&::-webkit-slider-thumb]:h-2.5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white"
+        />
       </div>
     </div>
   );
@@ -330,6 +319,26 @@ export function LinearLanding() {
   const [activeStep, setActiveStep] = useState(0);
   const threeThingsRef = useRef<HTMLElement>(null);
   const [threeThingsInView, setThreeThingsInView] = useState(false);
+  const [chromeReady, setChromeReady] = useState(false);
+
+  // Floating nav + edge blurs are below-the-fold chrome — mount after idle so
+  // they do not compete with LCP / INP on mobile.
+  useEffect(() => {
+    let idleId: number | undefined;
+    let timeoutId: number | undefined;
+    const arm = () => setChromeReady(true);
+    if (typeof window.requestIdleCallback === "function") {
+      idleId = window.requestIdleCallback(arm, { timeout: 2500 });
+    } else {
+      timeoutId = window.setTimeout(arm, 1200);
+    }
+    return () => {
+      if (idleId != null && typeof window.cancelIdleCallback === "function") {
+        window.cancelIdleCallback(idleId);
+      }
+      if (timeoutId != null) window.clearTimeout(timeoutId);
+    };
+  }, []);
 
   useEffect(() => {
     const el = threeThingsRef.current;
@@ -408,8 +417,8 @@ export function LinearLanding() {
         <div className="absolute bottom-[20%] right-[5%] w-[800px] h-[800px] rounded-full bg-neutral-950/20 blur-[200px]" />
       </div>
 
-      {/* Sticky Translucent Header */}
-      <Navbar theme="dark" />
+      {/* Sticky header — no next-auth session fetch on the critical path */}
+      <LandingHeader />
 
       <main id="main-content" className="w-full flex flex-col items-center">
 
@@ -418,13 +427,13 @@ export function LinearLanding() {
         <div className="absolute inset-x-0 bottom-0 h-[250px] bg-[radial-gradient(ellipse_at_bottom,rgba(255,255,255,0.08),transparent_70%)] pointer-events-none z-10" />
 
         <div className="w-full flex flex-col items-center max-w-5xl z-10 mx-auto px-6">
-          <h1 className="text-4xl md:text-[60px] font-medium tracking-[-0.035em] leading-[1.08] max-w-3xl bg-gradient-to-b from-white via-neutral-100 to-neutral-400 bg-clip-text text-transparent pb-2">
+          <h1 className="text-4xl md:text-[60px] font-medium tracking-[-0.035em] leading-[1.08] max-w-3xl text-white pb-2">
             You run your company,
             <br />
             We run your inbox.
           </h1>
 
-          <p className="text-lg md:text-[22px] text-[#b0b4bc] leading-relaxed max-w-4xl mt-8 font-light min-h-[4rem] flex items-center justify-center">
+          <p className="text-lg md:text-[22px] text-[#c8ccd4] leading-relaxed max-w-4xl mt-8 font-light min-h-[4rem] flex items-center justify-center">
             <RotatingTagline />
           </p>
 
@@ -437,7 +446,7 @@ export function LinearLanding() {
                 Watch Mailient handle a real inbox
               </CircleExpandButton>
             </div>
-            <p className="text-[13px] text-[#b0b4bc] tracking-wide">
+            <p className="text-[13px] text-[#c8ccd4] tracking-wide">
               3-day free trial · cancel anytime
             </p>
           </div>
@@ -559,7 +568,7 @@ export function LinearLanding() {
               >
               <span className={cn(
                 "font-mono text-[10px] tracking-[0.2em] font-medium block transition-all duration-300",
-                activeStep === 0 ? "text-[#b0b4bc] mb-3" : "text-neutral-500 group-hover:text-neutral-400 mb-1"
+                activeStep === 0 ? "text-[#c8ccd4] mb-3" : "text-neutral-500 group-hover:text-neutral-400 mb-1"
               )}>
                 01 // Only what needs you
               </span>
@@ -605,7 +614,7 @@ export function LinearLanding() {
               >
               <span className={cn(
                 "font-mono text-[10px] tracking-[0.2em] font-medium block transition-all duration-300",
-                activeStep === 1 ? "text-[#b0b4bc] mb-3" : "text-neutral-500 group-hover:text-neutral-400 mb-1"
+                activeStep === 1 ? "text-[#c8ccd4] mb-3" : "text-neutral-500 group-hover:text-neutral-400 mb-1"
               )}>
                 02 // Sounds exactly like you
               </span>
@@ -651,7 +660,7 @@ export function LinearLanding() {
               >
               <span className={cn(
                 "font-mono text-[10px] tracking-[0.2em] font-medium block transition-all duration-300",
-                activeStep === 2 ? "text-[#b0b4bc] mb-3" : "text-neutral-500 group-hover:text-neutral-400 mb-1"
+                activeStep === 2 ? "text-[#c8ccd4] mb-3" : "text-neutral-500 group-hover:text-neutral-400 mb-1"
               )}>
                 03 // While you sleep
               </span>
@@ -1278,14 +1287,14 @@ export function LinearLanding() {
               { icon: Inbox, label: "By 7am", value: <ActiveCounter target={3} />, caption: "Decisions left. It handled the rest." },
               { icon: Check, label: "You owe", value: <ActiveCounter target={0} />, caption: "Emails. Follow-ups chased for you." },
             ].map(({ icon: StatIcon, label, value, caption }, i) => (
-              <BlurFade key={label} inView repeat duration={0.6} delay={i * 0.07} blur="6px" className="h-full">
+              <BlurFade key={label} inView duration={0.6} delay={i * 0.07} blur="6px" className="h-full">
               <div
                 className="linear-grid-card linear-grid-card-lift p-6 flex flex-col gap-4 h-full"
               >
                 <span className="gradient-tile w-10 h-10 relative z-10">
                   <StatIcon className="w-4 h-4 text-white" />
                 </span>
-                <span className="font-mono text-[9px] tracking-[0.2em] text-[#b0b4bc] uppercase font-bold relative z-10">
+                <span className="font-mono text-[9px] tracking-[0.2em] text-[#c8ccd4] uppercase font-bold relative z-10">
                   {label}
                 </span>
                 {/* SOLID white, not gradient text. `bg-clip-text
@@ -1420,7 +1429,7 @@ export function LinearLanding() {
                       transition={{ duration: 0.3 }}
                       className="overflow-hidden"
                     >
-                      <div className="text-sm text-[#b0b4bc] font-light leading-relaxed font-sans pb-4 min-h-[3rem]">
+                      <div className="text-sm text-[#c8ccd4] font-light leading-relaxed font-sans pb-4 min-h-[3rem]">
                         <WordBlurStream
                           text={faq.a}
                           msPerWord={20}
@@ -1455,12 +1464,13 @@ export function LinearLanding() {
           floating nav is back: it gives that bar a surface to sit against
           instead of leaving it floating on bare black. Both sit at z-40, under
           the floating nav's z-[100]. */}
-      <ProgressiveBlur position="top" backgroundColor="#000000" height="72px" blurAmount="10px" className="fixed z-40" />
-      <ProgressiveBlur position="bottom" backgroundColor="#000000" height="96px" blurAmount="10px" className="fixed z-40" />
-
-      {/* Floating navigation — restored at the founder's request after being
-          pulled in 4918b3b. */}
-      <FloatingNavbar />
+      {chromeReady && (
+        <>
+          <ProgressiveBlur position="top" backgroundColor="#000000" height="72px" blurAmount="10px" className="fixed z-40" />
+          <ProgressiveBlur position="bottom" backgroundColor="#000000" height="96px" blurAmount="10px" className="fixed z-40" />
+          <FloatingNavbar />
+        </>
+      )}
     </div>
   );
 }

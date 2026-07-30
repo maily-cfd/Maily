@@ -204,7 +204,8 @@ body,
 .font-mono,
 .satoshi-app,
 .arcus-typography {
-  font-family: 'Satoshi', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  /* System UI first so LCP never waits on Fontshare; Satoshi enhances after load. */
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Satoshi', sans-serif !important;
 }
 
 /* Ensure inherit works for pseudo-elements */
@@ -215,7 +216,7 @@ body,
 }
 
 .satoshi-app {
-  font-family: 'Satoshi', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Satoshi', sans-serif !important;
 }
 
 @theme inline {

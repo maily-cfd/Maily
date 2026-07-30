@@ -21,7 +21,6 @@ const SoundSystem = dynamic(
 
 const queryClient = new QueryClient();
 
-/** App chrome that must not ship on marketing pages (unused JS + main-thread). */
 const APP_ONLY_PREFIXES = [
   "/home-feed",
   "/dashboard",
@@ -32,6 +31,18 @@ const APP_ONLY_PREFIXES = [
   "/compose",
 ];
 
+/** Public marketing routes — strip auth/query/settings chrome from the JS path. */
+const MARKETING_EXACT = new Set([
+  "/",
+  "/pricing",
+  "/security",
+  "/changelog",
+  "/contact",
+  "/privacy-policy",
+  "/terms-of-service",
+  "/blogs",
+]);
+
 function isAppRoute(pathname) {
   if (!pathname) return false;
   return APP_ONLY_PREFIXES.some(
@@ -39,9 +50,31 @@ function isAppRoute(pathname) {
   );
 }
 
+function isMarketingRoute(pathname) {
+  if (!pathname) return false;
+  if (MARKETING_EXACT.has(pathname)) return true;
+  return pathname.startsWith("/product/") || pathname.startsWith("/blogs/");
+}
+
 export default function Providers({ children }) {
   const pathname = usePathname();
   const loadAppChrome = isAppRoute(pathname);
+  const marketing = isMarketingRoute(pathname);
+
+  // Landing / marketing: Theme only. No SessionProvider, React Query, or
+  // dashboard settings — those were ~100KB+ of unused JS on mobile Lighthouse.
+  if (marketing && !loadAppChrome) {
+    return (
+      <ThemeProvider
+        attribute="class"
+        defaultTheme="dark"
+        enableSystem
+        disableTransitionOnChange
+      >
+        {children}
+      </ThemeProvider>
+    );
+  }
 
   return (
     <QueryClientProvider client={queryClient}>

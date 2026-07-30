@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import React from "react";
 import { cn } from "@/lib/utils";
@@ -8,25 +7,11 @@ import { cn } from "@/lib/utils";
 /**
  * The site's pill CTA.
  *
- * BACKGROUND FILL WAS BROKEN: the base class was `bg-[rgb(77, 77, 77)]`.
- * Tailwind arbitrary values cannot contain spaces — the className string
- * tokenizes on whitespace into `bg-[rgb(77,` / `77,` / `77)]`, none of which
- * are valid utilities, so NO background was ever generated. Every call site
- * had independently papered over this by passing its own `bg-*` in className,
- * and the two that didn't ("Get started free" on the landing hero and in the
- * closing CTA) rendered as a transparent pill with only an inset highlight.
+ * Fill is owned by an explicit `variant`:
+ *   primary   — solid white, black label
+ *   secondary — outlined grey ramp
  *
- * Fill is now owned by an explicit `variant` instead of by className patches:
- *
- *   primary   — solid white, black label. Mailient's palette has no hue, so
- *               LUMINANCE is the accent: pure white is reserved for the thing
- *               we want clicked and is deliberately the brightest element on
- *               any given screen.
- *   secondary — outlined, stays in the grey ramp. For navigational CTAs that
- *               should not compete with the primary action.
- *
- * Keep primary rare — roughly one per viewport. If everything is white,
- * nothing is.
+ * No framer-motion — CSS hover keeps this out of the landing LCP/INP path.
  */
 
 type CircleExpandButtonVariant = "primary" | "secondary";
@@ -69,7 +54,7 @@ export function CircleExpandButton({
       rel={rel}
       disabled={disabled}
       className={cn(
-        "relative inline-flex items-center justify-center gap-2",
+        "group/cta relative inline-flex items-center justify-center gap-2",
         "px-8 py-3 rounded-full",
         "font-semibold text-sm",
         "overflow-hidden cursor-pointer",
@@ -81,17 +66,9 @@ export function CircleExpandButton({
       )}
     >
       <span className="relative z-10">{children}</span>
-
-      {/* Arrow inherits the label colour — it was hardcoded text-white, which
-          left an invisible white-on-white arrow on the primary variant. */}
-      <motion.div
-        className="relative flex items-center justify-center"
-        initial={{ rotate: -45 }}
-        whileHover={{ rotate: 0 }}
-        transition={{ duration: 0.15 }}
-      >
+      <span className="relative flex items-center justify-center -rotate-45 transition-transform duration-150 group-hover/cta:rotate-0">
         <ArrowRight className="w-4 h-4" aria-hidden="true" />
-      </motion.div>
+      </span>
     </ButtonWrapper>
   );
 }

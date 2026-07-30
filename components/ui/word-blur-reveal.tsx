@@ -66,30 +66,29 @@ export function WordBlurReveal({
   let wordIndex = 0;
 
   return (
-    <p
-      ref={ref}
-      className={cn(playing && "wbr-play", className)}
-      // The full sentence stays available to screen readers and to copy/paste
-      // as one string, rather than as a pile of fragmented spans.
-      aria-label={text}
-    >
-      {tokens.map((token, i) => {
-        if (!token.trim()) {
-          return <span key={i} aria-hidden="true">{token}</span>;
-        }
-        const delay = delayMs + wordIndex * staggerMs;
-        wordIndex += 1;
-        return (
-          <span
-            key={i}
-            aria-hidden="true"
-            className="wbr-word"
-            style={{ animationDelay: `${delay}ms` }}
-          >
-            {token}
-          </span>
-        );
-      })}
+    <p ref={ref} className={cn(playing && "wbr-play", className)}>
+      {/* Visible animated words are aria-hidden; the full sentence is exposed
+          once via sr-only. aria-label on <p> is prohibited and breaks the
+          accessibility tree (Lighthouse / agent browsing). */}
+      <span className="sr-only">{text}</span>
+      <span aria-hidden="true">
+        {tokens.map((token, i) => {
+          if (!token.trim()) {
+            return <span key={i}>{token}</span>;
+          }
+          const delay = delayMs + wordIndex * staggerMs;
+          wordIndex += 1;
+          return (
+            <span
+              key={i}
+              className="wbr-word"
+              style={{ animationDelay: `${delay}ms` }}
+            >
+              {token}
+            </span>
+          );
+        })}
+      </span>
     </p>
   );
 }

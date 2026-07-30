@@ -31,7 +31,7 @@ export function CTASection() {
               We&apos;ll handle the inbox.
             </h2>
 
-            <p className="text-[#b0b4bc] text-sm md:text-base max-w-xl mb-10 leading-relaxed font-sans font-light select-none">
+            <p className="text-[#c8ccd4] text-sm md:text-base max-w-xl mb-10 leading-relaxed font-sans font-light select-none">
               Mailient removes email from your to-do list entirely. Connect your Gmail tonight — tomorrow morning, open one briefing. Not Gmail.
             </p>
 
@@ -50,7 +50,7 @@ export function CTASection() {
                   Talk to Founder
                 </CircleExpandButton>
               </div>
-              <p className="text-[13px] text-[#b0b4bc] tracking-wide select-none">
+              <p className="text-[13px] text-[#c8ccd4] tracking-wide select-none">
                 3-day free trial · cancel anytime
               </p>
             </div>

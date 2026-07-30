@@ -56,7 +56,7 @@ export function LeadCapture() {
           <h2 className="mt-6 text-2xl md:text-[32px] font-medium tracking-[-0.025em] leading-tight bg-gradient-to-b from-white via-neutral-100 to-neutral-400 bg-clip-text text-transparent relative z-10">
             Not ready to connect Gmail?
           </h2>
-          <p className="mt-3 text-sm md:text-base text-[#b0b4bc] font-light leading-relaxed max-w-md mx-auto relative z-10">
+          <p className="mt-3 text-sm md:text-base text-[#c8ccd4] font-light leading-relaxed max-w-md mx-auto relative z-10">
             Leave your email. I&apos;ll send you the 60-second case for why Mailient exists — start whenever you&apos;re ready.
           </p>
 

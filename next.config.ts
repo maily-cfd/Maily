@@ -3,6 +3,14 @@ import type { NextConfig } from 'next';
 const nextConfig: NextConfig = {
   serverExternalPackages: ['@supabase/supabase-js', 'resend', 'svix'],
   transpilePackages: ['recharts', 'd3-array', 'd3-scale', 'victory-vendor'],
+  // Tree-shake icon/motion barrels — cuts unused JS on the landing critical path.
+  experimental: {
+    optimizePackageImports: [
+      'lucide-react',
+      'framer-motion',
+      '@radix-ui/react-icons',
+    ],
+  },
   images: {
     formats: ["image/avif", "image/webp"],
     remotePatterns: [

@@ -128,7 +128,7 @@ export function Footer() {
             </div>
             <span className="font-extrabold text-[15px] tracking-tight text-white font-satoshi">Mailient</span>
           </div>
-          <p className="text-[13px] leading-relaxed text-neutral-500 font-light">
+          <p className="text-[13px] text-neutral-400 leading-relaxed font-light">
             Mailient removes email from your to-do list entirely. You go build — we&apos;ll handle the inbox.
           </p>
           {/* Socials */}
