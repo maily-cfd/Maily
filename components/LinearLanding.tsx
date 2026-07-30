@@ -1447,22 +1447,6 @@ export function LinearLanding() {
 
       <Footer />
       </main>
-
-      {/* Edge blurs, both shorter than the 120px/80px they started at — enough
-          to soften content passing under the fixed chrome without eating the
-          viewport. The bottom blur reads as intentional again now that the
-          floating nav is back: it gives that bar a surface to sit against
-          instead of leaving it floating on bare black. Both sit at z-40, under
-          the floating nav's z-[100]. */}
-      {/* No floating chrome on first paint — it was shifting layout (CLS ~0.16)
-          and competing with LCP on mobile. */}
-      {false && chromeReady && (
-        <>
-          <ProgressiveBlur position="top" backgroundColor="#000000" height="72px" blurAmount="10px" className="fixed z-40" />
-          <ProgressiveBlur position="bottom" backgroundColor="#000000" height="96px" blurAmount="10px" className="fixed z-40" />
-          <FloatingNavbar />
-        </>
-      )}
     </div>
   );
 }
