@@ -88,11 +88,11 @@ export function SectionHeader({
         <WordBlurReveal
           text={subtitle}
           delayMs={160}
-          className="mt-4 text-sm md:text-base text-[#8a8f98] font-light leading-relaxed font-sans max-w-xl"
+          className="mt-4 text-sm md:text-base text-[#b0b4bc] font-light leading-relaxed font-sans max-w-xl"
         />
       ) : subtitle ? (
         <BlurFade inView repeat duration={0.6} delay={0.16} blur="6px">
-          <p className="mt-4 text-sm md:text-base text-[#8a8f98] font-light leading-relaxed font-sans max-w-xl">
+          <p className="mt-4 text-sm md:text-base text-[#b0b4bc] font-light leading-relaxed font-sans max-w-xl">
             {subtitle}
           </p>
         </BlurFade>

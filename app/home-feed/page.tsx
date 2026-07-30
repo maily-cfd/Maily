@@ -364,22 +364,22 @@ function HomeFeedContent() {
       />
       {/* Margins must equal the sidebar's real widths (72px collapsed / 260px
           expanded) — ml-20/ml-64 (80/256) left an 8px gap / 4px overlap. */}
-      <div className={`flex-1 flex flex-col min-w-0 transition-[margin] duration-300 ${isSidebarCollapsed ? 'md:ml-[72px]' : 'md:ml-[260px]'}`}>
+      <div className={`flex-1 flex flex-col min-w-0 transition-[margin] duration-300 ${activeTab === 'today' ? 'mono-feed' : ''} ${isSidebarCollapsed ? 'md:ml-[72px]' : 'md:ml-[260px]'}`}>
         {/* Tab bar — Today (Sift decision queue) | Inbox (traditional view).
           PART 69: sliding pill highlight via Framer layoutId so the
           selected-tab background animates between buttons instead of
           snapping. */}
-      {/* Liquid Glass tab switcher — a floating glass pill over the feed
-          (iOS 26 style: refraction rim + blur, no full-width solid bar).
-          The wrapper stays sticky but is invisible; only the pill floats. */}
+      {/* Monochrome tab switcher — a white paper pill on a hairline border, with
+          an ink (#0a0a0a) active indicator. Matches the clinical light system. */}
       <div className="sticky top-0 z-30 pointer-events-none">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-center">
-          <div className="pointer-events-auto relative inline-flex items-center gap-1 p-1 rounded-full liquid-glass">
+          <div className={`pointer-events-auto relative inline-flex items-center gap-1 p-1 rounded-full ${activeTab === 'today' ? 'bg-white border border-[#e5e5e5] shadow-[0_1px_3px_rgba(0,0,0,0.08)]' : 'liquid-glass'}`}>
             {([
               { id: 'today' as TabId, Icon: Sparkles, label: 'Today' },
               { id: 'inbox' as TabId, Icon: Inbox,    label: 'Inbox' },
             ]).map(({ id, Icon, label }) => {
               const isActive = activeTab === id;
+              const mono = activeTab === 'today';
               return (
                 <button
                   key={id}
@@ -387,14 +387,14 @@ function HomeFeedContent() {
                   onClick={() => switchTab(id)}
                   className={`relative inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[12.5px] font-medium transition-colors duration-200 ${
                     isActive
-                      ? '!text-white dark:!text-black'
-                      : 'text-neutral-500 hover:text-black dark:hover:text-white'
+                      ? (mono ? '!text-[#fafafa]' : '!text-white dark:!text-black')
+                      : (mono ? 'text-[#737373] hover:text-[#0a0a0a]' : 'text-neutral-500 hover:text-black dark:hover:text-white')
                   }`}
                 >
                   {isActive && (
                     <motion.span
                       layoutId="home-tab-pill"
-                      className="absolute inset-0 rounded-full !bg-black dark:!bg-white"
+                      className={`absolute inset-0 rounded-full ${mono ? '!bg-[#0a0a0a]' : '!bg-black dark:!bg-white'}`}
                       transition={{ type: 'spring', stiffness: 380, damping: 32 }}
                     />
                   )}

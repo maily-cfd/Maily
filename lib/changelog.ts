@@ -26,6 +26,19 @@ export interface ChangelogGroup {
 
 export const CHANGELOG: ChangelogGroup[] = [
   {
+    date: 'July 26, 2026',
+    entries: [
+      {
+        tag: 'Improved',
+        title: 'A cleaner, lighter home — and a one-tap refresh',
+        points: [
+          'The Today home feed has a new look: a calm, light, monochrome design — white cards on a soft canvas with crisp hairline borders, in the spirit of tools like Linear and Vercel. Less visual noise, easier to scan, with a single red kept only for what’s genuinely at risk or errored.',
+          'New refresh button at the top of the feed re-pulls everything at once — today’s snapshot, your world, and your weekly analytics — so you can force a fresh read whenever you want, in one tap.',
+        ],
+      },
+    ],
+  },
+  {
     date: 'July 25, 2026',
     entries: [
       {

@@ -90,7 +90,7 @@ export function CircleExpandButton({
         whileHover={{ rotate: 0 }}
         transition={{ duration: 0.15 }}
       >
-        <ArrowRight className="w-4 h-4" />
+        <ArrowRight className="w-4 h-4" aria-hidden="true" />
       </motion.div>
     </ButtonWrapper>
   );

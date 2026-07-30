@@ -7,7 +7,8 @@ import "lenis/dist/lenis.css";
 
 // Routes where Lenis smooth scroll should be enabled
 const ENABLED_ROUTES = [
-  "/", // Landing page
+  // Landing (/) intentionally excluded — Lenis forces continuous layout
+  // work (forced reflow) and fights Lighthouse desktop main-thread budgets.
   "/product", // Product pages
   "/changelog", // Changelog
   "/contact", // Support

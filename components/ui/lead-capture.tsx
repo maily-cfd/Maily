@@ -56,7 +56,7 @@ export function LeadCapture() {
           <h2 className="mt-6 text-2xl md:text-[32px] font-medium tracking-[-0.025em] leading-tight bg-gradient-to-b from-white via-neutral-100 to-neutral-400 bg-clip-text text-transparent relative z-10">
             Not ready to connect Gmail?
           </h2>
-          <p className="mt-3 text-sm md:text-base text-[#8a8f98] font-light leading-relaxed max-w-md mx-auto relative z-10">
+          <p className="mt-3 text-sm md:text-base text-[#b0b4bc] font-light leading-relaxed max-w-md mx-auto relative z-10">
             Leave your email. I&apos;ll send you the 60-second case for why Mailient exists — start whenever you&apos;re ready.
           </p>
 
@@ -96,14 +96,14 @@ export function LeadCapture() {
                   disabled={state === "loading"}
                   className="rounded-full bg-white text-black font-semibold text-sm px-6 py-3 inline-flex items-center justify-center gap-2 hover:bg-neutral-200 transition-colors disabled:opacity-60 shrink-0"
                 >
-                  {state === "loading" ? "Sending…" : <>Send it <ArrowRight className="w-4 h-4" /></>}
+                  {state === "loading" ? "Sending…" : <>Send it <ArrowRight className="w-4 h-4" aria-hidden="true" /></>}
                 </button>
               </div>
 
               {state === "error" && (
                 <p className="mt-3 text-xs text-red-400">{error}</p>
               )}
-              <p className="mt-4 text-[11px] text-neutral-600">
+              <p className="mt-4 text-[11px] text-neutral-400">
                 One email. No list, no spam — unsubscribe by ignoring it.
               </p>
             </form>

@@ -16,6 +16,12 @@ const faqJsonLd = {
 export default function Home() {
   return (
     <>
+      <link
+        rel="preload"
+        as="image"
+        href="/demos/home-feed-demo.webp"
+        fetchPriority="high"
+      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}

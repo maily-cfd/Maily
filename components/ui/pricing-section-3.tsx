@@ -34,6 +34,7 @@ const PricingSwitch = ({
     <div className={cn("flex justify-center", className)}>
       <div className="relative z-10 mx-auto flex w-fit rounded-full bg-white/[0.02] border border-white/[0.08] p-1 shadow-2xl backdrop-blur-md">
         <button
+          type="button"
           onClick={() => handleSwitch("0")}
           className={cn(
             "relative z-10 w-fit sm:h-11 cursor-pointer h-9 rounded-full sm:px-6 px-4 sm:py-1.5 py-1 text-xs font-semibold transition-colors duration-300",
@@ -51,6 +52,7 @@ const PricingSwitch = ({
         </button>
 
         <button
+          type="button"
           onClick={() => handleSwitch("1")}
           className={cn(
             "relative z-10 w-fit cursor-pointer sm:h-11 h-9 flex-shrink-0 rounded-full sm:px-6 px-4 sm:py-1.5 py-1 text-xs font-semibold transition-colors duration-300",

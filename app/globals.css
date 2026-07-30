@@ -1,4 +1,5 @@
-@import url('https://api.fontshare.com/v2/css?f[]=satoshi@900,800,700,600,500,400,300,200,100&display=swap');
+/* Satoshi loads asynchronously from app/layout.jsx — do NOT @import it here
+   (render-blocking CSS import was a major LCP/FCP hit on mobile). */
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
@@ -187,9 +188,8 @@ html {
   }
 }
 
-/* NOTE: Satoshi is loaded via @import url('...fontshare...') at the top.
-   That import contains the REAL @font-face declarations with proper .woff2 URLs.
-   DO NOT add manual @font-face blocks pointing to the CSS URL — they will silently fail. */
+/* NOTE: Satoshi is loaded asynchronously from app/layout.jsx (non-blocking).
+   DO NOT @import Fontshare CSS here — that was render-blocking first paint. */
 
 html,
 body,
@@ -2035,6 +2035,67 @@ textarea,
   --arcus-fg-tertiary:      #8A8A8A; /* tertiary */
   --arcus-fg-muted:         #B8B8B8; /* muted */
   --arcus-fg-inverse:       #FFFFFF;
+}
+
+/* ═══ Monochrome "clinical blueprint" home feed (shadcn / Vercel, light) ════════
+   Scoped light-mono override. Redefining the arcus tokens on .mono-feed re-skins
+   every neutral arcus-* utility to the reference palette — white paper cards on a
+   #f5f5f5 canvas, #e5e5e5 hairlines, #0a0a0a ink — even though the app <html> is
+   .dark: CSS custom properties resolve by PROXIMITY, so the nearer .mono-feed
+   value wins for the whole subtree. Colored accents + glass are stripped in the
+   markup; the ONLY hue kept is Ember (#e7000b), and only for error / at-risk. */
+.mono-feed {
+  --arcus-bg: #f5f5f5;
+  --arcus-bg-elevated: #fafafa;
+  --arcus-surface: #ffffff;
+  --arcus-surface-hover: #fafafa;
+  --arcus-raised: #f0f0f0;
+  --arcus-border: #e5e5e5;
+  --arcus-divider: #e5e5e5;
+  --arcus-fg: #0a0a0a;
+  --arcus-fg-secondary: #404040;
+  --arcus-fg-tertiary: #737373;
+  --arcus-fg-muted: #a3a3a3;
+  --arcus-fg-inverse: #fafafa;
+  /* charts → grayscale ramp so any analytics reads monochrome */
+  --arcus-chart-blue: #0a0a0a;
+  --arcus-chart-green: #404040;
+  --arcus-chart-aqua: #737373;
+  --arcus-chart-magenta: #a3a3a3;
+  --arcus-chart-yellow: #525252;
+  background: #f5f5f5;
+  color: #0a0a0a;
+}
+
+/* Paper card — the reference's stacked hairline-plus-elevation shadow. Radius
+   comes from the markup (rounded-3xl = 24px containers, rounded-[18px] pills). */
+.mono-card {
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+  box-shadow:
+    0 0 0 1px rgba(23, 23, 23, 0.05),
+    0 1px 3px rgba(0, 0, 0, 0.1),
+    0 1px 2px -1px rgba(0, 0, 0, 0.1);
+}
+.mono-card-hover {
+  transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+.mono-card-hover:hover {
+  border-color: #d4d4d4;
+  box-shadow:
+    0 0 0 1px rgba(23, 23, 23, 0.06),
+    0 6px 16px -6px rgba(0, 0, 0, 0.12),
+    0 2px 6px -2px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+/* Soft inset panel (nested strips, quote blocks) — one tonal step, no shadow. */
+.mono-inset {
+  background: #fafafa;
+  border: 1px solid #ececec;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mono-card-hover { transition: none; }
+  .mono-card-hover:hover { transform: none; }
 }
 
 /* ===== APPLE-GRADE GLASS SURFACES (Arcus) =====================================

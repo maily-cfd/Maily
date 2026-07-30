@@ -94,11 +94,16 @@ function LiquidButton({
     className,
     variant,
     size,
+    asChild = false,
+    as,
     children,
     ...props
 }: React.ComponentProps<"button"> &
-    VariantProps<typeof liquidbuttonVariants>) {
-    const Comp = "button"
+    VariantProps<typeof liquidbuttonVariants> & {
+        asChild?: boolean
+        as?: "button" | "span"
+    }) {
+    const Comp = asChild ? Slot : (as ?? "button")
 
     return (
         <>
@@ -133,7 +138,7 @@ function LiquidButton({
 
 function GlassFilter() {
     return (
-        <svg className="hidden">
+        <svg className="hidden" aria-hidden="true">
             <defs>
                 <filter
                     id="container-glass"

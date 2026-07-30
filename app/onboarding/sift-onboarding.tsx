@@ -66,6 +66,7 @@ interface ScanResult {
   receivedCapped?: boolean;
   unansweredCapped?: boolean;
   automatedCapped?: boolean;
+  scannedAt?: number;
 }
 
 interface AgentSpec {
@@ -257,12 +258,8 @@ export default function SiftOnboardingPage() {
         if (!res.ok) return;
         const d = await res.json();
         const st = d?.state || {};
-        // Only accept a persisted scan that matches the CURRENT shape — older
-        // saves (needsReply/repetitive) lack these fields and would crash the
-        // First Scan screen on render. Drop them so step 4 re-scans cleanly.
-        if (st.scan && typeof st.scan.received === 'number' && typeof st.scan.unanswered === 'number') {
-          setScan(st.scan);
-        }
+        // Never restore scan counts from persistence — step 4 always re-reads Gmail
+        // so "This is your month" cannot show stale or placeholder numbers.
         if (st.voiceDone) setVoiceDone(true);
         if (st.agent) setCreatedAgent(st.agent);
         if (st.agentSpec) setAgentSpec(st.agentSpec);
@@ -303,10 +300,17 @@ export default function SiftOnboardingPage() {
     go(bypassSkipped(Math.max(FIRST, step - 1), -1));
   }, [go, step]);
 
-  // Scan results require a scan — if we landed here after a soft-fail skip, move on.
+  // Scan results require a fresh scan — never show step 5 without one.
   useEffect(() => {
-    if (step === 5 && !scan) go(6);
+    if (step === 5 && !scan) go(4);
   }, [step, scan, go]);
+
+  // Sign-in with Google already grants Gmail (legacy) or Composio already linked
+  // the inbox — don't make users confirm the same connection again on step 2.
+  useEffect(() => {
+    if (step !== 2 || !isConnected('gmail')) return;
+    next();
+  }, [step, isConnected, next]);
 
   // ── In-flow popup OAuth (keeps the user inside onboarding) ──
   // In-flow popup OAuth. `provider` is the integrations provider name
@@ -449,7 +453,7 @@ export default function SiftOnboardingPage() {
         <div className={cn('w-full', step === 13 ? 'max-w-4xl' : 'max-w-xl')}>
           <AnimatePresence mode="wait">
             <motion.div key={step} {...fade}>
-              {step === 1  && <S1Welcome onBegin={() => go(2)} />}
+              {step === 1  && <S1Welcome onBegin={() => go(isConnected('gmail') ? 3 : 2)} />}
               {step === 2  && <S2Gmail isConnected={isConnected('gmail')} onConnect={() => {
                 // Composio flow: log in with identity-only scopes first (no cap),
                 // then connect Gmail via Composio's verified client in a popup.
@@ -759,46 +763,67 @@ function S3Calendar({ connected, onConnect, onContinue, onSkip }: { connected: b
 
 function S4Scan({ scan, setScan, onDone, onSkip, reduce }: { scan: ScanResult | null; setScan: (s: ScanResult) => void; onDone: (s: ScanResult) => void; onSkip: () => void; reduce: boolean }) {
   const [display, setDisplay] = useState(0);
-  const [phase, setPhase] = useState<'reading' | 'settled' | 'error'>(scan ? 'settled' : 'reading');
-  const started = useRef(false);
+  const [phase, setPhase] = useState<'reading' | 'settled' | 'error'>('reading');
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const runId = useRef(0);
+
+  const loadScan = useCallback(async () => {
+    const id = ++runId.current;
+    setPhase('reading');
+    setErrorMsg(null);
+    setDisplay(0);
+    try {
+      const res = await fetch('/api/onboarding/scan', { method: 'POST' });
+      const d = await res.json().catch(() => ({}));
+      if (runId.current !== id) return;
+      if (!res.ok || !d.success) {
+        setErrorMsg(
+          typeof d?.error === 'string'
+            ? (d.error === 'Gmail not connected' ? 'Connect Gmail first, then try again.' : 'Could not read your inbox. Try again.')
+            : 'Could not read your inbox. Try again.',
+        );
+        setPhase('error');
+        return;
+      }
+      const result: ScanResult = {
+        windowDays: d.windowDays,
+        received: d.received,
+        unanswered: d.unanswered,
+        automated: d.automated,
+        hoursPerWeek: d.hoursPerWeek,
+        receivedCapped: d.receivedCapped,
+        unansweredCapped: d.unansweredCapped,
+        automatedCapped: d.automatedCapped,
+        scannedAt: d.scannedAt,
+      };
+      setScan(result);
+      if (reduce) {
+        setDisplay(result.received);
+        setPhase('settled');
+      } else {
+        const target = result.received;
+        const t0 = performance.now();
+        const dur = Math.min(2600, 900 + target);
+        const tick = (now: number) => {
+          if (runId.current !== id) return;
+          const p = Math.min(1, (now - t0) / dur);
+          const eased = 1 - Math.pow(1 - p, 3);
+          setDisplay(Math.round(target * eased));
+          if (p < 1) requestAnimationFrame(tick);
+          else setPhase('settled');
+        };
+        requestAnimationFrame(tick);
+      }
+    } catch {
+      if (runId.current !== id) return;
+      setErrorMsg('Connection lost while reading your inbox. Try again.');
+      setPhase('error');
+    }
+  }, [setScan, reduce]);
 
   useEffect(() => {
-    if (started.current) return;
-    started.current = true;
-    if (scan) { setDisplay(scan.received ?? 0); setPhase('settled'); return; }
-    (async () => {
-      try {
-        const res = await fetch('/api/onboarding/scan', { method: 'POST' });
-        const d = await res.json();
-        if (!res.ok || !d.success) throw new Error(d?.error || 'scan failed');
-        const result: ScanResult = {
-          windowDays: d.windowDays, received: d.received, unanswered: d.unanswered,
-          automated: d.automated, hoursPerWeek: d.hoursPerWeek,
-          receivedCapped: d.receivedCapped, unansweredCapped: d.unansweredCapped,
-          automatedCapped: d.automatedCapped,
-        };
-        setScan(result);
-        // Count-up to the real number, then settle into the insight.
-        if (reduce) {
-          setDisplay(result.received); setPhase('settled');
-        } else {
-          const target = result.received;
-          const t0 = performance.now();
-          const dur = Math.min(2600, 900 + target);
-          const tick = (now: number) => {
-            const p = Math.min(1, (now - t0) / dur);
-            const eased = 1 - Math.pow(1 - p, 3);
-            setDisplay(Math.round(target * eased));
-            if (p < 1) requestAnimationFrame(tick);
-            else setPhase('settled');
-          };
-          requestAnimationFrame(tick);
-        }
-      } catch {
-        setPhase('error');
-      }
-    })();
-  }, [scan, setScan, reduce]);
+    loadScan();
+  }, [loadScan]);
 
   // Auto-advance once settled (with a readable beat).
   useEffect(() => {
@@ -807,22 +832,18 @@ function S4Scan({ scan, setScan, onDone, onSkip, reduce }: { scan: ScanResult | 
     return () => clearTimeout(t);
   }, [phase, scan, onDone, reduce]);
 
-  // Soft fail — don't park the user on an error screen.
-  useEffect(() => {
-    if (phase !== 'error') return;
-    const t = setTimeout(() => (scan ? onDone(scan) : onSkip()), reduce ? 800 : 2000);
-    return () => clearTimeout(t);
-  }, [phase, scan, onDone, onSkip, reduce]);
-
   if (phase === 'error') {
     return (
       <div className="text-center">
         <IconBadge><Inbox className="w-5 h-5 text-[#0A0A0A]" strokeWidth={1.75} /></IconBadge>
-        <Display className="text-[26px] mb-3">We’ll finish this in the background</Display>
+        <Display className="text-[26px] mb-3">Couldn&apos;t read your inbox</Display>
         <Body className="text-[15px] max-w-sm mx-auto mb-7">
-          Your inbox is safe. You can keep going — Mailient will catch up on the scan shortly.
+          {errorMsg || 'Gmail didn&apos;t return your counts. This screen only shows your real numbers.'}
         </Body>
-        <PrimaryButton onClick={() => (scan ? onDone(scan) : onSkip())}>Continue <ArrowRight className="w-4 h-4" /></PrimaryButton>
+        <div className="flex flex-col items-center gap-3">
+          <PrimaryButton onClick={() => loadScan()}>Try again</PrimaryButton>
+          <SkipLink onClick={onSkip}>Skip for now</SkipLink>
+        </div>
       </div>
     );
   }
@@ -1100,12 +1121,15 @@ function S8MeetArcus({ onContinue }: { onContinue: () => void }) {
 interface Moment { kind: 'reason' | 'decision' | 'action' | 'final'; text: string }
 
 function S9Arcus({ scan, firstName, onContinue, reduce }: { scan: ScanResult | null; firstName: string; onContinue: () => void; reduce: boolean }) {
-  const count = Math.max(1, Math.min(3, scan?.unanswered ?? 3));
+  // Cap at 2 — reliable within function time; scan only informs the ask.
+  const count = Math.max(1, Math.min(2, scan?.unanswered ?? 2));
   const [phase, setPhase] = useState<'idle' | 'working' | 'done' | 'error'>('idle');
   const [moments, setMoments] = useState<Moment[]>([]);
   const [drafts, setDrafts] = useState(0);
+  const [finalNote, setFinalNote] = useState<string | null>(null);
   const [errorDetail, setErrorDetail] = useState<string | null>(null);
   const scroller = useRef<HTMLDivElement>(null);
+  const draftsRef = useRef(0);
 
   useEffect(() => {
     if (scroller.current) scroller.current.scrollTop = scroller.current.scrollHeight;
@@ -1114,7 +1138,12 @@ function S9Arcus({ scan, firstName, onContinue, reduce }: { scan: ScanResult | n
   const push = (m: Moment) => setMoments((prev) => [...prev, m]);
 
   const run = async () => {
-    setPhase('working'); setMoments([]); setDrafts(0); setErrorDetail(null);
+    setPhase('working');
+    setMoments([]);
+    setDrafts(0);
+    draftsRef.current = 0;
+    setFinalNote(null);
+    setErrorDetail(null);
     try {
       const res = await fetch('/api/onboarding/arcus-demo', {
         method: 'POST',
@@ -1126,13 +1155,13 @@ function S9Arcus({ scan, firstName, onContinue, reduce }: { scan: ScanResult | n
         setErrorDetail(
           typeof errBody?.message === 'string'
             ? errBody.message
-            : 'Arcus could not run right now. Check that Gmail is connected and try again.',
+            : 'Couldn’t start the run. Connect Gmail and try again.',
         );
         setPhase('error');
         return;
       }
       if (!res.body) {
-        setErrorDetail('Arcus returned an empty response. Try again.');
+        setErrorDetail('No response from Arcus. Try again.');
         setPhase('error');
         return;
       }
@@ -1143,6 +1172,7 @@ function S9Arcus({ scan, firstName, onContinue, reduce }: { scan: ScanResult | n
       let finalText = '';
       let errored = false;
       let streamError = '';
+      let needsGmail = false;
 
       while (true) {
         const { done, value } = await reader.read();
@@ -1163,53 +1193,54 @@ function S9Arcus({ scan, firstName, onContinue, reduce }: { scan: ScanResult | n
             if (msg) streamError = msg;
             continue;
           }
-          handleEvent(type, data, (t) => { finalText = t; });
+          if (type === 'connector_required') {
+            needsGmail = true;
+            errored = true;
+            streamError = 'Gmail isn’t connected. Connect it, then run this again.';
+            push({ kind: 'decision', text: 'Gmail needs to be connected' });
+            continue;
+          }
+          if (type === 'thinking' || type === 'narrative') {
+            const t = (data?.status || data?.text || data?.message || '').toString().trim();
+            if (t && t.length > 3) push({ kind: 'reason', text: clip(t) });
+          } else if (type === 'tool_call') {
+            const label = humanTool(data?.tool || data?.name || '');
+            if (label) push({ kind: 'decision', text: label });
+          } else if (type === 'tool_result') {
+            const name = (data?.tool || data?.name || '').toString();
+            if (/draft/i.test(name) && data?.success !== false) {
+              draftsRef.current += 1;
+              setDrafts(draftsRef.current);
+            }
+          } else if (type === 'message') {
+            const t = (data?.content || data?.text || '').toString().trim();
+            if (t) finalText = clip(t, 280);
+          }
         }
       }
-      if (errored && !finalText) {
-        setErrorDetail(streamError || 'Arcus hit an error while drafting. Try again.');
+
+      if (errored && draftsRef.current === 0) {
+        setErrorDetail(streamError || (needsGmail
+          ? 'Gmail isn’t connected. Connect it, then run this again.'
+          : 'That run didn’t finish. Try again.'));
         setPhase('error');
         return;
       }
-      if (finalText) push({ kind: 'final', text: finalText });
+
+      if (finalText) {
+        push({ kind: 'final', text: finalText });
+        setFinalNote(finalText);
+      } else if (draftsRef.current > 0) {
+        const note = draftsRef.current === 1
+          ? 'One draft is waiting in Gmail. Nothing was sent.'
+          : `${draftsRef.current} drafts are waiting in Gmail. Nothing was sent.`;
+        push({ kind: 'final', text: note });
+        setFinalNote(note);
+      }
       setPhase('done');
     } catch {
-      setErrorDetail('Connection lost while Arcus was working. Try again.');
+      setErrorDetail('Connection dropped mid-run. Try again — nothing was sent.');
       setPhase('error');
-    }
-  };
-
-  const handleEvent = (type: string, data: any, setFinal: (t: string) => void) => {
-    switch (type) {
-      case 'thinking':
-      case 'narrative': {
-        // thinking → { status }, narrative → { text }
-        const t = (data?.status || data?.text || data?.message || '').toString().trim();
-        if (t && t.length > 3) push({ kind: 'reason', text: clip(t) });
-        break;
-      }
-      case 'tool_call': {
-        const label = humanTool(data?.tool || data?.name || '');
-        if (label) push({ kind: 'decision', text: label });
-        break;
-      }
-      case 'tool_result': {
-        const name = (data?.tool || data?.name || '').toString();
-        // Only count drafts the agent actually saved.
-        if (/draft/i.test(name) && data?.success !== false) setDrafts((d) => d + 1);
-        break;
-      }
-      case 'message': {
-        const t = (data?.content || data?.text || '').toString().trim();
-        if (t) setFinal(clip(t, 320));
-        break;
-      }
-      case 'connector_required': {
-        push({ kind: 'decision', text: 'Gmail needs to be reconnected' });
-        setErrorDetail('Gmail connection is missing permissions. Reconnect Gmail, then run this again.');
-        break;
-      }
-      default: break;
     }
   };
 
@@ -1232,7 +1263,7 @@ function S9Arcus({ scan, firstName, onContinue, reduce }: { scan: ScanResult | n
               <div className="w-9 h-9 rounded-xl lg-pane flex items-center justify-center"><Inbox className="w-4 h-4 text-[#0A0A0A]" /></div>
               <div>
                 <p className="text-[13.5px] font-medium text-[#0A0A0A]">Draft {count} {count === 1 ? 'reply' : 'replies'}</p>
-                <p className="text-[12px] text-[#0A0A0A]/50">Your {count} oldest unanswered {count === 1 ? 'email' : 'emails'}</p>
+                <p className="text-[12px] text-[#0A0A0A]/50">Your oldest unanswered {count === 1 ? 'email' : 'emails'} — nothing sends</p>
               </div>
             </div>
           </GlassCard>
@@ -1259,24 +1290,26 @@ function S9Arcus({ scan, firstName, onContinue, reduce }: { scan: ScanResult | n
             ))}
             {phase === 'working' && (
               <div className="flex items-center gap-2 text-[13px] text-[#0A0A0A]/40 pt-1">
-                <Loader2 className="w-3.5 h-3.5 animate-spin" /> thinking…
+                <Loader2 className="w-3.5 h-3.5 animate-spin" /> working…
               </div>
             )}
           </div>
 
-          {/* Never hold the user hostage to a slow model — the run keeps going
-              server-side; the drafts still land in Gmail either way. */}
           {phase === 'working' && (
             <div className="text-center mt-4">
-              <SkipLink onClick={onContinue}>Skip — it&apos;ll finish in the background</SkipLink>
+              <SkipLink onClick={onContinue}>Skip this step</SkipLink>
             </div>
           )}
 
           {phase === 'done' && (
             <div className="mt-6 text-center">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full lg-pane text-[13px] font-medium text-[#0A0A0A] mb-6">
-                <Check className="w-3.5 h-3.5" />
-                {drafts > 0 ? `${drafts} ${drafts === 1 ? 'draft' : 'drafts'} saved — nothing was sent.` : 'Saved as drafts — nothing was sent.'}
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full lg-pane text-[13px] font-medium text-[#0A0A0A] mb-6 max-w-sm">
+                <Check className="w-3.5 h-3.5 shrink-0" />
+                <span className="text-left">
+                  {drafts > 0
+                    ? (drafts === 1 ? '1 draft saved in Gmail — nothing was sent.' : `${drafts} drafts saved in Gmail — nothing was sent.`)
+                    : (finalNote || 'Nothing needed a reply right now.')}
+                </span>
               </div>
               <div><PrimaryButton onClick={onContinue}>Continue <ArrowRight className="w-4 h-4" /></PrimaryButton></div>
             </div>
@@ -1287,7 +1320,7 @@ function S9Arcus({ scan, firstName, onContinue, reduce }: { scan: ScanResult | n
       {phase === 'error' && (
         <div className="text-center">
           <Body className="text-[14px] mb-5 max-w-sm mx-auto text-[#0A0A0A]/70">
-            {errorDetail || 'Something went wrong while Arcus was drafting.'}
+            {errorDetail || 'That run didn’t finish. Try again — nothing was sent.'}
           </Body>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <PrimaryButton onClick={run}>Try again</PrimaryButton>

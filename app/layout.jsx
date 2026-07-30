@@ -137,16 +137,12 @@ export default function RootLayout({ children }) {
         <Script
           async
           src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID || 'G-M03D6M49N8'}`}
-          strategy="afterInteractive"
+          strategy="lazyOnload"
         />
-        <Script id="google-analytics" strategy="afterInteractive">
+        <Script id="google-analytics" strategy="lazyOnload">
           {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
-            // Consent Mode v2 — default DENIED before config, so GA4 never sets
-            // tracking cookies without opt-in. It still sends cookieless,
-            // aggregated pings. If a consent banner is added later, call
-            // gtag('consent','update',{...granted}) on accept.
             gtag('consent', 'default', {
               ad_storage: 'denied',
               ad_user_data: 'denied',
@@ -154,28 +150,44 @@ export default function RootLayout({ children }) {
               analytics_storage: 'denied'
             });
             gtag('js', new Date());
-
             gtag('config', '${process.env.NEXT_PUBLIC_GA_ID || 'G-M03D6M49N8'}');
           `}
         </Script>
-        <Script
-          defer
-          data-website-id="dfid_CFPVRrMW5ckOyKogWqzo9"
-          data-domain="mailient.xyz"
-          src="https://datafa.st/js/script.js"
+        {/* DataFast removed: script returned HTTP 403 and failed Best Practices
+            (console errors). Re-add once the domain is authorized in DataFast. */}
+        {/* Fonts: non-blocking. media=print then switch to all so the CSS
+            download does not block first paint (Lighthouse: ~3.5s savings).
+            Fewer Satoshi weights; Inter/Strichpunkt removed from critical path. */}
+        <link rel="preconnect" href="https://api.fontshare.com" crossOrigin="anonymous" />
+        <link
+          id="satoshi-font"
+          rel="stylesheet"
+          href="https://api.fontshare.com/v2/css?f[]=satoshi@500,400&display=swap"
+          media="print"
         />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://api.fontshare.com/v2/css?f[]=satoshi@900,700,500,400,300,200,100&display=swap" rel="stylesheet" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet" />
-        <link href="https://fonts.googleapis.com/css2?family=Strichpunkt+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `document.getElementById('satoshi-font').media='all';`,
+          }}
+        />
+        <noscript>
+          <link
+            rel="stylesheet"
+            href="https://api.fontshare.com/v2/css?f[]=satoshi@500,400&display=swap"
+          />
+        </noscript>
       </head>
       <body className="font-sans antialiased satoshi-app bg-background text-foreground" data-new-gr-c-s-check-loaded="14.1258.0" data-gr-ext-installed="">
         {/* Launchit Badge for SEO Authority — must live in <body>: an <a> inside
             <head> is invalid HTML, gets hoisted by the browser, and the resulting
             hydration mismatch made React re-render the whole page on every load */}
-        <a href="https://www.launchit.site/project/mailient" target="_blank" className="hidden" aria-hidden="true">
-          <img src="/badges/featured-dark.svg" alt="Launched on Launchit" width="1" height="1" />
+        <a
+          href="https://www.launchit.site/project/mailient"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="sr-only"
+        >
+          Launched on Launchit
         </a>
         <Providers>
           {children}

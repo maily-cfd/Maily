@@ -1,19 +1,14 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
 /**
  * A looping product demo clip.
  *
- * Pauses itself whenever it scrolls out of view. That is not a nicety: a
- * <video autoPlay loop> keeps decoding frames forever wherever it sits on the
- * page, so a landing page with several of them burns CPU continuously on
- * content nobody is looking at. Same in-view gating the hero player and the
- * Three Things carousel already use.
- *
- * Always pass a `poster`. Without one the element paints black until the first
- * frame decodes, which on a dark page reads as a broken embed.
+ * - Does not attach `src` until near the viewport (LCP / network).
+ * - Pauses when scrolled away so decoders are not stacked offscreen.
+ * - No continuous autoplay fighting other media on first paint.
  */
 
 interface DemoVideoProps {
@@ -34,6 +29,7 @@ export function DemoVideo({
   fit = "cover",
 }: DemoVideoProps) {
   const ref = useRef<HTMLVideoElement>(null);
+  const [armed, setArmed] = useState(false);
 
   useEffect(() => {
     const video = ref.current;
@@ -41,30 +37,36 @@ export function DemoVideo({
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          video.play().catch(() => {
-            // Autoplay can be refused (e.g. battery saver). The poster stays
-            // visible, which is a fine resting state — nothing to recover.
+          setArmed(true);
+          // play() after src is set — next effect / same tick after arm
+          requestAnimationFrame(() => {
+            video.play().catch(() => {});
           });
         } else if (!video.paused) {
           video.pause();
         }
       },
-      { threshold: 0.2 },
+      { threshold: 0.2, rootMargin: "100px" },
     );
     observer.observe(video);
     return () => observer.disconnect();
   }, []);
 
+  useEffect(() => {
+    const video = ref.current;
+    if (!armed || !video) return;
+    video.play().catch(() => {});
+  }, [armed]);
+
   return (
     <video
       ref={ref}
-      src={src}
+      src={armed ? src : undefined}
       poster={poster}
-      autoPlay
       loop
       muted
       playsInline
-      preload="metadata"
+      preload="none"
       aria-label={label}
       className={cn(
         "w-full h-full",
