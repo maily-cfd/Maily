@@ -52,8 +52,6 @@ const Features8 = dynamic(() => import("@/components/ui/features-8").then((m) =>
 const CTASection = dynamic(() => import("@/components/ui/hero-dithering-card").then((m) => m.CTASection), { ssr: false });
 const TestimonialsSection = dynamic(() => import("@/components/ui/testimonials-section").then((m) => m.TestimonialsSection), { ssr: false });
 const LeadCapture = dynamic(() => import("@/components/ui/lead-capture").then((m) => m.LeadCapture), { ssr: false });
-const FloatingNavbar = dynamic(() => import("@/components/FloatingNavbar").then((m) => m.FloatingNavbar), { ssr: false });
-const ProgressiveBlur = dynamic(() => import("@/components/ui/progressive-blur").then((m) => m.ProgressiveBlur), { ssr: false });
 const WordBlurReveal = dynamic(() => import("@/components/ui/word-blur-reveal").then((m) => m.WordBlurReveal), { ssr: false });
 
 function ActiveCounter({ target = 1420 }: { target?: number }) {
@@ -319,26 +317,6 @@ export function LinearLanding() {
   const [activeStep, setActiveStep] = useState(0);
   const threeThingsRef = useRef<HTMLElement>(null);
   const [threeThingsInView, setThreeThingsInView] = useState(false);
-  const [chromeReady, setChromeReady] = useState(false);
-
-  // Floating nav + edge blurs are below-the-fold chrome — mount after idle so
-  // they do not compete with LCP / INP on mobile.
-  useEffect(() => {
-    let idleId: number | undefined;
-    let timeoutId: number | undefined;
-    const arm = () => setChromeReady(true);
-    if (typeof window.requestIdleCallback === "function") {
-      idleId = window.requestIdleCallback(arm, { timeout: 2500 });
-    } else {
-      timeoutId = window.setTimeout(arm, 1200);
-    }
-    return () => {
-      if (idleId != null && typeof window.cancelIdleCallback === "function") {
-        window.cancelIdleCallback(idleId);
-      }
-      if (timeoutId != null) window.clearTimeout(timeoutId);
-    };
-  }, []);
 
   useEffect(() => {
     const el = threeThingsRef.current;
@@ -451,7 +429,19 @@ export function LinearLanding() {
             </p>
           </div>
 
-          <HeroVideoPlayer />
+          {/* Desktop only in the first viewport. On mobile the poster was winning
+              LCP at ~4.8s after the H1 had already painted (~1.4s FCP). Link down
+              to demos instead so LCP stays on the headline. */}
+          <div className="hidden md:block w-full flex justify-center">
+            <HeroVideoPlayer />
+          </div>
+          <a
+            href="#demos"
+            className="md:hidden mt-14 inline-flex items-center gap-2 text-sm font-semibold text-white underline underline-offset-4 decoration-white/30 hover:decoration-white"
+          >
+            Watch Mailient handle a real inbox
+            <ArrowRight className="w-4 h-4" aria-hidden="true" />
+          </a>
         </div>
 
       {/* Clear Separation Line at the bottom of the Metallic Hero */}
@@ -1464,7 +1454,9 @@ export function LinearLanding() {
           floating nav is back: it gives that bar a surface to sit against
           instead of leaving it floating on bare black. Both sit at z-40, under
           the floating nav's z-[100]. */}
-      {chromeReady && (
+      {/* No floating chrome on first paint — it was shifting layout (CLS ~0.16)
+          and competing with LCP on mobile. */}
+      {false && chromeReady && (
         <>
           <ProgressiveBlur position="top" backgroundColor="#000000" height="72px" blurAmount="10px" className="fixed z-40" />
           <ProgressiveBlur position="bottom" backgroundColor="#000000" height="96px" blurAmount="10px" className="fixed z-40" />

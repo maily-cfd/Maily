@@ -155,22 +155,12 @@ export default function RootLayout({ children }) {
         </Script>
         {/* DataFast removed: script returned HTTP 403 and failed Best Practices
             (console errors). Re-add once the domain is authorized in DataFast. */}
-        {/* Fonts: load after first paint. Satoshi is brand, not LCP — system UI
-            paints the hero immediately (mobile CrUX LCP was 5.2s with remote font). */}
-        <link
-          rel="preload"
-          as="style"
-          href="https://api.fontshare.com/v2/css?f[]=satoshi@500,400&display=swap"
-        />
-        <link
-          id="satoshi-font"
-          rel="stylesheet"
-          href="https://api.fontshare.com/v2/css?f[]=satoshi@500,400&display=swap"
-          media="print"
-        />
+        {/* Brand font is optional enhancement — never on the critical path.
+            System UI paints FCP/LCP; Satoshi swaps in after idle if at all. */}
+        <link rel="preconnect" href="https://api.fontshare.com" crossOrigin="anonymous" />
         <script
           dangerouslySetInnerHTML={{
-            __html: `requestAnimationFrame(function(){var l=document.getElementById('satoshi-font');if(l)l.media='all';});`,
+            __html: `(function(){function load(){var l=document.createElement('link');l.rel='stylesheet';l.href='https://api.fontshare.com/v2/css?f[]=satoshi@500,400&display=swap';document.head.appendChild(l);}if('requestIdleCallback'in window)requestIdleCallback(load,{timeout:4000});else setTimeout(load,2000);})();`,
           }}
         />
         <noscript>
