@@ -319,14 +319,14 @@ export function Navbar({ theme = "light" }: NavbarProps) {
               {/* Real anchor, not a router.push button — the primary conversion
                   CTA must be middle-clickable, openable in a new tab, and
                   crawlable as a link to /auth/signup. */}
-              <Link href="/auth/signup" aria-label="Get started with Mailient">
+              <Link href="/auth/signup" aria-label="Start 3-day free trial with Mailient">
                 <LiquidButton
                   variant={isDark ? "default" : "light"}
                   size="sm"
                   className="rounded-full !h-8.5 px-4 font-bold text-[11px] tracking-tight hover:shadow-[0_0_30px_rgba(255,255,255,0.15)] flex items-center gap-1.5"
                 >
                   <Mail className="w-3.5 h-3.5" />
-                  Get started
+                  Start free trial
                 </LiquidButton>
               </Link>
             </>

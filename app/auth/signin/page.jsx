@@ -253,7 +253,9 @@ function SignInContent() {
               <StepIndicator currentStep={1} />
               <div className="mb-6">
                 <h2 className="text-foreground text-lg font-medium tracking-tight mb-2">Welcome back</h2>
-                <p className="text-muted-foreground text-sm">Sign in with Google to connect Gmail.</p>
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  Sign in with Google. That one button opens Google so Mailient can access your Gmail — required for the product to work.
+                </p>
               </div>
 
               {error && (
@@ -267,18 +269,26 @@ function SignInContent() {
 
               <PremiumGoogleButton />
 
+              <p className="text-[11px] text-muted-foreground leading-relaxed text-center px-1">
+                You&apos;ll pick a Google account, then approve Gmail access for Mailient.
+                Google may show a trusted partner screen (Composio) — that&apos;s how we connect Gmail securely. There is no separate email/password login.
+              </p>
+
               <div className="pt-2 space-y-2">
-                <label className="text-[12px] text-zinc-500 dark:text-white/35 block">Work email (optional)</label>
+                <label className="text-[12px] text-zinc-500 dark:text-white/35 block">Optional — help Google pick the right account</label>
                 <GlassInputWrapper>
                   <input
                     ref={emailInputRef}
                     type="email"
                     value={email}
                     onChange={(e) => onEmailChange(e.target.value)}
-                    placeholder="Helps Google pick the right account"
+                    placeholder="you@company.com (hint only)"
                     className="w-full bg-transparent text-sm p-4 rounded-2xl focus:outline-none text-foreground placeholder:text-zinc-400 dark:placeholder:text-white/20 font-medium"
                   />
                 </GlassInputWrapper>
+                <p className="text-[10px] text-zinc-500 dark:text-white/30 leading-relaxed">
+                  Typing an email here does not create an account. It only pre-selects that Google account on the next screen.
+                </p>
               </div>
 
               <div className="flex items-center justify-between text-[12px] pt-2">

@@ -1,14 +1,11 @@
 'use client';
 
 /**
- * Mailient onboarding — a 15-screen handoff built on a liquid-glass material
- * system. Light, monochrome, calm. Every connection, scan, voice profile,
- * agent, plan, and preference writes to the SAME data model the rest of the app
- * reads from — there is no throwaway "onboarding state". Progress persists
- * server-side per step so a refresh or another device resumes exactly here.
- *
- * Hero screens (the ones that carry the experience) are fully crafted and wired:
- *   1 Welcome · 2 Connect Gmail · 4 First Scan · 9 Arcus · 15 You're all set
+ * Mailient onboarding — short path to value, then trial.
+ * Essential screens only: Welcome → Gmail → Scan → Results → Trial → Done.
+ * Calendar, voice preview, Arcus theater, Notion/Slack, agent setup, and
+ * briefing prefs are deferred to in-app nudges so people can try the product
+ * before a long questionnaire.
  */
 
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
@@ -32,8 +29,15 @@ const FIRST = 1;
 const LAST = 15;
 type Step = number; // 1..15
 
-/** Notion/Slack deferred to in-app nudge — skip these step numbers in the flow. */
-const SKIP_STEPS = new Set([10, 11]);
+/**
+ * Skipped in the primary flow (still reachable via deep link briefly, then
+ * bounced forward). Keeps setup to ~6 screens instead of 14+.
+ * 3 Calendar · 6–9 voice/Arcus theater · 10–11 Notion/Slack · 12 agent · 14 briefing
+ */
+const SKIP_STEPS = new Set([3, 6, 7, 8, 9, 10, 11, 12, 14]);
+
+/** Ordered screens the user actually walks — drives the progress capsule. */
+const ACTIVE_FLOW: Step[] = [1, 2, 4, 5, 13, 15];
 
 function bypassSkipped(n: number, dir: 1 | -1): Step {
   let s = n;
@@ -162,7 +166,7 @@ export default function SiftOnboardingPage() {
     return bypassSkipped(raw, 1);
   });
 
-  // Deep links / resume on Notion or Slack steps → jump to First Agent.
+  // Deep links / resume on deferred steps → jump to next active screen.
   useEffect(() => {
     if (SKIP_STEPS.has(step)) {
       const next = bypassSkipped(step, 1);
@@ -246,6 +250,17 @@ export default function SiftOnboardingPage() {
     }
     return integrations.some((s: any) => s.provider === provider && s.connected);
   }, [integrations, session]);
+
+  // Build voice in the background after Gmail is connected — no dedicated screens.
+  const voiceKickoff = useRef(false);
+  useEffect(() => {
+    if (voiceKickoff.current || voiceDone) return;
+    if (step < 4 || !isConnected('gmail')) return;
+    voiceKickoff.current = true;
+    fetch('/api/user/voice-profile', { method: 'POST' })
+      .then((res) => { if (res.ok) setVoiceDone(true); })
+      .catch(() => { /* non-fatal — drafts still work with defaults */ });
+  }, [step, voiceDone, isConnected]);
 
   // ── Resume from server on mount ──
   const resumed = useRef(false);
@@ -469,7 +484,7 @@ export default function SiftOnboardingPage() {
                 }
               }} onContinue={() => next()} />}
               {step === 3  && <S3Calendar connected={isConnected('gcal') || isConnected('google_calendar')} onConnect={() => connectViaPopup('google_calendar')} onContinue={() => next()} onSkip={() => next()} />}
-              {step === 4  && <S4Scan scan={scan} setScan={setScan} onDone={(s) => next({ scan: s })} onSkip={() => go(6)} reduce={!!reduce} />}
+              {step === 4  && <S4Scan scan={scan} setScan={setScan} onDone={(s) => next({ scan: s })} onSkip={() => go(13)} reduce={!!reduce} />}
               {step === 5  && (scan
                 ? <S5ScanResults scan={scan} onContinue={() => next()} />
                 : null)}
@@ -510,15 +525,15 @@ export default function SiftOnboardingPage() {
    ───────────────────────────────────────────────────────────────────────── */
 
 function ProgressCapsule({ step }: { step: Step }) {
-  // Segments represent steps 2..15 (Welcome has no progress yet).
-  const segs = LAST - 1; // 14
+  // Only the screens people actually walk (Welcome → … → Done).
+  const segs = ACTIVE_FLOW.length;
+  const activeIdx = Math.max(0, ACTIVE_FLOW.indexOf(step));
   return (
-    <div className="lg-capsule flex-1" role="progressbar" aria-valuemin={FIRST} aria-valuemax={LAST} aria-valuenow={step} aria-label="Setup progress">
-      {Array.from({ length: segs }, (_, i) => {
-        const segStep = i + 2;
-        const filled = segStep <= step;
+    <div className="lg-capsule flex-1" role="progressbar" aria-valuemin={1} aria-valuemax={segs} aria-valuenow={activeIdx + 1} aria-label="Setup progress">
+      {ACTIVE_FLOW.map((segStep, i) => {
+        const filled = i <= activeIdx;
         return (
-          <div key={i} className="lg-capsule-seg flex-1">
+          <div key={segStep} className="lg-capsule-seg flex-1">
             <div className="lg-capsule-fill" style={{ width: filled ? '100%' : '0%' }} />
           </div>
         );
@@ -681,7 +696,7 @@ function S1Welcome({ onBegin }: { onBegin: () => void }) {
       </Display>
 
       <Body className="text-[16px] max-w-md mx-auto mb-10">
-        Mailient removes email from your to-do list entirely — it works while you sleep. Setup takes about 3 minutes.
+        Mailient removes email from your to-do list entirely — it works while you sleep. Connect Gmail, see your inbox in 60 seconds, then start a 3-day free trial.
       </Body>
 
       <PrimaryButton onClick={onBegin} className="px-8 py-3.5 text-[15px]">
@@ -1645,7 +1660,11 @@ function S13Plan({ firstName, plan, onChoose }: { firstName: string; plan: PlanC
                 : <>Get lifetime access <ArrowRight className="w-4 h-4" /></>}
         </PrimaryButton>
         <p className="text-[11.5px] text-[#0A0A0A]/40 mt-3">
-          {selected === 'lifetime' ? 'Secure checkout · One-time payment' : 'Secure checkout · Cancel anytime'}
+          {selected === 'lifetime'
+            ? 'Secure checkout · One-time payment'
+            : selected === 'monthly'
+              ? 'Secure Polar checkout · Card required · Not charged for 3 days · Cancel anytime'
+              : 'Secure checkout · Cancel anytime'}
         </p>
       </GlassCard>
     </div>

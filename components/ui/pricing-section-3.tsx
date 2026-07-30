@@ -137,7 +137,7 @@ export default function PricingSection3({
       description: "Scale your email operations autonomously. Triages, drafts in your voice, and logs CRM entries in real time. Monthly includes a 3-day free trial.",
       price: 29,
       yearlyPrice: 16.58,
-      buttonText: "Start Subscription",
+      buttonText: "Start 3-day free trial",
       popular: false,
       features: [
         "Full Sift email ingestion & triage",
@@ -147,7 +147,7 @@ export default function PricingSection3({
         "Gold Founding Badge status",
         "Gold Slack channel entry"
       ],
-      tag: "3-day free trial"
+      tag: "3-day free trial · card required"
     },
     {
       id: "lifetime" as const,
@@ -199,7 +199,7 @@ export default function PricingSection3({
             Your next hire costs $29 a month.
           </VerticalCutReveal>
         }
-        subtitle="One plan, everything included — monthly includes a 3-day free trial."
+        subtitle="One plan, everything included — monthly starts with a 3-day free trial (card required, cancel anytime)."
       />
 
       <TimelineContent

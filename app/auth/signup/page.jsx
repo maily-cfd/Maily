@@ -222,7 +222,9 @@ function SignUpContent() {
               <StepIndicator currentStep={1} />
               <div className="mb-6">
                 <h2 className="text-foreground text-lg font-medium tracking-tight mb-2">Create account</h2>
-                <p className="text-muted-foreground text-sm">Continue with Google to start your 3-day trial.</p>
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  Continue with Google to start your <span className="text-foreground font-medium">3-day free trial</span>. Mailient needs Gmail access — there is no email/password signup.
+                </p>
               </div>
 
               {error && (
@@ -236,18 +238,26 @@ function SignUpContent() {
 
               <PremiumGoogleButton />
 
+              <p className="text-[11px] text-muted-foreground leading-relaxed text-center px-1">
+                Next: pick your Google account, then approve Gmail for Mailient.
+                Google may show a trusted partner screen (Composio) — that&apos;s expected and secure. Card required for the trial; you won&apos;t be charged for 3 days and can cancel anytime.
+              </p>
+
               <div className="pt-2 space-y-2">
-                <label className="text-[12px] text-zinc-500 dark:text-white/35 block">Work email (optional)</label>
+                <label className="text-[12px] text-zinc-500 dark:text-white/35 block">Optional — help Google pick the right account</label>
                 <GlassInputWrapper>
                   <input
                     ref={emailInputRef}
                     type="email"
                     value={email}
                     onChange={(e) => onEmailChange(e.target.value)}
-                    placeholder="Helps Google pick the right account"
+                    placeholder="you@company.com (hint only)"
                     className="w-full bg-transparent text-sm p-4 rounded-2xl focus:outline-none text-foreground placeholder:text-zinc-400 dark:placeholder:text-white/10 font-medium"
                   />
                 </GlassInputWrapper>
+                <p className="text-[10px] text-zinc-500 dark:text-white/30 leading-relaxed">
+                  This field does not sign you up. It only pre-fills which Google account to open.
+                </p>
               </div>
 
               <div className="text-[12px] pt-2">

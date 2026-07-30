@@ -457,17 +457,22 @@ export function LinearLanding() {
 
           {/* Premium CTAs */}
           <BlurFade delay={0.3} duration={0.8} inView>
-            <div className="flex flex-wrap items-center justify-center gap-4 mt-12">
-              <CircleExpandButton href="/auth/signup">
-                Get started free
-              </CircleExpandButton>
+            <div className="flex flex-col items-center gap-3 mt-12">
+              <div className="flex flex-wrap items-center justify-center gap-4">
+                <CircleExpandButton href="/auth/signup">
+                  Start 3-day free trial
+                </CircleExpandButton>
 
-              {/* Points at #demos (the real product-demo videos), not
-                  #sample-brief — that anchor is the illustrative before/after
-                  panel, so the old link promised footage and delivered a mockup. */}
-              <CircleExpandButton href="#demos" variant="secondary">
-                Watch Mailient handle a real inbox
-              </CircleExpandButton>
+                {/* Points at #demos (the real product-demo videos), not
+                    #sample-brief — that anchor is the illustrative before/after
+                    panel, so the old link promised footage and delivered a mockup. */}
+                <CircleExpandButton href="#demos" variant="secondary">
+                  Watch Mailient handle a real inbox
+                </CircleExpandButton>
+              </div>
+              <p className="text-[13px] text-[#8a8f98] tracking-wide">
+                Card required · not charged for 3 days · cancel anytime · then $29/mo
+              </p>
             </div>
           </BlurFade>
 
@@ -542,12 +547,12 @@ export function LinearLanding() {
             </p>
 
             <WordBlurReveal
-              text="Gmail sorts what you read. Superhuman speeds up what you read. None of them watch the email you never opened — where the money actually leaks."
+              text="Gmail sorts what you read. Superhuman speeds it up. Claude connectors help when you ask. None of them run your inbox overnight — so the email you never opened still costs you the deal."
               className="text-center text-base md:text-lg"
             />
 
             <WordBlurReveal
-              text="So Mailient isn't a faster inbox. It's a hire — at $29 a month."
+              text="So Mailient isn't a faster inbox or another chat connector. It's a hire — at $29 a month, with a 3-day free trial."
               className="text-white font-normal text-xl md:text-2xl tracking-tight leading-snug text-center pt-2"
             />
 
