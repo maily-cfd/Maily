@@ -42,3 +42,5 @@ yarn-error.log*
 next-env.d.ts
 *.commit-msg.tmp
 .commit-msg.tmp
+
+nextbuild.log
