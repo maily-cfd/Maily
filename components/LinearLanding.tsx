@@ -37,25 +37,27 @@ import {
 import { Navbar } from "@/components/Navbar";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import PricingSection3 from "@/components/ui/pricing-section-3";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { ProgressiveBlur } from "@/components/ui/progressive-blur";
-import { Features8 } from "@/components/ui/features-8";
-import { CTASection } from "@/components/ui/hero-dithering-card";
 import { Footer } from "@/components/Footer";
 import { WordBlurStream } from "@/src/WordBlurStream";
 import { SpecialText } from "@/components/ui/special-text";
 import { BlurFade } from "@/components/ui/blur-fade";
 import NumberFlow from "@number-flow/react";
-import { EtheralShadow } from "@/components/ui/etheral-shadow";
 import { CircleExpandButton } from "@/components/CircleExpandButton";
 import { FloatingNavbar } from "@/components/FloatingNavbar";
 import { SectionHeader } from "@/components/ui/section-header";
-import { TestimonialsSection } from "@/components/ui/testimonials-section";
 import { WordBlurReveal } from "@/components/ui/word-blur-reveal";
 import { DemoVideo } from "@/components/ui/demo-video";
-import { LeadCapture } from "@/components/ui/lead-capture";
 import { landingFaqs } from "@/lib/landing-faqs";
+
+/** Below-fold / heavy modules — same UI, loaded after first paint. */
+const PricingSection3 = dynamic(() => import("@/components/ui/pricing-section-3"), { ssr: false });
+const Features8 = dynamic(() => import("@/components/ui/features-8").then((m) => m.Features8), { ssr: false });
+const CTASection = dynamic(() => import("@/components/ui/hero-dithering-card").then((m) => m.CTASection), { ssr: false });
+const TestimonialsSection = dynamic(() => import("@/components/ui/testimonials-section").then((m) => m.TestimonialsSection), { ssr: false });
+const EtheralShadow = dynamic(() => import("@/components/ui/etheral-shadow").then((m) => m.EtheralShadow), { ssr: false });
 
 function ActiveCounter({ target = 1420 }: { target?: number }) {
   const [count, setCount] = useState(0);
@@ -121,12 +123,15 @@ function RotatingTagline() {
 
 // Isolated so timeupdate ticks (~4/s while playing) re-render only the player,
 // not the whole page; also pauses itself whenever it scrolls offscreen.
+// Src attaches only when near the viewport so the large founder clip doesn't
+// contend with first paint — look once playing is unchanged (autoplay + loop).
 function HeroVideoPlayer() {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [isPlaying, setIsPlaying] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isMuted, setIsMuted] = useState(true);
+  const [mediaReady, setMediaReady] = useState(false);
   const userPausedRef = useRef(false);
 
   useEffect(() => {
@@ -134,21 +139,36 @@ function HeroVideoPlayer() {
     if (!video) return;
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (!entry.isIntersecting) {
-          if (!video.paused) video.pause();
-        } else if (!userPausedRef.current && video.paused) {
-          video.play().catch(() => {});
+        if (entry.isIntersecting) {
+          setMediaReady(true);
+          if (!userPausedRef.current) {
+            video.play().then(() => setIsPlaying(true)).catch(() => {});
+          }
+        } else if (!video.paused) {
+          video.pause();
+          setIsPlaying(false);
         }
       },
-      { threshold: 0.1 }
+      { threshold: 0.1, rootMargin: "120px" }
     );
     observer.observe(video);
     return () => observer.disconnect();
   }, []);
 
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !mediaReady || userPausedRef.current) return;
+    video.play().then(() => setIsPlaying(true)).catch(() => {});
+  }, [mediaReady]);
+
   const togglePlay = (e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
     if (!videoRef.current) return;
+    if (!mediaReady) {
+      setMediaReady(true);
+      userPausedRef.current = false;
+      return;
+    }
     if (isPlaying) {
       userPausedRef.current = true;
       videoRef.current.pause();
@@ -198,11 +218,11 @@ function HeroVideoPlayer() {
     >
       <video
         ref={videoRef}
-        src="/founder-demo.mp4"
-        autoPlay
+        src={mediaReady ? "/founder-demo.mp4" : undefined}
         loop
         muted={isMuted}
         playsInline
+        preload="none"
         onPlay={() => setIsPlaying(true)}
         onPause={() => setIsPlaying(false)}
         onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
@@ -297,13 +317,24 @@ export function LinearLanding() {
   const threeThingsRef = useRef<HTMLElement>(null);
   const [threeThingsInView, setThreeThingsInView] = useState(false);
 
-  // Mouse position tracker for cursor-reactive lighting on cards
+  // Mouse position tracker for cursor-reactive lighting on cards.
+  // Cache the card rect — getBoundingClientRect every mousemove forces reflow.
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
+  const cardRectRef = useRef<DOMRect | null>(null);
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const { left, top } = e.currentTarget.getBoundingClientRect();
+    if (!cardRectRef.current) {
+      cardRectRef.current = e.currentTarget.getBoundingClientRect();
+    }
+    const { left, top } = cardRectRef.current;
     mouseX.set(e.clientX - left);
     mouseY.set(e.clientY - top);
+  };
+  const handleMouseEnterCard = (e: React.MouseEvent<HTMLDivElement>) => {
+    cardRectRef.current = e.currentTarget.getBoundingClientRect();
+  };
+  const handleMouseLeaveCard = () => {
+    cardRectRef.current = null;
   };
 
   useEffect(() => {
@@ -881,6 +912,8 @@ export function LinearLanding() {
         <BlurFade delay={0.2} duration={0.9} inView>
           <div
             className="w-full linear-grid-card p-6 md:p-16 flex flex-col lg:flex-row gap-10 lg:gap-16 items-center relative group"
+            onMouseEnter={handleMouseEnterCard}
+            onMouseLeave={handleMouseLeaveCard}
             onMouseMove={handleMouseMove}
           >
             {/* Card Cursor Lighting Glow spotlight */}
@@ -1445,10 +1478,6 @@ export function LinearLanding() {
           </div>
         </BlurFade>
       </section>
-
-      {/* Soft-conversion email capture — for visitors who won't connect Gmail
-          yet. Opt-in only; fires one hook email via /api/leads. */}
-      <LeadCapture />
 
       {/* Premium Dithered CTA Section */}
       <BlurFade delay={0.1} duration={0.8} inView>
