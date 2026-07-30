@@ -54,6 +54,21 @@ const TestimonialsSection = dynamic(() => import("@/components/ui/testimonials-s
 const LeadCapture = dynamic(() => import("@/components/ui/lead-capture").then((m) => m.LeadCapture), { ssr: false });
 const WordBlurReveal = dynamic(() => import("@/components/ui/word-blur-reveal").then((m) => m.WordBlurReveal), { ssr: false });
 
+/** Desktop-only hero media — never SSR'd so mobile HTML has no poster preload
+ *  competing with the H1 for LCP. */
+function DesktopHeroVideo() {
+  const [show, setShow] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 768px)");
+    const sync = () => setShow(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+  if (!show) return null;
+  return <HeroVideoPlayer />;
+}
+
 function ActiveCounter({ target = 1420 }: { target?: number }) {
   const [count, setCount] = useState(0);
   const ref = useRef(null);
@@ -424,12 +439,9 @@ export function LinearLanding() {
             </p>
           </div>
 
-          {/* Desktop only in the first viewport. On mobile the poster was winning
-              LCP at ~4.8s after the H1 had already painted (~1.4s FCP). Link down
-              to demos instead so LCP stays on the headline. */}
-          <div className="hidden md:block w-full flex justify-center">
-            <HeroVideoPlayer />
-          </div>
+          {/* Desktop only, client-mounted — SSR would still emit the poster
+              <img>/preload and steal mobile LCP even inside hidden md:block. */}
+          <DesktopHeroVideo />
           <a
             href="#demos"
             className="md:hidden mt-14 inline-flex items-center gap-2 text-sm font-semibold text-white underline underline-offset-4 decoration-white/30 hover:decoration-white"
