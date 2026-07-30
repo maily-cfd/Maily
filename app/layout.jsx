@@ -1,7 +1,7 @@
-import Script from "next/script";
 import "./globals.css";
 import Providers from "./providers";
 import { Analytics } from "@vercel/analytics/next";
+import { DeferredAnalytics } from "../components/deferred-analytics";
 
 export const metadata = {
   title: "Mailient — Runs your inbox while you build your company",
@@ -134,25 +134,8 @@ export default function RootLayout({ children }) {
             });
           })();
         ` }} />
-        <Script
-          async
-          src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID || 'G-M03D6M49N8'}`}
-          strategy="lazyOnload"
-        />
-        <Script id="google-analytics" strategy="lazyOnload">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('consent', 'default', {
-              ad_storage: 'denied',
-              ad_user_data: 'denied',
-              ad_personalization: 'denied',
-              analytics_storage: 'denied'
-            });
-            gtag('js', new Date());
-            gtag('config', '${process.env.NEXT_PUBLIC_GA_ID || 'G-M03D6M49N8'}');
-          `}
-        </Script>
+        {/* Google Analytics loads after idle via DeferredAnalytics — keeps
+            ~180KB off the landing critical path (PSI unused JavaScript). */}
         {/* DataFast removed: script returned HTTP 403 and failed Best Practices
             (console errors). Re-add once the domain is authorized in DataFast. */}
         {/* Brand font is optional enhancement — never on the critical path.
@@ -184,6 +167,7 @@ export default function RootLayout({ children }) {
         </a>
         <Providers>
           {children}
+          <DeferredAnalytics />
           <Analytics />
         </Providers>
       </body>

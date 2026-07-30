@@ -140,7 +140,7 @@ export function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={s.label}
-                className="text-neutral-500 hover:text-white transition-colors duration-200"
+                className="text-neutral-400 hover:text-white transition-colors duration-200"
               >
                 {s.icon}
               </a>
@@ -155,7 +155,7 @@ export function Footer() {
 
           {/* Product column */}
           <div className="relative z-10">
-            <p className="text-[10px] font-bold tracking-[0.18em] uppercase text-neutral-600 mb-5">Product</p>
+            <p className="text-[10px] font-bold tracking-[0.18em] uppercase text-neutral-400 mb-5">Product</p>
             <ul className="space-y-3">
               {PRODUCT_LINKS.map((l) => (
                 <li key={l.href}>
@@ -172,7 +172,7 @@ export function Footer() {
 
           {/* Resources column */}
           <div className="relative z-10">
-            <p className="text-[10px] font-bold tracking-[0.18em] uppercase text-neutral-600 mb-5">Resources</p>
+            <p className="text-[10px] font-bold tracking-[0.18em] uppercase text-neutral-400 mb-5">Resources</p>
             <ul className="space-y-3">
               {RESOURCES_LINKS.map((l) => (
                 <li key={l.href}>
@@ -189,7 +189,7 @@ export function Footer() {
 
           {/* Join Us column */}
           <div className="relative z-10">
-            <p className="text-[10px] font-bold tracking-[0.18em] uppercase text-neutral-600 mb-5">Join Us</p>
+            <p className="text-[10px] font-bold tracking-[0.18em] uppercase text-neutral-400 mb-5">Join Us</p>
             <ul className="space-y-3">
               <li>
                 <button
@@ -198,7 +198,7 @@ export function Footer() {
                 >
                   Apply as Creator
                 </button>
-                <span className="text-[9px] text-neutral-500 font-mono block mt-0.5">Build AI Agents (RevShare)</span>
+                <span className="text-[9px] text-neutral-400 font-mono block mt-0.5">Build AI Agents (RevShare)</span>
               </li>
               <li>
                 <button
@@ -207,7 +207,7 @@ export function Footer() {
                 >
                   Apply as Affiliate
                 </button>
-                <span className="text-[9px] text-neutral-500 font-mono block mt-0.5">Earn recurring commissions</span>
+                <span className="text-[9px] text-neutral-400 font-mono block mt-0.5">Earn recurring commissions</span>
               </li>
             </ul>
           </div>

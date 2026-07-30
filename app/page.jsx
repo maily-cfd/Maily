@@ -16,12 +16,8 @@ const faqJsonLd = {
 export default function Home() {
   return (
     <>
-      <link
-        rel="preload"
-        as="image"
-        href="/demos/home-feed-demo.webp"
-        fetchPriority="high"
-      />
+      {/* Do not preload the hero poster — it is desktop-only and was stealing
+          mobile LCP from the H1 (PSI mobile LCP ~4.9s on the video). */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}

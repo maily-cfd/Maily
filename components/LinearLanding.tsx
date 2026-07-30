@@ -204,7 +204,6 @@ function HeroVideoPlayer() {
           alt=""
           width={1226}
           height={720}
-          fetchPriority="high"
           decoding="async"
           className="absolute inset-0 z-[5] w-full h-full object-cover pointer-events-none"
         />
@@ -388,12 +387,8 @@ export function LinearLanding() {
         }
       `}} />
 
-      {/* Atmospheric lighting — CSS only (no animated SVG filter on first paint) */}
-      <div className="absolute inset-0 z-0 pointer-events-none select-none overflow-hidden" aria-hidden="true">
-        <div className="absolute top-[4%] left-1/2 -translate-x-1/2 w-[1000px] h-[500px] rounded-full bg-neutral-900/10 blur-[180px]" />
-        <div className="absolute top-[25%] left-[5%] w-[500px] h-[500px] rounded-full bg-white/[0.005] blur-[150px]" />
-        <div className="absolute bottom-[20%] right-[5%] w-[800px] h-[800px] rounded-full bg-neutral-950/20 blur-[200px]" />
-      </div>
+      {/* Atmospheric lighting baked into backgrounds below — the old absolute
+          blur orbs were the dominant CLS culprits (~0.15) in mobile PSI. */}
 
       {/* Sticky header — no next-auth session fetch on the critical path */}
       <LandingHeader />
