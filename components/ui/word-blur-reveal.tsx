@@ -4,92 +4,79 @@ import React, { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
 /**
- * Per-word blur-in reveal, triggered on scroll.
+ * Soft per-word fade-in on scroll.
  *
- * Each word ramps opacity 0 -> 1 and blur 7px -> 0, staggered left to right so
- * the reveal sweeps across the line. Replays every time the block enters the
- * viewport, in either scroll direction.
+ * Replaces the old blur-per-word reveal: `filter: blur()` on dozens of word
+ * spans was the main landing scroll jank. Opacity + a 4px rise is GPU-cheap
+ * and still reads as a premium sweep.
  *
- * WHY NOT WordBlurStream (src/WordBlurStream.tsx):
- * That component implements the same visual, but drives it from a
- * requestAnimationFrame loop that setStates every frame and recomputes every
- * word's inline style. It also loops forever. That is correct for the one FAQ
- * answer it powers; putting it on every text block on the landing page would
- * reintroduce exactly the per-frame-setState jank removed in 71a8d04.
- *
- * Here the stagger is an animation-delay per word and the animation itself is
- * CSS (see .wbr-word in globals.css). React renders once; the browser owns the
- * animation. Cost is flat no matter how many of these are on the page.
- *
- * ONLY TAKES A STRING. It has to split text into word spans, so it cannot wrap
- * arbitrary JSX.
- *
- * NOT FOR GRADIENT HEADINGS: text using `bg-clip-text text-transparent` clips
- * the gradient to the parent's text box. Splitting it into per-word inline
- * blocks with their own opacity changes how that clip resolves. Gradient
- * headings use element-level BlurFade instead — same family of reveal, one
- * unit rather than per word.
+ * CSS owns the animation (.wsr-word in globals.css). React renders once.
  */
 
-interface WordBlurRevealProps {
+interface WordSoftRevealProps {
   text: string;
   className?: string;
-  /** ms between each word starting. Lower = faster sweep. */
   staggerMs?: number;
-  /** Delay before the first word starts, ms. */
   delayMs?: number;
 }
 
-export function WordBlurReveal({
+/** @deprecated Prefer WordSoftReveal — kept as alias so call sites keep working. */
+export function WordBlurReveal(props: WordSoftRevealProps) {
+  return <WordSoftReveal {...props} />;
+}
+
+export function WordSoftReveal({
   text,
   className,
-  staggerMs = 55,
+  staggerMs = 40,
   delayMs = 0,
-}: WordBlurRevealProps) {
+}: WordSoftRevealProps) {
   const ref = useRef<HTMLParagraphElement>(null);
   const [playing, setPlaying] = useState(false);
+  const seen = useRef(false);
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
     const observer = new IntersectionObserver(
-      ([entry]) => setPlaying(entry.isIntersecting),
-      { threshold: 0.15 },
+      ([entry]) => {
+        // Play once when first visible — replaying on every scroll pass was
+        // churn for no design gain.
+        if (entry.isIntersecting && !seen.current) {
+          seen.current = true;
+          setPlaying(true);
+        }
+      },
+      { threshold: 0.12 },
     );
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
 
-  // Split on whitespace but KEEP it, so spacing between words survives being
-  // wrapped in inline-block spans.
   const tokens = text.split(/(\s+)/).filter((t) => t.length > 0);
   let wordIndex = 0;
 
   return (
-    <p
-      ref={ref}
-      className={cn(playing && "wbr-play", className)}
-      // The full sentence stays available to screen readers and to copy/paste
-      // as one string, rather than as a pile of fragmented spans.
-      aria-label={text}
-    >
-      {tokens.map((token, i) => {
-        if (!token.trim()) {
-          return <span key={i} aria-hidden="true">{token}</span>;
-        }
-        const delay = delayMs + wordIndex * staggerMs;
-        wordIndex += 1;
-        return (
-          <span
-            key={i}
-            aria-hidden="true"
-            className="wbr-word"
-            style={{ animationDelay: `${delay}ms` }}
-          >
-            {token}
-          </span>
-        );
-      })}
+    <p ref={ref} className={cn(playing && "wsr-play", className)}>
+      <span className="sr-only">{text}</span>
+      <span aria-hidden="true">
+        {tokens.map((token, i) => {
+          if (!token.trim()) {
+            return <span key={i}>{token}</span>;
+          }
+          const delay = delayMs + wordIndex * staggerMs;
+          wordIndex += 1;
+          return (
+            <span
+              key={i}
+              className="wsr-word"
+              style={{ animationDelay: `${delay}ms` }}
+            >
+              {token}
+            </span>
+          );
+        })}
+      </span>
     </p>
   );
 }

@@ -41,14 +41,13 @@ import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { ProgressiveBlur } from "@/components/ui/progressive-blur";
 import { Footer } from "@/components/Footer";
-import { WordBlurStream } from "@/src/WordBlurStream";
 import { SpecialText } from "@/components/ui/special-text";
 import { BlurFade } from "@/components/ui/blur-fade";
 import NumberFlow from "@number-flow/react";
 import { CircleExpandButton } from "@/components/CircleExpandButton";
 import { FloatingNavbar } from "@/components/FloatingNavbar";
 import { SectionHeader } from "@/components/ui/section-header";
-import { WordBlurReveal } from "@/components/ui/word-blur-reveal";
+import { WordSoftReveal } from "@/components/ui/word-blur-reveal";
 import { DemoVideo } from "@/components/ui/demo-video";
 import { landingFaqs } from "@/lib/landing-faqs";
 
@@ -546,12 +545,12 @@ export function LinearLanding() {
               <span className="text-neutral-500"> A part-time job you never hired for.</span>
             </p>
 
-            <WordBlurReveal
+            <WordSoftReveal
               text="Gmail sorts what you read. Superhuman speeds it up. Claude connectors help when you ask. None of them run your inbox overnight — so the email you never opened still costs you the deal."
               className="text-center text-base md:text-lg"
             />
 
-            <WordBlurReveal
+            <WordSoftReveal
               text="So Mailient isn't a faster inbox or another chat connector. It's a hire — at $29 a month, with a 3-day free trial."
               className="text-white font-normal text-xl md:text-2xl tracking-tight leading-snug text-center pt-2"
             />
@@ -844,7 +843,7 @@ export function LinearLanding() {
               </span>
               <span className="font-mono text-[10px] tracking-[0.2em] text-neutral-600 font-bold block relative z-10">STEP 1</span>
               <h3 className="text-lg font-semibold text-white relative z-10">Connect Gmail.</h3>
-              <WordBlurReveal
+              <WordSoftReveal
                 text="Two minutes, secure Google sign-in. Your email stays in Gmail — nothing moves, nothing to configure."
                 className="text-sm text-neutral-400 font-light leading-relaxed font-sans relative z-10"
               />
@@ -855,7 +854,7 @@ export function LinearLanding() {
               </span>
               <span className="font-mono text-[10px] tracking-[0.2em] text-neutral-600 font-bold block relative z-10">STEP 2</span>
               <h3 className="text-lg font-semibold text-white relative z-10">It learns how you write.</h3>
-              <WordBlurReveal
+              <WordSoftReveal
                 text="From your last 90 days of sent mail: your greetings, your rhythm, your sign-offs. Drafts start sounding like you, not like AI."
                 className="text-sm text-neutral-400 font-light leading-relaxed font-sans relative z-10"
               />
@@ -866,7 +865,7 @@ export function LinearLanding() {
               </span>
               <span className="font-mono text-[10px] tracking-[0.2em] text-neutral-600 font-bold block relative z-10">STEP 3</span>
               <h3 className="text-lg font-semibold text-white relative z-10">Mornings arrive organized.</h3>
-              <WordBlurReveal
+              <WordSoftReveal
                 text="Overnight it reads everything, drafts the replies, books the meetings, chases the silence — and leaves you one briefing. Nothing sends without your approval."
                 className="text-sm text-neutral-400 font-light leading-relaxed font-sans relative z-10"
               />
@@ -1268,16 +1267,7 @@ export function LinearLanding() {
             pill="The morning transition"
             icon={Clock}
             heading="Chaos vs overnight clarity."
-            subtitle={
-              <span className="block min-h-[2.5rem]">
-                <WordBlurStream
-                  text="Most mornings you wake up already behind. Mailient clears it overnight — so you start on top of it, not buried."
-                  msPerWord={80}
-                  startupMs={300}
-                  holdMs={5000}
-                />
-              </span>
-            }
+            subtitle="Most mornings you wake up already behind. Mailient clears it overnight — so you start on top of it, not buried."
           />
 
           {/* 246 -> 3 is the whole section now.
@@ -1325,7 +1315,7 @@ export function LinearLanding() {
               { icon: Inbox, label: "By 7am", value: <ActiveCounter target={3} />, caption: "Decisions left. It handled the rest." },
               { icon: Check, label: "You owe", value: <ActiveCounter target={0} />, caption: "Emails. Follow-ups chased for you." },
             ].map(({ icon: StatIcon, label, value, caption }, i) => (
-              <BlurFade key={label} inView repeat duration={0.6} delay={i * 0.07} blur="6px" className="h-full">
+              <BlurFade key={label} inView duration={0.45} delay={i * 0.05} className="h-full">
               <div
                 className="linear-grid-card linear-grid-card-lift p-6 flex flex-col gap-4 h-full"
               >
@@ -1468,12 +1458,7 @@ export function LinearLanding() {
                       className="overflow-hidden"
                     >
                       <div className="text-sm text-[#8a8f98] font-light leading-relaxed font-sans pb-4 min-h-[3rem]">
-                        <WordBlurStream
-                          text={faq.a}
-                          msPerWord={20}
-                          loop={false}
-                          startupMs={100}
-                        />
+                        {faq.a}
                       </div>
                     </motion.div>
                   )}

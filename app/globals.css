@@ -4376,44 +4376,42 @@ html {
     0 10px 24px rgba(0, 0, 0, 0.65);
 }
 
-/* ===== WORD BLUR REVEAL ============================================
-   Per-word blur-in: each word ramps opacity 0->1 and blur 7px->0, staggered
-   left to right so the reveal sweeps across the line.
-
-   CSS-driven ON PURPOSE. The reference implementation of this effect (and the
-   existing WordBlurStream in src/) runs a requestAnimationFrame loop that
-   calls setState every frame and recomputes every word's inline style. That is
-   fine for one looping demo cell; it is the documented scroll-jank pattern
-   (71a8d04) once it is on every text block on a page. Here the stagger is just
-   an animation-delay per word, so the browser owns the whole thing and React
-   renders once.
+/* ===== WORD SOFT REVEAL ============================================
+   Per-word fade + slight rise (no filter:blur). Staggered left→right via
+   animation-delay. CSS-owned so React renders once — avoids the old
+   WordBlurStream rAF/setState-per-frame pattern that tanked landing scroll.
    ------------------------------------------------------------------ */
-@keyframes word-blur-in {
-  from { opacity: 0; filter: blur(7px); }
-  to   { opacity: 1; filter: blur(0); }
+@keyframes word-soft-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-.wbr-word {
+.wsr-word {
   display: inline-block;
   opacity: 0;
-  filter: blur(7px);
-  will-change: opacity, filter;
+  will-change: opacity, transform;
 }
 
-/* The play class is toggled by the component when the block enters view, and
-   removed when it leaves, so the reveal replays on scroll in both directions. */
-.wbr-play .wbr-word {
-  animation: word-blur-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+.wsr-play .wsr-word {
+  animation: word-soft-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* Never leave text invisible for someone who has motion turned off — without
-   this the resting state (opacity 0) would simply hide the copy. */
 @media (prefers-reduced-motion: reduce) {
-  .wbr-word {
+  .wsr-word {
     opacity: 1;
-    filter: none;
+    transform: none;
     animation: none !important;
   }
+}
+
+/* Legacy class names — kept so any stale CSS hooks don't leave text invisible. */
+.wbr-word {
+  display: inline-block;
+  opacity: 1;
+  filter: none;
+}
+.wbr-play .wbr-word {
+  animation: none;
 }
 
 /* Glass pill. Genuinely glassy — section headers sit over the atmospheric

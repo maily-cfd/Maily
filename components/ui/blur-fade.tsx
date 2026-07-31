@@ -15,55 +15,44 @@ interface BlurFadeProps {
   children: React.ReactNode
   className?: string
   variant?: {
-    hidden: { y: number; opacity: number; filter: string }
-    visible: { y: number; opacity: number; filter: string }
+    hidden: { y: number; opacity: number; filter?: string }
+    visible: { y: number; opacity: number; filter?: string }
   }
   duration?: number
   delay?: number
   yOffset?: number
   inView?: boolean
   inViewMargin?: MarginType
+  /** Ignored — blur filters were the landing scroll jank. Kept for API compat. */
   blur?: string
   /**
-   * Re-run the reveal every time the element enters the viewport, in either
-   * scroll direction, instead of only the first time.
-   *
-   * ONLY set this on SMALL subtrees — a heading, one card, one paragraph.
-   *
-   * The default is once-only for a measured reason: re-running a blur reveal
-   * over a whole section repaints an enormous subtree on every scroll pass,
-   * and that was the primary scroll-jank source on this page (fixed in
-   * 71a8d04). `filter: blur()` is the expensive part — the browser rasterises
-   * the entire subtree, blurs it, and composites it, every frame of the
-   * animation. Cost scales with painted area, so the same effect that is free
-   * on a 200px card is punishing on a 900px section.
-   *
-   * Rule of thumb: repeat on leaves, never on section wrappers.
+   * Re-run the reveal every time the element enters the viewport.
+   * Prefer once-only on landing; repeat is expensive on large subtrees.
    */
   repeat?: boolean
 }
 
+/**
+ * Soft section reveal: opacity + slight rise only.
+ * Previously used filter:blur() which forced expensive rasterization on every
+ * scroll-triggered animation across the landing page.
+ */
 export function BlurFade({
   children,
   className,
   variant,
-  duration = 0.5,
+  duration = 0.45,
   delay = 0,
-  yOffset = 8,
+  yOffset = 10,
   inView = false,
-  inViewMargin = "-50px",
-  blur = "8px",
+  inViewMargin = "-40px",
   repeat = false,
 }: BlurFadeProps) {
   const ref = useRef(null)
   const prefersReducedMotion = useReducedMotion()
-  // once: !repeat — see the `repeat` doc above. Section-level wrappers must
-  // stay once-only; only small subtrees opt into re-animating.
   const inViewResult = useInView(ref, { once: !repeat, margin: inViewMargin })
   const isInView = !inView || inViewResult
 
-  // Respect the OS "reduce motion" setting: render the final state, no
-  // transform, no blur, no repeated animation.
   if (prefersReducedMotion) {
     return <div className={className}>{children}</div>
   }
@@ -72,16 +61,20 @@ export function BlurFade({
     hidden: {
       y: yOffset,
       opacity: 0,
-      filter: `blur(${blur})`
     },
     visible: {
       y: 0,
       opacity: 1,
-      filter: "blur(0px)"
     },
   }
 
-  const combinedVariants = variant || defaultVariants
+  // Strip any caller-supplied filter blur so old call sites stay cheap.
+  const combinedVariants = variant
+    ? {
+        hidden: { y: variant.hidden.y, opacity: variant.hidden.opacity },
+        visible: { y: variant.visible.y, opacity: variant.visible.opacity },
+      }
+    : defaultVariants
 
   return (
     <motion.div
@@ -92,9 +85,10 @@ export function BlurFade({
       transition={{
         delay: 0.04 + delay,
         duration,
-        ease: [0.16, 1, 0.3, 1], // Premium cinematic easeOutExpo curve
+        ease: [0.16, 1, 0.3, 1],
       }}
       className={className}
+      style={{ willChange: "opacity, transform" }}
     >
       {children}
     </motion.div>
