@@ -1,7 +1,7 @@
 import { GmailService } from '@/lib/gmail.ts';
 import { DatabaseService } from '@/lib/supabase.js';
 import { auth } from '@/lib/auth.js';
-import { decrypt, encrypt } from '@/lib/crypto.js';
+import { decrypt } from '@/lib/crypto.js';
 import { subscriptionService } from '@/lib/subscription-service.js';
 import { logEvent } from "@/lib/logsso";
 
@@ -11,19 +11,15 @@ export async function GET(request, { params }) {
     const { messageId } = await params;
     console.log('Request params:', { messageId });
 
-    // Try to get session from NextAuth
-    console.log('Getting server session...');
     const session = await auth();
     console.log('Session result:', { hasSession: !!session, hasUser: !!session?.user, email: session?.user?.email });
 
     if (!session?.user?.email) {
-      console.log('No valid session, returning 401');
       return Response.json({
         error: 'No valid session found. Please sign in again.'
       }, { status: 401 });
     }
 
-    // 🔒 SECURITY: Check access before allowing email access
     const hasAccess = await subscriptionService.checkAccess(session.user.email);
     if (!hasAccess) {
       return Response.json({
@@ -33,89 +29,45 @@ export async function GET(request, { params }) {
       }, { status: 403 });
     }
 
-    // Get tokens from database, fallback to session tokens
-    console.log('Getting tokens from database...');
-    const db = new DatabaseService();
-    let userTokens = null;
+    const userEmail = session.user.email;
+    let refreshToken = session.refreshToken || '';
+
+    // Same unified token resolver as /api/gmail/messages — inbox list and
+    // message detail must agree on which Gmail credential is live.
+    let accessToken = null;
     try {
-      userTokens = await db.getUserTokens(session.user.email);
-      console.log('Database tokens result:', { hasTokens: !!userTokens, hasAccessToken: !!userTokens?.encrypted_access_token });
-
-      // Decrypt tokens if they exist
-      if (userTokens?.encrypted_access_token) {
-        userTokens.access_token = decrypt(userTokens.encrypted_access_token);
-      }
-      if (userTokens?.encrypted_refresh_token) {
-        userTokens.refresh_token = decrypt(userTokens.encrypted_refresh_token);
-      }
-      if (userTokens?.access_token_expires_at) {
-        userTokens.expires_at = userTokens.access_token_expires_at;
-      }
-    } catch (dbError) {
-      logEvent({ channel: "failures", event: "❌ API Error", description: String(dbError) });
-      console.error('Database error getting tokens:', dbError);
-      userTokens = null;
+      const { getGmailToken } = await import('@/lib/arcus/tools/http-tokens');
+      accessToken = await getGmailToken(userEmail);
+    } catch (e) {
+      logEvent({ channel: "failures", event: "❌ API Error", description: String(e) });
+      console.error('getGmailToken failed:', e?.message);
     }
 
-    // If no tokens in database, try to use session tokens
-    if (!userTokens?.access_token) {
-      console.log('No database tokens, checking session tokens...');
-      if (session.accessToken && session.refreshToken) {
-        userTokens = {
-          access_token: session.accessToken,
-          refresh_token: session.refreshToken,
-          expires_at: new Date(Date.now() + 3600000).toISOString(), // Assume 1 hour
-          token_type: 'Bearer'
-        };
-        console.log('Using session tokens as fallback');
-      } else {
-        console.log('No session tokens either, returning 401');
-        return Response.json({
-          error: 'No valid tokens found. Please sign in again.'
-        }, { status: 401 });
-      }
-    }
+    if (!accessToken && session.accessToken) accessToken = session.accessToken;
 
-    // Check if token is expired
-    const now = new Date();
-    const expiresAt = new Date(userTokens.expires_at);
-    console.log('Token expiration check:', { now: now.toISOString(), expiresAt: expiresAt.toISOString(), isExpired: now >= expiresAt });
-
-    if (now >= expiresAt) {
-      console.log('Token expired, attempting refresh...');
-      // Token expired, try to refresh
-      const gmailService = new GmailService(userTokens.access_token, userTokens.refresh_token);
+    const db = new DatabaseService();
+    if (!accessToken) {
       try {
-        const newAccessToken = await gmailService.refreshAccessToken();
-        console.log('Token refresh successful');
-        await db.storeUserTokens(session.user.email, {
-          access_token: encrypt(newAccessToken),
-          refresh_token: encrypt(userTokens.refresh_token),
-          expires_in: 3600,
-          token_type: 'Bearer'
-        });
-        userTokens.access_token = newAccessToken;
-      } catch (error) {
-        logEvent({ channel: "failures", event: "❌ API Error", description: String(error) });
-        console.log('Token refresh failed:', error.message);
-        return Response.json({
-          error: 'Token expired and refresh failed. Please sign in again.'
-        }, { status: 401 });
+        const userTokens = await db.getUserTokens(userEmail);
+        if (userTokens?.encrypted_access_token) accessToken = decrypt(userTokens.encrypted_access_token);
+        if (userTokens?.encrypted_refresh_token) refreshToken = decrypt(userTokens.encrypted_refresh_token);
+      } catch (dbError) {
+        logEvent({ channel: "failures", event: "❌ API Error", description: String(dbError) });
+        console.error('Database error getting tokens:', dbError);
       }
     }
 
-    const accessToken = userTokens.access_token;
-    const refreshToken = userTokens.refresh_token;
-    console.log('Final tokens:', { hasAccessToken: !!accessToken, hasRefreshToken: !!refreshToken });
+    if (!accessToken) {
+      return Response.json({
+        error: 'No valid tokens found. Please sign in again.'
+      }, { status: 401 });
+    }
 
-    // Create Gmail service instance
-    console.log('Creating Gmail service...');
-    const gmailService = new GmailService(accessToken, refreshToken);
+    const gmailService = new GmailService(accessToken, refreshToken || '');
+    gmailService.setUserEmail(userEmail);
 
-    // Fetch the specific message with timeout
     console.log('Fetching message:', messageId);
 
-    // Add timeout to prevent hanging requests
     const timeoutPromise = new Promise((_, reject) =>
       setTimeout(() => reject(new Error('Request timeout')), 10000)
     );
@@ -125,14 +77,12 @@ export async function GET(request, { params }) {
 
     console.log('Message fetched successfully');
 
-    // Parse data before returning
     const parsedData = gmailService.parseEmailData(messageData);
 
-    // Return successful response with cache headers
     return new Response(JSON.stringify(parsedData), {
       headers: {
         'Content-Type': 'application/json',
-        'Cache-Control': 'public, max-age=300', // Cache for 5 minutes
+        'Cache-Control': 'private, max-age=60',
       },
     });
 
@@ -142,10 +92,43 @@ export async function GET(request, { params }) {
     console.error('Error details:', error);
     console.error('Error message:', error.message);
     console.error('Error stack:', error.stack);
+
+    const msg = String(error?.message || '').toLowerCase();
+    const isTokenExpired =
+      msg.includes('token expired') ||
+      msg.includes('expired and refresh failed') ||
+      msg.includes('no refresh token available') ||
+      msg.includes('invalid_grant') ||
+      msg.includes('401');
+    const isScopeMissing =
+      msg.includes('insufficient') ||
+      msg.includes('access_token_scope') ||
+      msg.includes('insufficient authentication scopes') ||
+      msg.includes('scope');
+
+    if (isTokenExpired || isScopeMissing) {
+      try {
+        const session2 = await auth();
+        const uid = session2?.user?.email?.toLowerCase();
+        if (uid) {
+          const { markIntegrationNeedsReauth } = await import('@/lib/arcus/tools/http-tokens');
+          await markIntegrationNeedsReauth(uid, 'gmail');
+        }
+      } catch {
+        /* ignore reauth mark failures */
+      }
+      return Response.json(
+        {
+          error: 'gmail_token_expired',
+          message: 'Gmail sign-in expired. Reconnect to keep reading mail.',
+        },
+        { status: 401 },
+      );
+    }
+
     return Response.json(
       { error: 'Failed to fetch message', details: error.message },
       { status: 500 }
     );
   }
 }
-
