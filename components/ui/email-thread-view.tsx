@@ -71,87 +71,29 @@ export function EmailThreadView({ threadId, emailId, onClose, onAction }: Thread
 
   const loadThread = async () => {
     setIsLoading(true);
+    setError('');
+    setAiSummary('');
+    setSuggestedReplies([]);
     try {
       const response = await fetch(`/api/gmail/threads/${threadId}`);
       if (response.ok) {
         const data = await response.json();
-        setMessages(data.messages || []);
-        setSelectedMessage(data.messages?.[data.messages.length - 1] || null);
-        
-        // Generate AI summary and suggested replies
-        generateAIAnalysis(data.messages || []);
+        const msgs = data.messages || [];
+        setMessages(msgs);
+        setSelectedMessage(msgs.length ? msgs[msgs.length - 1] : null);
+      } else {
+        setMessages([]);
+        setSelectedMessage(null);
+        setError('Could not load this thread. Try again.');
       }
     } catch (error) {
       console.error('Error loading thread:', error);
-      // Load mock data as fallback
-      setMessages(generateMockThread());
-      setSelectedMessage(generateMockThread()[0]);
-      generateAIAnalysis(generateMockThread());
+      setMessages([]);
+      setSelectedMessage(null);
+      setError('Could not load this thread. Try again.');
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const generateMockThread = (): EmailMessage[] => [
-    {
-      id: '1',
-      threadId: threadId,
-      subject: 'Partnership Proposal - API Integration',
-      from: 'john.doe@techcorp.com',
-      fromName: 'John Doe',
-      to: 'user@company.com',
-      date: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-      body: 'Hi there,\n\nWe have been following your product and think there could be a great synergy. We would like to explore a potential partnership for API integration.\n\nOur platform serves over 10,000 enterprise customers who could benefit from your solution.\n\nWould you be interested in scheduling a call to discuss this further?\n\nBest regards,\nJohn Doe\nCTO, TechCorp',
-      isHtml: false,
-      isRead: true,
-      isImportant: true,
-      labels: ['Partnership', 'Important'],
-      attachments: []
-    },
-    {
-      id: '2',
-      threadId: threadId,
-      subject: 'Re: Partnership Proposal - API Integration',
-      from: 'user@company.com',
-      fromName: 'User Name',
-      to: 'john.doe@techcorp.com',
-      date: new Date(Date.now() - 22 * 60 * 60 * 1000).toISOString(),
-      body: 'Hi John,\n\nThank you for reaching out! I\'m definitely interested in exploring this partnership opportunity.\n\nYour platform\'s enterprise customer base aligns perfectly with our target market. I\'d love to learn more about your integration requirements and discuss how we can create mutual value.\n\nAre you available for a call this week? I\'m flexible with timing.\n\nBest regards,\nUser Name\nFounder, Company',
-      isHtml: false,
-      isRead: true,
-      isImportant: true,
-      labels: ['Partnership', 'Important'],
-      attachments: []
-    },
-    {
-      id: '3',
-      threadId: threadId,
-      subject: 'Re: Partnership Proposal - API Integration',
-      from: 'john.doe@techcorp.com',
-      fromName: 'John Doe',
-      to: 'user@company.com',
-      date: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-      body: 'Excellent! I\'m glad to hear you\'re interested.\n\nI\'d like to schedule a call for Thursday afternoon. Would 2:00 PM PST work for you? I\'ll prepare a brief overview of our integration requirements and potential partnership terms.\n\nLooking forward to our conversation!\n\nBest regards,\nJohn Doe',
-      isHtml: false,
-      isRead: false,
-      isImportant: true,
-      labels: ['Partnership', 'Important', 'Meeting Scheduled'],
-      attachments: []
-    }
-  ];
-
-  const generateAIAnalysis = (messages: EmailMessage[]) => {
-    // Generate AI summary
-    const summary = `Thread Summary: Partnership discussion with John Doe from TechCorp. They propose API integration for their 10K+ enterprise customers. Positive response received, meeting scheduled for Thursday 2PM PST.`;
-    setAiSummary(summary);
-
-    // Generate suggested replies based on context
-    const replies = [
-      `Hi John, Thursday 2PM PST works perfectly. I'll send a calendar invite shortly. Looking forward to discussing the partnership details!`,
-      `Thanks for the follow-up, John. I have a conflict at 2PM. Could we do 3:30 PM PST instead?`,
-      `Perfect timing, John! I'll prepare our integration documentation and case studies for the call.`
-    ];
-    setSuggestedReplies(replies);
   };
 
   const formatDate = (dateString: string) => {

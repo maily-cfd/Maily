@@ -12,6 +12,7 @@ import { FloatingNavbar } from "@/components/FloatingNavbar";
 import { ProgressiveBlur } from "@/components/ui/progressive-blur";
 import { Footer } from "@/components/Footer";
 import { CircleExpandButton } from "@/components/CircleExpandButton";
+import { DemoVideo } from "@/components/ui/demo-video";
 
 const Dithering = lazy(() => 
   import("@paper-design/shaders-react").then((mod) => ({ default: mod.Dithering }))
@@ -161,37 +162,14 @@ export default function DraftsProductPage() {
             </ul>
           </div>
 
-          {/* Interactive Screen Mockup (Draft Process) */}
-          <div className="flex-1 w-full linear-grid-card !rounded-2xl p-6 h-[340px] flex flex-col justify-between font-mono text-left text-xs text-neutral-400 relative">
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.01),transparent_60%)] pointer-events-none" />
-
-            <div className="flex items-center justify-between pb-3 border-b border-white/[0.03] text-[10px] text-neutral-500">
-              <span>Gmail Draft Queue</span>
-              <span className="text-emerald-500 font-bold uppercase tracking-widest animate-pulse">Synced</span>
-            </div>
-
-            <div className="space-y-2 p-4 bg-[#0c0c0c] border border-white/[0.04] rounded-xl relative overflow-hidden">
-              <div className="flex items-center justify-between border-b border-white/[0.03] pb-2 mb-2 text-[10px] text-neutral-500">
-                <span>To: Sarah Miller (Acme VC)</span>
-                <span>Subject: Re: Funding Specs</span>
-              </div>
-              <p className="text-[11px] leading-relaxed text-neutral-300 font-sans font-light">
-                Hi Sarah, <br /><br />
-                Thanks for reaching out! Yes — everything is encrypted end to end (AES-256), and customer data never trains any AI model. I've attached our security overview below. <br /><br />
-                Best,<br />
-                Marcus
-              </p>
-              <div className="flex justify-end pt-2 border-t border-white/[0.03] mt-4">
-                <span className="px-2.5 py-1 rounded bg-white text-neutral-950 text-[9px] font-black uppercase flex items-center gap-1 cursor-pointer">
-                  Approve & Send
-                </span>
-              </div>
-            </div>
-
-            <div className="pt-3 border-t border-white/[0.03] flex items-center justify-between text-[9px] text-neutral-500">
-              <span>Encrypted in your browser</span>
-              <span>NOTHING SENDS WITHOUT YOU</span>
-            </div>
+          {/* Real product footage — no coded draft mockup */}
+          <div className="flex-1 w-full linear-grid-card !rounded-2xl overflow-hidden h-[340px] relative">
+            <DemoVideo
+              src="/demos/voice-demo.mp4"
+              poster="/demos/voice-demo.jpg"
+              label="Arcus drafting a reply in your voice on a real inbox"
+              className="absolute inset-0 w-full h-full"
+            />
           </div>
 
         </div>

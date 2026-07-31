@@ -458,21 +458,21 @@ export async function GET(req) {
     const enhancedProfile = {
       ...profile,
       email_accounts_connected: tokens.length || 0,
-      emails_processed: 99, // Show 99+ for demo purposes
+      emails_processed: emailCount || 0,
       plan: profile?.preferences?.plan || 'No Active Plan',
       storage_used: `${Math.round(emailCount * 0.1)} MB`, // Rough estimate
       last_email_activity: lastEmail?.date || null,
       // Ensure defaults for new fields - always set them
       bio: profile.bio || null,
       location: profile.location || null, // Will be empty until user sets it
-      website: profile.website || 'https://example.com',
+      website: profile.website || null,
       status: profile.status || 'online',
       banner_url: profile.banner_url || null,
       preferences: profile.preferences || { theme: 'dark', language: 'en', notifications: true, email_frequency: 'daily', timezone: 'UTC' },
-      birthdate: profile.birthdate || '1999-01-01', // Default for demo
-      gender: profile.gender || 'Not specified', // Default for demo
-      work_status: profile.work_status || 'Professional',
-      interests: profile.interests || ['Technology', 'Productivity', 'AI']
+      birthdate: profile.birthdate || null,
+      gender: profile.gender || null,
+      work_status: profile.work_status || null,
+      interests: profile.interests || []
     };
 
     return NextResponse.json(enhancedProfile);

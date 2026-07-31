@@ -12,6 +12,7 @@ import { FloatingNavbar } from "@/components/FloatingNavbar";
 import { ProgressiveBlur } from "@/components/ui/progressive-blur";
 import { Footer } from "@/components/Footer";
 import { CircleExpandButton } from "@/components/CircleExpandButton";
+import { DemoVideo } from "@/components/ui/demo-video";
 
 const Dithering = lazy(() => 
   import("@paper-design/shaders-react").then((mod) => ({ default: mod.Dithering }))
@@ -163,51 +164,14 @@ export default function SiftProductPage() {
             </ul>
           </div>
 
-          {/* Interactive Screen Mockup (Sift Process) */}
-          <div className="flex-1 w-full linear-grid-card !rounded-2xl p-6 h-[340px] flex flex-col justify-between font-mono text-left text-xs text-neutral-400 relative">
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.01),transparent_60%)] pointer-events-none" />
-
-            <div className="flex items-center justify-between pb-3 border-b border-white/[0.03] text-[10px] text-neutral-500">
-              <span>Sift — reading your inbox</span>
-              <span className="text-emerald-500 font-bold uppercase tracking-widest animate-pulse">Running</span>
-            </div>
-
-            <div className="space-y-3">
-              <div className="p-3 bg-[#0c0c0c] rounded-lg border border-white/[0.04] relative overflow-hidden flex items-center justify-between">
-                <div>
-                  <p className="font-semibold text-white text-[11px]">Sarah Miller (Acme VC)</p>
-                  <p className="text-[10px] text-neutral-500">"Meeting request next week..."</p>
-                </div>
-                <span className="px-2 py-0.5 rounded bg-emerald-950/20 text-emerald-400 border border-emerald-900/40 text-[9px] font-bold uppercase">
-                  Priority Deal
-                </span>
-              </div>
-
-              <div className="p-3 bg-[#0c0c0c] rounded-lg border border-white/[0.04] relative overflow-hidden flex items-center justify-between opacity-50">
-                <div>
-                  <p className="font-semibold text-neutral-400 text-[11px]">Marketing Digest weekly</p>
-                  <p className="text-[10px] text-neutral-500">"Check our updated metrics..."</p>
-                </div>
-                <span className="px-2 py-0.5 rounded bg-neutral-900 text-neutral-500 text-[9px] font-medium uppercase">
-                  Archived
-                </span>
-              </div>
-
-              <div className="p-3 bg-[#0c0c0c] rounded-lg border border-white/[0.04] relative overflow-hidden flex items-center justify-between">
-                <div>
-                  <p className="font-semibold text-white text-[11px]">Dev Ops Alert</p>
-                  <p className="text-[10px] text-neutral-500">"Uptime report successful..."</p>
-                </div>
-                <span className="px-2 py-0.5 rounded bg-neutral-900 text-neutral-300 text-[9px] font-semibold border border-white/[0.06] uppercase">
-                  Operational
-                </span>
-              </div>
-            </div>
-
-            <div className="pt-3 border-t border-white/[0.03] flex items-center justify-between text-[9px] text-neutral-500">
-              <span>Encrypted in your browser</span>
-              <span>ONLY WHAT NEEDS YOU</span>
-            </div>
+          {/* Real product footage — no coded inbox mockup */}
+          <div className="flex-1 w-full linear-grid-card !rounded-2xl overflow-hidden h-[340px] relative">
+            <DemoVideo
+              src="/demos/home-feed-demo.mp4"
+              poster="/demos/home-feed-demo.jpg"
+              label="Sift on a real inbox — only the emails that need a decision"
+              className="absolute inset-0 w-full h-full"
+            />
           </div>
 
         </div>

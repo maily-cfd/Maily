@@ -30,8 +30,6 @@ import {
   Eye,
   Monitor,
   ShieldCheck,
-  Clock,
-  Briefcase,
   AlertCircle
 } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
@@ -43,7 +41,6 @@ import { ProgressiveBlur } from "@/components/ui/progressive-blur";
 import { Footer } from "@/components/Footer";
 import { SpecialText } from "@/components/ui/special-text";
 import { BlurFade } from "@/components/ui/blur-fade";
-import NumberFlow from "@number-flow/react";
 import { CircleExpandButton } from "@/components/CircleExpandButton";
 import { FloatingNavbar } from "@/components/FloatingNavbar";
 import { SectionHeader } from "@/components/ui/section-header";
@@ -57,39 +54,6 @@ const Features8 = dynamic(() => import("@/components/ui/features-8").then((m) =>
 const CTASection = dynamic(() => import("@/components/ui/hero-dithering-card").then((m) => m.CTASection), { ssr: false });
 const TestimonialsSection = dynamic(() => import("@/components/ui/testimonials-section").then((m) => m.TestimonialsSection), { ssr: false });
 const EtheralShadow = dynamic(() => import("@/components/ui/etheral-shadow").then((m) => m.EtheralShadow), { ssr: false });
-
-function ActiveCounter({ target = 1420 }: { target?: number }) {
-  const [count, setCount] = useState(0);
-  const ref = useRef(null);
-  const [isInView, setIsInView] = useState(false);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsInView(true);
-        }
-      },
-      { threshold: 0.1 }
-    );
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, []);
-
-  useEffect(() => {
-    if (isInView) {
-      setCount(target);
-    } else {
-      setCount(0);
-    }
-  }, [target, isInView]);
-
-  return (
-    <span ref={ref} className="inline-flex items-center">
-      <NumberFlow value={count} />
-    </span>
-  );
-}
 
 // landingFaqs moved to lib/landing-faqs.ts (shared with homepage FAQPage JSON-LD)
 
@@ -462,9 +426,7 @@ export function LinearLanding() {
                   Start 3-day free trial
                 </CircleExpandButton>
 
-                {/* Points at #demos (the real product-demo videos), not
-                    #sample-brief — that anchor is the illustrative before/after
-                    panel, so the old link promised footage and delivered a mockup. */}
+                {/* Points at #demos (the real product-demo videos). */}
                 <CircleExpandButton href="#demos" variant="secondary">
                   Watch Mailient handle a real inbox
                 </CircleExpandButton>
@@ -1260,91 +1222,11 @@ export function LinearLanding() {
         </div>
       </section>
 
-      {/* 5. THE MORNING SIDE-BY-SIDE: Chaos vs Overnight Clarity */}
-      <section id="sample-brief" className="py-16 md:py-32 px-6 w-full max-w-7xl mx-auto border-t border-white/[0.06] z-10 relative">
-        <BlurFade delay={0.1} duration={0.8} inView>
-          <SectionHeader
-            pill="The morning transition"
-            icon={Clock}
-            heading="Chaos vs overnight clarity."
-            subtitle="Most mornings you wake up already behind. Mailient clears it overnight — so you start on top of it, not buried."
-          />
-
-          {/* 246 -> 3 is the whole section now.
-              Two 460px detail panels used to sit under this, each with invented
-              email rows and fabricated metric chips ("14h Drag", "8h Delay",
-              "TONE SIGNED"). That was the densest block of reading left on the
-              page below the fold, it restated what this number already says in
-              one glance, and it was more made-up telemetry. Deleted — the
-              contrast is stronger without a paragraph explaining it. */}
-          <div className="flex flex-col items-center text-center select-none">
-            <span className="font-mono text-[11px] tracking-[0.2em] uppercase text-neutral-600 mb-2">Yesterday</span>
-            <span className="text-5xl md:text-7xl font-medium tracking-tight text-neutral-600 line-through decoration-red-500/60 decoration-2">246 unread</span>
-            <span className="text-neutral-700 text-3xl my-6 font-light">↓</span>
-            <span className="font-mono text-[11px] tracking-[0.2em] uppercase text-neutral-500 mb-2">Today</span>
-            <span className="text-6xl md:text-8xl font-medium tracking-tight bg-gradient-to-b from-white via-neutral-100 to-neutral-400 bg-clip-text text-transparent">3 decisions.</span>
-          </div>
-
-        </BlurFade>
-      </section>
-
-      {/* 6. SOCIAL PROOF, STAT ROW, SECURITY STRIP */}
+      {/* 5. PRODUCT CLAIMS + SECURITY STRIP */}
       <section className="py-16 md:py-32 px-6 w-full max-w-7xl mx-auto border-t border-white/[0.06] z-10 relative">
         <BlurFade delay={0.1} duration={0.8} inView>
           <div className="max-w-5xl mx-auto">
           
-          {/* Founder-time row — what the founder gets BACK, not what the machine
-              does. These figures are ILLUSTRATIVE (a target morning), not
-              measured medians — we have no usage data yet. They are labeled as
-              such on screen; swap in real medians once live briefs exist and
-              then drop the "what a handled morning looks like" framing. */}
-          <SectionHeader
-            pill="What you get back"
-            icon={Clock}
-            heading="What a handled morning looks like."
-            subtitle="Illustrative of a typical morning — not averaged usage data."
-          />
-          {/* Was four bare text columns floating on the page background. Now
-              lit cards with icon tiles and a much larger figure — this is the
-              payoff section, so the numbers should carry the most weight in it.
-              The figures remain illustrative; the subtitle says so. */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-12 md:mb-24 text-left">
-            {[
-              { icon: Clock, label: "Every morning", value: <>2h 14m</>, caption: "Returned to you. Go build." },
-              { icon: Briefcase, label: "Every week", value: <><ActiveCounter target={13} />h</>, caption: "Of email work off your plate." },
-              { icon: Inbox, label: "By 7am", value: <ActiveCounter target={3} />, caption: "Decisions left. It handled the rest." },
-              { icon: Check, label: "You owe", value: <ActiveCounter target={0} />, caption: "Emails. Follow-ups chased for you." },
-            ].map(({ icon: StatIcon, label, value, caption }, i) => (
-              <BlurFade key={label} inView duration={0.45} delay={i * 0.05} className="h-full">
-              <div
-                className="linear-grid-card linear-grid-card-lift p-6 flex flex-col gap-4 h-full"
-              >
-                <span className="gradient-tile w-10 h-10 relative z-10">
-                  <StatIcon className="w-4 h-4 text-white" />
-                </span>
-                <span className="font-mono text-[9px] tracking-[0.2em] text-[#8a8f98] uppercase font-bold relative z-10">
-                  {label}
-                </span>
-                {/* SOLID white, not gradient text. `bg-clip-text
-                    text-transparent` rendered these blank: NumberFlow draws its
-                    digits in its own element, which does not inherit the
-                    background-clip, so it kept `color: transparent` and
-                    painted nothing. Card 1 survived only because "2h 14m" is a
-                    plain string; the three NumberFlow cards lost their values
-                    entirely (one showed a bare "h" suffix).
-                    Do not reintroduce gradient text around <NumberFlow>. */}
-                <span className="text-3xl md:text-4xl font-semibold tracking-tight text-white relative z-10">
-                  {value}
-                </span>
-                <span className="text-[11px] text-neutral-500 font-light font-sans relative z-10 mt-auto">
-                  {caption}
-                </span>
-              </div>
-              </BlurFade>
-            ))}
-          </div>
-
-
           {/* Product statement cards. These were previously styled as pull-quotes
               (serif open-quote glyph + em-dash attribution), which reads as a
               customer testimonial at a glance even though the attribution line

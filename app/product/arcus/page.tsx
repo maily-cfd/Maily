@@ -4,13 +4,11 @@ import React, { useEffect, useState, Suspense, lazy } from "react";
 import { Navbar } from "@/components/Navbar";
 import { motion, AnimatePresence, useMotionValue, useMotionTemplate } from "framer-motion";
 import { 
-  Cpu, Check, Terminal, Sparkles, ArrowRight, ShieldCheck, Zap, 
-  Layers, MessageSquare, Play, Lock, Eye, Monitor, Settings, Code, ChevronRight,
-  Mail, Calendar, RefreshCw, Plus, Minus, Inbox, User, Clock, ArrowDown
+  ArrowRight, ShieldCheck,
+  ChevronRight
 } from "lucide-react";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
 import { BlurFade } from "@/components/ui/blur-fade";
 import { FloatingNavbar } from "@/components/FloatingNavbar";
 import { ProgressiveBlur } from "@/components/ui/progressive-blur";
@@ -19,6 +17,7 @@ import { WordBlurStream } from "@/src/WordBlurStream";
 import { CTASection } from "@/components/ui/hero-dithering-card";
 import { Footer } from "@/components/Footer";
 import { CircleExpandButton } from "@/components/CircleExpandButton";
+import { DemoVideo } from "@/components/ui/demo-video";
 
 const Dithering = lazy(() => 
   import("@paper-design/shaders-react").then((mod) => ({ default: mod.Dithering }))
@@ -68,9 +67,6 @@ const arcusFaqs = [
 ];
 
 export default function ArcusProductPage() {
-  // Simulator sequence states
-  const [activeStep, setActiveStep] = useState(0);
-  const [selectedThread, setSelectedThread] = useState("q3-proposal");
   const [activeAccordion, setActiveAccordion] = useState<number | null>(null);
 
   // Mouse position tracker for spotlight glowing effects
@@ -84,11 +80,6 @@ export default function ArcusProductPage() {
 
   useEffect(() => {
     document.title = "Arcus — the AI running your inbox | Mailient";
-    // Loop steps to show active execution simulation in the middle console
-    const interval = setInterval(() => {
-      setActiveStep((prev) => (prev + 1) % 4);
-    }, 4500);
-    return () => clearInterval(interval);
   }, []);
 
   return (
@@ -171,7 +162,7 @@ export default function ArcusProductPage() {
         </div>
       </section>
 
-      {/* 2. CORE WORKSPACE APPLICATION MOCKUP (Codex-Inspired Triple Pane Interface) */}
+      {/* 2. Real Arcus footage — no coded triple-pane mockup */}
       <section className="py-24 px-6 w-full max-w-7xl mx-auto z-10 relative">
         <div className="text-center mb-16">
           <span className="font-mono text-[9px] tracking-[0.2em] text-indigo-400 uppercase font-bold block mb-4">
@@ -181,194 +172,13 @@ export default function ArcusProductPage() {
             Watch it work. Approve what goes out.
           </h2>
         </div>
-
-        {/* Triple Pane Obsidian Mockup Box */}
-        <div className="w-full linear-grid-card !rounded-[24px] overflow-hidden font-mono text-[11px] text-neutral-300 relative flex flex-col md:flex-row h-[580px]">
-          <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.005] to-white/[0.02] pointer-events-none" />
-
-          {/* Pane 1: Left Threads Sidebar */}
-          <div className="w-full md:w-[220px] bg-[#08090d]/90 border-r border-white/[0.06] p-5 flex flex-col justify-between select-none">
-            <div className="space-y-6 text-left">
-              {/* Window controls */}
-              <div className="flex items-center gap-1.5 pb-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
-                <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80" />
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
-              </div>
-
-              <div className="space-y-3">
-                <div className="text-[10px] text-neutral-500 font-bold uppercase tracking-wider">Active Outboxes</div>
-                <div className="space-y-1">
-                  <button 
-                    onClick={() => setSelectedThread("q3-proposal")}
-                    className={cn(
-                      "w-full text-left px-3 py-2 rounded-lg flex items-center gap-2 transition-all font-sans font-medium text-[11px]",
-                      selectedThread === "q3-proposal" 
-                        ? "bg-white/[0.05] text-white border border-white/[0.05]" 
-                        : "text-neutral-400 hover:text-white"
-                    )}
-                  >
-                    <Mail className="w-3.5 h-3.5 shrink-0 text-indigo-400" />
-                    <span className="truncate">Q3 Proposal Followup</span>
-                  </button>
-                  <button 
-                    onClick={() => setSelectedThread("james-reminder")}
-                    className={cn(
-                      "w-full text-left px-3 py-2 rounded-lg flex items-center gap-2 transition-all font-sans font-medium text-[11px]",
-                      selectedThread === "james-reminder" 
-                        ? "bg-white/[0.05] text-white border border-white/[0.05]" 
-                        : "text-neutral-400 hover:text-white"
-                    )}
-                  >
-                    <Clock className="w-3.5 h-3.5 shrink-0 text-amber-400" />
-                    <span className="truncate">James Friday Sweep</span>
-                  </button>
-                  <button 
-                    onClick={() => setSelectedThread("pitch-deck")}
-                    className={cn(
-                      "w-full text-left px-3 py-2 rounded-lg flex items-center gap-2 transition-all font-sans font-medium text-[11px]",
-                      selectedThread === "pitch-deck" 
-                        ? "bg-white/[0.05] text-white border border-white/[0.05]" 
-                        : "text-neutral-400 hover:text-white"
-                    )}
-                  >
-                    <Inbox className="w-3.5 h-3.5 shrink-0 text-emerald-400" />
-                    <span className="truncate">Investor Pitch Update</span>
-                  </button>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <div className="text-[10px] text-neutral-500 font-bold uppercase tracking-wider">Integrations</div>
-                <div className="space-y-1 font-sans text-[10.5px] text-neutral-400 pl-3">
-                  <div className="flex items-center gap-2">✓ Google Calendar</div>
-                  <div className="flex items-center gap-2">✓ Gmail outbox</div>
-                  <div className="flex items-center gap-2">✓ Notion Workspace</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="pt-4 border-t border-white/[0.04] text-[10px] text-neutral-500 font-sans">
-              SYNC STATUS: ACTIVE
-            </div>
-          </div>
-
-          {/* Pane 2: Middle Execution Console (Narrator step-by-step logs) */}
-          <div className="flex-1 bg-[#050608] p-6 flex flex-col justify-between text-left">
-            <div className="space-y-6">
-              <div className="flex items-center justify-between pb-3 border-b border-white/[0.04]">
-                <span className="text-[10px] tracking-wider uppercase text-neutral-400 font-bold">Execution Console</span>
-                <span className="text-[9px] px-2 py-0.5 rounded bg-indigo-950/20 text-indigo-400 border border-indigo-900/30">LOOPING</span>
-              </div>
-
-              {/* Dynamic steps inside console */}
-              <div className="space-y-5">
-                <div className="space-y-1.5">
-                  <div className="text-[10px] text-neutral-500 font-bold">&gt; INCOMING EMAIL IDENTIFIED</div>
-                  <div className="bg-[#0b0c10] border border-white/[0.04] p-3 rounded-lg text-neutral-200 font-sans leading-relaxed text-[10px]">
-                    {selectedThread === "q3-proposal" && "Hi Maulik, The Q3 proposal layout looks solid. Can we lock in a brief sync session sometime next Tuesday afternoon? Let me know. - Priya"}
-                    {selectedThread === "james-reminder" && "No recent response from James. Triggering automated check loop."}
-                    {selectedThread === "pitch-deck" && "Draft complete for Austin regarding Aether Labs capital structure changes."}
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <div className="text-[10px] text-neutral-500 font-bold">&gt; AGENT EXECUTION LOG</div>
-                  <div className="space-y-2.5 font-mono text-[10.5px]">
-                    <div className="flex items-center gap-2 text-indigo-400">
-                      <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-ping" />
-                      <span>Thought 4s: Analyzing thread context...</span>
-                    </div>
-                    
-                    {/* Simulated timeline steps */}
-                    <div className="space-y-1.5 pl-3.5 text-neutral-400">
-                      <div className="flex items-center gap-2">
-                        <Check className="w-3.5 h-3.5 text-emerald-400" />
-                        <span>Explored sent mail history</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Check className="w-3.5 h-3.5 text-emerald-400" />
-                        <span>Google Calendar: slot located (Tue 3:00 PM)</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Check className="w-3.5 h-3.5 text-emerald-400" />
-                        <span>Generated secure Google Meet bridge link</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="pt-4 border-t border-white/[0.04] flex items-center justify-between text-neutral-500 text-[10px]">
-              <span>Console Sync Status: SECURED</span>
-              <span className="animate-pulse">Active loop thread synced</span>
-            </div>
-          </div>
-
-          {/* Pane 3: Right Pane Outbox Diff View (Matching code-diff view from image) */}
-          <div className="w-full md:w-[380px] bg-[#08090d]/90 border-l border-white/[0.06] p-6 flex flex-col justify-between text-left">
-            <div className="space-y-5">
-              <div className="flex items-center justify-between pb-3 border-b border-white/[0.04]">
-                <span className="text-[10px] tracking-wider uppercase text-neutral-400 font-bold">Gmail Draft Diff</span>
-                <div className="flex items-center gap-2">
-                  <button className="px-2 py-0.5 rounded bg-white text-black font-bold text-[9px] transition-colors hover:bg-neutral-200">
-                    Approve
-                  </button>
-                  <button className="px-2 py-0.5 rounded bg-[#16171b] border border-white/[0.08] text-white font-bold text-[9px] transition-colors hover:border-white/[0.2]">
-                    Discard
-                  </button>
-                </div>
-              </div>
-
-              {/* Diff Code Layout matching the provided Codex concept */}
-              <div className="space-y-4">
-                <div className="text-[9.5px] text-neutral-500 font-bold uppercase tracking-wider">src/draft_reply.eml <span className="text-emerald-400 pl-2">+9 -2</span></div>
-                <div className="bg-[#050608] border border-white/[0.04] rounded-lg p-3 font-mono text-[10px] space-y-1.5 text-neutral-400 overflow-y-auto max-h-[300px]">
-                  
-                  {/* Draft body structured like a code diff card */}
-                  <div>
-                    <span className="text-neutral-500">To:</span> priya@aetherlabs.co
-                  </div>
-                  <div>
-                    <span className="text-neutral-500">Subject:</span> Re: Q3 Proposal Layout
-                  </div>
-                  <hr className="border-white/[0.03] my-2" />
-                  
-                  <div className="text-[#a51d2d] bg-[#ffeef0]/5 px-1 py-0.5 rounded">
-                    - Let me review and follow up with a slot.
-                  </div>
-                  
-                  <div className="text-[#22863a] bg-[#f0fff4]/5 px-1 py-0.5 rounded">
-                    + Tuesday at 3:00 PM works perfect on my end.
-                  </div>
-                  <div className="text-[#22863a] bg-[#f0fff4]/5 px-1 py-0.5 rounded">
-                    + I've locked in the slot and added a calendar
-                  </div>
-                  <div className="text-[#22863a] bg-[#f0fff4]/5 px-1 py-0.5 rounded">
-                    + invite containing the Google Meet link below:
-                  </div>
-                  
-                  <div className="pl-4 text-indigo-400 bg-indigo-950/10 px-1 py-0.5 rounded mt-2 border-l-2 border-indigo-500">
-                    meet.google.com/q3-proposal-bridge
-                  </div>
-
-                  <div className="text-neutral-500 pt-3">
-                    Voice: learned from your last 90 days of sent mail
-                  </div>
-                  <div className="text-neutral-500">
-                    Sounds like: you
-                  </div>
-
-                </div>
-              </div>
-            </div>
-
-            <div className="pt-4 border-t border-white/[0.04] text-[10px] text-neutral-500 font-sans">
-              Status: waiting_for_manual_approval_or_autocommit
-            </div>
-          </div>
-
+        <div className="w-full linear-grid-card !rounded-[24px] overflow-hidden relative aspect-video max-h-[580px]">
+          <DemoVideo
+            src="/demos/arcus-demo.mp4"
+            poster="/demos/arcus-demo.jpg"
+            label="Arcus working on a real inbox — drafts, reasoning, and approvals"
+            className="absolute inset-0 w-full h-full"
+          />
         </div>
       </section>
 
@@ -403,26 +213,13 @@ export default function ArcusProductPage() {
               </div>
             </div>
 
-            {/* Gradient Wrapper Mockup Panel */}
-            <div className="flex-1 w-full flex items-center justify-center p-8 rounded-[24px] bg-gradient-to-br from-indigo-500/10 via-blue-600/5 to-transparent border border-white/[0.06] relative overflow-hidden group h-[320px]">
-              {/* Mesh background */}
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.1),transparent_60%)] pointer-events-none" />
-              
-              {/* Floating elegant terminal mockup card */}
-              <div className="w-[340px] bg-[#08090c] border border-white/[0.08] rounded-xl p-4 shadow-2xl space-y-3 font-mono text-[10px] text-neutral-300 relative z-10 transition-transform group-hover:scale-[1.02] duration-300">
-                <div className="flex items-center justify-between border-b border-white/[0.04] pb-2 text-neutral-500">
-                  <span>Voice profile</span>
-                  <span className="text-emerald-400 font-bold">LEARNED</span>
-                </div>
-                <div className="space-y-1.5 font-sans">
-                  <div className="font-semibold text-white font-mono">&gt; What it learned from your sent mail:</div>
-                  <div className="pl-3.5 text-neutral-400 text-[9.5px] leading-relaxed">
-                    • Average length: 34 words per message<br />
-                    • Warm but direct with clients<br />
-                    • Favorite sign-off: "Looking forward to it"
-                  </div>
-                </div>
-              </div>
+            <div className="flex-1 w-full rounded-[24px] overflow-hidden border border-white/[0.06] relative h-[320px]">
+              <DemoVideo
+                src="/demos/voice-demo.mp4"
+                poster="/demos/voice-demo.jpg"
+                label="Arcus drafting in your learned voice on a real inbox"
+                className="absolute inset-0 w-full h-full"
+              />
             </div>
           </div>
 
@@ -443,27 +240,13 @@ export default function ArcusProductPage() {
               </div>
             </div>
 
-            {/* Gradient Wrapper Mockup Panel */}
-            <div className="flex-1 w-full flex items-center justify-center p-8 rounded-[24px] bg-gradient-to-br from-indigo-500/10 via-blue-600/5 to-transparent border border-white/[0.06] relative overflow-hidden group h-[320px]">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.1),transparent_60%)] pointer-events-none" />
-              
-              {/* Floating elegant concurrent loop card */}
-              <div className="w-[340px] bg-[#08090c] border border-white/[0.08] rounded-xl p-4 shadow-2xl space-y-3 font-mono text-[10px] text-neutral-300 relative z-10 transition-transform group-hover:scale-[1.02] duration-300">
-                <div className="flex items-center justify-between border-b border-white/[0.04] pb-2 text-neutral-500">
-                  <span>Agent Orchestrator</span>
-                  <span className="text-indigo-400 font-bold">RUNNING</span>
-                </div>
-                <div className="space-y-2 text-neutral-400">
-                  <div className="flex items-center justify-between bg-white/[0.02] p-2 rounded border border-white/[0.04]">
-                    <span>Inbox Triage sweep</span>
-                    <span className="text-emerald-400">Every 5m</span>
-                  </div>
-                  <div className="flex items-center justify-between bg-white/[0.02] p-2 rounded border border-white/[0.04]">
-                    <span>Friday James check-in</span>
-                    <span className="text-neutral-500">Starts in 3h</span>
-                  </div>
-                </div>
-              </div>
+            <div className="flex-1 w-full rounded-[24px] overflow-hidden border border-white/[0.06] relative h-[320px]">
+              <DemoVideo
+                src="/demos/agent-demo.mp4"
+                poster="/demos/agent-demo.jpg"
+                label="Background scheduling agent running on a real inbox"
+                className="absolute inset-0 w-full h-full"
+              />
             </div>
           </div>
 
@@ -484,31 +267,13 @@ export default function ArcusProductPage() {
               </div>
             </div>
 
-            {/* Gradient Wrapper Mockup Panel */}
-            <div className="flex-1 w-full flex items-center justify-center p-8 rounded-[24px] bg-gradient-to-br from-indigo-500/10 via-blue-600/5 to-transparent border border-white/[0.06] relative overflow-hidden group h-[320px]">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.1),transparent_60%)] pointer-events-none" />
-              
-              {/* Floating elegant integration card */}
-              <div className="w-[340px] bg-[#08090c] border border-white/[0.08] rounded-xl p-4 shadow-2xl space-y-3 font-mono text-[10px] text-neutral-300 relative z-10 transition-transform group-hover:scale-[1.02] duration-300">
-                <div className="flex items-center justify-between border-b border-white/[0.04] pb-2 text-neutral-500">
-                  <span>Connector Hub</span>
-                  <span className="text-emerald-400 font-bold">CONNECTED</span>
-                </div>
-                <div className="grid grid-cols-3 gap-2">
-                  <div className="bg-[#0d0e12] border border-white/[0.04] p-2 rounded flex flex-col items-center justify-center text-center">
-                    <Mail className="w-4 h-4 text-indigo-400 mb-1" />
-                    <span className="text-[8px]">Gmail</span>
-                  </div>
-                  <div className="bg-[#0d0e12] border border-white/[0.04] p-2 rounded flex flex-col items-center justify-center text-center">
-                    <Calendar className="w-4 h-4 text-emerald-400 mb-1" />
-                    <span className="text-[8px]">GCal</span>
-                  </div>
-                  <div className="bg-[#0d0e12] border border-white/[0.04] p-2 rounded flex flex-col items-center justify-center text-center">
-                    <RefreshCw className="w-4 h-4 text-amber-400 mb-1 animate-spin-slow" />
-                    <span className="text-[8px]">Cal.com</span>
-                  </div>
-                </div>
-              </div>
+            <div className="flex-1 w-full rounded-[24px] overflow-hidden border border-white/[0.06] relative h-[320px]">
+              <DemoVideo
+                src="/demos/connect-gmail-demo.mp4"
+                poster="/demos/connect-gmail-demo.jpg"
+                label="Connecting Gmail so Arcus can work on your real inbox"
+                className="absolute inset-0 w-full h-full"
+              />
             </div>
           </div>
 
