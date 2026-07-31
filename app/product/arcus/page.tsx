@@ -2,12 +2,11 @@
 
 import React, { useEffect, useState, Suspense, lazy } from "react";
 import { Navbar } from "@/components/Navbar";
-import { motion, AnimatePresence, useMotionValue, useMotionTemplate } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { 
   ArrowRight, ShieldCheck,
   ChevronRight
 } from "lucide-react";
-import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { BlurFade } from "@/components/ui/blur-fade";
 import { FloatingNavbar } from "@/components/FloatingNavbar";
@@ -68,15 +67,6 @@ const arcusFaqs = [
 
 export default function ArcusProductPage() {
   const [activeAccordion, setActiveAccordion] = useState<number | null>(null);
-
-  // Mouse position tracker for spotlight glowing effects
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const { left, top } = e.currentTarget.getBoundingClientRect();
-    mouseX.set(e.clientX - left);
-    mouseY.set(e.clientY - top);
-  };
 
   useEffect(() => {
     document.title = "Arcus — the AI running your inbox | Mailient";
