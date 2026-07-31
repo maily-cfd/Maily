@@ -210,25 +210,17 @@ function SignUpContent() {
 
   return (
     <SignInLayout
-      title="Create your account"
-      description="Start your 3-day free trial. Mailient removes email from your to-do list — replies in your voice, meetings booked, follow-ups sent while you sleep."
+      title="Start free"
+      description="3-day trial. Connect Gmail — Mailient handles the rest."
       heroImageSrc="https://images.unsplash.com/photo-1642615835477-d303d7dc9ee9?w=2160&q=80"
       testimonials={testimonials}
     >
       <div className="w-full">
         <AnimatePresence mode="wait">
           {step === 1 && (
-            <motion.div key="step1" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} transition={{ duration: 0.4 }} className="space-y-6">
-              <StepIndicator currentStep={1} />
-              <div className="mb-6">
-                <h2 className="text-foreground text-lg font-medium tracking-tight mb-2">Create account</h2>
-                <p className="text-muted-foreground text-sm leading-relaxed">
-                  Continue with Google to start your <span className="text-foreground font-medium">3-day free trial</span>. Mailient needs Gmail access — there is no email/password signup.
-                </p>
-              </div>
-
+            <motion.div key="step1" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} transition={{ duration: 0.4 }} className="space-y-5">
               {error && (
-                <div className="mb-6 p-3 bg-red-500/5 border border-red-500/20 rounded-xl flex gap-3 items-center">
+                <div className="p-3 bg-red-500/5 border border-red-500/20 rounded-xl flex gap-3 items-center">
                   <AlertCircle className="w-4 h-4 text-red-500 dark:text-red-400 shrink-0" strokeWidth={1.5} />
                   <p className="text-[11px] text-red-750 dark:text-red-200/60 font-medium tracking-tight">{error}</p>
                 </div>
@@ -239,28 +231,33 @@ function SignUpContent() {
               <PremiumGoogleButton />
 
               <p className="text-[11px] text-muted-foreground leading-relaxed text-center px-1">
-                Next: pick your Google account, then approve Gmail for Mailient.
-                Google may show a trusted partner screen (Composio) — that&apos;s expected and secure. Card required for the trial; you won&apos;t be charged for 3 days and can cancel anytime.
+                Opens Google to connect Gmail. You may see Composio — our secure partner. Card for trial; no charge for 3 days.
               </p>
 
-              <div className="pt-2 space-y-2">
-                <label className="text-[12px] text-zinc-500 dark:text-white/35 block">Optional — help Google pick the right account</label>
-                <GlassInputWrapper>
-                  <input
-                    ref={emailInputRef}
-                    type="email"
-                    value={email}
-                    onChange={(e) => onEmailChange(e.target.value)}
-                    placeholder="you@company.com (hint only)"
-                    className="w-full bg-transparent text-sm p-4 rounded-2xl focus:outline-none text-foreground placeholder:text-zinc-400 dark:placeholder:text-white/10 font-medium"
-                  />
-                </GlassInputWrapper>
-                <p className="text-[10px] text-zinc-500 dark:text-white/30 leading-relaxed">
-                  This field does not sign you up. It only pre-fills which Google account to open.
-                </p>
-              </div>
+              <details className="group rounded-2xl border border-zinc-200 dark:border-white/10 bg-zinc-50/40 dark:bg-white/[0.02] open:bg-zinc-50 dark:open:bg-white/[0.03]">
+                <summary className="cursor-pointer list-none px-4 py-3 text-[12px] text-zinc-500 dark:text-white/40 hover:text-foreground transition-colors flex items-center justify-between gap-2 [&::-webkit-details-marker]:hidden">
+                  <span>Wrong Google account often? Add a hint</span>
+                  <span className="text-zinc-400 dark:text-white/25 group-open:rotate-180 transition-transform text-[10px]">▼</span>
+                </summary>
+                <div className="px-4 pb-4 space-y-2 border-t border-zinc-200/80 dark:border-white/5 pt-3">
+                  <GlassInputWrapper>
+                    <input
+                      ref={emailInputRef}
+                      type="email"
+                      value={email}
+                      onChange={(e) => onEmailChange(e.target.value)}
+                      placeholder="you@company.com"
+                      autoComplete="username"
+                      className="w-full bg-transparent text-sm p-4 rounded-2xl focus:outline-none text-foreground placeholder:text-zinc-400 dark:placeholder:text-white/10 font-medium"
+                    />
+                  </GlassInputWrapper>
+                  <p className="text-[10px] text-zinc-500 dark:text-white/30 leading-relaxed">
+                    Prefills the next Google screen only — does not create an account.
+                  </p>
+                </div>
+              </details>
 
-              <div className="text-[12px] pt-2">
+              <div className="text-[12px] pt-1">
                 <button type="button" onClick={() => router.push('/auth/signin')} className="text-zinc-400 hover:text-foreground transition-colors">
                   Already registered? <span className="text-zinc-500 dark:text-white/40 border-b border-zinc-300 dark:border-white/10 ml-1">Sign in</span>
                 </button>

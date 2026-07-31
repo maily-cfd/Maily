@@ -233,8 +233,8 @@ function SignInContent() {
 
   return (
     <SignInLayout
-      title="Let’s Continue"
-      description="Your inbox employee kept working while you were away. Sign in to see what's been handled — and the few things that need you."
+      title="Welcome back"
+      description="Your inbox employee kept working. Sign in to pick up where it left off."
       heroImageSrc="https://images.unsplash.com/photo-1642615835477-d303d7dc9ee9?w=2160&q=80"
       testimonials={testimonials}
     >
@@ -248,18 +248,10 @@ function SignInContent() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -10 }}
               transition={{ duration: 0.4 }}
-              className="space-y-6"
+              className="space-y-5"
             >
-              <StepIndicator currentStep={1} />
-              <div className="mb-6">
-                <h2 className="text-foreground text-lg font-medium tracking-tight mb-2">Welcome back</h2>
-                <p className="text-muted-foreground text-sm leading-relaxed">
-                  Sign in with Google. That one button opens Google so Mailient can access your Gmail — required for the product to work.
-                </p>
-              </div>
-
               {error && (
-                <div className="mb-6 p-3 bg-red-500/5 border border-red-500/20 rounded-xl flex gap-3 items-center">
+                <div className="p-3 bg-red-500/5 border border-red-500/20 rounded-xl flex gap-3 items-center">
                   <AlertCircle className="w-4 h-4 text-red-500 dark:text-red-400 shrink-0" strokeWidth={1.5} />
                   <p className="text-[11px] text-red-750 dark:text-red-200/60 font-medium tracking-tight">{error}</p>
                 </div>
@@ -270,28 +262,33 @@ function SignInContent() {
               <PremiumGoogleButton />
 
               <p className="text-[11px] text-muted-foreground leading-relaxed text-center px-1">
-                You&apos;ll pick a Google account, then approve Gmail access for Mailient.
-                Google may show a trusted partner screen (Composio) — that&apos;s how we connect Gmail securely. There is no separate email/password login.
+                Opens Google to connect Gmail. You may see Composio — our secure partner.
               </p>
 
-              <div className="pt-2 space-y-2">
-                <label className="text-[12px] text-zinc-500 dark:text-white/35 block">Optional — help Google pick the right account</label>
-                <GlassInputWrapper>
-                  <input
-                    ref={emailInputRef}
-                    type="email"
-                    value={email}
-                    onChange={(e) => onEmailChange(e.target.value)}
-                    placeholder="you@company.com (hint only)"
-                    className="w-full bg-transparent text-sm p-4 rounded-2xl focus:outline-none text-foreground placeholder:text-zinc-400 dark:placeholder:text-white/20 font-medium"
-                  />
-                </GlassInputWrapper>
-                <p className="text-[10px] text-zinc-500 dark:text-white/30 leading-relaxed">
-                  Typing an email here does not create an account. It only pre-selects that Google account on the next screen.
-                </p>
-              </div>
+              <details className="group rounded-2xl border border-zinc-200 dark:border-white/10 bg-zinc-50/40 dark:bg-white/[0.02] open:bg-zinc-50 dark:open:bg-white/[0.03]">
+                <summary className="cursor-pointer list-none px-4 py-3 text-[12px] text-zinc-500 dark:text-white/40 hover:text-foreground transition-colors flex items-center justify-between gap-2 [&::-webkit-details-marker]:hidden">
+                  <span>Wrong Google account often? Add a hint</span>
+                  <span className="text-zinc-400 dark:text-white/25 group-open:rotate-180 transition-transform text-[10px]">▼</span>
+                </summary>
+                <div className="px-4 pb-4 space-y-2 border-t border-zinc-200/80 dark:border-white/5 pt-3">
+                  <GlassInputWrapper>
+                    <input
+                      ref={emailInputRef}
+                      type="email"
+                      value={email}
+                      onChange={(e) => onEmailChange(e.target.value)}
+                      placeholder="you@company.com"
+                      autoComplete="username"
+                      className="w-full bg-transparent text-sm p-4 rounded-2xl focus:outline-none text-foreground placeholder:text-zinc-400 dark:placeholder:text-white/20 font-medium"
+                    />
+                  </GlassInputWrapper>
+                  <p className="text-[10px] text-zinc-500 dark:text-white/30 leading-relaxed">
+                    Prefills the next Google screen only — does not create an account.
+                  </p>
+                </div>
+              </details>
 
-              <div className="flex items-center justify-between text-[12px] pt-2">
+              <div className="flex items-center justify-between text-[12px] pt-1">
                 <label className="flex items-center gap-3 cursor-pointer group">
                   <input type="checkbox" name="rememberMe" className="custom-checkbox" />
                   <span className="text-muted-foreground group-hover:text-foreground transition-colors">Keep me signed in</span>
