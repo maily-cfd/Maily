@@ -1,0 +1,15 @@
+---
+description: Always commit finished work and push to main
+alwaysApply: true
+---
+
+# Git: always commit and push to main
+
+After completing any substantive code change in this repo:
+
+1. Commit on `main` (do not ask for permission first).
+2. Push to `origin/main` immediately after a successful commit.
+3. Skip secrets, credentials, `.env*`, and build logs (`nextbuild*.log`, etc.).
+4. Use a concise commit message focused on why.
+5. Never force-push to main. Never amend commits that are already pushed.
+6. If there is nothing meaningful to commit, do not create an empty commit.
