@@ -44,9 +44,9 @@ interface CircleExpandButtonProps {
 
 const VARIANT_STYLES: Record<CircleExpandButtonVariant, string> = {
   primary:
-    "bg-white text-black hover:bg-neutral-200 shadow-[0_8px_24px_rgba(0,0,0,0.45)]",
+    "bg-neutral-900 text-white hover:bg-neutral-800 shadow-[0_8px_24px_rgba(0,0,0,0.2)] dark:bg-white dark:text-black dark:hover:bg-neutral-200 dark:shadow-[0_8px_24px_rgba(0,0,0,0.45)]",
   secondary:
-    "bg-white/[0.03] text-white border border-white/15 hover:bg-white/[0.08] hover:border-white/25",
+    "bg-neutral-900/[0.04] text-neutral-900 border border-neutral-900/15 hover:bg-neutral-900/[0.08] hover:border-neutral-900/25 dark:bg-white/[0.03] dark:text-white dark:border-white/15 dark:hover:bg-white/[0.08] dark:hover:border-white/25",
 };
 
 export function CircleExpandButton({
@@ -74,7 +74,7 @@ export function CircleExpandButton({
         "font-semibold text-sm",
         "overflow-hidden cursor-pointer",
         "transition-all duration-200 hover:scale-[1.02]",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2 focus-visible:ring-offset-black",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900/40 dark:focus-visible:ring-white/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#f4f4f5] dark:focus-visible:ring-offset-black",
         VARIANT_STYLES[variant],
         disabled && "opacity-50 cursor-not-allowed",
         className,

@@ -4389,6 +4389,66 @@ html {
   transform: translateY(-1px);
 }
 
+/* Light theme — landing keeps the same composition, inverted surfaces.
+   Dark remains the default via ThemeProvider; these only apply when the
+   user (or system) selects light. */
+.light .linear-grid-card {
+  background: radial-gradient(circle at 50% 0%, rgba(0, 0, 0, 0.03) 0%, transparent 70%), #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06), inset 0 1px 1px rgba(255, 255, 255, 0.8);
+}
+.light .linear-grid-card::before {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 0, 0, 0.035) 1px, transparent 1px);
+}
+.light .linear-grid-card-inner {
+  background: radial-gradient(circle at 50% 0%, rgba(0, 0, 0, 0.025) 0%, transparent 70%), #fafafa;
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.9);
+}
+.light .linear-grid-card::after,
+.light .linear-grid-card-inner::after {
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.1) 0%,
+    rgba(0, 0, 0, 0.04) 40%,
+    rgba(0, 0, 0, 0.02) 100%
+  );
+}
+.light .gradient-tile {
+  background: linear-gradient(
+    155deg,
+    rgba(0, 0, 0, 0.9) 0%,
+    rgba(30, 30, 30, 0.95) 55%,
+    rgba(20, 20, 20, 1) 100%
+  );
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.12),
+    0 8px 18px rgba(0, 0, 0, 0.18);
+}
+.light .gradient-pill {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(245, 245, 245, 0.9) 100%
+  );
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 4px 14px -8px rgba(0, 0, 0, 0.2);
+}
+.light .linear-cta {
+  background: linear-gradient(180deg, rgba(0,0,0,0.04) 0%, rgba(0,0,0,0) 100%), #111111;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12), inset 0 1px 1px rgba(255, 255, 255, 0.08);
+  color: #fafafa;
+}
+.light .linear-cta:hover {
+  background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(0,0,0,0) 100%), #1a1a1a;
+  border-color: rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.16), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+}
+
 /* Smooth ambient breathing glow */
 .smooth-glow {
   position: absolute;

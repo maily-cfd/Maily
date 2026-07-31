@@ -44,7 +44,7 @@ function TestimonialCard({ item }: { item: Testimonial }) {
         </div>
       ) : null}
 
-      <p className="text-sm md:text-base text-neutral-200 font-light leading-relaxed font-sans relative z-10 flex-1">
+      <p className="text-sm md:text-base text-neutral-700 dark:text-neutral-200 font-light leading-relaxed font-sans relative z-10 flex-1">
         {item.quote}
       </p>
 
@@ -61,7 +61,7 @@ function TestimonialCard({ item }: { item: Testimonial }) {
           </span>
         )}
         <span className="flex flex-col">
-          <span className="text-sm font-semibold text-white leading-tight">{item.name}</span>
+          <span className="text-sm font-semibold text-neutral-900 dark:text-white leading-tight">{item.name}</span>
           <span className="text-[11px] text-neutral-500 font-sans leading-tight">{item.role}</span>
         </span>
       </div>
@@ -75,7 +75,7 @@ export function TestimonialsSection() {
   if (TESTIMONIALS.length === 0) return null;
 
   return (
-    <section className="py-16 md:py-32 px-6 w-full max-w-7xl mx-auto border-t border-white/[0.06] z-10 relative">
+    <section className="py-16 md:py-32 px-6 w-full max-w-7xl mx-auto border-t border-neutral-200 dark:border-white/[0.06] z-10 relative">
       <BlurFade delay={0.1} duration={0.8} inView>
         <SectionHeader
           pill="Customers"

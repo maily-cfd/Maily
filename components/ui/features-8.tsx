@@ -5,7 +5,7 @@ import { SectionHeader } from "@/components/ui/section-header"
 
 export function Features8() {
   return (
-    <section className="py-24 md:py-32 bg-black relative overflow-hidden z-10">
+    <section className="py-24 md:py-32 bg-[#f4f4f5] dark:bg-black relative overflow-hidden z-10 border-t border-neutral-200 dark:border-transparent">
       {/* Subtle Atmospheric Lighting */}
       <div className="absolute inset-0 z-0 pointer-events-none select-none overflow-hidden">
         <div className="absolute top-[10%] left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full bg-neutral-900/10 blur-[150px]" />
@@ -29,7 +29,7 @@ export function Features8() {
           <div className="relative z-10 grid grid-cols-6 gap-4">
             
             {/* Card 1: 100% Autopilot */}
-            <Card className="relative col-span-full flex overflow-hidden lg:col-span-2 bg-neutral-950/40 border-white/[0.08] rounded-3xl group hover:border-white/20 transition-all duration-500 shadow-[0_10px_30px_rgba(0,0,0,0.8)]">
+            <Card className="relative col-span-full flex overflow-hidden lg:col-span-2 bg-white dark:bg-neutral-950/40 border-neutral-200 dark:border-white/[0.08] rounded-3xl group hover:border-neutral-300 dark:hover:border-white/20 transition-all duration-500 shadow-[0_10px_30px_rgba(0,0,0,0.06)] dark:shadow-[0_10px_30px_rgba(0,0,0,0.8)]">
               <CardContent className="relative m-auto size-fit pt-6 text-center">
                 <div className="relative flex h-24 w-56 items-center">
                   <svg className="text-neutral-700/60 absolute inset-0 size-full transition-transform duration-700 group-hover:scale-105" viewBox="0 0 254 104" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -38,17 +38,17 @@ export function Features8() {
                       fill="currentColor"
                     />
                   </svg>
-                  <span className="mx-auto block w-fit text-5xl font-semibold tracking-tight text-white">100%</span>
+                  <span className="mx-auto block w-fit text-5xl font-semibold tracking-tight text-neutral-900 dark:text-white">100%</span>
                 </div>
-                <h3 className="mt-6 text-xl font-medium text-white">Autopilot Engine</h3>
-                <p className="text-[11px] text-neutral-400 mt-2 font-sans font-light max-w-[200px] mx-auto">
+                <h3 className="mt-6 text-xl font-medium text-neutral-900 dark:text-white">Autopilot Engine</h3>
+                <p className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-2 font-sans font-light max-w-[200px] mx-auto">
                   Processes and handles emails entirely autonomously without human bottlenecks.
                 </p>
               </CardContent>
             </Card>
 
             {/* Card 2: Secure By Default */}
-            <Card className="relative col-span-full overflow-hidden sm:col-span-3 lg:col-span-2 bg-neutral-950/40 border-white/[0.08] rounded-3xl group hover:border-white/20 transition-all duration-500 shadow-[0_10px_30px_rgba(0,0,0,0.8)]">
+            <Card className="relative col-span-full overflow-hidden sm:col-span-3 lg:col-span-2 bg-white dark:bg-neutral-950/40 border-neutral-200 dark:border-white/[0.08] rounded-3xl group hover:border-neutral-300 dark:hover:border-white/20 transition-all duration-500 shadow-[0_10px_30px_rgba(0,0,0,0.06)] dark:shadow-[0_10px_30px_rgba(0,0,0,0.8)]">
               <CardContent className="pt-6 text-center">
                 <div className="relative mx-auto flex aspect-square size-32 rounded-full border border-white/[0.05] before:absolute before:-inset-2 before:rounded-full before:border before:border-white/[0.02] dark:border-white/10 dark:before:border-white/5 transition-transform duration-700 group-hover:scale-105">
                   <svg className="m-auto h-fit w-24 text-neutral-400" viewBox="0 0 212 143" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -76,8 +76,8 @@ export function Features8() {
                   </svg>
                 </div>
                 <div className="relative z-10 mt-6 space-y-2 text-center">
-                  <h3 className="text-lg font-medium text-white transition group-hover:text-neutral-300">Enterprise Isolation</h3>
-                  <p className="text-neutral-400 font-sans font-light text-xs max-w-[220px] mx-auto leading-relaxed">
+                  <h3 className="text-lg font-medium text-neutral-900 dark:text-white transition group-hover:text-neutral-700 dark:group-hover:text-neutral-300">Enterprise Isolation</h3>
+                  <p className="text-neutral-500 dark:text-neutral-500 dark:text-neutral-400 font-sans font-light text-xs max-w-[220px] mx-auto leading-relaxed">
                     Operates in fully secure, dedicated sandbox instances to process sensitive customer threads.
                   </p>
                 </div>
@@ -85,7 +85,7 @@ export function Features8() {
             </Card>
 
             {/* Card 3: 9x Faster Replies (Chart) */}
-            <Card className="relative col-span-full overflow-hidden sm:col-span-3 lg:col-span-2 bg-neutral-950/40 border-white/[0.08] rounded-3xl group hover:border-white/20 transition-all duration-500 shadow-[0_10px_30px_rgba(0,0,0,0.8)]">
+            <Card className="relative col-span-full overflow-hidden sm:col-span-3 lg:col-span-2 bg-white dark:bg-neutral-950/40 border-neutral-200 dark:border-white/[0.08] rounded-3xl group hover:border-neutral-300 dark:hover:border-white/20 transition-all duration-500 shadow-[0_10px_30px_rgba(0,0,0,0.06)] dark:shadow-[0_10px_30px_rgba(0,0,0,0.8)]">
               <CardContent className="pt-6 text-center">
                 <div className="pt-6 lg:px-6 transition-transform duration-700 group-hover:scale-105">
                   <svg className="text-neutral-400 w-full" viewBox="0 0 386 123" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -127,8 +127,8 @@ export function Features8() {
                   </svg>
                 </div>
                 <div className="relative z-10 mt-14 space-y-2 text-center">
-                  <h3 className="text-lg font-medium text-white transition">9x Faster Triage</h3>
-                  <p className="text-neutral-400 font-sans font-light text-xs max-w-[220px] mx-auto leading-relaxed">
+                  <h3 className="text-lg font-medium text-neutral-900 dark:text-white transition">9x Faster Triage</h3>
+                  <p className="text-neutral-500 dark:text-neutral-500 dark:text-neutral-400 font-sans font-light text-xs max-w-[220px] mx-auto leading-relaxed">
                     Sifts and classifies inbox sweeps at near zero-latency speeds, routing priorities instantly.
                   </p>
                 </div>
@@ -136,22 +136,22 @@ export function Features8() {
             </Card>
 
             {/* Card 4: Deep Privacy (Shield) */}
-            <Card className="relative col-span-full overflow-hidden lg:col-span-3 bg-neutral-950/40 border-white/[0.08] rounded-3xl group hover:border-white/20 transition-all duration-500 shadow-[0_10px_30px_rgba(0,0,0,0.8)]">
+            <Card className="relative col-span-full overflow-hidden lg:col-span-3 bg-white dark:bg-neutral-950/40 border-neutral-200 dark:border-white/[0.08] rounded-3xl group hover:border-neutral-300 dark:hover:border-white/20 transition-all duration-500 shadow-[0_10px_30px_rgba(0,0,0,0.06)] dark:shadow-[0_10px_30px_rgba(0,0,0,0.8)]">
               <CardContent className="grid pt-6 sm:grid-cols-2">
                 <div className="relative z-10 flex flex-col justify-between space-y-12 lg:space-y-6">
-                  <div className="relative flex aspect-square size-12 rounded-full border border-white/[0.08] before:absolute before:-inset-2 before:rounded-full before:border before:border-white/[0.02] dark:border-white/10 dark:before:border-white/5 transition-transform duration-700 group-hover:scale-105 bg-black/40">
+                  <div className="relative flex aspect-square size-12 rounded-full border border-white/[0.08] before:absolute before:-inset-2 before:rounded-full before:border before:border-white/[0.02] dark:border-white/10 dark:before:border-white/5 transition-transform duration-700 group-hover:scale-105 bg-neutral-100 dark:bg-black/40">
                     <Shield className="m-auto size-5 text-white" strokeWidth={1} />
                   </div>
                   <div className="space-y-2">
-                    <h3 className="text-lg font-medium text-white transition group-hover:text-neutral-300">Absolute Privacy</h3>
-                    <p className="text-neutral-400 font-sans font-light text-xs leading-relaxed max-w-[200px]">
+                    <h3 className="text-lg font-medium text-neutral-900 dark:text-white transition group-hover:text-neutral-700 dark:group-hover:text-neutral-300">Absolute Privacy</h3>
+                    <p className="text-neutral-500 dark:text-neutral-500 dark:text-neutral-400 font-sans font-light text-xs leading-relaxed max-w-[200px]">
                       Your draft data, credentials, and custom models are fully isolated and remain strictly in-memory during execution.
                     </p>
                   </div>
                 </div>
                 
                 {/* Visual Chart Graphic Overlay */}
-                <div className="rounded-tl-(--radius) relative -mb-6 -mr-6 mt-6 h-fit border-l border-t border-white/[0.08] p-6 py-6 sm:ml-6 bg-black/40 overflow-hidden">
+                <div className="rounded-tl-(--radius) relative -mb-6 -mr-6 mt-6 h-fit border-l border-t border-neutral-200 dark:border-white/[0.08] p-6 py-6 sm:ml-6 bg-neutral-100 dark:bg-black/40 overflow-hidden">
                   <div className="absolute left-3 top-2 flex gap-1">
                     <span className="block size-2 rounded-full border border-white/10 bg-white/10"></span>
                     <span className="block size-2 rounded-full border border-white/10 bg-white/10"></span>
@@ -182,20 +182,20 @@ export function Features8() {
             </Card>
 
             {/* Card 5: Collaborative Loops (Users stack) */}
-            <Card className="relative col-span-full overflow-hidden lg:col-span-3 bg-neutral-950/40 border-white/[0.08] rounded-3xl group hover:border-white/20 transition-all duration-500 shadow-[0_10px_30px_rgba(0,0,0,0.8)]">
+            <Card className="relative col-span-full overflow-hidden lg:col-span-3 bg-white dark:bg-neutral-950/40 border-neutral-200 dark:border-white/[0.08] rounded-3xl group hover:border-neutral-300 dark:hover:border-white/20 transition-all duration-500 shadow-[0_10px_30px_rgba(0,0,0,0.06)] dark:shadow-[0_10px_30px_rgba(0,0,0,0.8)]">
               <CardContent className="grid h-full pt-6 sm:grid-cols-2">
                 <div className="relative z-10 flex flex-col justify-between space-y-12 lg:space-y-6">
-                  <div className="relative flex aspect-square size-12 rounded-full border border-white/[0.08] before:absolute before:-inset-2 before:rounded-full before:border before:border-white/[0.02] dark:border-white/10 dark:before:border-white/5 transition-transform duration-700 group-hover:scale-105 bg-black/40">
+                  <div className="relative flex aspect-square size-12 rounded-full border border-white/[0.08] before:absolute before:-inset-2 before:rounded-full before:border before:border-white/[0.02] dark:border-white/10 dark:before:border-white/5 transition-transform duration-700 group-hover:scale-105 bg-neutral-100 dark:bg-black/40">
                     <Users className="m-auto size-5 text-white" strokeWidth={1} />
                   </div>
                   <div className="space-y-2">
-                    <h3 className="text-lg font-medium text-white transition group-hover:text-neutral-300">Agent Orchestration</h3>
-                    <p className="text-neutral-400 font-sans font-light text-xs leading-relaxed max-w-[200px]">
+                    <h3 className="text-lg font-medium text-neutral-900 dark:text-white transition group-hover:text-neutral-700 dark:group-hover:text-neutral-300">Agent Orchestration</h3>
+                    <p className="text-neutral-500 dark:text-neutral-500 dark:text-neutral-400 font-sans font-light text-xs leading-relaxed max-w-[200px]">
                       Coordinates multiple specialized sub-agents to manage intake, verify context, and schedule meetings as a single aligned sweep.
                     </p>
                   </div>
                 </div>
-                <div className="relative mt-6 sm:-my-6 sm:-mr-6 border-l border-white/[0.08] sm:border-t-0 border-t border-t-white/[0.08]">
+                <div className="relative mt-6 sm:-my-6 sm:-mr-6 border-l border-neutral-200 dark:border-white/[0.08] sm:border-t-0 border-t border-t-neutral-200 dark:border-t-white/[0.08]">
                   <div className="relative flex h-full flex-col justify-center space-y-6 py-6 bg-black/20">
                     <div className="relative flex w-[calc(50%+0.875rem)] items-center justify-end gap-2 transition-transform duration-500 group-hover:translate-x-1">
                       <span className="block h-fit rounded border border-white/10 bg-neutral-900 px-2 py-1 text-[10px] text-white font-mono shadow-sm">Sift AI</span>

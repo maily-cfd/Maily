@@ -32,13 +32,13 @@ export function CTASection() {
 
        The rounded card is replaced by a top hairline, which is how every other
        section on the page separates itself. */
-    <section ref={sectionRef} className="py-24 w-full flex justify-center items-center bg-black relative z-10 border-t border-white/[0.06]">
+    <section ref={sectionRef} className="py-24 w-full flex justify-center items-center bg-[#f4f4f5] dark:bg-black relative z-10 border-t border-neutral-200 dark:border-white/[0.06]">
       <div
         className="w-full relative"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        <div className="relative overflow-hidden bg-neutral-950/40 min-h-[520px] flex flex-col items-center justify-center duration-500">
+        <div className="relative overflow-hidden bg-white/60 dark:bg-neutral-950/40 min-h-[520px] flex flex-col items-center justify-center duration-500">
 
           {shaderActive && (
             <Suspense fallback={<div className="absolute inset-0 bg-neutral-900/10 pointer-events-none" />}>
@@ -74,13 +74,13 @@ export function CTASection() {
                 which made the loudest type on the page the closing CTA and
                 inverted the hierarchy. 56px keeps it emphatic as the final
                 beat while staying below the hero. */}
-            <h2 className="text-4xl md:text-5xl lg:text-[56px] font-medium tracking-[-0.035em] mb-6 leading-[1.08] max-w-3xl font-sans select-none bg-gradient-to-b from-white via-neutral-100 to-neutral-500 bg-clip-text text-transparent">
+            <h2 className="text-4xl md:text-5xl lg:text-[56px] font-medium tracking-[-0.035em] mb-6 leading-[1.08] max-w-3xl font-sans select-none bg-gradient-to-b from-neutral-900 via-neutral-700 to-neutral-400 dark:from-white dark:via-neutral-100 dark:to-neutral-500 bg-clip-text text-transparent">
               Go ship. Go sell. Go build. <br />
               We&apos;ll handle the inbox.
             </h2>
 
             {/* Description */}
-            <p className="text-[#8a8f98] text-sm md:text-base max-w-xl mb-10 leading-relaxed font-sans font-light select-none">
+            <p className="text-neutral-500 dark:text-[#8a8f98] text-sm md:text-base max-w-xl mb-10 leading-relaxed font-sans font-light select-none">
               Mailient removes email from your to-do list entirely. Connect your Gmail tonight — tomorrow morning, open one briefing. Not Gmail.
             </p>
 

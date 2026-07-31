@@ -32,13 +32,13 @@ const PricingSwitch = ({
 
   return (
     <div className={cn("flex justify-center", className)}>
-      <div className="relative z-10 mx-auto flex w-fit rounded-full bg-white/[0.02] border border-white/[0.08] p-1 shadow-2xl backdrop-blur-md">
+      <div className="relative z-10 mx-auto flex w-fit rounded-full bg-neutral-100 dark:bg-white/[0.02] border border-neutral-200 dark:border-white/[0.08] p-1 shadow-2xl backdrop-blur-md">
         <button
           type="button"
           onClick={() => handleSwitch("0")}
           className={cn(
             "relative z-10 w-fit sm:h-11 cursor-pointer h-9 rounded-full sm:px-6 px-4 sm:py-1.5 py-1 text-xs font-semibold transition-colors duration-300",
-            selected === "0" ? "text-[#030303]" : "text-neutral-400 hover:text-white"
+            selected === "0" ? "text-[#030303] dark:text-white" : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
           )}
         >
           {selected === "0" && (
@@ -56,7 +56,7 @@ const PricingSwitch = ({
           onClick={() => handleSwitch("1")}
           className={cn(
             "relative z-10 w-fit cursor-pointer sm:h-11 h-9 flex-shrink-0 rounded-full sm:px-6 px-4 sm:py-1.5 py-1 text-xs font-semibold transition-colors duration-300",
-            selected === "1" ? "text-[#030303]" : "text-neutral-400 hover:text-white"
+            selected === "1" ? "text-[#030303] dark:text-white" : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
           )}
         >
           {selected === "1" && (
@@ -171,7 +171,7 @@ export default function PricingSection3({
 
   return (
     <div
-      className="px-4 py-20 min-h-screen max-w-6xl mx-auto relative text-white"
+      className="px-4 py-20 min-h-screen max-w-6xl mx-auto relative text-neutral-900 dark:text-white"
       ref={pricingRef}
     >
       {/* Visual background textures inside pricing panel */}
@@ -207,7 +207,7 @@ export default function PricingSection3({
         animationNum={1}
         timelineRef={pricingRef}
         customVariants={revealVariants}
-        className="flex justify-center pb-16 mb-16 border-b border-white/[0.04]"
+        className="flex justify-center pb-16 mb-16 border-b border-neutral-200 dark:border-white/[0.04]"
       >
         <PricingSwitch onSwitch={togglePricingPeriod} className="shrink-0" />
       </TimelineContent>
@@ -238,8 +238,8 @@ export default function PricingSection3({
                 className={cn(
                   "relative w-full flex flex-col justify-between rounded-[32px] p-8 transition-all duration-500 overflow-hidden group backdrop-blur-md",
                   plan.popular
-                    ? "bg-white/[0.02] border-white/[0.15] ring-1 ring-white/10"
-                    : "bg-white/[0.01] border-white/[0.04] hover:border-white/[0.08]"
+                    ? "bg-white border-neutral-300 ring-1 ring-neutral-200 dark:bg-white/[0.02] dark:border-white/[0.15] dark:ring-white/10"
+                    : "bg-white border-neutral-200 hover:border-neutral-300 dark:bg-white/[0.01] dark:border-white/[0.04] dark:hover:border-white/[0.08]"
                 )}
               >
                 {/* Visual glow backdrop for popular lifetime card */}
@@ -249,7 +249,7 @@ export default function PricingSection3({
 
                 <CardContent className="pt-0 relative z-10 flex-grow">
                   <div className="flex items-center justify-between mb-8">
-                    <span className="text-[9px] font-black uppercase tracking-widest text-neutral-400">
+                    <span className="text-[9px] font-black uppercase tracking-widest text-neutral-500 dark:text-neutral-400">
                       {plan.id === "subscription" && !isYearly
                         ? "3-day free trial"
                         : plan.id === "subscription" && isYearly
@@ -270,7 +270,7 @@ export default function PricingSection3({
                   </div>
 
                   <div className="flex items-baseline mb-3">
-                    <span className="text-4xl md:text-5xl font-light text-white flex items-baseline">
+                    <span className="text-4xl md:text-5xl font-light text-neutral-900 dark:text-white flex items-baseline">
                       $
                       <NumberFlow
                         format={{
@@ -278,27 +278,27 @@ export default function PricingSection3({
                           maximumFractionDigits: isLifetime ? 0 : 2,
                         }}
                         value={displayPrice}
-                        className="text-4xl md:text-5xl font-light tracking-tight text-white inline-block"
+                        className="text-4xl md:text-5xl font-light tracking-tight text-neutral-900 dark:text-white inline-block"
                       />
                     </span>
-                    <span className="text-neutral-400 font-light text-xs ml-2">
+                    <span className="text-neutral-500 dark:text-neutral-400 font-light text-xs ml-2">
                       {isLifetime ? "one-time payment" : isWeekly ? "/week" : (isYearly ? "/month, billed yearly" : "/month")}
                     </span>
                   </div>
 
                   {plan.id === "subscription" && isYearly && (
-                    <p className="text-[10px] text-neutral-400 font-semibold mb-6">
+                    <p className="text-[10px] text-neutral-500 dark:text-neutral-400 font-semibold mb-6">
                       Billed as $199 annually (40% discount applied)
                     </p>
                   )}
 
                   <h3 className="text-xl font-medium mb-3">{plan.name}</h3>
-                  <p className="text-xs text-neutral-400 font-light leading-relaxed mb-8">
+                  <p className="text-xs text-neutral-500 dark:text-neutral-400 font-light leading-relaxed mb-8">
                     {plan.description}
                   </p>
 
-                  <div className="border-t border-white/[0.06] pt-6 space-y-4">
-                    <h4 className="font-semibold text-[10px] uppercase tracking-wider text-neutral-300">
+                  <div className="border-t border-neutral-200 dark:border-white/[0.06] pt-6 space-y-4">
+                    <h4 className="font-semibold text-[10px] uppercase tracking-wider text-neutral-600 dark:text-neutral-300">
                       What's Included:
                     </h4>
                     <ul className="space-y-3">
@@ -307,12 +307,12 @@ export default function PricingSection3({
                           <span className={cn(
                             "w-5 h-5 rounded-full border grid place-content-center mt-0.5 shrink-0 transition-colors",
                             plan.popular 
-                              ? "bg-white/10 border-white/20 text-white" 
-                              : "bg-white/5 border-white/10 text-white"
+                              ? "bg-neutral-900/10 border-neutral-900/20 text-neutral-900 dark:bg-white/10 dark:border-white/20 dark:text-white" 
+                              : "bg-neutral-900/5 border-neutral-900/10 text-neutral-900 dark:bg-white/5 dark:border-white/10 dark:text-white"
                           )}>
                             <Check className="w-3.5 h-3.5" />
                           </span>
-                          <span className="text-xs text-neutral-300 font-light leading-normal">
+                          <span className="text-xs text-neutral-600 dark:text-neutral-300 font-light leading-normal">
                             {feature}
                           </span>
                         </li>

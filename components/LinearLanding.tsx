@@ -37,6 +37,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
+import { useTheme } from "next-themes";
 import { ProgressiveBlur } from "@/components/ui/progressive-blur";
 import { Footer } from "@/components/Footer";
 import { SpecialText } from "@/components/ui/special-text";
@@ -78,7 +79,7 @@ function RotatingTagline() {
   const dynamicSpeed = Math.max(4, Math.floor(750 / (currentText.length * 4)));
 
   return (
-    <SpecialText speed={dynamicSpeed} delay={0} className="text-lg md:text-[22px] text-[#8a8f98] font-sans font-light tracking-wide text-center">
+    <SpecialText speed={dynamicSpeed} delay={0} className="text-lg md:text-[22px] text-neutral-500 dark:text-[#8a8f98] font-sans font-light tracking-wide text-center">
       {currentText}
     </SpecialText>
   );
@@ -175,7 +176,7 @@ function HeroVideoPlayer() {
     <div
       onClick={(e) => togglePlay(e)}
       className={cn(
-        "w-full max-w-4xl aspect-[16/9] bg-[#050505] border border-white/[0.08] rounded-[28px] mt-20 relative z-20 overflow-hidden group cursor-pointer transition-shadow duration-500",
+        "w-full max-w-4xl aspect-[16/9] bg-[#050505] border border-neutral-200 dark:border-white/[0.08] rounded-[28px] mt-20 relative z-20 overflow-hidden group cursor-pointer transition-shadow duration-500",
         isPlaying ? "shadow-none" : "shadow-[0_50px_100px_rgba(0,0,0,0.85)]"
       )}
     >
@@ -205,7 +206,7 @@ function HeroVideoPlayer() {
           <div className="flex items-center gap-4">
             <button
               onClick={(e) => togglePlay(e)}
-              className="hover:text-white transition-colors focus:outline-none"
+              className="hover:text-neutral-900 dark:text-white transition-colors focus:outline-none"
             >
               {isPlaying ? (
                 <Pause className="w-4 h-4 fill-white stroke-none" />
@@ -222,7 +223,7 @@ function HeroVideoPlayer() {
           <div className="flex items-center gap-4">
             <button
               onClick={(e) => toggleMute(e)}
-              className="hover:text-white transition-colors focus:outline-none"
+              className="hover:text-neutral-900 dark:text-white transition-colors focus:outline-none"
             >
               {isMuted ? (
                 <VolumeX className="w-4.5 h-4.5" />
@@ -232,7 +233,7 @@ function HeroVideoPlayer() {
             </button>
             <button
               onClick={(e) => toggleFullscreen(e)}
-              className="hover:text-white transition-colors focus:outline-none"
+              className="hover:text-neutral-900 dark:text-white transition-colors focus:outline-none"
             >
               <Maximize className="w-4 h-4" />
             </button>
@@ -274,6 +275,12 @@ function HeroVideoPlayer() {
 const STEP_DURATIONS = [30000, 20000, 30000]; // ms — all FALLBACKS [Home feed, Voice demo, Scheduling demo]
 
 export function LinearLanding() {
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+  const isDark = !mounted || resolvedTheme !== "light";
+  const navTheme = isDark ? "dark" : "light";
+  const blurBg = isDark ? "#000000" : "#f4f4f5";
   const router = useRouter();
   const [activeAccordion, setActiveAccordion] = useState<number | null>(null);
   const [activeStep, setActiveStep] = useState(0);
@@ -341,7 +348,7 @@ export function LinearLanding() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#000000] text-white flex flex-col items-center justify-start overflow-x-hidden font-inter strichpunkt-theme relative selection:bg-white selection:text-black">
+    <div className="min-h-screen bg-[#f4f4f5] dark:bg-[#000000] text-neutral-900 dark:text-white flex flex-col items-center justify-start overflow-x-hidden font-inter strichpunkt-theme relative selection:bg-neutral-900 selection:text-white dark:selection:bg-white dark:selection:text-black transition-colors duration-500">
       
       {/* 0. Custom Radar & Orbital Keyframes */}
       <style dangerouslySetInnerHTML={{ __html: `
@@ -384,7 +391,7 @@ export function LinearLanding() {
       </div>
 
       {/* Sticky Translucent Header */}
-      <Navbar theme="dark" />
+      <Navbar theme={navTheme} />
 
       {/* 1. HERO SECTION */}
       <section className="relative w-full pt-40 pb-0 md:pt-48 flex flex-col items-center text-center z-10 bg-gradient-to-b from-[#000000] via-[#09090b] to-[#16161a] overflow-hidden">
@@ -392,11 +399,11 @@ export function LinearLanding() {
         <div className="absolute inset-x-0 bottom-0 h-[250px] bg-[radial-gradient(ellipse_at_bottom,rgba(255,255,255,0.08),transparent_70%)] pointer-events-none z-10" />
 
         {/* Etheral Shadow Background Layer */}
-        <div className="absolute inset-0 z-0 pointer-events-none opacity-40 mix-blend-screen select-none">
+        <div className={`absolute inset-0 z-0 pointer-events-none select-none ${isDark ? "opacity-40 mix-blend-screen" : "opacity-30 mix-blend-multiply"}`}>
           <EtheralShadow
-            color="rgba(128, 128, 128, 1)"
+            color={isDark ? "rgba(128, 128, 128, 1)" : "rgba(120, 120, 130, 0.55)"}
             animation={{ scale: 100, speed: 90 }}
-            noise={{ opacity: 1, scale: 1.2 }}
+            noise={{ opacity: isDark ? 1 : 0.45, scale: 1.2 }}
             sizing="fill"
           />
         </div>
@@ -405,7 +412,7 @@ export function LinearLanding() {
           
           {/* Headline & Subtitle */}
           <BlurFade delay={0.1} duration={0.8} inView>
-            <h1 className="text-4xl md:text-[60px] font-medium tracking-[-0.035em] leading-[1.08] max-w-3xl bg-gradient-to-b from-white via-neutral-100 to-neutral-400 bg-clip-text text-transparent pb-2">
+            <h1 className="text-4xl md:text-[60px] font-medium tracking-[-0.035em] leading-[1.08] max-w-3xl bg-gradient-to-b from-neutral-900 via-neutral-700 to-neutral-400 dark:from-white dark:via-neutral-100 dark:to-neutral-400 bg-clip-text text-transparent pb-2">
               You run your company,
               <br />
               We run your inbox.
@@ -413,7 +420,7 @@ export function LinearLanding() {
           </BlurFade>
 
           <BlurFade delay={0.2} duration={0.8} inView>
-            <p className="text-lg md:text-[22px] text-[#8a8f98] leading-relaxed max-w-4xl mt-8 font-light min-h-[4rem] flex items-center justify-center">
+            <p className="text-lg md:text-[22px] text-neutral-500 dark:text-[#8a8f98] leading-relaxed max-w-4xl mt-8 font-light min-h-[4rem] flex items-center justify-center">
               <RotatingTagline />
             </p>
           </BlurFade>
@@ -431,7 +438,7 @@ export function LinearLanding() {
                   Watch Mailient handle a real inbox
                 </CircleExpandButton>
               </div>
-              <p className="text-[13px] text-[#8a8f98] tracking-wide">
+              <p className="text-[13px] text-neutral-500 dark:text-[#8a8f98] tracking-wide">
                 Card required · not charged for 3 days · cancel anytime · then $29/mo
               </p>
             </div>
@@ -445,7 +452,7 @@ export function LinearLanding() {
       </div>
 
       {/* Clear Separation Line at the bottom of the Metallic Hero */}
-      <div className="w-full h-px bg-gradient-to-r from-transparent via-white/[0.12] to-transparent relative z-25 mt-16 md:mt-24" />
+      <div className="w-full h-px bg-gradient-to-r from-transparent via-neutral-300 dark:via-white/[0.12] to-transparent relative z-25 mt-16 md:mt-24" />
 
       {/* NOTE: a PerspectiveMarquee sat here as a "trusted by" wall. It was
           mounted with no `items` prop, so it fell through to that component's
@@ -458,7 +465,7 @@ export function LinearLanding() {
     </section>
 
       {/* 1.5 THE PROBLEM — WHY MAILIENT MANIFESTO (moved up: problem right after hero, per positioning spec) */}
-      <section className="py-16 md:py-32 px-6 w-full max-w-4xl mx-auto border-t border-white/[0.06] z-10 relative flex flex-col items-center text-left">
+      <section className="py-16 md:py-32 px-6 w-full max-w-4xl mx-auto border-t border-neutral-200 dark:border-white/[0.06] z-10 relative flex flex-col items-center text-left">
         <BlurFade delay={0.1} duration={0.8} inView>
           <div className="w-full space-y-12">
           
@@ -469,25 +476,25 @@ export function LinearLanding() {
             subtitle="Every founder has lost money to an email they saw too late. You have too — you just can't name which one."
           />
 
-          <div className="space-y-8 text-neutral-400 font-sans font-light leading-relaxed text-base md:text-lg">
+          <div className="space-y-8 text-neutral-500 dark:text-neutral-600 dark:text-neutral-400 font-sans font-light leading-relaxed text-base md:text-lg">
             {/* Pain-point cards moved onto the shared .linear-grid-card-inner
                 treatment — they had their own one-off fill and radius. */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-10">
               <div className="linear-grid-card-inner linear-grid-card-lift p-6 space-y-2">
-                <span className="text-xs font-mono text-neutral-500">PAIN POINT 01</span>
-                <p className="text-sm text-neutral-200">The email that sat in your inbox for three days while you meant to reply.</p>
+                <span className="text-xs font-mono text-neutral-500 dark:text-neutral-500">PAIN POINT 01</span>
+                <p className="text-sm text-neutral-800 dark:text-neutral-200">The email that sat in your inbox for three days while you meant to reply.</p>
               </div>
               <div className="linear-grid-card-inner linear-grid-card-lift p-6 space-y-2">
-                <span className="text-xs font-mono text-neutral-500">PAIN POINT 02</span>
-                <p className="text-sm text-neutral-200">The client who went cold because you got buried in other threads.</p>
+                <span className="text-xs font-mono text-neutral-500 dark:text-neutral-500">PAIN POINT 02</span>
+                <p className="text-sm text-neutral-800 dark:text-neutral-200">The client who went cold because you got buried in other threads.</p>
               </div>
               <div className="linear-grid-card-inner linear-grid-card-lift p-6 space-y-2">
-                <span className="text-xs font-mono text-neutral-500">PAIN POINT 03</span>
-                <p className="text-sm text-neutral-200">The meeting that never got booked because the scheduling back-and-forth took a week.</p>
+                <span className="text-xs font-mono text-neutral-500 dark:text-neutral-500">PAIN POINT 03</span>
+                <p className="text-sm text-neutral-800 dark:text-neutral-200">The meeting that never got booked because the scheduling back-and-forth took a week.</p>
               </div>
               <div className="linear-grid-card-inner linear-grid-card-lift p-6 space-y-2">
-                <span className="text-xs font-mono text-neutral-500">PAIN POINT 04</span>
-                <p className="text-sm text-neutral-200">The Sunday night dread of opening Gmail and seeing 200 unread messages staring back.</p>
+                <span className="text-xs font-mono text-neutral-500 dark:text-neutral-500">PAIN POINT 04</span>
+                <p className="text-sm text-neutral-800 dark:text-neutral-200">The Sunday night dread of opening Gmail and seeing 200 unread messages staring back.</p>
               </div>
             </div>
 
@@ -501,10 +508,10 @@ export function LinearLanding() {
                 an essay. Nobody reads an essay on a landing page. What survives
                 is one number, one contrast, and one reframe, each on its own
                 line so the section can be SCANNED rather than read. */}
-            <p className="text-white font-normal text-xl md:text-2xl tracking-tight leading-snug text-center">
-              <span className="text-white font-medium">13 hours a week</span>, gone to your inbox.
+            <p className="text-neutral-900 dark:text-white font-normal text-xl md:text-2xl tracking-tight leading-snug text-center">
+              <span className="text-neutral-900 dark:text-white font-medium">13 hours a week</span>, gone to your inbox.
               <br className="hidden md:block" />
-              <span className="text-neutral-500"> A part-time job you never hired for.</span>
+              <span className="text-neutral-500 dark:text-neutral-500"> A part-time job you never hired for.</span>
             </p>
 
             <WordSoftReveal
@@ -514,7 +521,7 @@ export function LinearLanding() {
 
             <WordSoftReveal
               text="So Mailient isn't a faster inbox or another chat connector. It's a hire — at $29 a month, with a 3-day free trial."
-              className="text-white font-normal text-xl md:text-2xl tracking-tight leading-snug text-center pt-2"
+              className="text-neutral-900 dark:text-white font-normal text-xl md:text-2xl tracking-tight leading-snug text-center pt-2"
             />
 
           </div>
@@ -524,7 +531,7 @@ export function LinearLanding() {
       </section>
 
       {/* 2. THREE THINGS IT DOES INTERACTIVE SECTION */}
-      <section id="demos" ref={threeThingsRef} className="py-16 md:py-32 px-6 w-full max-w-7xl mx-auto border-t border-white/[0.06] z-10 relative text-left">
+      <section id="demos" ref={threeThingsRef} className="py-16 md:py-32 px-6 w-full max-w-7xl mx-auto border-t border-neutral-200 dark:border-white/[0.06] z-10 relative text-left">
         {/* This section previously had NO heading at all — it opened straight
             into the tab list, so a scroller hit three product demos with no
             statement of what they were demonstrating. */}
@@ -562,15 +569,15 @@ export function LinearLanding() {
               >
               <span className={cn(
                 "font-mono text-[10px] tracking-[0.2em] font-medium block transition-all duration-300",
-                activeStep === 0 ? "text-[#8a8f98] mb-3" : "text-neutral-700 group-hover:text-neutral-500 mb-1"
+                activeStep === 0 ? "text-neutral-500 dark:text-[#8a8f98] mb-3" : "text-neutral-700 group-hover:text-neutral-500 dark:text-neutral-500 mb-1"
               )}>
                 01 // Only what needs you
               </span>
               <h3 className={cn(
                 "font-medium tracking-tight leading-tight transition-all duration-500",
                 activeStep === 0
-                  ? "text-2xl md:text-[34px] text-white"
-                  : "text-xl md:text-2xl text-neutral-600 group-hover:text-neutral-400"
+                  ? "text-2xl md:text-[34px] text-neutral-900 dark:text-white"
+                  : "text-xl md:text-2xl text-neutral-500 dark:text-neutral-600 group-hover:text-neutral-500 dark:text-neutral-600 dark:text-neutral-400"
               )}>
                 Only the emails that deserve your attention.
               </h3>
@@ -582,7 +589,7 @@ export function LinearLanding() {
                   transition={{ duration: 0.4 }}
                   className="mt-4 space-y-4"
                 >
-                  <p className="text-sm md:text-base text-neutral-400 leading-relaxed font-light font-sans max-w-sm">
+                  <p className="text-sm md:text-base text-neutral-500 dark:text-neutral-600 dark:text-neutral-400 leading-relaxed font-light font-sans max-w-sm">
                     The few emails that need a decision. The rest is handled.
                   </p>
                   <CircleExpandButton
@@ -608,15 +615,15 @@ export function LinearLanding() {
               >
               <span className={cn(
                 "font-mono text-[10px] tracking-[0.2em] font-medium block transition-all duration-300",
-                activeStep === 1 ? "text-[#8a8f98] mb-3" : "text-neutral-700 group-hover:text-neutral-500 mb-1"
+                activeStep === 1 ? "text-neutral-500 dark:text-[#8a8f98] mb-3" : "text-neutral-700 group-hover:text-neutral-500 dark:text-neutral-500 mb-1"
               )}>
                 02 // Sounds exactly like you
               </span>
               <h3 className={cn(
                 "font-medium tracking-tight leading-tight transition-all duration-500",
                 activeStep === 1
-                  ? "text-2xl md:text-[34px] text-white"
-                  : "text-xl md:text-2xl text-neutral-600 group-hover:text-neutral-400"
+                  ? "text-2xl md:text-[34px] text-neutral-900 dark:text-white"
+                  : "text-xl md:text-2xl text-neutral-500 dark:text-neutral-600 group-hover:text-neutral-500 dark:text-neutral-600 dark:text-neutral-400"
               )}>
                 Replies that sound like you.
               </h3>
@@ -628,7 +635,7 @@ export function LinearLanding() {
                   transition={{ duration: 0.4 }}
                   className="mt-4 space-y-4"
                 >
-                  <p className="text-sm md:text-base text-neutral-400 leading-relaxed font-light font-sans max-w-sm">
+                  <p className="text-sm md:text-base text-neutral-500 dark:text-neutral-600 dark:text-neutral-400 leading-relaxed font-light font-sans max-w-sm">
                     Learned from your sent mail. Ask for 15 at once — it writes all 15.
                   </p>
                   <CircleExpandButton
@@ -654,15 +661,15 @@ export function LinearLanding() {
               >
               <span className={cn(
                 "font-mono text-[10px] tracking-[0.2em] font-medium block transition-all duration-300",
-                activeStep === 2 ? "text-[#8a8f98] mb-3" : "text-neutral-700 group-hover:text-neutral-500 mb-1"
+                activeStep === 2 ? "text-neutral-500 dark:text-[#8a8f98] mb-3" : "text-neutral-700 group-hover:text-neutral-500 dark:text-neutral-500 mb-1"
               )}>
                 03 // While you sleep
               </span>
               <h3 className={cn(
                 "font-medium tracking-tight leading-tight transition-all duration-500",
                 activeStep === 2
-                  ? "text-2xl md:text-[34px] text-white"
-                  : "text-xl md:text-2xl text-neutral-600 group-hover:text-neutral-400"
+                  ? "text-2xl md:text-[34px] text-neutral-900 dark:text-white"
+                  : "text-xl md:text-2xl text-neutral-500 dark:text-neutral-600 group-hover:text-neutral-500 dark:text-neutral-600 dark:text-neutral-400"
               )}>
                 Repetitive work happens while you sleep.
               </h3>
@@ -674,7 +681,7 @@ export function LinearLanding() {
                   transition={{ duration: 0.4 }}
                   className="mt-4 space-y-4"
                 >
-                  <p className="text-sm md:text-base text-neutral-400 leading-relaxed font-light font-sans max-w-sm">
+                  <p className="text-sm md:text-base text-neutral-500 dark:text-neutral-600 dark:text-neutral-400 leading-relaxed font-light font-sans max-w-sm">
                     Describe the job, pick when it runs. Set it once.
                   </p>
                   <CircleExpandButton
@@ -692,7 +699,7 @@ export function LinearLanding() {
 
           {/* Right panel: dynamic high-contrast visual display */}
           <BlurFade delay={0.25} duration={0.8} inView className="lg:col-span-8 w-full h-[440px] md:h-[580px]">
-            <div id="demo-panel" role="tabpanel" className="bg-[#050505] border border-white/[0.08] rounded-[28px] p-5 md:p-10 shadow-2xl h-full flex flex-col justify-between relative overflow-hidden">
+            <div id="demo-panel" role="tabpanel" className="bg-[#050505] border border-neutral-200 dark:border-white/[0.08] rounded-[28px] p-5 md:p-10 shadow-2xl h-full flex flex-col justify-between relative overflow-hidden">
             {/* Custom Dither Dot Grid Overlay */}
             <div className="absolute inset-y-0 left-0 w-[45%] pointer-events-none opacity-[0.08] mix-blend-screen select-none"
                  style={{
@@ -786,7 +793,7 @@ export function LinearLanding() {
     </section>
 
       {/* 3.5 HOW MAILIENT WORKS — three steps, no jargon */}
-      <section className="py-16 md:py-24 px-6 w-full max-w-5xl mx-auto border-t border-white/[0.06] z-10 relative">
+      <section className="py-16 md:py-24 px-6 w-full max-w-5xl mx-auto border-t border-neutral-200 dark:border-white/[0.06] z-10 relative">
         <BlurFade delay={0.1} duration={0.8} inView>
           <SectionHeader
             pill="How it works"
@@ -803,33 +810,33 @@ export function LinearLanding() {
               <span className="gradient-tile w-12 h-12 relative z-10">
                 <Mail className="w-5 h-5 text-white" />
               </span>
-              <span className="font-mono text-[10px] tracking-[0.2em] text-neutral-600 font-bold block relative z-10">STEP 1</span>
-              <h3 className="text-lg font-semibold text-white relative z-10">Connect Gmail.</h3>
+              <span className="font-mono text-[10px] tracking-[0.2em] text-neutral-500 dark:text-neutral-600 font-bold block relative z-10">STEP 1</span>
+              <h3 className="text-lg font-semibold text-neutral-900 dark:text-white relative z-10">Connect Gmail.</h3>
               <WordSoftReveal
                 text="Two minutes, secure Google sign-in. Your email stays in Gmail — nothing moves, nothing to configure."
-                className="text-sm text-neutral-400 font-light leading-relaxed font-sans relative z-10"
+                className="text-sm text-neutral-500 dark:text-neutral-600 dark:text-neutral-400 font-light leading-relaxed font-sans relative z-10"
               />
             </div>
             <div className="linear-grid-card linear-grid-card-lift p-8 space-y-4">
               <span className="gradient-tile w-12 h-12 relative z-10">
                 <Eye className="w-5 h-5 text-white" />
               </span>
-              <span className="font-mono text-[10px] tracking-[0.2em] text-neutral-600 font-bold block relative z-10">STEP 2</span>
-              <h3 className="text-lg font-semibold text-white relative z-10">It learns how you write.</h3>
+              <span className="font-mono text-[10px] tracking-[0.2em] text-neutral-500 dark:text-neutral-600 font-bold block relative z-10">STEP 2</span>
+              <h3 className="text-lg font-semibold text-neutral-900 dark:text-white relative z-10">It learns how you write.</h3>
               <WordSoftReveal
                 text="From your last 90 days of sent mail: your greetings, your rhythm, your sign-offs. Drafts start sounding like you, not like AI."
-                className="text-sm text-neutral-400 font-light leading-relaxed font-sans relative z-10"
+                className="text-sm text-neutral-500 dark:text-neutral-600 dark:text-neutral-400 font-light leading-relaxed font-sans relative z-10"
               />
             </div>
             <div className="linear-grid-card linear-grid-card-lift p-8 space-y-4">
               <span className="gradient-tile w-12 h-12 relative z-10">
                 <Inbox className="w-5 h-5 text-white" />
               </span>
-              <span className="font-mono text-[10px] tracking-[0.2em] text-neutral-600 font-bold block relative z-10">STEP 3</span>
-              <h3 className="text-lg font-semibold text-white relative z-10">Mornings arrive organized.</h3>
+              <span className="font-mono text-[10px] tracking-[0.2em] text-neutral-500 dark:text-neutral-600 font-bold block relative z-10">STEP 3</span>
+              <h3 className="text-lg font-semibold text-neutral-900 dark:text-white relative z-10">Mornings arrive organized.</h3>
               <WordSoftReveal
                 text="Overnight it reads everything, drafts the replies, books the meetings, chases the silence — and leaves you one briefing. Nothing sends without your approval."
-                className="text-sm text-neutral-400 font-light leading-relaxed font-sans relative z-10"
+                className="text-sm text-neutral-500 dark:text-neutral-600 dark:text-neutral-400 font-light leading-relaxed font-sans relative z-10"
               />
             </div>
           </div>
@@ -842,7 +849,7 @@ export function LinearLanding() {
           27-second video inside step 1 would both unbalance it and hide the
           clip. Here the recording is the whole point of the section.
           Copy is one line — the video is the argument. */}
-      <section id="connect-gmail" className="py-16 md:py-32 px-6 w-full max-w-6xl mx-auto border-t border-white/[0.06] z-10 relative">
+      <section id="connect-gmail" className="py-16 md:py-32 px-6 w-full max-w-6xl mx-auto border-t border-neutral-200 dark:border-white/[0.06] z-10 relative">
         <BlurFade delay={0.1} duration={0.8} inView>
           <SectionHeader
             pill="Connect Gmail"
@@ -866,7 +873,7 @@ export function LinearLanding() {
       </section>
 
       {/* 4. FLAGSHIP MEET ARCUS SECTION */}
-      <section className="py-20 md:py-36 px-6 w-full max-w-7xl mx-auto border-t border-white/[0.06] z-10 relative">
+      <section className="py-20 md:py-36 px-6 w-full max-w-7xl mx-auto border-t border-neutral-200 dark:border-white/[0.06] z-10 relative">
         <BlurFade delay={0.1} duration={0.9} inView>
           <SectionHeader
             pill="Meet Arcus"
@@ -896,7 +903,7 @@ export function LinearLanding() {
               {/* Was one dense run-on sentence that buried four capabilities and
                   four integrations in a single breath. Same content, broken
                   into a scannable list — a landing page gets skimmed, not read. */}
-              <p className="text-base md:text-lg text-white font-normal leading-snug tracking-tight max-w-xl">
+              <p className="text-base md:text-lg text-neutral-900 dark:text-white font-normal leading-snug tracking-tight max-w-xl">
                 Tell it &ldquo;clear my inbox and prep tomorrow.&rdquo;
               </p>
 
@@ -907,14 +914,14 @@ export function LinearLanding() {
                   "Books the calls",
                   "Chases the follow-ups",
                 ].map((item) => (
-                  <li key={item} className="flex items-center gap-3 text-sm text-neutral-400 font-light font-sans">
-                    <Check className="w-3.5 h-3.5 text-white shrink-0" />
+                  <li key={item} className="flex items-center gap-3 text-sm text-neutral-500 dark:text-neutral-600 dark:text-neutral-400 font-light font-sans">
+                    <Check className="w-3.5 h-3.5 text-neutral-900 dark:text-white shrink-0" />
                     {item}
                   </li>
                 ))}
               </ul>
 
-              <p className="text-sm text-neutral-500 font-light font-sans max-w-xl">
+              <p className="text-sm text-neutral-500 dark:text-neutral-500 font-light font-sans max-w-xl">
                 Then shows you the few things that still need you.
               </p>
 
@@ -952,7 +959,7 @@ export function LinearLanding() {
       </section>
 
       {/* 3. RADAR CIRCULAR APP ORBITS INTEGRATIONS */}
-      <section id="connectors" className="py-16 md:py-32 px-6 w-full max-w-7xl mx-auto border-t border-white/[0.06] z-10 relative text-center flex flex-col items-center overflow-hidden">
+      <section id="connectors" className="py-16 md:py-32 px-6 w-full max-w-7xl mx-auto border-t border-neutral-200 dark:border-white/[0.06] z-10 relative text-center flex flex-col items-center overflow-hidden">
         
         {/* Graphite and White glassmorphism styles */}
         <style dangerouslySetInnerHTML={{ __html: `
@@ -1106,7 +1113,7 @@ export function LinearLanding() {
                 alt="Mailient Hub" 
                 className="w-12 h-12 object-cover relative z-10 transition-transform duration-500 group-hover:scale-105"
               />
-              <div className="absolute bottom-full mb-4 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-xl bg-neutral-950 border border-white/10 text-white font-mono text-[10px] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none shadow-2xl">
+              <div className="absolute bottom-full mb-4 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-xl bg-neutral-950 border border-neutral-200 dark:border-white/10 text-neutral-900 dark:text-white font-mono text-[10px] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none shadow-2xl">
                 Mailient Core Hub
               </div>
             </div>
@@ -1121,7 +1128,7 @@ export function LinearLanding() {
                     <path d="M458 512H56c-30.4 0-55-24.6-55-55V55C1 24.6 25.6 0 56 0h402c30.4 0 55 24.6 55 55v402c0 30.4-24.6 55-55 55" style={{ fill: '#fff' }}/>
                     <path d="M162.8 347.3c-50.4 0-88.4-39.9-88.4-89.3s35.9-89.6 88.4-89.6c27.9 0 47 8.6 62.1 28l-24.3 20.1c-10.1-10.8-22.5-16.2-37.8-16.2-34.1 0-52.8 26.1-52.8 57.6s20.5 57.1 52.8 57.1c15.1 0 28-5.3 38.4-16.2l23.9 21c-14.5 18.9-34.3 27.5-62.3 27.5m166.4-131.2h32.7v128.1h-32.7v-18.7c-6.7 13.2-18.1 22.2-39.7 22.2-34.6 0-62.3-30.1-62.3-66.9 0-37 27.7-66.9 62.3-66.9 21.5 0 33 8.9 39.7 22.2zm1.1 64.5c0-20-13.8-36.6-35.4-36.6-20.8 0-34.4 16.7-34.4 36.6 0 19.4 13.6 36.6 34.4 36.6 21.4 0 35.4-16.7 35.4-36.6M385 164.3h32.7v179.6H385z" style={{ fill: '#242424' }}/>
                   </svg>
-                  <div className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded bg-neutral-950 border border-white/10 text-white font-mono text-[9px] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-xl z-30">
+                  <div className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded bg-neutral-950 border border-neutral-200 dark:border-white/10 text-neutral-900 dark:text-white font-mono text-[9px] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-xl z-30">
                     Cal.com Booking
                   </div>
                 </div>
@@ -1135,7 +1142,7 @@ export function LinearLanding() {
                     <path d="M41.8 22.1 325.1 1.2c34.8-3 43.7-1 65.6 14.9l90.4 63.7c14.9 11 19.9 13.9 19.9 25.9v349.4c0 21.9-8 34.9-35.8 36.8l-329 19.9c-20.9 1-30.8-2-41.8-15.9l-66.6-86.6C15.9 393.4 11 381.4 11 367.5V56.9c0-17.9 7.9-32.8 30.8-34.8" style={{ fill: '#fff' }}/>
                     <path d="M325.1 1.2 41.8 22.1C18.9 24.1 11 39 11 56.9v310.6c0 13.9 5 25.9 16.9 41.8l66.6 86.6c10.9 13.9 20.9 16.9 41.8 15.9l329-19.9c27.8-2 35.8-14.9 35.8-36.8V105.7c0-11.3-4.5-14.6-17.6-24.2l-92.7-65.4C368.8.2 359.9-1.8 325.1 1.2M143.7 100c-26.9 1.8-33 2.2-48.2-10.2L56.7 58.9c-3.9-4-2-9 8-10L337 29.1c22.9-2 34.8 6 43.7 12.9l46.7 33.8c2 1 7 7 1 7L147.2 99.7zm-31.3 352.1V155.5c0-13 4-18.9 15.9-19.9l323-18.9c11-1 15.9 6 15.9 18.9v294.6c0 13-2 23.9-19.9 24.9L138.2 473c-17.9 1-25.8-5-25.8-20.9m305.1-280.7c2 9 0 17.9-9 18.9l-14.9 3v219c-12.9 7-24.8 10.9-34.8 10.9-15.9 0-19.9-5-31.8-19.9L229.6 250v148.3l30.8 7s0 17.9-24.9 17.9l-68.6 4c-2-4 0-13.9 6.9-15.9l17.9-5V210.2l-24.8-2c-2-9 3-21.9 16.9-22.9l73.6-5 101.4 155.3V198.3l-25.8-3c-2-11 6-18.9 15.9-19.9z" style={{ fillRule: 'evenodd', clipRule: 'evenodd' }}/>
                   </svg>
-                  <div className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded bg-neutral-950 border border-white/10 text-white font-mono text-[9px] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-xl z-30">
+                  <div className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded bg-neutral-950 border border-neutral-200 dark:border-white/10 text-neutral-900 dark:text-white font-mono text-[9px] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-xl z-30">
                     Notion Workspace
                   </div>
                 </div>
@@ -1152,7 +1159,7 @@ export function LinearLanding() {
                     <path d="M227.066 252.787C218.406 253.322 215.462 259.932 215.474 270.09V271.876C214.441 272.119 213.576 272.349 212.53 272.41C206.291 272.799 201.79 267.733 201.778 258.644C201.766 244.744 214.221 231.658 237.952 230.188C259.081 228.875 272.631 257.089C272.643 270.636 261.392 280.247 250.311 283.26C271.098 284.282 279.771 295.873 279.795 310.66C279.819 335.97 261.307 350.319 232.722 352.106L232.029 352.154C210.547 353.491 195.465 345.338 195.453 331.255C195.453 323.236 201.327 316.444 210.159 315.897C210.852 315.849 211.545 315.994 212.238 315.946C213.99 330.283 223.697 335.557 233.391 334.961C242.745 334.378 249.325 328.084 249.313 319.165V318.813C249.301 304.901 237.685 304.209 220.193 303.516L217.408 286.93C233.683 283.954 241.82 278.631 241.808 269.008C241.808 258.668 236.067 252.253 227.066 252.811V252.787Z" fill="black"/>
                     <path d="M305.181 245.959C287.859 250.965 284.041 243.358 285.938 235.388C296.325 232.958 323.341 224.854 333.558 221.196L333.68 327.987L352.57 330.732C352.57 337.683 348.605 342.032 341.501 342.482C335.614 342.846 321.93 343.345 315.349 343.758C305.132 344.39 286.424 345.921 286.424 345.921C285.901 344.524 285.731 341.862C285.731 338.472 287.105 334.998 291.606 333.478L305.29 329.056L305.193 245.971L305.181 245.959Z" fill="black"/>
                   </svg>
-                  <div className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded bg-neutral-950 border border-white/10 text-white font-mono text-[9px] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-xl z-30">
+                  <div className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded bg-neutral-950 border border-neutral-200 dark:border-white/10 text-neutral-900 dark:text-white font-mono text-[9px] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-xl z-30">
                     Notion Calendar
                   </div>
                 </div>
@@ -1173,7 +1180,7 @@ export function LinearLanding() {
                     <polygon fill="#2a83f8" points="77.916 66.381 75.53 63.003 84.021 56.868 87.243 56.868 87.243 85.747 82.626 85.747 82.626 62.772 77.916 66.381"></polygon>
                     <path fill="#2a83f8" d="M67.29834,70.55785A7.88946,7.88946,0,0,0,70.78,64.12535c0-4.49-4-8.12-8.94-8.12a8.77525,8.77525,0,0,0-8.74548,6.45379l3.96252,1.58258a4.41779,4.41779,0,0,1,4.473-3.51635,4.138,4.138,0,1,1,.06256,8.24426v.00513h-.0559l-.00666.00061-.00964-.00061H59.15v3.87677h2.70642L61.88,72.65a4.70514,4.70514,0,1,1,0,9.37,5.35782,5.35782,0,0,1-3.96588-1.69354,4.59717,4.59717,0,0,1-.80408-1.2442l-.69757-1.69946L52.23005,79c.62,4.33,4.69,7.68,9.61,7.68,5.36,0,9.7-3.96,9.7-8.83A8.63346,8.63346,0,0,0,67.29834,70.55785Z"></path>
                   </svg>
-                  <div className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded bg-neutral-950 border border-white/10 text-white font-mono text-[9px] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-xl z-30">
+                  <div className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded bg-neutral-950 border border-neutral-200 dark:border-white/10 text-neutral-900 dark:text-white font-mono text-[9px] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-xl z-30">
                     Google Calendar
                   </div>
                 </div>
@@ -1193,7 +1200,7 @@ export function LinearLanding() {
                     <path fill="#00ac47" d="M29,8.26V23.74a.9989.9989,0,0,1-1.67.74L24,21.45,18,16l5.5-5,.5-.45,3.33-3.03A.9989.9989,0,0,1,29,8.26Z"></path>
                     <polygon fill="#188038" points="24 10.55 24 21.45 18 16 23.5 11 24 10.55"></polygon>
                   </svg>
-                  <div className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded bg-neutral-950 border border-white/10 text-white font-mono text-[9px] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-xl z-30">
+                  <div className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded bg-neutral-950 border border-neutral-200 dark:border-white/10 text-neutral-900 dark:text-white font-mono text-[9px] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-xl z-30">
                     Google Meet
                   </div>
                 </div>
@@ -1209,7 +1216,7 @@ export function LinearLanding() {
                     <path d="M100.745 47.281c0-7.33 5.978-13.317 13.309-13.317 7.33 0 13.317 5.987 13.317 13.317s-5.987 13.317-13.317 13.317h-13.309zm-6.709 0c0 7.33-5.987 13.317-13.317 13.317s-13.317-5.986-13.317-13.317V13.946C67.402 6.616 73.388.63 80.719.63c7.33 0 13.317 5.987 13.317 13.317zm0 0" fill="#2eb57d"/>
                     <path d="M80.719 100.745c7.33 0 13.317 5.978 13.317 13.309 0 7.33-5.987 13.317-13.317 13.317s-13.317-5.987-13.317-13.317v-13.309zm0-6.709c-7.33 0-13.317-5.987-13.317-13.317s5.986-13.317 13.317-13.317h33.335c7.33 0 13.317 5.986 13.317 13.317 0 7.33-5.987 13.317-13.317 13.317zm0 0" fill="#ebb02e"/>
                   </svg>
-                  <div className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded bg-neutral-950 border border-white/10 text-white font-mono text-[9px] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-xl z-30">
+                  <div className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded bg-neutral-950 border border-neutral-200 dark:border-white/10 text-neutral-900 dark:text-white font-mono text-[9px] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-xl z-30">
                     Slack Workspaces
                   </div>
                 </div>
@@ -1223,7 +1230,7 @@ export function LinearLanding() {
       </section>
 
       {/* 5. PRODUCT CLAIMS + SECURITY STRIP */}
-      <section className="py-16 md:py-32 px-6 w-full max-w-7xl mx-auto border-t border-white/[0.06] z-10 relative">
+      <section className="py-16 md:py-32 px-6 w-full max-w-7xl mx-auto border-t border-neutral-200 dark:border-white/[0.06] z-10 relative">
         <BlurFade delay={0.1} duration={0.8} inView>
           <div className="max-w-5xl mx-auto">
           
@@ -1235,33 +1242,33 @@ export function LinearLanding() {
               labeled product claims. */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-left mb-12 md:mb-24">
             <div className="linear-grid-card linear-grid-card-lift p-8 relative text-left">
-              <span className="font-mono text-[10px] tracking-[0.2em] text-neutral-500 uppercase block mb-4 relative z-10">
+              <span className="font-mono text-[10px] tracking-[0.2em] text-neutral-500 dark:text-neutral-500 uppercase block mb-4 relative z-10">
                 What mornings become
               </span>
-              <p className="text-sm text-neutral-300 font-light leading-relaxed font-sans relative z-10">
+              <p className="text-sm text-neutral-700 dark:text-neutral-300 font-light leading-relaxed font-sans relative z-10">
                 You open Mailient and there are only two emails left to think about. The other two hundred are read, sorted, answered, or archived — each with a note explaining what happened to it.
               </p>
             </div>
 
             <div className="linear-grid-card linear-grid-card-lift p-8 relative text-left">
-              <span className="font-mono text-[10px] tracking-[0.2em] text-neutral-500 uppercase block mb-4 relative z-10">
+              <span className="font-mono text-[10px] tracking-[0.2em] text-neutral-500 dark:text-neutral-500 uppercase block mb-4 relative z-10">
                 Why it&apos;s different
               </span>
-              <p className="text-sm text-neutral-300 font-light leading-relaxed font-sans relative z-10">
+              <p className="text-sm text-neutral-700 dark:text-neutral-300 font-light leading-relaxed font-sans relative z-10">
                 It learns who you are — your VIPs, your voice, what&apos;s strategic versus routine — and gets sharper every run. You&apos;re not operating software. You hired someone.
               </p>
             </div>
           </div>
 
           {/* Security Strip */}
-          <div className="w-full linear-grid-card !rounded-2xl py-4 px-6 hover:shadow-[0_20px_40px_rgba(16,185,129,0.06)] hover:border-white/[0.1] transition-all duration-300 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4 text-left">
+          <div className="w-full linear-grid-card !rounded-2xl py-4 px-6 hover:shadow-[0_20px_40px_rgba(16,185,129,0.06)] hover:border-neutral-200 dark:border-white/[0.1] transition-all duration-300 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4 text-left">
             <div className="flex items-center gap-3">
               <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span className="text-[11px] text-neutral-400 font-sans">
+              <span className="text-[11px] text-neutral-500 dark:text-neutral-600 dark:text-neutral-400 font-sans">
                 Your emails are encrypted in your browser before they leave it. Personal data is stripped before any AI sees it.
               </span>
             </div>
-            <Link href="/security" className="text-[10px] text-white font-semibold hover:underline flex items-center gap-1 shrink-0 whitespace-nowrap">
+            <Link href="/security" className="text-[10px] text-neutral-900 dark:text-white font-semibold hover:underline flex items-center gap-1 shrink-0 whitespace-nowrap">
               Read Security Standard
               <ChevronRight className="w-3.5 h-3.5" />
             </Link>
@@ -1286,7 +1293,7 @@ export function LinearLanding() {
       </BlurFade>
 
       {/* MODULAR PRICING SECTION — id is load-bearing: in-page CTAs target #pricing */}
-      <section id="pricing" className="w-full border-t border-white/[0.06] z-10 relative">
+      <section id="pricing" className="w-full border-t border-neutral-200 dark:border-white/[0.06] z-10 relative">
         <BlurFade delay={0.1} duration={0.8} inView>
           <PricingSection3
             handleSelectPlan={(planId) => {
@@ -1297,7 +1304,7 @@ export function LinearLanding() {
       </section>
 
       {/* FAQ ACCORDION SECTION — objection handling, directly after the price */}
-      <section className="py-16 md:py-32 px-6 w-full max-w-7xl mx-auto border-t border-white/[0.06] z-10 relative">
+      <section className="py-16 md:py-32 px-6 w-full max-w-7xl mx-auto border-t border-neutral-200 dark:border-white/[0.06] z-10 relative">
         <BlurFade delay={0.1} duration={0.8} inView>
           {/* Was a 4/8 split with the header stranded in the left column. Now
               the shared centered header over a single measured column, which
@@ -1312,7 +1319,7 @@ export function LinearLanding() {
 
           <div className="flex flex-col space-y-4 w-full max-w-3xl mx-auto">
             {landingFaqs.map((faq, index) => (
-              <div key={index} className="border-b border-white/[0.06] pb-4 text-left">
+              <div key={index} className="border-b border-neutral-200 dark:border-white/[0.06] pb-4 text-left">
                 {/* Real <button> with aria-expanded/aria-controls — this was a
                     div+onClick, so the entire FAQ was unreachable by keyboard
                     and invisible to screen readers. */}
@@ -1322,10 +1329,10 @@ export function LinearLanding() {
                   aria-expanded={activeAccordion === index}
                   aria-controls={`faq-panel-${index}`}
                   id={`faq-trigger-${index}`}
-                  className="w-full flex items-center justify-between gap-4 py-4 cursor-pointer text-sm font-semibold text-white text-left hover:text-neutral-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/40 rounded-sm"
+                  className="w-full flex items-center justify-between gap-4 py-4 cursor-pointer text-sm font-semibold text-neutral-900 dark:text-white text-left hover:text-neutral-700 dark:text-neutral-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/40 rounded-sm"
                 >
                   <span>{faq.q}</span>
-                  <span aria-hidden="true" className="text-xs text-neutral-500 font-mono shrink-0">{activeAccordion === index ? "[-]" : "[+]"}</span>
+                  <span aria-hidden="true" className="text-xs text-neutral-500 dark:text-neutral-500 font-mono shrink-0">{activeAccordion === index ? "[-]" : "[+]"}</span>
                 </button>
                 <AnimatePresence>
                   {activeAccordion === index && (
@@ -1339,7 +1346,7 @@ export function LinearLanding() {
                       transition={{ duration: 0.3 }}
                       className="overflow-hidden"
                     >
-                      <div className="text-sm text-[#8a8f98] font-light leading-relaxed font-sans pb-4 min-h-[3rem]">
+                      <div className="text-sm text-neutral-500 dark:text-[#8a8f98] font-light leading-relaxed font-sans pb-4 min-h-[3rem]">
                         {faq.a}
                       </div>
                     </motion.div>
@@ -1364,8 +1371,8 @@ export function LinearLanding() {
           floating nav is back: it gives that bar a surface to sit against
           instead of leaving it floating on bare black. Both sit at z-40, under
           the floating nav's z-[100]. */}
-      <ProgressiveBlur position="top" backgroundColor="#000000" height="72px" blurAmount="10px" className="fixed z-40" />
-      <ProgressiveBlur position="bottom" backgroundColor="#000000" height="96px" blurAmount="10px" className="fixed z-40" />
+      <ProgressiveBlur position="top" backgroundColor={blurBg} height="72px" blurAmount="10px" className="fixed z-40" />
+      <ProgressiveBlur position="bottom" backgroundColor={blurBg} height="96px" blurAmount="10px" className="fixed z-40" />
 
       {/* Floating navigation — restored at the founder's request after being
           pulled in 4918b3b. */}
