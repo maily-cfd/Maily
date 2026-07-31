@@ -89,6 +89,24 @@ function cleanHtml(html: string) {
 }
 
 /**
+ * Wrap raw email HTML in a light-only document so dark app theme cannot
+ * force a black iframe canvas (black text on black = blank viewer).
+ */
+function buildEmailSrcDoc(html: string) {
+    const safe = html || '';
+    return `<!DOCTYPE html><html><head><meta charset="utf-8"/><meta name="color-scheme" content="light only"/><meta name="supported-color-schemes" content="light"/><base target="_blank" rel="noopener noreferrer"/><style>
+html,body{margin:0;padding:16px;background:#ffffff!important;color:#1a1a1a!important;color-scheme:light only;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:15px;line-height:1.6;word-break:break-word;}
+img{max-width:100%;height:auto;}a{color:#2563eb;}
+</style></head><body>${safe}</body></html>`;
+}
+
+function emailBodyLooksLikeHtml(body: string | undefined | null, isHtmlFlag?: boolean) {
+    if (isHtmlFlag) return true;
+    if (!body) return false;
+    return /<\/?[a-z][\s\S]*>/i.test(body);
+}
+
+/**
  * Detect and wrap URLs in plain text with premium styling for actions
  */
 function linkify(text: string) {
@@ -1010,16 +1028,26 @@ export function GmailInterfaceFixed({ forceTraditionalView = false }: GmailInter
     };
 
     const handleTraditionalEmailClick = async (emailId: string) => {
-        setSelectedTraditionalEmail(null);
+        // Prefill header from the list row so a failed detail fetch never shows
+        // a hollow "Sender" shell with a black body.
+        const preview = traditionalEmails.find((e) => e.id === emailId);
+        setSelectedTraditionalEmail(preview ? { ...preview, body: preview.body || '', isHtml: !!preview.isHtml } : null);
         setIsTraditionalModalOpen(true);
         setIsSummarizing(true);
         try {
             const response = await fetch(`/api/gmail/messages/${emailId}`);
-            const data = await response.json();
+            const data = await response.json().catch(() => ({}));
+            if (!response.ok || data?.error) {
+                throw new Error(data?.message || data?.error || 'Failed to load email details');
+            }
+            if (!data?.id) {
+                throw new Error('Email response was incomplete');
+            }
             setSelectedTraditionalEmail(data);
         } catch (error) {
             console.error('Error fetching email details:', error);
-            toast.error('Failed to load email details');
+            toast.error(error instanceof Error ? error.message : 'Failed to load email details');
+            setSelectedTraditionalEmail(null);
             setIsTraditionalModalOpen(false);
         } finally {
             setIsSummarizing(false);
@@ -2920,35 +2948,32 @@ export function GmailInterfaceFixed({ forceTraditionalView = false }: GmailInter
                                                                  ) : selectedTraditionalEmail ? (
                                                                      <div className={`mx-auto space-y-12 pb-20 transition-all duration-500 ${isModalExpanded ? 'max-w-6xl' : 'max-w-4xl'}`}>
                                                                          <div className="traditional-email-content font-sans text-lg">
-                                                                             {selectedTraditionalEmail.isHtml ? (
-                                                                                 <div className="bg-white dark:bg-white/95 rounded-xl overflow-hidden shadow-inner border border-neutral-200 dark:border-white/10 ring-1 ring-black/5 flex">
+                                                                             {!selectedTraditionalEmail.body ? (
+                                                                                 <div className="rounded-2xl border border-neutral-200 dark:border-white/10 bg-white/5 px-6 py-16 text-center text-neutral-500 dark:text-neutral-400">
+                                                                                     No message body available for this email.
+                                                                                 </div>
+                                                                             ) : emailBodyLooksLikeHtml(selectedTraditionalEmail.body, selectedTraditionalEmail.isHtml) ? (
+                                                                                 <div className="bg-white rounded-xl overflow-hidden shadow-inner border border-neutral-200 dark:border-white/10 ring-1 ring-black/5 flex">
                                                                                      <iframe
                                                                                          title="Email Content"
-                                                                                         srcDoc={selectedTraditionalEmail.body}
-                                                                                         className={`w-full border-none bg-transparent transition-all duration-500 ${isModalExpanded ? 'min-h-[80vh]' : 'min-h-[60vh]'}`}
+                                                                                         srcDoc={buildEmailSrcDoc(selectedTraditionalEmail.body)}
+                                                                                         className={`w-full border-none bg-white transition-all duration-500 ${isModalExpanded ? 'min-h-[80vh]' : 'min-h-[60vh]'}`}
                                                                                          sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin"
-                                                                                         style={{ backgroundColor: 'transparent', colorSchemes: 'light dark' } as any}
+                                                                                         style={{ backgroundColor: '#ffffff', colorScheme: 'light' }}
                                                                                          onLoad={(e) => {
                                                                                              const iframe = e.target as HTMLIFrameElement;
                                                                                              if (iframe.contentWindow) {
-                                                                                                 // Add base target blank so all links open in new tab
-                                                                                                 const base = iframe.contentDocument?.createElement('base');
-                                                                                                 if (base) {
-                                                                                                     base.target = '_blank';
-                                                                                                     iframe.contentDocument?.head.appendChild(base);
-                                                                                                 }
-                                                                                                 // Auto-resize height based on content
                                                                                                  try {
                                                                                                      const height = iframe.contentWindow.document.documentElement.scrollHeight;
                                                                                                      if (height > 0) iframe.style.height = `${height}px`;
-                                                                                                 } catch (err) { }
+                                                                                                 } catch (err) { /* cross-origin guard */ }
                                                                                              }
                                                                                          }}
                                                                                      />
                                                                                  </div>
                                                                              ) : (
                                                                                  <div
-                                                                                     className="whitespace-pre-wrap selection:bg-blue-500/30 text-black dark:text-neutral-300 font-light leading-relaxed p-6 bg-black/5 dark:bg-white/5 rounded-2xl font-mono text-sm"
+                                                                                     className="whitespace-pre-wrap selection:bg-blue-500/30 text-neutral-900 dark:text-neutral-200 font-light leading-relaxed p-6 bg-white dark:bg-white/5 rounded-2xl font-mono text-sm border border-neutral-200 dark:border-white/10"
                                                                                      dangerouslySetInnerHTML={{ __html: linkify(selectedTraditionalEmail.body) }}
                                                                                  />
                                                                              )}
@@ -3048,19 +3073,11 @@ export function GmailInterfaceFixed({ forceTraditionalView = false }: GmailInter
                     text-decoration: underline !important;
                 }
                 
-                /* Ensure buttons and styled elements in emails are visible */
-                .traditional-email-content table,
-                .traditional-email-content div,
-                .traditional-email-content section {
+                /* Keep wide HTML tables from blowing out the viewer; do NOT
+                   force transparent backgrounds — that turns dark email text
+                   into a black screen on the dark modal. */
+                .traditional-email-content table {
                     max-width: 100% !important;
-                    background-color: transparent !important;
-                }
-                
-                /* Force background colors for specific structured elements that might be buttons */
-                .traditional-email-content [style*="background-color"] {
-                    display: inline-block !important;
-                    min-width: 10px !important;
-                    min-height: 10px !important;
                 }
 
                 .clickable-link {
