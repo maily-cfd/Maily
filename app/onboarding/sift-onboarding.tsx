@@ -34,10 +34,10 @@ type Step = number; // 1..15
  * bounced forward). Keeps setup to ~6 screens instead of 14+.
  * 3 Calendar · 6–9 voice/Boult theater · 10–11 Notion/Slack · 12 agent · 14 briefing
  */
-const SKIP_STEPS = new Set([3, 6, 7, 8, 9, 10, 11, 12, 14]);
+const SKIP_STEPS = new Set([3, 6, 7, 8, 9, 10, 11, 12, 13, 14]);
 
 /** Ordered screens the user actually walks — drives the progress capsule. */
-const ACTIVE_FLOW: Step[] = [1, 2, 4, 5, 13, 15];
+const ACTIVE_FLOW: Step[] = [1, 2, 4, 5, 15];
 
 function bypassSkipped(n: number, dir: 1 | -1): Step {
   let s = n;
@@ -465,7 +465,7 @@ export default function SiftOnboardingPage() {
       )}
 
       <main className="flex-1 flex items-center justify-center px-5 py-8 relative z-10">
-        <div className={cn('w-full', step === 13 ? 'max-w-4xl' : 'max-w-xl')}>
+        <div className="w-full max-w-xl">
           <AnimatePresence mode="wait">
             <motion.div key={step} {...fade}>
               {step === 1  && <S1Welcome onBegin={() => go(isConnected('gmail') ? 3 : 2)} />}
@@ -493,9 +493,8 @@ export default function SiftOnboardingPage() {
               {step === 8  && <S8MeetBoult onContinue={() => next()} />}
               {step === 9  && <S9Boult scan={scan} firstName={firstName} onContinue={() => next()} reduce={!!reduce} />}
               {step === 12 && <S12Agent spec={agentSpec} setSpec={setAgentSpec} created={createdAgent} setCreated={setCreatedAgent} onContinue={(c) => next(c ? { agent: c, agentSpec } : undefined)} onSkip={() => next()} />}
-              {step === 13 && <S13Plan firstName={firstName} plan={planChoice} onChoose={(p) => { try { posthog.capture('paywall_plan_chosen', { plan: p }); } catch { /* analytics never blocks */ } setPlanChoice(p); next({ plan: p }); }} />}
               {step === 14 && <S14Notifications time={briefTime} setTime={setBriefTime} channel={briefChannel} setChannel={setBriefChannel} hasSlack={isConnected('slack')} agent={createdAgent} onUpdate={setCreatedAgent} onContinue={() => next({ briefTime, briefChannel })} />}
-              {step === 15 && <S15Done firstName={firstName} agent={createdAgent} scan={scan} briefTime={briefTime} briefChannel={briefChannel} plan={planChoice} onFinish={completeOnboarding} />}
+              {step === 15 && <S15Done firstName={firstName} agent={createdAgent} scan={scan} briefTime={briefTime} briefChannel={briefChannel} onFinish={completeOnboarding} />}
             </motion.div>
           </AnimatePresence>
         </div>
@@ -696,7 +695,7 @@ function S1Welcome({ onBegin }: { onBegin: () => void }) {
       </Display>
 
       <Body className="text-[16px] max-w-md mx-auto mb-10">
-        Maily removes email from your to-do list entirely — it works while you sleep. Connect Gmail, see your inbox in 60 seconds, then start a 3-day free trial.
+        Maily removes email from your to-do list entirely — it works while you sleep. Connect Gmail, see your inbox in 60 seconds, then deploy your first agent.
       </Body>
 
       <PrimaryButton onClick={onBegin} className="px-8 py-3.5 text-[15px]">
@@ -1759,82 +1758,18 @@ function S14Notifications({ time, setTime, channel, setChannel, hasSlack, agent,
 
 /* ═══════════════════════════ 15 · YOU'RE ALL SET ═══════════════════════════ */
 
-function S15Done({ firstName, agent, scan, briefTime, briefChannel, plan, onFinish }: {
+function S15Done({ firstName, agent, scan, briefTime, briefChannel, onFinish }: {
   firstName: string; agent: CreatedAgent | null; scan: ScanResult | null;
-  briefTime: string; briefChannel: 'gmail' | 'slack' | 'both'; plan: PlanChoice | null;
+  briefTime: string; briefChannel: 'gmail' | 'slack' | 'both';
   onFinish: () => Promise<void>;
 }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
 
-  // Did we just come back from a successful Polar checkout? /payment-success
-  // returns the user to /onboarding?step=15&paid=1 after verifying payment.
-  const paid = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('paid') === '1';
-
   const finish = async () => {
     setBusy(true);
-    // Returned from checkout (?paid=1)? The param alone is NOT proof — verify the
-    // real subscription server-side before letting them into the app. A verified
-    // paid/active plan → in. Otherwise (incl. abandoned checkout) → back to the
-    // paywall at step 13; never grant access on an unverified URL param.
-    if (paid) {
-      try {
-        const r = await fetch(`/api/subscription/status?t=${Date.now()}`);
-        const d = r.ok ? await r.json() : null;
-        const pt = d?.subscription?.planType;
-        const isPaid = !!pt && pt !== 'free' && pt !== 'none' && !d?.subscription?.isExpired;
-        if (isPaid) {
-          try { posthog.capture('checkout_paid_verified', { plan: pt }); } catch { /* */ }
-          // Payment verified — NOW mark onboarding complete. Doing this before
-          // verification was the root cause of unpaid users being flagged as
-          // "completed" and slipping through the redirect API.
-          await onFinish();
-          router.push('/home-feed');
-          return;
-        }
-      } catch { /* fall through to paywall */ }
-      try { posthog.capture('checkout_return_unpaid'); } catch { /* */ }
-      setBusy(false);
-      router.replace('/onboarding?step=13');
-      return;
-    }
-    // No plan chosen yet → send them to pick one (the paywall), not into the app.
-    if (!plan) {
-      setBusy(false);
-      router.replace('/onboarding?step=13');
-      return;
-    }
-    // Send to Polar checkout, remembering where to come back to so the user
-    // lands right here (paid) afterward instead of the dashboard.
-    // Do NOT call onFinish here — onboarding is only "complete" after payment.
-    try {
-      localStorage.setItem('pending_plan', plan);
-      localStorage.setItem('maily_checkout_return', '/onboarding?step=15&paid=1');
-    } catch { /* */ }
-    try { posthog.capture('checkout_started', { plan }); } catch { /* */ }
-
-    // Prefer a server-created Polar checkout SESSION (correct org via our access
-    // token, email prefilled so the webhook maps the payment to THIS account,
-    // reliable success_url + user_id metadata). This is the fix for "21 started,
-    // 0 completed" — the static links below leave nowhere real to land and no way
-    // to attribute the payment. Fall back to the static link ONLY if the session
-    // call fails, so this can never regress below current behaviour.
-    try {
-      const r = await fetch('/api/subscription/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plan }),
-      });
-      const d = await r.json().catch(() => ({}));
-      if (r.ok && d?.url) {
-        window.location.href = d.url;
-        return;
-      }
-      console.error('[checkout] session create failed — falling back to static link:', d);
-    } catch (e) {
-      console.error('[checkout] session create threw — falling back to static link:', e);
-    }
-    window.location.href = POLAR_CHECKOUT_URLS[plan];
+    await onFinish();
+    router.push('/home-feed');
   };
 
   const channelLabel = briefChannel === 'both' ? 'Gmail + Slack' : briefChannel === 'slack' ? 'Slack' : 'Gmail';
@@ -1845,15 +1780,9 @@ function S15Done({ firstName, agent, scan, briefTime, briefChannel, plan, onFini
         <IconBadge><Check className="w-5 h-5 text-[#0A0A0A]" strokeWidth={2} /></IconBadge>
       </motion.div>
 
-      <Display className="text-[32px] sm:text-[42px] mb-4">{paid ? 'Boult is on duty.' : 'One step to go live.'}</Display>
+      <Display className="text-[32px] sm:text-[42px] mb-4">One step to go live.</Display>
       <Body className="text-[15.5px] max-w-md mx-auto mb-8">
-        {paid
-          ? `${firstName ? `You're set, ${firstName}. ` : ''}Your agent runs on its schedule and everything waits for your approval before it sends. Go build — we'll handle the inbox.`
-          : plan === 'weekly'
-            ? `${firstName ? `Almost there, ${firstName}. ` : ''}$8.99 a week, cancel whenever you like. Tomorrow morning: one briefing, not an inbox.`
-          : plan === 'monthly'
-            ? `${firstName ? `Almost there, ${firstName}. ` : ''}Start your 3-day free trial — no charge today, cancel anytime. Tomorrow morning: one briefing, not an inbox.`
-            : `${firstName ? `Almost there, ${firstName}. ` : ''}Subscribe and your agent deploys tonight. Tomorrow morning: one briefing, not an inbox. Everything waits for your approval.`}
+        {`${firstName ? `Almost there, ${firstName}. ` : ''}Your agent is ready to deploy. Tomorrow morning: one briefing, not an inbox.`}
       </Body>
 
       <GlassCard className="max-w-sm mx-auto text-left space-y-4 mb-9">
@@ -1871,41 +1800,11 @@ function S15Done({ firstName, agent, scan, briefTime, briefChannel, plan, onFini
           <SummaryRow icon={<Sparkles className="w-4 h-4" />} label="First agent" value="None yet — add one from your dashboard" />
         )}
         {scan?.hoursPerWeek != null && <SummaryRow icon={<Activity className="w-4 h-4" />} label="Taking off your plate" value={`~${scan.hoursPerWeek}h / week`} />}
-        {/* The user is one click from a payment page — the price they'll see
-            there must be on THIS screen, or Polar's total reads as a surprise. */}
-        {!paid && plan && (
-          <SummaryRow
-            icon={<Check className="w-4 h-4" />}
-            label="Plan"
-            value={plan === 'weekly' ? 'Weekly — $8.99/week' : plan === 'monthly' ? '3 days free, then $29/mo' : plan === 'annual' ? 'Annual — $199/year' : 'Lifetime — $499 once'}
-          />
-        )}
       </GlassCard>
 
       <PrimaryButton onClick={finish} disabled={busy} className="px-8 py-3.5 text-[15px]">
-        {busy
-          ? <><Loader2 className="w-4 h-4 animate-spin" /> Opening…</>
-          : paid
-            ? <>Go to Maily <ArrowRight className="w-4 h-4" /></>
-            : !plan
-              // Without a plan this button routes to the paywall — say so.
-              // "Go to Maily" that lands on a pricing screen reads as a trick.
-              ? <>Choose your plan <ArrowRight className="w-4 h-4" /></>
-              : plan === 'weekly'
-                ? <>Start Weekly <ArrowRight className="w-4 h-4" /></>
-              : plan === 'monthly'
-                ? <>Start 3-day free trial <ArrowRight className="w-4 h-4" /></>
-                : <>Subscribe &amp; deploy <ArrowRight className="w-4 h-4" /></>}
+        {busy ? <><Loader2 className="w-4 h-4 animate-spin" /> Opening…</> : <>Go to Maily <ArrowRight className="w-4 h-4" /></>}
       </PrimaryButton>
-
-      {!paid && plan && (
-        <div className="mt-4 flex flex-col items-center gap-1.5">
-          <p className="text-[11.5px] text-[#0A0A0A]/40">
-            {plan === 'monthly' ? 'No charge today · Secure checkout · Cancel anytime' : plan === 'lifetime' ? 'Secure checkout · One-time payment' : 'Secure checkout · Cancel anytime'}
-          </p>
-          <SkipLink onClick={() => router.replace('/onboarding?step=13')}>Change plan</SkipLink>
-        </div>
-      )}
     </div>
   );
 }
