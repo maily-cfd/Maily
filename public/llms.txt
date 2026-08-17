@@ -37,10 +37,10 @@
 
 ## Company
 
-- Built by Maulik, a 14-year-old solo founder.
+- Maily is a free, open source project. Star us at github.com/maily-cfd/Maily
 - Website: https://maily.dev
 - Contact: maily.dev@gmail.com
-- X (Twitter): https://x.com/maulik_5
+- X (Twitter): https://x.com/Mailycfd
 
 ## Key pages
 

@@ -1,6 +1,5 @@
-'use client';
-
 import Link from 'next/link';
+import { PlasmaBackground } from './plasma-background';
 
 export default function HeroASCII() {
   return (
@@ -28,13 +27,9 @@ export default function HeroASCII() {
         }
       `}</style>
 
-      {/* Background Image Container */}
-      <div className="absolute inset-0 w-full h-full z-0">
-        <img 
-          src="/hero-bg.png" 
-          alt="Maily Hero Background" 
-          className="w-full h-full object-cover object-center opacity-90 mix-blend-lighten"
-        />
+      {/* Plasma WebGL Background */}
+      <div className="absolute inset-0 w-full h-full z-0 overflow-hidden">
+        <PlasmaBackground />
       </div>
 
       {/* Left-side overlay so text stays legible without hiding the animation */}

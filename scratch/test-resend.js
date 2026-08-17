@@ -20,7 +20,7 @@ async function test() {
   try {
     const { data, error } = await resend.emails.send({
       from: 'Mailient Access <support@mailient.xyz>',
-      to: ['mailient.xyz@gmail.com'],
+      to: ['support.maily@gmail.com'],
       replyTo: 'test@example.com',
       subject: 'Test email from access request script',
       html: '<p>This is a test to verify if support@mailient.xyz works.</p>',
