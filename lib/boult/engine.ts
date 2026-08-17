@@ -387,7 +387,7 @@ export async function callLLM(
         headers: {
           Authorization: `Bearer ${key}`,
           'Content-Type': 'application/json',
-          'HTTP-Referer': 'https://maily.dev',
+          'HTTP-Referer': 'https://maily.cfd',
           'X-Title': 'Boult AI',
         },
         body: JSON.stringify(finalBody),

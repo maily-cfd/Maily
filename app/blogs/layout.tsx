@@ -3,11 +3,11 @@ import { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Platform Insights // Maily Blog",
   description: "Essays and guides on AI email agents, inbox triage, replies in your own voice, and email encryption — written by the founder building Maily.",
-  metadataBase: new URL("https://maily.dev"),
+  metadataBase: new URL("https://maily.cfd"),
   openGraph: {
     title: "Platform Insights // Maily Blog",
     description: "Essays and guides on AI email agents, inbox triage, replies in your own voice, and email encryption — written by the founder building Maily.",
-    url: "https://maily.dev/blogs",
+    url: "https://maily.cfd/blogs",
     siteName: "Maily",
     images: [
       {

@@ -7562,7 +7562,7 @@ async function emailNewsletterDigest(userId: string, markdown: string, count: nu
     const { Resend } = await import('resend');
     const resend = new Resend(apiKey);
     const { error } = await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL || 'Boult AI <boult@maily.dev>',
+      from: process.env.RESEND_FROM_EMAIL || 'Boult AI <boult@maily.cfd>',
       replyTo: 'support.maily@gmail.com',
       to: userId,
       subject: `📰 Your newsletter digest — ${count} caught up`,
@@ -7891,7 +7891,7 @@ function reportGenerate(input: any): ToolResult {
 
   // ── Footer — one line. Next run only when there is one. ──
   const nextRun = input?.nextRunTime ? String(input.nextRunTime).trim() : '';
-  lines.push('', '---', `Sent by Boult • maily.dev${nextRun ? ` • Next run: ${nextRun}` : ''}`);
+  lines.push('', '---', `Sent by Boult • maily.cfd${nextRun ? ` • Next run: ${nextRun}` : ''}`);
 
   return { output: lines.join('\n') };
 }
@@ -8084,7 +8084,7 @@ async function reportSendGmail(userId: string, input: any): Promise<ToolResult> 
     // Footer
     '<tr><td style="padding:16px 32px 24px;border-top:1px solid #f0f0f0;">',
     '<p style="margin:0;font-size:12px;color:#999;line-height:1.5;">',
-    'Sent by <strong style="color:#666;">Boult</strong> for Maily &bull; <a href="https://maily.dev" style="color:#2563eb;text-decoration:none;">maily.dev</a>',
+    'Sent by <strong style="color:#666;">Boult</strong> for Maily &bull; <a href="https://maily.cfd" style="color:#2563eb;text-decoration:none;">maily.cfd</a>',
     '</p></td></tr>',
     '</table>',
     '</td></tr></table></body></html>',
@@ -10614,7 +10614,7 @@ async function slackPostDailyBriefing(userId: string, input: any, context: ToolC
     }
   } catch { /* skip */ }
 
-  sections.push('', '_Sent by Boult · maily.dev_');
+  sections.push('', '_Sent by Boult · maily.cfd_');
   const text = sections.join('\n');
 
   const send = await sendSlackMessage(userId, { channel, text }, context);
@@ -10676,7 +10676,7 @@ async function slackTeamDigestWeekly(userId: string, input: any, context: ToolCo
     if (items.length) sections.push(`🤖 *Agent runs:* ${items.length} background runs this week`);
   } catch { /* skip */ }
 
-  sections.push('', '_Sent by Boult · maily.dev_');
+  sections.push('', '_Sent by Boult · maily.cfd_');
   const text = sections.join('\n');
 
   return await sendSlackMessage(userId, { channel, text }, context);
@@ -10729,7 +10729,7 @@ async function slackApprovalRequestRouting(userId: string, input: any, context: 
   const channel = (input?.channel || 'dm').trim();
   const question = (input?.question || '').trim();
   const actionDescription = (input?.actionDescription || '').trim();
-  const dashboardUrl = (input?.dashboardUrl || 'https://maily.dev/dashboard?tab=agents&approve=pending').trim();
+  const dashboardUrl = (input?.dashboardUrl || 'https://maily.cfd/dashboard?tab=agents&approve=pending').trim();
   if (!question) return failureResult('question is required.', 'validation_error');
   if (!actionDescription) return failureResult('actionDescription is required.', 'validation_error');
 

@@ -62,7 +62,7 @@ export async function POST(request) {
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${apiKey}`,
-                        'HTTP-Referer': process.env.HOST || 'https://maily.dev',
+                        'HTTP-Referer': process.env.HOST || 'https://maily.cfd',
                         'X-Title': 'Maily',
                         ...(privacyMode ? { 'X-OpenRouter-Data-Collection': 'opt-out' } : {})
                     },

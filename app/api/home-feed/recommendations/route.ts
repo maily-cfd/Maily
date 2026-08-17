@@ -254,7 +254,7 @@ async function generate(items: InItem[], prefs: BriefingPrefs, founderModel = ''
         if (/nemotron/i.test(model)) reqBody.reasoning = { enabled: false };
         const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
           method: 'POST',
-          headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json', 'HTTP-Referer': 'https://maily.dev', 'X-Title': 'Maily' },
+          headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json', 'HTTP-Referer': 'https://maily.cfd', 'X-Title': 'Maily' },
           body: JSON.stringify(reqBody),
           signal: AbortSignal.timeout(14000),
         });

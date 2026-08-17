@@ -41,7 +41,7 @@ export async function POST(req: Request) {
         `;
 
         const { data, error } = await resend.emails.send({
-            from: 'Support <support@maily.dev>',
+            from: 'Support <support@maily.cfd>',
             to: ['support.maily@gmail.com'],
             replyTo: email,
             subject: `[Support] ${subject} from ${name}`,

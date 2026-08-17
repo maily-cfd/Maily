@@ -218,7 +218,7 @@ export async function GET(
                             headers: {
                                 'Content-Type': 'application/json',
                                 'Authorization': `Bearer ${apiKey}`,
-                                'HTTP-Referer': process.env.HOST || 'https://maily.dev',
+                                'HTTP-Referer': process.env.HOST || 'https://maily.cfd',
                                 'X-Title': 'Maily'
                             },
                             body: JSON.stringify({

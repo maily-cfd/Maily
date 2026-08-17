@@ -51,7 +51,7 @@ async function tryGenerateTitle(message: string): Promise<string | null> {
           headers: {
             Authorization: `Bearer ${key}`,
             'Content-Type': 'application/json',
-            'HTTP-Referer': 'https://maily.dev',
+            'HTTP-Referer': 'https://maily.cfd',
           },
           body: JSON.stringify({
             model,

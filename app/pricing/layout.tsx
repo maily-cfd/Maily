@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: "Pricing — Your next hire costs $29 a month | Maily",
   description:
     "One plan, everything included. Monthly $29, Annual $199/year, or Lifetime Founder $499 once. Maily removes email from your to-do list entirely. 3-day free trial.",
-  alternates: { canonical: "https://maily.dev/pricing" },
+  alternates: { canonical: "https://maily.cfd/pricing" },
   openGraph: {
     title: "Pricing — Your next hire costs $29 a month | Maily",
     description:
       "One plan, everything included. Monthly $29, Annual $199/year, or Lifetime Founder $499 once. 3-day free trial.",
-    url: "https://maily.dev/pricing",
+    url: "https://maily.cfd/pricing",
     images: [{ url: "/logo-maily.png", width: 1200, height: 630, alt: "Maily pricing" }],
   },
 };

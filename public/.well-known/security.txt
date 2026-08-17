@@ -1,14 +1,14 @@
-Contact: mailto:security@maily.dev
+Contact: mailto:security@maily.cfd
 Expires: 2027-12-31T23:59:59.000Z
 Preferred-Languages: en
-Canonical: https://maily.dev/.well-known/security.txt
-Policy: https://maily.dev/privacy-policy
+Canonical: https://maily.cfd/.well-known/security.txt
+Policy: https://maily.cfd/privacy-policy
 
 # Maily Security Disclosure Policy
 #
 # If you discover a security vulnerability in Maily, we ask that you:
 #
-# 1. Email security@maily.dev with details of the vulnerability
+# 1. Email security@maily.cfd with details of the vulnerability
 # 2. Do not publicly disclose the issue until we've had time to address it
 # 3. Do not access or modify user data without explicit permission
 # 4. Provide sufficient information to reproduce the issue
@@ -20,7 +20,7 @@ Policy: https://maily.dev/privacy-policy
 # - Crediting you (if desired) in our security acknowledgments
 #
 # Scope:
-# - maily.dev and all subdomains
+# - maily.cfd and all subdomains
 # - Maily API endpoints
 # - Authentication and session management
 # - Data encryption and storage

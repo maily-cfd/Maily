@@ -16,7 +16,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'maily.dev',
+        hostname: 'maily.cfd',
       },
       {
         protocol: 'https',

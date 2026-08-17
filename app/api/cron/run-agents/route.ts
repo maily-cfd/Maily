@@ -11,8 +11,8 @@
  *
  * Required env vars:
  *   RESEND_API_KEY          — Resend API key (send email reports)
- *   RESEND_FROM_EMAIL       — Verified Resend sender, e.g. "Boult <boult@maily.dev>"
- *                             Defaults to "Boult AI <boult@maily.dev>"
+ *   RESEND_FROM_EMAIL       — Verified Resend sender, e.g. "Boult <boult@maily.cfd>"
+ *                             Defaults to "Boult AI <boult@maily.cfd>"
  *
  * Optional env vars:
  *   BOULT_SLACK_BOT_TOKEN   — Slack bot token for the Maily workspace.
@@ -42,7 +42,7 @@ import { reconcileLedger } from '../../../../lib/boult/super/ledger';
 import { logEvent } from "@/lib/logsso";
 
 const CRON_SECRET = process.env.CRON_SECRET || 'boult-cron-secret';
-const RESEND_FROM = process.env.RESEND_FROM_EMAIL || 'Boult AI <boult@maily.dev>';
+const RESEND_FROM = process.env.RESEND_FROM_EMAIL || 'Boult AI <boult@maily.cfd>';
 
 // A 'running' row older than this is treated as a crashed/timed-out run
 // (stuck lock) and is allowed to run again, instead of being excluded forever.
@@ -1080,8 +1080,8 @@ function buildReportHtml(agentName: string, date: string, report: string, hasPen
     : '';
 
   const cta = hasPending
-    ? UI.button('Review queued actions', 'https://maily.dev/dashboard?tab=agents&approve=pending')
-    : UI.button('Open dashboard', 'https://maily.dev/dashboard');
+    ? UI.button('Review queued actions', 'https://maily.cfd/dashboard?tab=agents&approve=pending')
+    : UI.button('Open dashboard', 'https://maily.cfd/dashboard');
 
   const content = `
     ${pendingBanner}
@@ -1233,7 +1233,7 @@ function buildSlackBlocks(agentName: string, date: string, report: string, hasPe
       accessory: {
         type: 'button',
         text: { type: 'plain_text', text: 'Review', emoji: false },
-        url: 'https://maily.dev/dashboard?tab=agents&approve=pending',
+        url: 'https://maily.cfd/dashboard?tab=agents&approve=pending',
         style: 'primary',
       },
     },
@@ -1263,7 +1263,7 @@ function buildSlackBlocks(agentName: string, date: string, report: string, hasPe
     {
       type: 'context',
       elements: [
-        { type: 'mrkdwn', text: `<https://maily.dev/dashboard|Open dashboard> · ${new Date().toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true })}` },
+        { type: 'mrkdwn', text: `<https://maily.cfd/dashboard|Open dashboard> · ${new Date().toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true })}` },
       ],
     },
   ];
@@ -1279,7 +1279,7 @@ function buildSlackBlocks(agentName: string, date: string, report: string, hasPe
     const truncated = bodyBlocks.slice(0, maxBodyBlocks - 1);
     truncated.push({
       type: 'section',
-      text: { type: 'mrkdwn', text: '_Report truncated — <https://maily.dev/dashboard?tab=agents|view full report on dashboard>_' },
+      text: { type: 'mrkdwn', text: '_Report truncated — <https://maily.cfd/dashboard?tab=agents|view full report on dashboard>_' },
     });
     // Rebuild blocks array with truncated body
     const insertIdx = blocks.indexOf(bodyBlocks[0]);
@@ -1298,7 +1298,7 @@ async function sendErrorNotification(agent: any, errorMessage: string): Promise<
     weekday: 'short', month: 'short', day: 'numeric',
     hour: 'numeric', minute: '2-digit', hour12: true,
   });
-  const report = `# ⚠️ Agent Run Failed — ${agent.name}\n\nYour agent **${agent.name}** encountered an issue during its scheduled run at ${ts}.\n\n**Error:** ${errorMessage}\n\nThe agent has been kept active and will attempt to run again at its next scheduled time. If this error repeats, check your connected integrations or update the agent's task description.\n\n_If you need help, reply to this message or visit [maily.dev](https://maily.dev)._`;
+  const report = `# ⚠️ Agent Run Failed — ${agent.name}\n\nYour agent **${agent.name}** encountered an issue during its scheduled run at ${ts}.\n\n**Error:** ${errorMessage}\n\nThe agent has been kept active and will attempt to run again at its next scheduled time. If this error repeats, check your connected integrations or update the agent's task description.\n\n_If you need help, reply to this message or visit [maily.cfd](https://maily.cfd)._`;
 
   // Fix 7 — use Promise.allSettled so both channels are always attempted.
   // Previously sequential await meant email failure blocked Slack notification.

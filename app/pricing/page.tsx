@@ -108,7 +108,7 @@ export default function PricingPage() {
 
     const params = new URLSearchParams();
     if (session?.user?.email) params.set("email", session.user.email);
-    const baseUrl = typeof window !== "undefined" ? window.location.origin : "https://maily.dev";
+    const baseUrl = typeof window !== "undefined" ? window.location.origin : "https://maily.cfd";
     params.set("redirect_url", `${baseUrl}/payment-success`);
 
     window.location.href = `${checkoutUrl}?${params.toString()}`;

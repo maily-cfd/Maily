@@ -55,7 +55,7 @@ async function callLLM(
         method: 'POST',
         headers: {
           Authorization: `Bearer ${key}`,
-          'HTTP-Referer': 'https://maily.dev',
+          'HTTP-Referer': 'https://maily.cfd',
           'X-Title': 'Boult AI',
           'Content-Type': 'application/json',
         },

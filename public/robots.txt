@@ -40,7 +40,7 @@ Allow: /
 User-agent: Applebot-Extended
 Allow: /
 
-Sitemap: https://maily.dev/sitemap.xml
+Sitemap: https://maily.cfd/sitemap.xml
 
 # Canonical product summary for LLMs:
-# https://maily.dev/llms.txt
+# https://maily.cfd/llms.txt

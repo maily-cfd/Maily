@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "How AI Learns to Write Exactly Like You // Maily Blog",
     description: "Generic AI drafts damage relationships. Learn how Maily's 90-day voice analysis builds a writing profile that mirrors your tone, sign-offs, and sentence patterns.",
-    url: "https://maily.dev/blogs/ai-learns-your-writing-style",
+    url: "https://maily.cfd/blogs/ai-learns-your-writing-style",
     type: "article",
     publishedTime: "2026-05-22T00:00:00.000Z",
     authors: ["Maily"],

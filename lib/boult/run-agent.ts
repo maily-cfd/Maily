@@ -165,11 +165,11 @@ OMIT if nothing was learned this run.
 ALWAYS the last line of the body. Offer the obvious next move as one tap, in your own warm voice — "want me to archive that noise or handle any of the action items?", "say the word and I'll send all 3 drafts", "want me to chase Acme on the contract?". Make it answerable with a one-word reply. Never end on a flat status.
 
 ---
-Sent by Boult for Maily • [maily.dev](https://maily.dev/dashboard?tab=agents)
+Sent by Boult for Maily • [maily.cfd](https://maily.cfd/dashboard?tab=agents)
 Status: [success if the mission's relevant success criteria were genuinely advanced; partial if some work remains; blocked if something stopped you — be honest, never fake success] · Run completed: [INSERT_CURRENT_UTC_TIMESTAMP]
 Next run: [derive from the schedule — e.g. "Tomorrow at 9:00 AM". Omit if unknown.]
 
-[Edit this agent](https://maily.dev/dashboard?tab=agents&agentId=[INSERT_AGENT_ID]) · [Pause](https://maily.dev/dashboard?tab=agents&agentId=[INSERT_AGENT_ID]&action=pause) · [Run history](https://maily.dev/dashboard?tab=agents&agentId=[INSERT_AGENT_ID]&view=history)
+[Edit this agent](https://maily.cfd/dashboard?tab=agents&agentId=[INSERT_AGENT_ID]) · [Pause](https://maily.cfd/dashboard?tab=agents&agentId=[INSERT_AGENT_ID]&action=pause) · [Run history](https://maily.cfd/dashboard?tab=agents&agentId=[INSERT_AGENT_ID]&view=history)
 
 PROOF & HONESTY (non-negotiable):
 - Every artifact link is a REAL URL from a tool result (draft URL, event htmlLink, Notion pageMeta.url). NEVER fabricate one. If a tool succeeded but returned no URL, list the action without a link and say so.
@@ -561,7 +561,7 @@ export async function runAgentTask(
         'The run hit its time limit before the final report could be written. The work above was completed — a full summary will be included in the next scheduled run.',
         '',
         '---',
-        `Sent by Boult for Maily • [maily.dev](https://maily.dev/dashboard?tab=agents)`,
+        `Sent by Boult for Maily • [maily.cfd](https://maily.cfd/dashboard?tab=agents)`,
         `Status: partial · Run completed: ${new Date().toUTCString()}`,
       ].filter(Boolean).join('\n');
     } else {

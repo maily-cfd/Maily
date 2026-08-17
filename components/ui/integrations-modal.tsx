@@ -163,7 +163,7 @@ export function IntegrationsModal({ isOpen, onClose }: IntegrationsModalProps) {
   const [integrations, setIntegrations] = useState<Integration[]>([
     {
       id: 'maily',
-      name: 'maily.dev',
+      name: 'maily.cfd',
       logo: <BrandIcons.Maily />,
       enabled: true,
       disabled: true,

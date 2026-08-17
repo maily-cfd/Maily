@@ -51,14 +51,14 @@ export function BlogLayout({ meta, children, tableOfContents = [], relatedPosts 
     headline: meta.title,
     description: meta.description,
     datePublished: new Date(meta.date).toISOString(),
-    url: `https://maily.dev/blogs/${meta.slug}`,
-    mainEntityOfPage: `https://maily.dev/blogs/${meta.slug}`,
+    url: `https://maily.cfd/blogs/${meta.slug}`,
+    mainEntityOfPage: `https://maily.cfd/blogs/${meta.slug}`,
     author: { "@type": "Organization", name: "Maily", url: "https://x.com/Mailycfd" },
     publisher: {
       "@type": "Organization",
       name: "Maily",
-      url: "https://maily.dev",
-      logo: { "@type": "ImageObject", url: "https://maily.dev/logo-maily.png" },
+      url: "https://maily.cfd",
+      logo: { "@type": "ImageObject", url: "https://maily.cfd/logo-maily.png" },
     },
   };
 

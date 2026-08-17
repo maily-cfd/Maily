@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "AI Email Agent vs. AI Email Assistant // Maily Blog",
     description: "An assistant answers questions. An agent takes action. Understanding this distinction is the key to choosing the right tool for your inbox.",
-    url: "https://maily.dev/blogs/ai-email-agent-vs-assistant",
+    url: "https://maily.cfd/blogs/ai-email-agent-vs-assistant",
     type: "article",
     publishedTime: "2026-05-21T00:00:00.000Z",
     authors: ["Maily"],

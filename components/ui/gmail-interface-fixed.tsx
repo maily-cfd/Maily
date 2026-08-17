@@ -1657,7 +1657,7 @@ export function GmailInterfaceFixed({ forceTraditionalView = false }: GmailInter
             <br/><br/>
             <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #eaeaea; color: #888; font-family: system-ui, sans-serif;">
                 <span style="opacity: 0.7; font-size: 12px; margin-right: 12px;">Made by Maily</span>
-                <a href="https://maily.dev/auth/signup" style="background-color: #ffffff; color: #000000; padding: 8px 16px; text-decoration: none; border-radius: 6px; font-weight: 500; border: 1px solid #e5e5e5; font-size: 12px; display: inline-block;">Join Now!</a>
+                <a href="https://maily.cfd/auth/signup" style="background-color: #ffffff; color: #000000; padding: 8px 16px; text-decoration: none; border-radius: 6px; font-weight: 500; border: 1px solid #e5e5e5; font-size: 12px; display: inline-block;">Join Now!</a>
             </div>
         `;
 

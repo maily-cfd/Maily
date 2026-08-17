@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "The 3-Hour Email Rule // Maily Blog",
     description: "Professionals spend 3+ hours per day on email. AI triage doesn't just organize — it gives you back the time you didn't know you were losing.",
-    url: "https://maily.dev/blogs/ai-inbox-triage-reclaim-calendar",
+    url: "https://maily.cfd/blogs/ai-inbox-triage-reclaim-calendar",
     type: "article",
     publishedTime: "2026-05-20T00:00:00.000Z",
     authors: ["Maily"],

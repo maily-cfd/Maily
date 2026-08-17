@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     title: "What Is an AI Email Employee? // Maily Blog",
     description:
       "An AI email employee reads, triages, drafts, books, and follows up autonomously — you approve, it works. How it differs from assistants, copilots, and email clients.",
-    url: "https://maily.dev/blogs/what-is-an-ai-email-employee",
+    url: "https://maily.cfd/blogs/what-is-an-ai-email-employee",
     type: "article",
     publishedTime: "2026-07-02T00:00:00.000Z",
     authors: ["Maily"],

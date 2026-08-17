@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Why Founders Lose Deals in Their Inbox // Maily Blog",
     description: "The hidden cost of inbox overload isn't just wasted time — it's missed revenue. Here's how high-stakes emails slip through the cracks, and what to do about it.",
-    url: "https://maily.dev/blogs/founders-lose-deals-inbox",
+    url: "https://maily.cfd/blogs/founders-lose-deals-inbox",
     type: "article",
     publishedTime: "2026-05-24T00:00:00.000Z",
     authors: ["Maily"],

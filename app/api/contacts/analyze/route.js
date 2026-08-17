@@ -125,7 +125,7 @@ JSON ONLY.`;
                             headers: {
                                 'Authorization': `Bearer ${openRouterKey}`,
                                 'Content-Type': 'application/json',
-                                'HTTP-Referer': 'https://maily.dev',
+                                'HTTP-Referer': 'https://maily.cfd',
                                 'X-Title': 'Maily'
                             },
                             body: JSON.stringify({

@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     title: "Maily vs Fyxer (2026): Drafts vs a Whole Inbox Employee",
     description:
       "Fyxer drafts your replies and organizes your inbox. Maily runs the whole job. An honest comparison for solo founders.",
-    url: "https://maily.dev/blogs/maily-vs-fyxer",
+    url: "https://maily.cfd/blogs/maily-vs-fyxer",
     type: "article",
     publishedTime: "2026-07-02T00:00:00.000Z",
     authors: ["Maily"],

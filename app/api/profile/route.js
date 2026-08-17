@@ -24,7 +24,7 @@ async function ensureDatabaseTables() {
 
     if (profileCheckError && profileCheckError.message.includes('does not exist')) {
       console.log("user_profiles table missing, running total setup...");
-      const setupResponse = await fetch(`${process.env.NEXTAUTH_URL || 'https://maily.dev'}/api/database/setup`, {
+      const setupResponse = await fetch(`${process.env.NEXTAUTH_URL || 'https://maily.cfd'}/api/database/setup`, {
         method: 'POST'
       });
       if (!setupResponse.ok) throw new Error("Setup failed");

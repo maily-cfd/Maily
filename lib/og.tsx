@@ -34,7 +34,7 @@ export function ogImage(title: string, subtitle: string) {
             {subtitle}
           </div>
         </div>
-        <div style={{ display: "flex", fontSize: 22, color: "#555555" }}>maily.dev</div>
+        <div style={{ display: "flex", fontSize: 22, color: "#555555" }}>maily.cfd</div>
       </div>
     ),
     OG_SIZE,

@@ -38,16 +38,16 @@
 ## Company
 
 - Maily is a free, open source project. Star us at github.com/maily-cfd/Maily
-- Website: https://maily.dev
-- Contact: maily.dev@gmail.com
+- Website: https://maily.cfd
+- Contact: maily.cfd@gmail.com
 - X (Twitter): https://x.com/Mailycfd
 
 ## Key pages
 
-- [Home](https://maily.dev/): what Maily does, the morning brief, FAQs
-- [Pricing](https://maily.dev/pricing): plans and comparison
-- [Boult](https://maily.dev/product/boult): the AI that runs the inbox
-- [Sift](https://maily.dev/product/sift): how prioritization decides what needs you
-- [Drafts](https://maily.dev/product/drafts): replies in your voice
-- [Security](https://maily.dev/security): encryption and data-handling architecture
-- [Blog](https://maily.dev/blogs): essays on AI email agents, triage, voice, and encryption
+- [Home](https://maily.cfd/): what Maily does, the morning brief, FAQs
+- [Pricing](https://maily.cfd/pricing): plans and comparison
+- [Boult](https://maily.cfd/product/boult): the AI that runs the inbox
+- [Sift](https://maily.cfd/product/sift): how prioritization decides what needs you
+- [Drafts](https://maily.cfd/product/drafts): replies in your voice
+- [Security](https://maily.cfd/security): encryption and data-handling architecture
+- [Blog](https://maily.cfd/blogs): essays on AI email agents, triage, voice, and encryption

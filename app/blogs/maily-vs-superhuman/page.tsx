@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     title: "Maily vs Superhuman (2026): Speed vs Autonomy",
     description:
       "Superhuman makes you faster at email. Maily does the email for you. An honest comparison — features, pricing, and who each is for.",
-    url: "https://maily.dev/blogs/maily-vs-superhuman",
+    url: "https://maily.cfd/blogs/maily-vs-superhuman",
     type: "article",
     publishedTime: "2026-07-02T00:00:00.000Z",
     authors: ["Maily"],

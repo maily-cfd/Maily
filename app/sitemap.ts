@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next';
 
-const BASE = 'https://maily.dev';
+const BASE = 'https://maily.cfd';
 
 // Blog posts with their real publish dates (kept in sync with each post's
 // openGraph.publishedTime).

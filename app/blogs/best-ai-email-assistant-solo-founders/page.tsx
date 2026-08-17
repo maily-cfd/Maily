@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     title: "Best AI Email Tools for Solo Founders (2026)",
     description:
       "Superhuman, Fyxer, Shortwave, Notion Mail, Gmail Gemini, and Maily — what each is best at, and how to choose.",
-    url: "https://maily.dev/blogs/best-ai-email-assistant-solo-founders",
+    url: "https://maily.cfd/blogs/best-ai-email-assistant-solo-founders",
     type: "article",
     publishedTime: "2026-07-02T00:00:00.000Z",
     authors: ["Maily"],

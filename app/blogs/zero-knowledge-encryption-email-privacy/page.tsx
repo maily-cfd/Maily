@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Zero-Knowledge Encryption Explained // Maily Blog",
     description: "Most AI email tools need to read your data to work. Maily doesn't. A deep dive into the architecture that keeps your inbox private.",
-    url: "https://maily.dev/blogs/zero-knowledge-encryption-email-privacy",
+    url: "https://maily.cfd/blogs/zero-knowledge-encryption-email-privacy",
     type: "article",
     publishedTime: "2026-05-23T00:00:00.000Z",
     authors: ["Maily"],

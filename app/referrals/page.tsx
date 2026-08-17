@@ -33,7 +33,7 @@ export default async function ReferralsPage() {
   const session = await auth();
   if (!session?.user?.email) redirect('/auth/signin?callbackUrl=/referrals');
 
-  const origin = process.env.NEXTAUTH_URL || 'https://maily.dev';
+  const origin = process.env.NEXTAUTH_URL || 'https://maily.cfd';
   const stats = await getReferralStats(session.user.email, origin);
 
   return (

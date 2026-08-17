@@ -84,7 +84,7 @@ export async function POST(req: Request) {
         `;
 
         const { data, error } = await resend.emails.send({
-            from: 'Maily Onboarding <support@maily.dev>',
+            from: 'Maily Onboarding <support@maily.cfd>',
             to: ['support.maily@gmail.com'],
             replyTo: email,
             subject: `[Partner Loop] New ${type === 'creator' ? 'Creator' : 'Affiliate'} Application from ${email}`,

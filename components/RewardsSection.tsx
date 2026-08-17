@@ -43,7 +43,7 @@ export function RewardsSection({
     const [copied, setCopied] = useState(false);
     const [leaderboard, setLeaderboard] = useState<any[]>([]);
     const [loadingLeaderboard, setLoadingLeaderboard] = useState(true);
-    const referralLink = `https://maily.dev?ref=${username}`;
+    const referralLink = `https://maily.cfd?ref=${username}`;
 
     useEffect(() => {
         fetch("/api/leaderboard")
@@ -103,7 +103,7 @@ export function RewardsSection({
                     <div className="flex flex-col sm:flex-row gap-3">
                         <div className="flex-1 flex items-center gap-3 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-neutral-300 font-mono text-sm overflow-hidden whitespace-nowrap">
                             <span className="opacity-50 select-none">https://</span>
-                            <span>maily.dev?ref={username}</span>
+                            <span>maily.cfd?ref={username}</span>
                         </div>
                         <Button
                             onClick={handleCopyLink}
@@ -188,7 +188,7 @@ export function RewardsSection({
                         icon: <Share2 className="w-6 h-6 text-blue-400" />,
                         preview: (
                             <div className="p-4 rounded-xl bg-white/5 border border-white/10 font-mono text-xs text-neutral-400">
-                                https://maily.dev?ref="{username}"
+                                https://maily.cfd?ref="{username}"
                             </div>
                         )
                     },

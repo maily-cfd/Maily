@@ -34,10 +34,10 @@ export default function PrivacyPolicy() {
         <div className="space-y-4">
           <p>This policy applies to:</p>
           <ul className="list-disc pl-5 space-y-2">
-            <li>All users of the Maily website and web application at maily.dev</li>
+            <li>All users of the Maily website and web application at maily.cfd</li>
             <li>Users who connect their Google or Google Workspace accounts to Maily</li>
             <li>Users of both the hosted and self-hosted versions of Maily</li>
-            <li>Visitors who browse maily.dev without creating an account</li>
+            <li>Visitors who browse maily.cfd without creating an account</li>
           </ul>
           <p>This policy does not apply to third-party websites, services, or applications that may be linked from our platform.</p>
         </div>
@@ -298,7 +298,7 @@ export default function PrivacyPolicy() {
         <div className="space-y-2">
           <p className="font-bold text-black dark:text-white">Maily Intelligence</p>
           <p>Email: <a href="mailto:support.maily@gmail.com" className="text-black dark:text-white font-medium underline underline-offset-4 decoration-neutral-300 dark:decoration-neutral-700 hover:decoration-black dark:hover:decoration-white transition-all">support.maily@gmail.com</a></p>
-          <p>Website: <a href="https://maily.dev" className="hover:text-black dark:hover:text-white transition-colors">maily.dev</a></p>
+          <p>Website: <a href="https://maily.cfd" className="hover:text-black dark:hover:text-white transition-colors">maily.cfd</a></p>
           <p>X / Twitter: <a href="https://x.com/Mailycfd" className="text-black dark:text-white font-medium underline underline-offset-4 decoration-neutral-300 dark:decoration-neutral-700 hover:decoration-black dark:hover:decoration-white transition-all">@Mailycfd on X</a></p>
           <p>GitHub: <a href="https://github.com/maily-cfd/Maily" className="text-black dark:text-white font-medium underline underline-offset-4 decoration-neutral-300 dark:decoration-neutral-700 hover:decoration-black dark:hover:decoration-white transition-all">github.com/maily-cfd/Maily</a></p>
         </div>
@@ -330,7 +330,7 @@ export default function PrivacyPolicy() {
             </p>
             <div className="h-px w-full bg-neutral-100 dark:bg-neutral-900 my-10" />
             <p className="text-[17px] leading-[1.7] text-neutral-600 dark:text-neutral-400">
-                This Privacy Policy describes how Maily Intelligence ("Maily," "we," "us," or "our") collects, uses, stores, and protects your personal information when you use our email intelligence platform at maily.dev. By using Maily, you agree to the practices described in this policy.
+                This Privacy Policy describes how Maily Intelligence ("Maily," "we," "us," or "our") collects, uses, stores, and protects your personal information when you use our email intelligence platform at maily.cfd. By using Maily, you agree to the practices described in this policy.
             </p>
           </motion.div>
         </header>

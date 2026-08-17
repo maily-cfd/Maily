@@ -6358,7 +6358,7 @@ export default function ChatInterface({
                                             rel="noopener noreferrer"
                                             className="text-white/40 text-[13px] hover:text-white/60 underline underline-offset-4 transition-colors w-fit break-all"
                                           >
-                                            https://maily.dev/pricing
+                                            https://maily.cfd/pricing
                                           </a>
                                         </div>
 

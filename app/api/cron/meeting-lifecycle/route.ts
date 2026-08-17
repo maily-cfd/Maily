@@ -43,7 +43,7 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 const CRON_SECRET = process.env.CRON_SECRET || 'boult-cron-secret';
-const RESEND_FROM = process.env.RESEND_FROM_EMAIL || 'Boult AI <boult@maily.dev>';
+const RESEND_FROM = process.env.RESEND_FROM_EMAIL || 'Boult AI <boult@maily.cfd>';
 const DEFAULT_LEAD_MINUTES = 25;
 const LOOKAHEAD_PAD_MINUTES = 6;          // pre-stage: catches meetings between ticks
 const FOLLOWUP_MIN_MINUTES_AGO = 30;      // wait this long after meeting end
@@ -479,7 +479,7 @@ function wrapHtml(title: string, body: string, headerPill: string = 'Boult'): st
     <div style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#888;font-weight:600;margin-bottom:18px">${escapeHtml(headerPill)}</div>
     ${body}
     <div style="border-top:1px solid #f0f0f0;margin-top:32px;padding-top:18px;font-size:11px;color:#999;line-height:1.5">
-      Quiet notice from Boult. Reply to silence these, or tune them in <a href="https://maily.dev/dashboard" style="color:#666;text-decoration:underline">settings</a>.
+      Quiet notice from Boult. Reply to silence these, or tune them in <a href="https://maily.cfd/dashboard" style="color:#666;text-decoration:underline">settings</a>.
     </div>
   </div>
 </body>

@@ -29,7 +29,7 @@ import { PLANS } from '@/lib/subscription-service';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const SITE = process.env.NEXTAUTH_URL || 'https://maily.dev';
+const SITE = process.env.NEXTAUTH_URL || 'https://maily.cfd';
 
 // Onboarding's plan ids -> PLANS keys. Onboarding calls the $29 tier 'monthly';
 // in PLANS it's keyed 'pro'. The others match 1:1.

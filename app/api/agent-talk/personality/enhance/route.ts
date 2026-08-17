@@ -62,7 +62,7 @@ Rules:
         headers: {
           Authorization: `Bearer ${apiKey}`,
           'Content-Type': 'application/json',
-          'HTTP-Referer': 'https://maily.dev',
+          'HTTP-Referer': 'https://maily.cfd',
         },
         body: JSON.stringify({
           model: 'nvidia/nemotron-3-ultra-550b-a55b:free',

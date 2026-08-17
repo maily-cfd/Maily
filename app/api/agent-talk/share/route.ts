@@ -39,7 +39,7 @@ export async function POST(request: Request) {
     }
 
     // Build the share url using the host header or host config
-    const host = request.headers.get('host') || 'maily.dev';
+    const host = request.headers.get('host') || 'maily.cfd';
     const protocol = host.includes('localhost') ? 'http' : 'https';
     const shareUrl = `${protocol}://${host}/share/${sharedConvo.id}`;
 

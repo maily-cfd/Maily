@@ -33,7 +33,7 @@ export class SchedulingAIService {
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${this.apiKey}`,
-                        'HTTP-Referer': process.env.HOST || 'https://maily.dev',
+                        'HTTP-Referer': process.env.HOST || 'https://maily.cfd',
                         'X-Title': 'Maily Scheduling'
                     },
                     body: JSON.stringify({

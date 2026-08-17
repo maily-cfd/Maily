@@ -91,7 +91,7 @@ export function PricingCard({ onClose }: PricingCardProps) {
         }
         
         // CRITICAL: Set redirect URL so users come back to our payment success page
-        const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://maily.dev';
+        const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://maily.cfd';
         params.set('redirect_url', `${baseUrl}/payment-success`);
 
         // Redirect in the same window so they come back to the app easily

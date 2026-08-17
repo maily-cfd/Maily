@@ -3,11 +3,11 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Contact | Maily",
   description: "Get in touch with the Maily team — open an issue on GitHub or reach us at @Mailycfd on X.",
-  alternates: { canonical: "https://maily.dev/contact" },
+  alternates: { canonical: "https://maily.cfd/contact" },
   openGraph: {
     title: "Contact | Maily",
     description: "Get in touch with the Maily team — open an issue on GitHub or reach us at @Mailycfd on X.",
-    url: "https://maily.dev/contact",
+    url: "https://maily.cfd/contact",
     images: [{ url: "/logo-maily.png", width: 1200, height: 630, alt: "Contact Maily" }],
   },
 };
