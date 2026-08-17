@@ -1,14 +1,14 @@
 /**
- * Arcus V3 — Plan Actions: Approve, Execute, Dismiss
- * POST /api/arcus/v3/plans/[planId]/approve
- * POST /api/arcus/v3/plans/[planId]/execute
- * POST /api/arcus/v3/plans/[planId]/dismiss
+ * Boult V3 — Plan Actions: Approve, Execute, Dismiss
+ * POST /api/boult/v3/plans/[planId]/approve
+ * POST /api/boult/v3/plans/[planId]/execute
+ * POST /api/boult/v3/plans/[planId]/dismiss
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '../../../../../../../lib/auth.js';
 import { getSupabaseAdmin } from '../../../../../../../lib/supabase.js';
-import { executePlan } from '../../../../../../../lib/arcus-v3/executor';
+import { executePlan } from '../../../../../../../lib/boult-v3/executor';
 import { auditLogger } from '../../../../../../../lib/audit-logger.js';
 import { logEvent } from "@/lib/logsso";
 
@@ -33,7 +33,7 @@ export async function POST(
 
     // Verify plan exists and belongs to user
     const { data: plan, error } = await supabase
-      .from('arcus_plans')
+      .from('boult_plans')
       .select('id, status, findings, selected_option')
       .eq('id', planId)
       .eq('user_id', userId)
@@ -81,15 +81,15 @@ export async function POST(
           status: 'pending',
         }));
 
-        await supabase.from('arcus_plan_steps').insert(steps);
+        await supabase.from('boult_plan_steps').insert(steps);
 
         // Update plan status
         await supabase
-          .from('arcus_plans')
+          .from('boult_plans')
           .update({ status: 'approved', selected_option: selectedOption })
           .eq('id', planId);
 
-        await auditLogger.log(userId, 'arcus.plan_approved', { planId, selectedOption });
+        await auditLogger.log(userId, 'boult.plan_approved', { planId, selectedOption });
 
         return NextResponse.json({ status: 'approved', stepsCreated: steps.length });
       }
@@ -105,7 +105,7 @@ export async function POST(
 
         // Start execution in background (non-blocking)
         executePlan(planId, userId).catch(err => {
-          console.error('[Arcus V3] Execution error:', err.message);
+          console.error('[Boult V3] Execution error:', err.message);
         });
 
         return NextResponse.json({ status: 'executing' });
@@ -121,11 +121,11 @@ export async function POST(
         }
 
         await supabase
-          .from('arcus_plans')
+          .from('boult_plans')
           .update({ status: 'dismissed' })
           .eq('id', planId);
 
-        await auditLogger.log(userId, 'arcus.plan_dismissed', { planId });
+        await auditLogger.log(userId, 'boult.plan_dismissed', { planId });
 
         return NextResponse.json({ status: 'dismissed' });
       }
@@ -136,7 +136,7 @@ export async function POST(
 
   } catch (error) {
     logEvent({ channel: "failures", event: "❌ API Error", description: String(error) });
-    console.error('[Arcus V3] Plan action error:', (error as Error).message);
+    console.error('[Boult V3] Plan action error:', (error as Error).message);
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }

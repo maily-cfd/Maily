@@ -1,20 +1,20 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Platform Insights // Mailient Blog",
-  description: "Essays and guides on AI email agents, inbox triage, replies in your own voice, and email encryption — written by the founder building Mailient.",
-  metadataBase: new URL("https://mailient.xyz"),
+  title: "Platform Insights // Maily Blog",
+  description: "Essays and guides on AI email agents, inbox triage, replies in your own voice, and email encryption — written by the founder building Maily.",
+  metadataBase: new URL("https://maily.dev"),
   openGraph: {
-    title: "Platform Insights // Mailient Blog",
-    description: "Essays and guides on AI email agents, inbox triage, replies in your own voice, and email encryption — written by the founder building Mailient.",
-    url: "https://mailient.xyz/blogs",
-    siteName: "Mailient",
+    title: "Platform Insights // Maily Blog",
+    description: "Essays and guides on AI email agents, inbox triage, replies in your own voice, and email encryption — written by the founder building Maily.",
+    url: "https://maily.dev/blogs",
+    siteName: "Maily",
     images: [
       {
-        url: "/og-image.png",
+        url: "/logo-maily.png",
         width: 1200,
         height: 630,
-        alt: "Mailient Blog — Platform Insights",
+        alt: "Maily Blog — Platform Insights",
       },
     ],
     locale: "en_US",
@@ -22,9 +22,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Platform Insights // Mailient Blog",
+    title: "Platform Insights // Maily Blog",
     description: "Explore technical deep dives, engineering essays, and guides on autonomous AI email agents.",
-    images: ["/og-image.png"],
+    images: ["/logo-maily.png"],
   },
 };
 

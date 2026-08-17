@@ -1,4 +1,5 @@
 'use client';
+import { Mail } from "lucide-react";
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -129,24 +130,24 @@ export function HelpCard({ onClose }: HelpCardProps) {
                                 >
                                     <div>
                                         <h4 className="text-3xl font-bold text-black dark:text-white tracking-tighter mb-3">Power User Playbook.</h4>
-                                        <p className="text-neutral-600 dark:text-neutral-500 text-base leading-relaxed max-w-xl">Advanced strategies and hidden shortcuts to maximize your daily output with Mailient.</p>
+                                        <p className="text-neutral-600 dark:text-neutral-500 text-base leading-relaxed max-w-xl">Advanced strategies and hidden shortcuts to maximize your daily output with Maily.</p>
                                     </div>
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-12 pb-12">
                                         {[
-                                            { title: "Jump to Arcus", desc: "Press ⌘K (Ctrl+K) from anywhere to focus the Arcus chat input and start typing instantly." },
-                                            { title: "Voice Profile", desc: "Arcus analyzes your sent mail to match your tone and sign-offs — and keeps learning from the edits you make to its drafts." },
+                                            { title: "Jump to Boult", desc: "Press ⌘K (Ctrl+K) from anywhere to focus the Boult chat input and start typing instantly." },
+                                            { title: "Voice Profile", desc: "Boult analyzes your sent mail to match your tone and sign-offs — and keeps learning from the edits you make to its drafts." },
                                             { title: "Scheduled Agents", desc: "Set up background agents that run on their own schedule — like a morning inbox sweep — and report back to you." },
-                                            { title: "Calendar Scheduling", desc: "Ask Arcus to find open slots from your connected Google Calendar and draft a reply proposing times." },
-                                            { title: "Drafts, Never Auto-Sent", desc: "Every reply Arcus writes lands in your Gmail Drafts for approval. Nothing sends without you." },
+                                            { title: "Calendar Scheduling", desc: "Ask Boult to find open slots from your connected Google Calendar and draft a reply proposing times." },
+                                            { title: "Drafts, Never Auto-Sent", desc: "Every reply Boult writes lands in your Gmail Drafts for approval. Nothing sends without you." },
                                             { title: "Sift Today", desc: "Sift surfaces the threads that actually need you on your home feed — and shows the reasoning behind each one." },
-                                            { title: "Tone & Length", desc: "Tune Arcus in Settings: tone (Direct / Balanced / Warm) and length (Brief / Normal / Detailed)." },
-                                            { title: "Custom Instructions", desc: "Add standing instructions in Settings and Arcus follows them on every task it runs." },
+                                            { title: "Tone & Length", desc: "Tune Boult in Settings: tone (Direct / Balanced / Warm) and length (Brief / Normal / Detailed)." },
+                                            { title: "Custom Instructions", desc: "Add standing instructions in Settings and Boult follows them on every task it runs." },
 
-                                            { title: "Session Memory", desc: "Arcus remembers context across a conversation, so follow-ups stay sharp without re-explaining." },
+                                            { title: "Session Memory", desc: "Boult remembers context across a conversation, so follow-ups stay sharp without re-explaining." },
                                             { title: "Connected Tools", desc: "Link Google Calendar, Notion, and Slack so your agents can act and report across all of them." },
-                                            { title: "Reads Attachments", desc: "Attach or paste text files and Arcus reads them inline before it responds." },
-                                            { title: "Thread Summaries", desc: "Ask Arcus to condense a long thread — or several related ones — into a single brief." }
+                                            { title: "Reads Attachments", desc: "Attach or paste text files and Boult reads them inline before it responds." },
+                                            { title: "Thread Summaries", desc: "Ask Boult to condense a long thread — or several related ones — into a single brief." }
                                         ].map((tip, i) => (
                                             <div key={i} className="group">
                                                 <div className="flex items-center gap-4 mb-3">
@@ -170,18 +171,18 @@ export function HelpCard({ onClose }: HelpCardProps) {
                                     className="max-w-2xl py-4"
                                 >
                                     <div className="space-y-10 text-neutral-800 dark:text-neutral-300">
-                                        <h4 className="text-5xl font-bold text-black dark:text-white tracking-tighter leading-none mb-12">The vision for Mailient.</h4>
+                                        <h4 className="text-5xl font-bold text-black dark:text-white tracking-tighter leading-none mb-12">The vision for Maily.</h4>
                                         
                                         <p className="text-xl leading-relaxed font-semibold dark:text-neutral-100 border-l-2 border-black dark:border-white pl-8 italic">
-                                            &quot;I built Mailient because I was tired of fighting my own inbox. It felt like every morning I was drowning in noise, missing opportunities that actually mattered.&quot;
+                                            &quot;I built Maily because I was tired of fighting my own inbox. It felt like every morning I was drowning in noise, missing opportunities that actually mattered.&quot;
                                         </p>
                                         
                                         <div className="space-y-8 text-lg leading-relaxed text-neutral-500 dark:text-neutral-400">
                                             <p>
-                                                We built this app to be your second brain. Not another tool that demands your attention, but a partner that clears the path so you can focus on the work that truly moves the needle. Mailient is about reclaiming your time and your sanity.
+                                                We built this app to be your second brain. Not another tool that demands your attention, but a partner that clears the path so you can focus on the work that truly moves the needle. Maily is about reclaiming your time and your sanity.
                                             </p>
                                             <p>
-                                                The truth is, email was never designed for the scale of business we do today. It&apos;s a legacy system that we&apos;re trying to fix with modern intelligence. Every feature you see in Mailient—from the way Arcus drafts replies to how Sift identifies hot leads—is something I personally needed.
+                                                The truth is, email was never designed for the scale of business we do today. It&apos;s a legacy system that we&apos;re trying to fix with modern intelligence. Every feature you see in Maily—from the way Boult drafts replies to how Sift identifies hot leads—is something I personally needed.
                                             </p>
                                             <p>
                                                 We&apos;re just getting started. Every feature, every pixel, and every AI model we train is designed with one goal: making your life simpler. Thanks for joining us on this journey. It means the world to me.
@@ -190,10 +191,10 @@ export function HelpCard({ onClose }: HelpCardProps) {
                                         
                                         <div className="pt-12 flex items-center gap-8">
                                             <div className="w-20 h-20 rounded-full overflow-hidden grayscale border border-neutral-200 dark:border-white/10">
-                                                <img src="/mailient-logo-v3.png" className="w-full h-full object-cover bg-black" alt="Maulik" />
+                                                <Mail className="w-full h-full p-1 text-inherit" />
                                             </div>
                                             <div>
-                                                <div className="text-2xl font-bold dark:text-white tracking-tight">Maulik Barsaiyan</div>
+                                                <div className="text-2xl font-bold dark:text-white tracking-tight">Maily Team</div>
                                                 <div className="text-sm text-neutral-600 dark:text-neutral-500 font-mono tracking-widest uppercase mt-1">Founding Engineer & CEO</div>
                                             </div>
                                         </div>

@@ -36,7 +36,7 @@ export async function GET(request, { params }) {
     // message detail must agree on which Gmail credential is live.
     let accessToken = null;
     try {
-      const { getGmailToken } = await import('@/lib/arcus/tools/http-tokens');
+      const { getGmailToken } = await import('@/lib/boult/tools/http-tokens');
       accessToken = await getGmailToken(userEmail);
     } catch (e) {
       logEvent({ channel: "failures", event: "❌ API Error", description: String(e) });
@@ -111,7 +111,7 @@ export async function GET(request, { params }) {
         const session2 = await auth();
         const uid = session2?.user?.email?.toLowerCase();
         if (uid) {
-          const { markIntegrationNeedsReauth } = await import('@/lib/arcus/tools/http-tokens');
+          const { markIntegrationNeedsReauth } = await import('@/lib/boult/tools/http-tokens');
           await markIntegrationNeedsReauth(uid, 'gmail');
         }
       } catch {

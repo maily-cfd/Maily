@@ -1,14 +1,14 @@
 'use client';
 /**
- * Arcus V3 — Plan Artifact Card
+ * Boult V3 — Plan Artifact Card
  *
  * State machine component with exactly 4 states:
  * detected → plan_built → executing → completed
  *
- * Presentation is built on the app's own theme tokens (arcus-* + glass), so
+ * Presentation is built on the app's own theme tokens (boult-* + glass), so
  * the card and every element on it is legible in BOTH themes. The previous
- * version styled itself with the standalone arcus-v3 token sheet whose
- * companion classes (.arcus-badge, .arcus-btn-primary, …) were never loaded
+ * version styled itself with the standalone boult-v3 token sheet whose
+ * companion classes (.boult-badge, .boult-btn-primary, …) were never loaded
  * in the chat bundle — badges and buttons rendered unstyled and inherited
  * near-invisible colors on the light theme.
  */
@@ -97,7 +97,7 @@ interface PlanArtifactCardProps {
 }
 
 const SEVERITY_MAP: Record<string, { label: string; chip: string }> = {
-  low:    { label: 'Low Priority',    chip: 'bg-black/[0.05] dark:bg-white/[0.07] text-arcus-fg-secondary' },
+  low:    { label: 'Low Priority',    chip: 'bg-black/[0.05] dark:bg-white/[0.07] text-boult-fg-secondary' },
   medium: { label: 'Needs Attention', chip: 'bg-amber-500/10 text-amber-700 dark:text-amber-300' },
   high:   { label: 'Action Required', chip: 'bg-rose-500/10 text-rose-700 dark:text-rose-300' },
 };
@@ -156,13 +156,13 @@ export default function PlanArtifactCard({ plan, isNew, onUpdate }: PlanArtifact
   async function handleBuildPlan() {
     setLoading(true);
     try {
-      const res = await fetch(`/api/arcus/v3/plans/${normalizedPlan.id}/approve`, {
+      const res = await fetch(`/api/boult/v3/plans/${normalizedPlan.id}/approve`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ selectedOption }),
       });
       if (res.ok) {
-        const planRes = await fetch(`/api/arcus/v3/plans/${normalizedPlan.id}`);
+        const planRes = await fetch(`/api/boult/v3/plans/${normalizedPlan.id}`);
         if (planRes.ok) {
           const updated = await planRes.json();
           setSteps(updated.steps || []);
@@ -179,7 +179,7 @@ export default function PlanArtifactCard({ plan, isNew, onUpdate }: PlanArtifact
   async function handleExecute() {
     setLoading(true);
     try {
-      const res = await fetch(`/api/arcus/v3/plans/${normalizedPlan.id}/execute`, { method: 'POST' });
+      const res = await fetch(`/api/boult/v3/plans/${normalizedPlan.id}/execute`, { method: 'POST' });
       if (res.ok) setStatus('executing');
     } catch (err) {
       console.error('Execution trigger failed:', err);
@@ -190,7 +190,7 @@ export default function PlanArtifactCard({ plan, isNew, onUpdate }: PlanArtifact
 
   async function handleDismiss() {
     try {
-      await fetch(`/api/arcus/v3/plans/${normalizedPlan.id}/dismiss`, { method: 'POST' });
+      await fetch(`/api/boult/v3/plans/${normalizedPlan.id}/dismiss`, { method: 'POST' });
       setStatus('dismissed');
       onUpdate?.();
     } catch (err) {
@@ -205,11 +205,11 @@ export default function PlanArtifactCard({ plan, isNew, onUpdate }: PlanArtifact
   // State: Completed (Collapsed)
   if (status === 'completed') {
     return (
-      <div className="arcus-glass rounded-2xl px-5 py-3.5 mb-4 flex items-center justify-between gap-3 opacity-70">
-        <span className="text-[13px] text-arcus-fg-secondary truncate">
+      <div className="boult-glass rounded-2xl px-5 py-3.5 mb-4 flex items-center justify-between gap-3 opacity-70">
+        <span className="text-[13px] text-boult-fg-secondary truncate">
           {normalizedPlan.findings?.[0]?.headline || normalizedPlan.headline}
         </span>
-        <span className="text-[11.5px] text-arcus-fg-tertiary shrink-0">
+        <span className="text-[11.5px] text-boult-fg-tertiary shrink-0">
           Completed · {completedRelativeTime}
         </span>
       </div>
@@ -220,27 +220,27 @@ export default function PlanArtifactCard({ plan, isNew, onUpdate }: PlanArtifact
   const finding = normalizedPlan.findings?.[0];
 
   return (
-    <div className={cn('arcus-glass-card rounded-2xl p-6 mb-4', isNew && 'animate-in fade-in slide-in-from-bottom-2 duration-300')}>
+    <div className={cn('boult-glass-card rounded-2xl p-6 mb-4', isNew && 'animate-in fade-in slide-in-from-bottom-2 duration-300')}>
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <span className={cn('px-2.5 py-1 rounded-full text-[10.5px] font-semibold uppercase tracking-[0.08em]', severity.chip)}>
           {severity.label}
         </span>
-        <span className="text-[11.5px] text-arcus-fg-tertiary">{relativeTime}</span>
+        <span className="text-[11.5px] text-boult-fg-tertiary">{relativeTime}</span>
       </div>
 
       {/* Headline & Impact */}
-      <h3 className="text-[15.5px] font-semibold text-arcus-fg leading-snug mb-1.5">
+      <h3 className="text-[15.5px] font-semibold text-boult-fg leading-snug mb-1.5">
         {finding?.headline || normalizedPlan.headline}
       </h3>
-      <p className="text-[13.5px] text-arcus-fg-secondary leading-relaxed mb-3">
+      <p className="text-[13.5px] text-boult-fg-secondary leading-relaxed mb-3">
         {finding?.impact || normalizedPlan.impact}
       </p>
 
       {/* Detected State */}
       {(status === 'proposed' || status === 'detected') && finding && (
         <>
-          <div className="text-[11.5px] text-arcus-fg-tertiary mb-4">
+          <div className="text-[11.5px] text-boult-fg-tertiary mb-4">
             Detected from {normalizedPlan.source || 'connected apps'}
           </div>
 
@@ -262,20 +262,20 @@ export default function PlanArtifactCard({ plan, isNew, onUpdate }: PlanArtifact
                   {/* Radio */}
                   <span className={cn(
                     'mt-0.5 w-4 h-4 rounded-full border-[1.5px] flex items-center justify-center shrink-0 transition-colors',
-                    active ? 'border-arcus-fg' : 'border-black/25 dark:border-white/30',
+                    active ? 'border-boult-fg' : 'border-black/25 dark:border-white/30',
                   )}>
-                    {active && <span className="w-2 h-2 rounded-full bg-arcus-fg" />}
+                    {active && <span className="w-2 h-2 rounded-full bg-boult-fg" />}
                   </span>
                   <span className="flex-1 min-w-0">
                     <span className="flex items-baseline justify-between gap-3">
-                      <span className="text-[13.5px] font-medium text-arcus-fg">{option.label}</span>
-                      <span className="text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded bg-black/[0.05] dark:bg-white/[0.07] text-arcus-fg-tertiary shrink-0">
+                      <span className="text-[13.5px] font-medium text-boult-fg">{option.label}</span>
+                      <span className="text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded bg-black/[0.05] dark:bg-white/[0.07] text-boult-fg-tertiary shrink-0">
                         {option.effort} effort
                       </span>
                     </span>
                     <span className={cn(
                       'block text-[12px] leading-snug mt-0.5',
-                      option.irreversible ? 'text-amber-700 dark:text-amber-400' : 'text-arcus-fg-tertiary',
+                      option.irreversible ? 'text-amber-700 dark:text-amber-400' : 'text-boult-fg-tertiary',
                     )}>
                       {option.irreversible && <AlertTriangle className="inline w-3 h-3 mr-1 -mt-0.5" />}
                       {option.tradeoff}
@@ -291,7 +291,7 @@ export default function PlanArtifactCard({ plan, isNew, onUpdate }: PlanArtifact
               type="button"
               onClick={handleBuildPlan}
               disabled={loading}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-arcus-fg text-arcus-fg-inverse text-[13px] font-semibold hover:opacity-90 active:scale-95 transition-all disabled:opacity-50"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-boult-fg text-boult-fg-inverse text-[13px] font-semibold hover:opacity-90 active:scale-95 transition-all disabled:opacity-50"
             >
               {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : 'Build Plan'}
             </button>
@@ -315,15 +315,15 @@ export default function PlanArtifactCard({ plan, isNew, onUpdate }: PlanArtifact
                   'w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[11px] tabular-nums',
                   step.status === 'completed'
                     ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400'
-                    : 'bg-black/[0.05] dark:bg-white/[0.08] text-arcus-fg-tertiary',
+                    : 'bg-black/[0.05] dark:bg-white/[0.08] text-boult-fg-tertiary',
                 )}>
                   {step.status === 'pending' && (idx + 1)}
                   {step.status === 'executing' && <Loader2 className="w-3 h-3 animate-spin" />}
                   {step.status === 'completed' && <Check className="w-3 h-3" strokeWidth={2.5} />}
                   {step.status === 'failed' && <X className="w-3 h-3 text-rose-600 dark:text-rose-400" strokeWidth={2.5} />}
                 </span>
-                <span className="flex-1 text-[13px] text-arcus-fg leading-snug">{step.human_readable}</span>
-                <span className="text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded bg-black/[0.04] dark:bg-white/[0.06] border border-black/[0.06] dark:border-white/[0.08] text-arcus-fg-tertiary shrink-0">
+                <span className="flex-1 text-[13px] text-boult-fg leading-snug">{step.human_readable}</span>
+                <span className="text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded bg-black/[0.04] dark:bg-white/[0.06] border border-black/[0.06] dark:border-white/[0.08] text-boult-fg-tertiary shrink-0">
                   {step.app}
                 </span>
               </div>
@@ -336,7 +336,7 @@ export default function PlanArtifactCard({ plan, isNew, onUpdate }: PlanArtifact
                 <button
                   type="button"
                   onClick={handleDismiss}
-                  className="px-4 py-2 rounded-xl text-[13px] font-medium text-arcus-fg-secondary hover:bg-black/[0.04] dark:hover:bg-white/[0.05] transition-colors"
+                  className="px-4 py-2 rounded-xl text-[13px] font-medium text-boult-fg-secondary hover:bg-black/[0.04] dark:hover:bg-white/[0.05] transition-colors"
                 >
                   Dismiss
                 </button>
@@ -344,14 +344,14 @@ export default function PlanArtifactCard({ plan, isNew, onUpdate }: PlanArtifact
                   type="button"
                   onClick={handleExecute}
                   disabled={loading}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-arcus-fg text-arcus-fg-inverse text-[13px] font-semibold hover:opacity-90 active:scale-95 transition-all disabled:opacity-50"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-boult-fg text-boult-fg-inverse text-[13px] font-semibold hover:opacity-90 active:scale-95 transition-all disabled:opacity-50"
                 >
                   {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : 'Execute'}
                 </button>
               </>
             )}
             {status === 'executing' && (
-              <span className="inline-flex items-center gap-2 px-4 py-2 text-[13px] font-medium text-arcus-fg-tertiary">
+              <span className="inline-flex items-center gap-2 px-4 py-2 text-[13px] font-medium text-boult-fg-tertiary">
                 <Loader2 className="w-3.5 h-3.5 animate-spin" /> Running…
               </span>
             )}

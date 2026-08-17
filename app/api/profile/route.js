@@ -24,7 +24,7 @@ async function ensureDatabaseTables() {
 
     if (profileCheckError && profileCheckError.message.includes('does not exist')) {
       console.log("user_profiles table missing, running total setup...");
-      const setupResponse = await fetch(`${process.env.NEXTAUTH_URL || 'https://mailient.xyz'}/api/database/setup`, {
+      const setupResponse = await fetch(`${process.env.NEXTAUTH_URL || 'https://maily.dev'}/api/database/setup`, {
         method: 'POST'
       });
       if (!setupResponse.ok) throw new Error("Setup failed");
@@ -393,7 +393,7 @@ export async function GET(req) {
         last_synced_at: null,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
-        // Enhanced data for Mailient
+        // Enhanced data for Maily
         email_accounts_connected: tokens.length || 0,
         emails_processed: emailCount || 0,
         plan: profile?.preferences?.plan || 'No Active Plan',
@@ -402,7 +402,7 @@ export async function GET(req) {
       });
     }
 
-    // Fetch additional data for Mailient
+    // Fetch additional data for Maily
     // Query by google_email since tokens might be stored with email as user_id
     let tokens = [];
     try {
@@ -949,7 +949,7 @@ async function getGmailProfile(email) {
 
   // try fetch; on 401 try refresh once
   const profileFetch = async (token) => {
-    const { googleFetch } = await import('@/lib/arcus/tools/http-tokens');
+    const { googleFetch } = await import('@/lib/boult/tools/http-tokens');
     const r = await googleFetch(email, 'gmail', "https://www.googleapis.com/gmail/v1/users/me/profile", {
       headers: { Authorization: `Bearer ${token}` },
     });

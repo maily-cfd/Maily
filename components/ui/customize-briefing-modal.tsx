@@ -6,7 +6,7 @@ import { X, SlidersHorizontal, Loader2, Mail, Calendar, CalendarClock, FileText,
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 // Type-only import — keeps the server-side lib (supabase) out of the client bundle.
-import type { BriefingPrefs, BriefingFocus, BriefingTone } from '@/lib/arcus/briefing-prefs';
+import type { BriefingPrefs, BriefingFocus, BriefingTone } from '@/lib/boult/briefing-prefs';
 
 const DEFAULTS: BriefingPrefs = {
   focus: 'balanced',
@@ -221,7 +221,7 @@ export function CustomizeBriefingModal({ isOpen, onClose, onSaved }: CustomizeBr
                     />
                     <div className="flex items-center gap-1.5 mt-2 text-[11.5px] text-black/35 dark:text-white/35">
                       <Sparkles className="w-3 h-3" strokeWidth={2} />
-                      Honored where it applies — Arcus never invents items to satisfy it.
+                      Honored where it applies — Boult never invents items to satisfy it.
                       <span className="ml-auto tabular-nums">{prefs.customInstructions.length}/500</span>
                     </div>
                   </div>

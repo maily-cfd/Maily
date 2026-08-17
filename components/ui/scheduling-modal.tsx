@@ -87,7 +87,7 @@ export function SchedulingModal({ isOpen, onClose, emailId }: SchedulingModalPro
     // Initialize Cal.com API
     useEffect(() => {
         (async function initCal() {
-            const cal = await getCalApi({ namespace: "mailient" });
+            const cal = await getCalApi({ namespace: "maily" });
             cal("ui", {
                 cssVarsPerTheme: {
                     light: {
@@ -199,7 +199,7 @@ export function SchedulingModal({ isOpen, onClose, emailId }: SchedulingModalPro
         localStorage.setItem('calcom_event_type', calComEventType);
 
         try {
-            const cal = await getCalApi({ namespace: "mailient" });
+            const cal = await getCalApi({ namespace: "maily" });
 
             // Open Cal.com modal with pre-configured settings
             cal("modal", {

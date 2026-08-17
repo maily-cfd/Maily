@@ -1,6 +1,6 @@
 'use client';
 /**
- * Arcus V3 — Relative Time Hook
+ * Boult V3 — Relative Time Hook
  * Updates every 60 seconds.
  */
 import { useState, useEffect } from 'react';

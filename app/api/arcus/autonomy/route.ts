@@ -1,8 +1,8 @@
 /**
  * Autonomy API — the trust-ladder control surface.
  *
- *   GET  /api/arcus/autonomy   → { settings, grants, suggestions, pendingActions }
- *   POST /api/arcus/autonomy   → one of:
+ *   GET  /api/boult/autonomy   → { settings, grants, suggestions, pendingActions }
+ *   POST /api/boult/autonomy   → one of:
  *      { op: 'settings', enabled?, bufferMinutes?, allowInstant? }
  *      { op: 'setGrant', action, targetKey, level, delayMode?, scope?, label? }
  *      { op: 'acceptSuggestion', action, targetKey, delayMode? }   // → level 'auto'
@@ -20,7 +20,7 @@ import {
   getSettings, updateSettings, listGrants, listSuggestions, listAutonomyActions,
   setGrant, dismissSuggestion, stopAutonomyAction,
   type GrantAction, type GrantLevel, type DelayMode,
-} from '../../../../lib/arcus/autonomy-grants';
+} from '../../../../lib/boult/autonomy-grants';
 import { logEvent } from "@/lib/logsso";
 
 const auth: any = nextAuth;

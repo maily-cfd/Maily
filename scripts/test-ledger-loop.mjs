@@ -2,12 +2,12 @@
 //
 // Stage 4 (follow-through) smoke test — proves a commitment survives and closes
 // across runs, against LIVE Supabase. Verifies the exact DB contract the ledger
-// module (lib/arcus/super/ledger.ts) depends on, so you can trust the moat
+// module (lib/boult/super/ledger.ts) depends on, so you can trust the moat
 // before launch without needing a live cron tick.
 //
 // Run:  node scripts/test-ledger-loop.mjs
 // Needs: .env.local with SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY, and the
-//        arcus_super_agent_v1.sql migration applied (creates arcus_ledger).
+//        boult_super_agent_v1.sql migration applied (creates boult_ledger).
 //
 // It self-cleans: every row it writes is deleted at the end (and on failure).
 
@@ -37,7 +37,7 @@ function check(name, cond) {
 
 async function cleanup() {
   if (created.length) {
-    await supabase.from('arcus_ledger').delete().in('id', created);
+    await supabase.from('boult_ledger').delete().in('id', created);
   }
 }
 
@@ -48,15 +48,15 @@ async function main() {
   const yesterday = new Date(Date.now() - 86_400_000).toISOString();
   const what = 'Send Acme the revised proposal deck';
   const { data: added, error: addErr } = await supabase
-    .from('arcus_ledger')
+    .from('boult_ledger')
     .insert({ user_id: TEST_USER, what, who: 'Acme', due: yesterday, status: 'open', detail: {} })
     .select()
     .single();
 
   if (addErr) {
     console.error(`\n✗ Insert failed: ${addErr.message}`);
-    if (/relation .*arcus_ledger.* does not exist/i.test(addErr.message)) {
-      console.error('  → The arcus_super_agent_v1.sql migration has NOT been applied yet.');
+    if (/relation .*boult_ledger.* does not exist/i.test(addErr.message)) {
+      console.error('  → The boult_super_agent_v1.sql migration has NOT been applied yet.');
     }
     process.exit(1);
   }
@@ -64,13 +64,13 @@ async function main() {
   check('commitment added (open)', added.status === 'open' && added.what === what);
 
   // 2) Idempotency — re-adding the same open promise must NOT duplicate.
-  let dq = supabase.from('arcus_ledger').select('*')
+  let dq = supabase.from('boult_ledger').select('*')
     .eq('user_id', TEST_USER).in('status', ['open', 'in_progress']).ilike('what', what);
   const { data: dup } = await dq.maybeSingle();
   check('dedupe finds the existing open item (no duplicate)', dup && dup.id === added.id);
 
   // 3) listOpen + due filtering — the item shows up as DUE (due <= now).
-  const { data: openRows } = await supabase.from('arcus_ledger').select('*')
+  const { data: openRows } = await supabase.from('boult_ledger').select('*')
     .eq('user_id', TEST_USER).in('status', ['open', 'in_progress'])
     .order('due', { ascending: true, nullsFirst: false });
   const due = (openRows || []).filter(e => e.due && new Date(e.due).getTime() <= Date.now());
@@ -83,14 +83,14 @@ async function main() {
   check('overdue item is flagged as unmentioned (would be surfaced)', unmentioned.some(e => e.id === added.id));
 
   // 5) Close it — simulating a later run that actually did the work.
-  const { error: closeErr } = await supabase.from('arcus_ledger')
+  const { error: closeErr } = await supabase.from('boult_ledger')
     .update({ status: 'done', closed_run_id: null, updated_at: new Date().toISOString() })
     .eq('id', added.id);
   if (closeErr) console.error(`    (close error: ${closeErr.message})`);
   check('commitment closed (done)', !closeErr);
 
   // 6) Cross-run check — next run's "open" list no longer contains it.
-  const { data: openAfter } = await supabase.from('arcus_ledger').select('id')
+  const { data: openAfter } = await supabase.from('boult_ledger').select('id')
     .eq('user_id', TEST_USER).in('status', ['open', 'in_progress']);
   check('closed commitment no longer open (ball not re-dropped)', !(openAfter || []).some(e => e.id === added.id));
 

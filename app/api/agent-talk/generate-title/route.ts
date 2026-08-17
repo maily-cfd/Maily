@@ -5,7 +5,7 @@ import { logEvent } from "@/lib/logsso";
 export const dynamic = 'force-dynamic';
 export const maxDuration = 15;
 
-// Verified-working free models (same set as lib/arcus/engine.ts). The old list
+// Verified-working free models (same set as lib/boult/engine.ts). The old list
 // was a single tiny 1.2B "thinking" model that was unreliable AND leaked
 // <thinking> tags into titles — so titles silently fell back to the user's
 // first words every time. These are reliable + don't emit reasoning tags.
@@ -51,7 +51,7 @@ async function tryGenerateTitle(message: string): Promise<string | null> {
           headers: {
             Authorization: `Bearer ${key}`,
             'Content-Type': 'application/json',
-            'HTTP-Referer': 'https://mailient.xyz',
+            'HTTP-Referer': 'https://maily.dev',
           },
           body: JSON.stringify({
             model,

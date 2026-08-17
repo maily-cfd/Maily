@@ -187,7 +187,7 @@ function SignUpContent() {
 
   const testimonials = [
     {
-      avatarSrc: "/testimonials/john-oliver.png",
+      avatarSrc: "/user-avatar.png",
       name: "John Oliver",
       handle: "@joms0993",
       text: "I checked out your tool and it looks great. I think people would find a lot of value in it. The pricing is also very competitive compared to similar tools, which could make an easy choice for users."

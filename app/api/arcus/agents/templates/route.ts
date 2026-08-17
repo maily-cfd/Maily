@@ -1,6 +1,6 @@
 // @ts-nocheck
 /**
- * /api/arcus/agents/templates
+ * /api/boult/agents/templates
  *
  *   GET  → returns the AGENT_TEMPLATES catalog (no auth — the catalog is
  *          static config; the UI can show it on the marketing page too).
@@ -8,7 +8,7 @@
  *   POST → body: { templateId, overrides? } — spawns the template as a
  *          live agent for the authenticated user. Skips the LLM-driven
  *          spec-confirm flow because the template IS the spec.
- *          Returns the same shape as /api/arcus/agents/create.
+ *          Returns the same shape as /api/boult/agents/create.
  *
  * Optional `overrides` lets the user tweak schedule / channel / skipConfirmations
  * at spawn time without re-typing the whole template.
@@ -17,7 +17,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '../../../../../lib/auth.js';
 import { getSupabaseAdmin } from '../../../../../lib/supabase.js';
-import { AGENT_TEMPLATES, getTemplateById } from '../../../../../lib/arcus/agent-templates';
+import { AGENT_TEMPLATES, getTemplateById } from '../../../../../lib/boult/agent-templates';
 import { logEvent } from "@/lib/logsso";
 
 const DOW_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
     // active agent with the template's name for this user, return it instead
     // of inserting a second row.
     const { data: existing } = await supabase
-      .from('arcus_agents')
+      .from('boult_agents')
       .select('id, name, task_description, cron_schedule, output_channel, status, skip_confirmations')
       .eq('user_id', userId)
       .eq('name', template.name)
@@ -95,7 +95,7 @@ export async function POST(request: NextRequest) {
     if (Array.isArray(template.pipelineChildren) && template.pipelineChildren.length) {
       for (const child of template.pipelineChildren) {
         const { data: childRow, error: childErr } = await supabase
-          .from('arcus_agents')
+          .from('boult_agents')
           .insert({
             user_id: userId,
             name: child.name,
@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { data, error } = await supabase
-      .from('arcus_agents')
+      .from('boult_agents')
       .insert({
         user_id: userId,
         name: template.name,

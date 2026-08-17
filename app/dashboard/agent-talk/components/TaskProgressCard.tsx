@@ -64,7 +64,7 @@ export function TaskProgressCard({ taskList, isActive }: TaskProgressCardProps) 
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 4 }}
       transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-      className="w-full rounded-2xl border border-arcus-border bg-arcus-surface overflow-hidden mb-2"
+      className="w-full rounded-2xl border border-boult-border bg-boult-surface overflow-hidden mb-2"
     >
       {/* Task rows — rendered ABOVE the header so expansion goes upward */}
       <AnimatePresence initial={false}>
@@ -76,7 +76,7 @@ export function TaskProgressCard({ taskList, isActive }: TaskProgressCardProps) 
             transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
             className="overflow-hidden"
           >
-            <div className="px-4 pt-3 pb-2 flex flex-col gap-0.5 border-b border-arcus-border/40">
+            <div className="px-4 pt-3 pb-2 flex flex-col gap-0.5 border-b border-boult-border/40">
               {tasks.map((task, idx) => {
                 const isCompleted = idx < done;
                 const isRunning = !isCompleted && isActive && idx === done;
@@ -96,17 +96,17 @@ export function TaskProgressCard({ taskList, isActive }: TaskProgressCardProps) 
                           animate={{ scale: 1, opacity: 1 }}
                           transition={{ type: 'spring', damping: 20, stiffness: 350 }}
                         >
-                          <Check className="w-3.5 h-3.5 text-arcus-fg-secondary" />
+                          <Check className="w-3.5 h-3.5 text-boult-fg-secondary" />
                         </motion.div>
                       ) : isRunning ? (
                         <motion.div
                           animate={{ opacity: [0.4, 1, 0.4] }}
                           transition={{ repeat: Infinity, duration: 1.4, ease: 'easeInOut' }}
                         >
-                          <Clock className="w-3.5 h-3.5 text-arcus-fg-secondary/80" />
+                          <Clock className="w-3.5 h-3.5 text-boult-fg-secondary/80" />
                         </motion.div>
                       ) : (
-                        <Clock className="w-3.5 h-3.5 text-arcus-fg-muted/40" />
+                        <Clock className="w-3.5 h-3.5 text-boult-fg-muted/40" />
                       )}
                     </div>
 
@@ -114,10 +114,10 @@ export function TaskProgressCard({ taskList, isActive }: TaskProgressCardProps) 
                       className={cn(
                         'text-[13px] leading-snug tracking-tight transition-colors duration-500',
                         isCompleted
-                          ? 'text-arcus-fg-secondary/80 line-through'
+                          ? 'text-boult-fg-secondary/80 line-through'
                           : isRunning
-                          ? 'text-arcus-fg font-medium'
-                          : 'text-arcus-fg-muted/50',
+                          ? 'text-boult-fg font-medium'
+                          : 'text-boult-fg-muted/50',
                       )}
                     >
                       {task}
@@ -134,18 +134,18 @@ export function TaskProgressCard({ taskList, isActive }: TaskProgressCardProps) 
           so the user reads the current state without expanding. */}
       <button
         onClick={() => setCollapsed(c => !c)}
-        className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-arcus-surface-hover/30 transition-colors text-left"
+        className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-boult-surface-hover/30 transition-colors text-left"
       >
         {/* Status dot — pulse while active */}
         <div className="flex-shrink-0">
           {isActive && done < total ? (
             <motion.span
-              className="inline-block w-1.5 h-1.5 rounded-full bg-arcus-fg-secondary/60"
+              className="inline-block w-1.5 h-1.5 rounded-full bg-boult-fg-secondary/60"
               animate={{ opacity: [0.3, 1, 0.3] }}
               transition={{ repeat: Infinity, duration: 1.4, ease: 'easeInOut' }}
             />
           ) : (
-            <Check className="w-3 h-3 text-arcus-fg-secondary/60" />
+            <Check className="w-3 h-3 text-boult-fg-secondary/60" />
           )}
         </div>
 
@@ -157,12 +157,12 @@ export function TaskProgressCard({ taskList, isActive }: TaskProgressCardProps) 
               initial={{ opacity: 0, y: 2 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.25 }}
-              className="block text-[12.5px] font-medium text-arcus-fg tracking-tight truncate"
+              className="block text-[12.5px] font-medium text-boult-fg tracking-tight truncate"
             >
               {activeTask}
             </motion.span>
           ) : (
-            <span className="block text-[12.5px] font-semibold text-arcus-fg-secondary tracking-tight">
+            <span className="block text-[12.5px] font-semibold text-boult-fg-secondary tracking-tight">
               {done === total ? 'Done' : 'Working…'}
             </span>
           )}
@@ -170,18 +170,18 @@ export function TaskProgressCard({ taskList, isActive }: TaskProgressCardProps) 
 
         {/* Right side: progress count + elapsed + chevron */}
         <div className="flex items-center gap-2.5 flex-shrink-0">
-          <span className="text-[11px] font-mono text-arcus-fg-muted tabular-nums">
+          <span className="text-[11px] font-mono text-boult-fg-muted tabular-nums">
             {done}/{total}
           </span>
           <span className={cn(
             'text-[11px] font-mono tabular-nums',
-            isActive ? 'text-arcus-fg-secondary' : 'text-arcus-fg-muted',
+            isActive ? 'text-boult-fg-secondary' : 'text-boult-fg-muted',
           )}>
             {elapsedLabel}
           </span>
           <ChevronDown
             className={cn(
-              'w-3.5 h-3.5 text-arcus-fg-muted/60 transition-transform duration-200',
+              'w-3.5 h-3.5 text-boult-fg-muted/60 transition-transform duration-200',
               collapsed ? 'rotate-0' : 'rotate-180',
             )}
           />

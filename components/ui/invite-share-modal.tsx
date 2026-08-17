@@ -43,19 +43,19 @@ export function InviteShareModal({ open, onOpenChange, username }: InviteShareMo
 
   // Generate platform-specific messages
   const getMessage = (platform: string) => {
-    const baseMessage = `Hey!\n\n${username} has invited you to join Mailient`;
+    const baseMessage = `Hey!\n\n${username} has invited you to join Maily`;
 
     switch (platform) {
       case 'x-dm':
         return `${baseMessage} - a powerful email intelligence platform. Check it out: ${invitationLink}`;
       case 'x-post':
-        return `${baseMessage}! 🚀 Join me on Mailient and transform how you manage your emails. ${invitationLink}`;
+        return `${baseMessage}! 🚀 Join me on Maily and transform how you manage your emails. ${invitationLink}`;
       case 'whatsapp':
         return `${baseMessage}! 🎉 It's an amazing email intelligence platform that helps you stay organized and productive. Join me here: ${invitationLink}`;
       case 'gmail':
-        return `Hey!\n\n${username} has invited you to join Mailient, a powerful email intelligence platform that helps you stay organized and productive.\n\nJoin here: ${invitationLink}\n\nLooking forward to connecting with you on Mailient!\n\nBest regards`;
+        return `Hey!\n\n${username} has invited you to join Maily, a powerful email intelligence platform that helps you stay organized and productive.\n\nJoin here: ${invitationLink}\n\nLooking forward to connecting with you on Maily!\n\nBest regards`;
       case 'linkedin':
-        return `Hi there,\n\n${username} has invited you to join Mailient, a professional email intelligence platform designed to help you manage your communications more effectively.\n\nI think you'd find it valuable for your workflow. You can join here: ${invitationLink}\n\nLooking forward to connecting with you on the platform!\n\nBest regards`;
+        return `Hi there,\n\n${username} has invited you to join Maily, a professional email intelligence platform designed to help you manage your communications more effectively.\n\nI think you'd find it valuable for your workflow. You can join here: ${invitationLink}\n\nLooking forward to connecting with you on the platform!\n\nBest regards`;
       default:
         return `${baseMessage}. Join here: ${invitationLink}`;
     }
@@ -97,7 +97,7 @@ export function InviteShareModal({ open, onOpenChange, username }: InviteShareMo
       icon: GmailLogo,
       color: 'text-[#EA4335]',
       action: () => {
-        const subject = `${username} has invited you to join Mailient`;
+        const subject = `${username} has invited you to join Maily`;
         const body = getMessage('gmail');
         const url = `https://mail.google.com/mail/?view=cm&fs=1&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
         window.open(url, '_blank', 'noopener,noreferrer');
@@ -132,7 +132,7 @@ export function InviteShareModal({ open, onOpenChange, username }: InviteShareMo
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg bg-[#000000] border-[#2f3336] text-white backdrop-blur-md bg-opacity-90 [&_[data-radix-dialog-backdrop]]:bg-black/60 [&_[data-radix-dialog-backdrop]]:backdrop-blur-sm">
         <DialogHeader>
-          <DialogTitle className="text-white text-xl font-bold">Invite Friends to Mailient</DialogTitle>
+          <DialogTitle className="text-white text-xl font-bold">Invite Friends to Maily</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6">

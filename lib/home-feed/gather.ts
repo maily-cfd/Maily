@@ -25,9 +25,9 @@
 import { getSupabaseAdmin } from '@/lib/supabase.js';
 // @ts-ignore — JS module
 import { CalComService } from '@/lib/calcom.js';
-import { getGmailToken, getGcalToken, getNotionToken, getSlackToken, googleFetch } from '@/lib/arcus/tools/http-tokens';
+import { getGmailToken, getGcalToken, getNotionToken, getSlackToken, googleFetch } from '@/lib/boult/tools/http-tokens';
 import { logEvent } from '@/lib/logsso';
-import type { BriefingPrefs } from '@/lib/arcus/briefing-prefs';
+import type { BriefingPrefs } from '@/lib/boult/briefing-prefs';
 
 // ── Shared shapes ─────────────────────────────────────────────────────────────
 

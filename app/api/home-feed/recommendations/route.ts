@@ -17,7 +17,7 @@
 import { NextResponse } from 'next/server';
 // @ts-ignore — JS module
 import { auth } from '@/lib/auth.js';
-import { getBriefingPrefs, type BriefingPrefs } from '@/lib/arcus/briefing-prefs';
+import { getBriefingPrefs, type BriefingPrefs } from '@/lib/boult/briefing-prefs';
 // The five cross-app gatherers now live in the SHARED module so /world can fuse
 // them too — this route just consumes their output (unchanged behavior for it).
 import { gatherServerSignals, cleanName, type GatheredSignal } from '@/lib/home-feed/gather';
@@ -74,7 +74,7 @@ interface OutRec {
   category: Category;
   title: string;
   summary: string;
-  arcusPrompt: string;
+  boultPrompt: string;
   ctaLabel: string;
   stat: { value: number; label: string };
   // Opportunity Detection: true when this is a hidden loss caught before it
@@ -173,7 +173,7 @@ async function generate(items: InItem[], prefs: BriefingPrefs, founderModel = ''
 
   // FOUNDER MEMORY (visible recall on the feed): if we know the founder's VIPs /
   // style / priorities, let the picks reason from that — a rec grounded in "Priya
-  // is a VIP you flagged" reads like Mailient already knows them. Never invent:
+  // is a VIP you flagged" reads like Maily already knows them. Never invent:
   // the model may only LEAN on this, never manufacture a person/fact from it.
   const memoryLine = founderModel.trim()
     ? `WHAT YOU ALREADY KNOW ABOUT THIS FOUNDER (reason from it; rank a known VIP's silence above a stranger's; when a pick is shaped by something here, say so briefly in the summary — "Priya, a VIP you flagged, has gone quiet". NEVER invent a person or fact not present in the numbered items):\n${founderModel.trim().slice(0, 900)}\n\n`
@@ -190,13 +190,13 @@ async function generate(items: InItem[], prefs: BriefingPrefs, founderModel = ''
     '- Do NOT put your own statistics or counts in the text — the system computes and renders those separately. Keep summary about the specific people/subjects.\n' +
     '- title: a short, plain imperative, ≤7 words (e.g. "Reconnect with Sarah before it stalls").\n' +
     '- summary: ONE sentence, specific, naming the real person/subject and why it matters now.\n' +
-    '- arcusPrompt: one self-contained instruction the user hands to their AI assistant (Arcus) to DO this with zero further typing (e.g. "Draft a warm, low-pressure follow-up to Sarah Chen about the Q3 proposal she hasn\'t replied to."). Grounded entirely in the referenced items.\n' +
+    '- boultPrompt: one self-contained instruction the user hands to their AI assistant (Boult) to DO this with zero further typing (e.g. "Draft a warm, low-pressure follow-up to Sarah Chen about the Q3 proposal she hasn\'t replied to."). Grounded entirely in the referenced items.\n' +
     '- ctaLabel: 2-3 words for the button (e.g. "Draft nudge", "Prep me", "Clear it").\n\n' +
     'ALSO write a "sift" object — a spoken-aloud read of the founder\'s WHOLE connected ecosystem right now (not just the recommendations above):\n' +
     '  · headline = ONE short punchy sentence (≤14 words) naming the single thing that matters most today.\n' +
     '  · analysis = a FULL 3-4 sentence paragraph (aim for 3-4 lines, ~55-90 words) that reads the founder\'s table back to them: who is waiting on a reply, what has gone quiet or is at risk, which meetings or commitments are coming, and what is already handled — name the real people and subjects, and finish with the single move that matters most today. Flowing prose like a sharp chief of staff briefing them in 20 seconds, NOT a bullet list, and it must be a COMPLETE thought — never trail off mid-sentence.\n' +
     'Ground both ENTIRELY in the numbered items; NEVER invent a person, count, or company. If there is little going on, say so honestly in 2-3 calm sentences rather than padding.\n' +
-    'Return ONLY JSON: {"sift":{"headline","analysis"},"recommendations":[{"category","title","summary","arcusPrompt","ctaLabel","atRisk":true|false,"refIds":[numbers]}]}';
+    'Return ONLY JSON: {"sift":{"headline","analysis"},"recommendations":[{"category","title","summary","boultPrompt","ctaLabel","atRisk":true|false,"refIds":[numbers]}]}';
 
   const basePayload = {
     max_tokens: 1050,   // room for the fuller 3-4 line Sift read + the recs
@@ -215,7 +215,7 @@ async function generate(items: InItem[], prefs: BriefingPrefs, founderModel = ''
   // paid model here without the user naming it first.
   const paidModels = process.env.DISABLE_PAID_FALLBACK === 'true'
     ? []
-    : ((process.env.ARCUS_PREMIUM_MODELS || '').split(',').map(s => s.trim()).filter(Boolean));
+    : ((process.env.BOULT_PREMIUM_MODELS || '').split(',').map(s => s.trim()).filter(Boolean));
   // Extra free model so the chain doesn't dead-end when gemma and nemotron-super
   // are both rate-limited upstream. Live-verified 2026-07-22 (real keys, clean
   // non-empty content under response_format:json_object). extractJsonObject()
@@ -234,7 +234,7 @@ async function generate(items: InItem[], prefs: BriefingPrefs, founderModel = ''
   // engine does, so a 14s timeout × every model × every key could exceed this
   // route's own maxDuration (25s) long before exhausting the chain — the exact
   // mechanical shape of the "AI doesn't work" bug found and fixed in
-  // lib/arcus/engine.ts's MODEL_TIMEOUT. Capping keys-per-model bounds the
+  // lib/boult/engine.ts's MODEL_TIMEOUT. Capping keys-per-model bounds the
   // worst case to (models × 2 × 14s) instead of (models × keys × 14s).
   const KEYS_PER_MODEL = 2;
   // Track the REAL last failure so the route can surface it directly instead of a
@@ -248,13 +248,13 @@ async function generate(items: InItem[], prefs: BriefingPrefs, founderModel = ''
         // max_tokens budget on hidden reasoning and come back as an empty 200
         // (zero recs). Two of the three free models in modelChain are nemotron,
         // so without this the fallback path silently produced no AI recs whenever
-        // gemma was rate-limited. Same fix already proven in lib/arcus/engine.ts;
+        // gemma was rate-limited. Same fix already proven in lib/boult/engine.ts;
         // gated to /nemotron/ so non-reasoning models are untouched.
         const reqBody: Record<string, any> = { ...basePayload, model };
         if (/nemotron/i.test(model)) reqBody.reasoning = { enabled: false };
         const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
           method: 'POST',
-          headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json', 'HTTP-Referer': 'https://mailient.xyz', 'X-Title': 'Mailient' },
+          headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json', 'HTTP-Referer': 'https://maily.dev', 'X-Title': 'Maily' },
           body: JSON.stringify(reqBody),
           signal: AbortSignal.timeout(14000),
         });
@@ -352,21 +352,21 @@ function validate(raw: any[], items: InItem[], maxRecs: number): OutRec[] {
     const category: Category = r.category === 'connect' ? 'connect' : r.category === 'productivity' ? 'productivity' : 'productivity';
     const title = clampStr(r.title, 70);
     const summary = clampStr(r.summary, 200);
-    const arcusPrompt = clampStr(r.arcusPrompt, 400);
-    const ctaLabel = clampStr(r.ctaLabel, 24) || 'Do it with Arcus';
+    const boultPrompt = clampStr(r.boultPrompt, 400);
+    const ctaLabel = clampStr(r.ctaLabel, 24) || 'Do it with Boult';
     // refIds MUST all resolve to real items we sent — this is the anti-hallucination
     // gate. Coerce "1" / 1 / "[1]" to the integer ref; drop anything that doesn't match.
     const refIdsRaw = Array.isArray(r.refIds) ? r.refIds : [];
     const refs = refIdsRaw
       .map((id: any) => byRef.get(parseInt(String(id).replace(/[^\d]/g, ''), 10)))
       .filter(Boolean) as InItem[];
-    if (!title || !summary || !arcusPrompt || refs.length === 0) continue;
+    if (!title || !summary || !boultPrompt || refs.length === 0) continue;
     out.push({
       id: `airec-${i}`,
       category,
       title,
       summary,
-      arcusPrompt,
+      boultPrompt,
       ctaLabel,
       stat: statFor(refs),
       atRisk: r.atRisk === true,
@@ -411,10 +411,10 @@ export async function POST(req: Request) {
 
     // The user's Customize-Briefing prefs shape what we gather and how we rank.
     // The founder model (VIPs/style/priorities) lets picks reason from what
-    // Mailient already knows — fetched in parallel, fail-soft to ''.
+    // Maily already knows — fetched in parallel, fail-soft to ''.
     const [prefs, founderModel] = await Promise.all([
       getBriefingPrefs(userEmail),
-      (async () => { try { const { getUserModelSummary } = await import('@/lib/arcus/user-model'); return await getUserModelSummary(userEmail); } catch {
+      (async () => { try { const { getUserModelSummary } = await import('@/lib/boult/user-model'); return await getUserModelSummary(userEmail); } catch {
           logEvent({ channel: "failures", event: "❌ API Error", description: "Unknown error" }); return ''; } })(),
     ]);
 

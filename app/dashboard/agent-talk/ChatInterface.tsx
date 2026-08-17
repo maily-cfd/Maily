@@ -9,8 +9,8 @@ import { AddSquareIcon, Cancel01Icon, WorkHistoryIcon } from '@hugeicons/core-fr
 import { ChatHistoryModal } from './components/ChatHistoryModal';
 import { SuggestionChips } from './components/SuggestionChips';
 // PART 46 — slash-command registry (for /help generation + handler typing).
-import { SLASH_COMMANDS } from '@/lib/arcus/skills';
-import { humanizeToolName } from '@/lib/arcus/tool-labels';
+import { SLASH_COMMANDS } from '@/lib/boult/skills';
+import { humanizeToolName } from '@/lib/boult/tool-labels';
 import { ThinkingLayer, ResultCard, type ThinkingStep, type ThinkingBlock, type SearchSession } from './components/ThinkingLayer';
 import { ConnectorRequiredPanel, type ConnectorRequiredEntry } from './components/ThinkingLayerV2';
 import { AskUserCard, type AskQuestion } from './components/AskUserCard';
@@ -36,13 +36,13 @@ import { PlanCanvas } from './components/PlanCanvas';
 import { SearchExecutionPanel } from './components/SearchExecutionPanel';
 import { ConnectorBar } from './components/ConnectorBar';
 import { StatusBar } from './components/StatusBar';
-import { ArcusDashboard } from './components/ArcusDashboard';
+import { BoultDashboard } from './components/BoultDashboard';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { PromptInputBox } from '@/components/ui/ai-prompt-box';
 import { ConnectorsModal } from '@/components/ui/connectors-modal';
 import { EmailSelectionModal } from '@/components/ui/email-selection-modal';
-import { ArcusSettingsModal } from '@/components/ui/arcus-settings-modal';
+import { BoultSettingsModal } from '@/components/ui/boult-settings-modal';
 import { GradientButton } from '@/components/ui/gradient-button';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
 import { RainbowButton } from '@/components/ui/rainbow-button';
@@ -50,7 +50,7 @@ import { HomeFeedSidebar } from "@/components/ui/home-feed-sidebar";
 import { TextShimmer } from '@/components/ui/text-shimmer';
 import WordBlurStream from '../../../src/WordBlurStream';
 import { GlassButton, GlassTabContainer } from "@/components/ui/apple-tahoe-liquid-glass-button";
-import { ArcusLogo } from "@/components/ui/arcus-logo";
+import { BoultLogo } from "@/components/ui/boult-logo";
 
 import { UsageLimitModal } from '@/components/ui/usage-limit-modal';
 import { SettingsCard } from '@/components/ui/settings-card';
@@ -68,8 +68,8 @@ import { audioRuntime } from '@/lib/audio-runtime';
 import { NotificationService } from '@/lib/notification-service';
 import { GradientWave } from '@/components/ui/gradient-wave';
 import { SpiralLoader } from '@/components/ui/spiral-loader';
-import { useArcusAgentStream } from './hooks/useArcusAgentStream';
-import { useArcusV3Feed } from './hooks/useArcusV3Feed';
+import { useBoultAgentStream } from './hooks/useBoultAgentStream';
+import { useBoultV3Feed } from './hooks/useBoultV3Feed';
 import { usePlanModeBrief } from './hooks/usePlanModeBrief';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { ShortcutsModal } from './components/ShortcutsModal';
@@ -231,7 +231,7 @@ const MarkdownComponents: any = {
         "font-mono text-sm",
         inline
           ? "px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-white/[0.08] text-zinc-800 dark:text-white"
-          : "block p-4 bg-zinc-50 dark:bg-arcus-elevated border border-zinc-200 dark:border-arcus-border rounded-lg text-zinc-800 dark:text-white my-4 overflow-x-auto",
+          : "block p-4 bg-zinc-50 dark:bg-boult-elevated border border-zinc-200 dark:border-boult-border rounded-lg text-zinc-800 dark:text-white my-4 overflow-x-auto",
         className
       )} {...props}>
         {children}
@@ -239,7 +239,7 @@ const MarkdownComponents: any = {
     );
   },
   pre: ({ children }: any) => (
-    <pre className="block my-4 bg-zinc-50 dark:bg-arcus-elevated border border-zinc-200 dark:border-arcus-border rounded-lg overflow-hidden">
+    <pre className="block my-4 bg-zinc-50 dark:bg-boult-elevated border border-zinc-200 dark:border-boult-border rounded-lg overflow-hidden">
       {children}
     </pre>
   ),
@@ -384,7 +384,7 @@ const MissionStatusHeader = ({ mission }: { mission: any }) => {
   };
 
   return (
-    <div className="flex items-center gap-3 px-4 py-2 bg-arcus-surface border border-arcus-border rounded-xl w-fit mb-8 shadow-sm">
+    <div className="flex items-center gap-3 px-4 py-2 bg-boult-surface border border-boult-border rounded-xl w-fit mb-8 shadow-sm">
       <div className="flex items-center gap-2">
         <div className="w-1.5 h-1.5 rounded-full bg-white/40 animate-pulse shrink-0" />
         <span className="text-black dark:text-white/95 text-[13px] font-bold tracking-tight">{mission.goal}</span>
@@ -962,20 +962,20 @@ const NoScrollbarStyles = () => (
       font-family: 'Montserrat', sans-serif !important;
     }
 
-    .arcus-scrollbar::-webkit-scrollbar {
+    .boult-scrollbar::-webkit-scrollbar {
       width: 6px;
     }
-    .arcus-scrollbar::-webkit-scrollbar-track {
+    .boult-scrollbar::-webkit-scrollbar-track {
       background: transparent;
     }
-    .arcus-scrollbar::-webkit-scrollbar-thumb {
+    .boult-scrollbar::-webkit-scrollbar-thumb {
       background: rgba(255, 255, 255, 0.1);
       border-radius: 10px;
     }
-    .arcus-scrollbar::-webkit-scrollbar-thumb:hover {
+    .boult-scrollbar::-webkit-scrollbar-thumb:hover {
       background: rgba(255, 255, 255, 0.2);
     }
-    .arcus-scrollbar {
+    .boult-scrollbar {
       scrollbar-width: thin;
       scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
     }
@@ -1023,7 +1023,7 @@ function AgentThinkingSection({ content, isComplete }: { content: string, isComp
           <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="w-4 h-4 rounded-full bg-arcus-elevated border border-arcus-border flex items-center justify-center flex-shrink-0"
+            className="w-4 h-4 rounded-full bg-boult-elevated border border-boult-border flex items-center justify-center flex-shrink-0"
           >
             <div className="w-1 h-1 rounded-full bg-black/40 dark:bg-white/25" />
           </motion.div>
@@ -1127,8 +1127,8 @@ function AgentTaskPill({ step }: { step: AgentStep }) {
     <div className={cn(
       "flex flex-col gap-0.5 px-3 py-1.5 rounded-2xl w-fit mt-2 group/pill transition-all border",
       step.status === 'active'
-        ? "bg-arcus-surface border-arcus-divider shadow-[0_0_10px_rgba(255,255,255,0.05)] overflow-hidden relative"
-        : "bg-arcus-elevated border-arcus-border hover:bg-arcus-surface hover:border-arcus-divider"
+        ? "bg-boult-surface border-boult-divider shadow-[0_0_10px_rgba(255,255,255,0.05)] overflow-hidden relative"
+        : "bg-boult-elevated border-boult-border hover:bg-boult-surface hover:border-boult-divider"
     )}>
       {step.status === 'active' && (
         <motion.div
@@ -1142,7 +1142,7 @@ function AgentTaskPill({ step }: { step: AgentStep }) {
           "flex items-center justify-center w-5 h-5 rounded-full border transition-all relative overflow-hidden flex-shrink-0",
           step.status === 'active'
             ? "bg-white/20 border-white/30 text-white shadow-[0_0_12px_rgba(255,255,255,0.4)]"
-            : "bg-arcus-elevated border-arcus-border text-arcus-fg-tertiary group-hover/pill:text-arcus-fg group-hover/pill:border-arcus-divider"
+            : "bg-boult-elevated border-boult-border text-boult-fg-tertiary group-hover/pill:text-boult-fg group-hover/pill:border-boult-divider"
         )}>
           {step.status === 'active' && (
             <motion.div
@@ -1299,7 +1299,7 @@ function CollapsibleSteps({
     : `${totalCount} step${totalCount !== 1 ? 's' : ''} completed`;
 
   return (
-    <div className={cn('mt-1 mb-4 arcus-glass rounded-2xl px-3.5 transition-all w-[640px] max-w-full', collapsed ? 'py-2' : 'py-2.5')}>
+    <div className={cn('mt-1 mb-4 boult-glass rounded-2xl px-3.5 transition-all w-[640px] max-w-full', collapsed ? 'py-2' : 'py-2.5')}>
       {/* Toggle row */}
       <button
         onClick={() => {
@@ -1389,14 +1389,14 @@ function CollapsibleSteps({
   );
 }
 
-// ─── Arcus Error Card ──────────────────────────────────────────────────────────
+// ─── Boult Error Card ──────────────────────────────────────────────────────────
 /**
  * PART 8 #6 — Classify a raw error string into a severity bucket so the
  * card can pick the right border color, icon, and primary action. Keeps
  * the LLM- and route-side error messages from leaking through raw.
  */
-type ArcusErrorKind = 'auth' | 'error' | 'warning';
-function classifyArcusError(message: string | undefined): ArcusErrorKind {
+type BoultErrorKind = 'auth' | 'error' | 'warning';
+function classifyBoultError(message: string | undefined): BoultErrorKind {
   if (!message) return 'error';
   const m = message.toLowerCase();
   // Auth/scope problems → "Reconnect" action makes sense
@@ -1433,7 +1433,7 @@ function classifyArcusError(message: string | undefined): ArcusErrorKind {
   return 'error';
 }
 
-function ArcusErrorCard({
+function BoultErrorCard({
   errorMessage,
   onRetry,
   onReconnect,
@@ -1447,7 +1447,7 @@ function ArcusErrorCard({
   const [retrying, setRetrying] = useState(false);
   const [nextRetryInMs, setNextRetryInMs] = useState<number | null>(null);
 
-  const kind = classifyArcusError(errorMessage);
+  const kind = classifyBoultError(errorMessage);
   const isExhausted = kind === 'warning';
 
   const RETRY_DELAYS_MS = [5000, 12000, 30000];
@@ -1488,8 +1488,8 @@ function ArcusErrorCard({
       : kind === 'warning'
         ? exhaustedAttempts
           ? 'Models are slammed right now.'
-          : 'Arcus is taking a moment.'
-        : 'Arcus was unable to reply.';
+          : 'Boult is taking a moment.'
+        : 'Boult was unable to reply.';
 
   const subtitle = (() => {
     if (kind === 'auth' || kind === 'error') {
@@ -1517,8 +1517,8 @@ function ArcusErrorCard({
     : kind === 'warning'
       ? {
           border: 'border-white/15',
-          bg: 'bg-arcus-surface-hover',
-          iconBg: 'bg-arcus-elevated border-arcus-border',
+          bg: 'bg-boult-surface-hover',
+          iconBg: 'bg-boult-elevated border-boult-border',
           iconColor: 'text-white/55',
         }
       : {
@@ -1576,8 +1576,8 @@ function ArcusErrorCard({
           <Icon />
         </div>
         <div className="min-w-0">
-          <p className="text-[13px] font-semibold text-arcus-fg leading-tight">{headline}</p>
-          <p className="text-[12px] text-arcus-fg-tertiary mt-0.5 leading-snug break-words">{subtitle}</p>
+          <p className="text-[13px] font-semibold text-boult-fg leading-tight">{headline}</p>
+          <p className="text-[12px] text-boult-fg-tertiary mt-0.5 leading-snug break-words">{subtitle}</p>
         </div>
       </div>
 
@@ -1596,8 +1596,8 @@ function ArcusErrorCard({
           className={cn(
             'flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-[12px] font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm',
             showReconnect
-              ? 'border border-arcus-border text-arcus-fg-secondary hover:text-arcus-fg hover:bg-arcus-surface-hover'
-              : 'bg-arcus-fg text-arcus-fg-inverse hover:bg-arcus-fg/90',
+              ? 'border border-boult-border text-boult-fg-secondary hover:text-boult-fg hover:bg-boult-surface-hover'
+              : 'bg-boult-fg text-boult-fg-inverse hover:bg-boult-fg/90',
           )}
         >
           {retrying ? (
@@ -1635,7 +1635,7 @@ function PartialCompletionCard({
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ type: 'spring', damping: 24, stiffness: 260 }}
-      className="mt-3 rounded-2xl overflow-hidden border border-arcus-border bg-arcus-elevated"
+      className="mt-3 rounded-2xl overflow-hidden border border-boult-border bg-boult-elevated"
     >
       {/* Skipped steps */}
       <div className="px-4 py-3">
@@ -1656,7 +1656,7 @@ function PartialCompletionCard({
       </div>
 
       {/* Reason footer */}
-      <div className="px-4 py-2 border-t border-arcus-border bg-white/[0.02]">
+      <div className="px-4 py-2 border-t border-boult-border bg-white/[0.02]">
         <p className="text-[11px] text-white/30">{reason}</p>
       </div>
     </motion.div>
@@ -1681,40 +1681,40 @@ function PartialFailureCard({
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ type: 'spring', damping: 24, stiffness: 260 }}
-      className="mt-4 rounded-2xl overflow-hidden border border-arcus-border bg-arcus-elevated"
+      className="mt-4 rounded-2xl overflow-hidden border border-boult-border bg-boult-elevated"
     >
       {/* Done section */}
       {done.length > 0 && (
-        <div className="px-4 py-3 border-b border-arcus-border">
-          <p className="text-[10px] font-bold text-arcus-fg-muted uppercase tracking-widest mb-2">Done</p>
+        <div className="px-4 py-3 border-b border-boult-border">
+          <p className="text-[10px] font-bold text-boult-fg-muted uppercase tracking-widest mb-2">Done</p>
           <div className="flex flex-col gap-1">
             {done.map(t => (
               <div key={t} className="flex items-center gap-2">
                 <div className="w-1.5 h-1.5 rounded-full bg-green-400/60 flex-shrink-0" />
-                <span className="text-[12px] text-arcus-fg-secondary font-mono">{toolLabel(t)}</span>
+                <span className="text-[12px] text-boult-fg-secondary font-mono">{toolLabel(t)}</span>
               </div>
             ))}
           </div>
         </div>
       )}
       {/* Failed section */}
-      <div className="px-4 py-3 border-b border-arcus-border">
+      <div className="px-4 py-3 border-b border-boult-border">
         <p className="text-[10px] font-bold text-red-400/60 uppercase tracking-widest mb-2">Needs attention</p>
         <div className="flex flex-col gap-2">
           {failed.map(f => (
             <div key={f.tool}>
               <div className="flex items-center gap-2">
                 <div className="w-1.5 h-1.5 rounded-full bg-red-400/60 flex-shrink-0" />
-                <span className="text-[12px] text-arcus-fg font-semibold font-mono">{toolLabel(f.tool)}</span>
+                <span className="text-[12px] text-boult-fg font-semibold font-mono">{toolLabel(f.tool)}</span>
               </div>
-              <p className="text-[11px] text-arcus-fg-muted pl-3.5 mt-0.5 leading-snug">{f.error}</p>
+              <p className="text-[11px] text-boult-fg-muted pl-3.5 mt-0.5 leading-snug">{f.error}</p>
             </div>
           ))}
         </div>
       </div>
       {/* Recovery question */}
       <div className="px-4 py-3">
-        <p className="text-[12px] text-arcus-fg-tertiary leading-snug">{question}</p>
+        <p className="text-[12px] text-boult-fg-tertiary leading-snug">{question}</p>
       </div>
     </motion.div>
   );
@@ -1743,7 +1743,7 @@ function ProceedConfirmButtons({ onProceed, onDismiss }: { onProceed: () => void
         </button>
         <button
           onClick={() => { onDismiss(); setDismissed(true); }}
-          className="px-4 py-2 rounded-xl bg-arcus-surface border border-arcus-border text-arcus-fg-tertiary text-[12px] font-medium hover:bg-arcus-raised hover:text-arcus-fg-secondary transition-all"
+          className="px-4 py-2 rounded-xl bg-boult-surface border border-boult-border text-boult-fg-tertiary text-[12px] font-medium hover:bg-boult-raised hover:text-boult-fg-secondary transition-all"
         >
           Cancel
         </button>
@@ -1829,7 +1829,7 @@ const UserMessageBlock = ({
 
   return (
     <div className="flex flex-col items-end w-full">
-      <div className="relative overflow-hidden arcus-glass-pill px-5 py-3 rounded-[22px] text-black dark:text-white max-w-full">
+      <div className="relative overflow-hidden boult-glass-pill px-5 py-3 rounded-[22px] text-black dark:text-white max-w-full">
         {isLoading && isLatestUser && (
           <motion.div
             className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.08] to-transparent w-[200%] pointer-events-none"
@@ -2001,7 +2001,7 @@ const MessageActionButtons = ({ msg, onFeedback, onRegenerate, isLoading, onShar
 
   return (
     <div className={cn("mt-5 flex flex-wrap items-center gap-2 max-w-full transition-opacity", isLoading ? "opacity-30 pointer-events-none" : "group-hover/msg:opacity-100")}>
-      <div className="inline-flex items-center gap-1.5 p-1.5 bg-arcus-elevated border border-arcus-border rounded-full backdrop-blur-md">
+      <div className="inline-flex items-center gap-1.5 p-1.5 bg-boult-elevated border border-boult-border rounded-full backdrop-blur-md">
         {/* Copy Button */}
         <Tooltip delayDuration={200}>
           <TooltipTrigger asChild>
@@ -2022,7 +2022,7 @@ const MessageActionButtons = ({ msg, onFeedback, onRegenerate, isLoading, onShar
               </AnimatePresence>
             </button>
           </TooltipTrigger>
-          <TooltipContent className="bg-white dark:bg-arcus-surface-hover border-black/10 dark:border-arcus-border text-black dark:text-white rounded-xl px-3 py-2 shadow-2xl">
+          <TooltipContent className="bg-white dark:bg-boult-surface-hover border-black/10 dark:border-boult-border text-black dark:text-white rounded-xl px-3 py-2 shadow-2xl">
             <div className="flex items-center gap-2">
               <span className="text-[11px] font-bold">Copy text</span>
               <span className="text-black/20 dark:text-white/20 text-[10px] font-mono">⌘C</span>
@@ -2053,7 +2053,7 @@ const MessageActionButtons = ({ msg, onFeedback, onRegenerate, isLoading, onShar
               </AnimatePresence>
             </button>
           </TooltipTrigger>
-          <TooltipContent className="bg-white dark:bg-arcus-surface-hover border-black/10 dark:border-arcus-border text-black dark:text-white rounded-xl px-3 py-2 shadow-2xl">
+          <TooltipContent className="bg-white dark:bg-boult-surface-hover border-black/10 dark:border-boult-border text-black dark:text-white rounded-xl px-3 py-2 shadow-2xl">
             <div className="flex items-center gap-2">
               <span className="text-[11px] font-bold">Share link</span>
               <span className="text-black/20 dark:text-white/20 text-[10px] font-mono">⌘L</span>
@@ -2076,7 +2076,7 @@ const MessageActionButtons = ({ msg, onFeedback, onRegenerate, isLoading, onShar
               </motion.div>
             </button>
           </TooltipTrigger>
-          <TooltipContent className="bg-white dark:bg-arcus-surface-hover border-black/10 dark:border-arcus-border text-black dark:text-white rounded-xl px-3 py-2 shadow-2xl">
+          <TooltipContent className="bg-white dark:bg-boult-surface-hover border-black/10 dark:border-boult-border text-black dark:text-white rounded-xl px-3 py-2 shadow-2xl">
             <span className="text-[11px] font-bold">Helpful</span>
           </TooltipContent>
         </Tooltip>
@@ -2096,7 +2096,7 @@ const MessageActionButtons = ({ msg, onFeedback, onRegenerate, isLoading, onShar
               </motion.div>
             </button>
           </TooltipTrigger>
-          <TooltipContent className="bg-white dark:bg-arcus-surface-hover border-black/10 dark:border-arcus-border text-black dark:text-white rounded-xl px-3 py-2 shadow-2xl">
+          <TooltipContent className="bg-white dark:bg-boult-surface-hover border-black/10 dark:border-boult-border text-black dark:text-white rounded-xl px-3 py-2 shadow-2xl">
             <span className="text-[11px] font-bold">Not helpful</span>
           </TooltipContent>
         </Tooltip>
@@ -2116,7 +2116,7 @@ const MessageActionButtons = ({ msg, onFeedback, onRegenerate, isLoading, onShar
               </motion.div>
             </button>
           </TooltipTrigger>
-          <TooltipContent className="bg-white dark:bg-arcus-surface-hover border-black/10 dark:border-arcus-border text-black dark:text-white rounded-xl px-3 py-2 shadow-2xl">
+          <TooltipContent className="bg-white dark:bg-boult-surface-hover border-black/10 dark:border-boult-border text-black dark:text-white rounded-xl px-3 py-2 shadow-2xl">
             <span className="text-[11px] font-bold">Regenerate</span>
           </TooltipContent>
         </Tooltip>
@@ -2154,13 +2154,13 @@ export default function ChatInterface({
   // nothing. Stored in state so we can fire handleSend once the chat has settled.
   const [pendingPrefill, setPendingPrefill] = useState<string | null>(null);
 
-  // SiftToday → Arcus prefill bridge. The home-feed action buttons stash a
+  // SiftToday → Boult prefill bridge. The home-feed action buttons stash a
   // prompt in sessionStorage before navigating here; we drain it on mount.
   useEffect(() => {
     try {
-      const prefill = sessionStorage.getItem('arcus_prefill');
+      const prefill = sessionStorage.getItem('boult_prefill');
       if (prefill) {
-        sessionStorage.removeItem('arcus_prefill');
+        sessionStorage.removeItem('boult_prefill');
         setPendingPrefill(prefill);
       }
     } catch { /* sessionStorage unavailable — ignore */ }
@@ -2266,7 +2266,7 @@ export default function ChatInterface({
   const [communicationStyle, setCommunicationStyle] = useState<'direct' | 'balanced' | 'warm'>('warm');
   const [verbosity, setVerbosity] = useState<'brief' | 'normal' | 'detailed'>('normal');
   // PART 47 — Ask / Auto write-action mode, with the same persistence pattern.
-  // Drives the prompt-box dropdown + the per-request body field on /api/arcus/chat.
+  // Drives the prompt-box dropdown + the per-request body field on /api/boult/chat.
   const [actionMode, setActionMode] = useState<'ask' | 'auto'>('ask');
   const [gmailAccessToken, setGmailAccessToken] = useState<string | null>(null);
   const [gmailTokenSource, setGmailTokenSource] = useState<string | null>(null);
@@ -2275,17 +2275,17 @@ export default function ChatInterface({
   const [showNotesFetching, setShowNotesFetching] = useState<boolean>(false);
   const [notesResults, setNotesResults] = useState<any[]>([]);
 
-  // Arcus V2 State
+  // Boult V2 State
   const [activeMission, setActiveMission] = useState<any>(null);
   const [liveThinkingBlocks, setLiveThinkingBlocks] = useState<ThinkingBlock[]>([]);
   const [currentThought, setCurrentThought] = useState<string | undefined>(undefined);
   const [pendingReplyProposal, setPendingReplyProposal] = useState<any>(null);
 
-  // Arcus view mode: 'feed' (default) or 'plan_mode' (daily brief)
-  const [arcusView, setArcusView] = useState<'feed' | 'plan_mode'>('feed');
+  // Boult view mode: 'feed' (default) or 'plan_mode' (daily brief)
+  const [boultView, setBoultView] = useState<'feed' | 'plan_mode'>('feed');
   const [dashboardTab, setDashboardTab] = useState<'home' | 'agents'>('home');
 
-  // Arcus V3 Plan Mode Brief
+  // Boult V3 Plan Mode Brief
   const {
     brief: planModeBrief,
     briefDate: planModeBriefDate,
@@ -2293,7 +2293,7 @@ export default function ChatInterface({
     generateNew: generateNewBrief,
   } = usePlanModeBrief();
 
-  // Arcus V3 Reactive Feed — surfaces webhook-driven plans in the chat
+  // Boult V3 Reactive Feed — surfaces webhook-driven plans in the chat
   const {
     activePlans: v3ActivePlans,
     completedPlans: v3CompletedPlans,
@@ -2301,11 +2301,11 @@ export default function ChatInterface({
     executePlan: v3ExecutePlan,
     dismissPlan: v3DismissPlan,
     refresh: v3Refresh,
-  } = useArcusV3Feed({
+  } = useBoultV3Feed({
     enabled: true,
     pollInterval: 30000,
     onNewPlan: (plan) => {
-      toast.info(`Arcus detected: ${plan.title}`, {
+      toast.info(`Boult detected: ${plan.title}`, {
         description: plan.objective?.substring(0, 80),
         duration: 5000,
       });
@@ -2402,8 +2402,8 @@ export default function ChatInterface({
   // Sync notification state and request permission
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const savedNotify = localStorage.getItem('arcus_notifications_enabled') === 'true';
-      const savedSound = localStorage.getItem('arcus_sound_enabled') !== 'false';
+      const savedNotify = localStorage.getItem('boult_notifications_enabled') === 'true';
+      const savedSound = localStorage.getItem('boult_sound_enabled') !== 'false';
 
       setNotificationsEnabled(savedNotify && NotificationService.permission === 'granted');
       setSoundEnabled(savedSound);
@@ -2415,7 +2415,7 @@ export default function ChatInterface({
     const isGranted = await NotificationService.requestPermission();
     if (isGranted) {
       setNotificationsEnabled(true);
-      localStorage.setItem('arcus_notifications_enabled', 'true');
+      localStorage.setItem('boult_notifications_enabled', 'true');
     }
   };
 
@@ -2423,7 +2423,7 @@ export default function ChatInterface({
     const newState = !soundEnabled;
     setSoundEnabled(newState);
     audioRuntime.setEnabled(newState);
-    localStorage.setItem('arcus_sound_enabled', String(newState));
+    localStorage.setItem('boult_sound_enabled', String(newState));
   };
 
   // Global Click Sound Listener
@@ -2456,7 +2456,7 @@ export default function ChatInterface({
     };
   }, [soundEnabled]);
 
-  const [arcusCredits, setArcusCredits] = useState<{
+  const [boultCredits, setBoultCredits] = useState<{
     usage: number;
     limit: number;
     remaining: number;
@@ -2493,7 +2493,7 @@ export default function ChatInterface({
       delete canvasResolversRef.current[msgId];
     }
 
-    toast.success('Mission accepted', { description: 'Opening Arcus Workspace...' });
+    toast.success('Mission accepted', { description: 'Opening Boult Workspace...' });
     
     // Resume agent loop with approval
     setTimeout(() => {
@@ -2755,12 +2755,12 @@ export default function ChatInterface({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoading, isAgentLoopActive, messages]);
 
-  const refreshArcusCredits = useCallback(async (showToast = false) => {
+  const refreshBoultCredits = useCallback(async (showToast = false) => {
     try {
       const res = await fetch('/api/subscription/usage', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ featureType: 'arcus_ai', increment: false })
+        body: JSON.stringify({ featureType: 'boult_ai', increment: false })
       });
 
       const data = await res.json().catch(() => null);
@@ -2781,11 +2781,11 @@ export default function ChatInterface({
         isUnlimited: !!data.isUnlimited
       };
 
-      setArcusCredits(next);
+      setBoultCredits(next);
 
       if (showToast && !next.isUnlimited && next.limit > 0) {
         toast.success('Credits Updated', {
-          description: `Arcus AI: ${next.usage}/${next.limit} used (${next.remaining} left ${next.period === 'daily' ? 'today' : 'this month'})`
+          description: `Boult AI: ${next.usage}/${next.limit} used (${next.remaining} left ${next.period === 'daily' ? 'today' : 'this month'})`
         });
       }
     } catch {
@@ -2841,7 +2841,7 @@ export default function ChatInterface({
           }
         }
 
-        await refreshArcusCredits(false);
+        await refreshBoultCredits(false);
       } catch (error) {
         console.error('Error in subscription flow:', error);
         setCurrentPlan('none');
@@ -2874,7 +2874,7 @@ export default function ChatInterface({
   const shortcuts = useKeyboardShortcuts({
     enabled: true,
     onFocusInput: () => {
-      const textarea = document.querySelector<HTMLTextAreaElement>('textarea[placeholder*="Arcus"]') ||
+      const textarea = document.querySelector<HTMLTextAreaElement>('textarea[placeholder*="Boult"]') ||
         document.querySelector<HTMLTextAreaElement>('textarea');
       textarea?.focus();
     },
@@ -3053,7 +3053,7 @@ export default function ChatInterface({
       case 'save_draft': return isActive ? 'Drafting response...' : 'Drafted response';
       case 'create_note': return isActive ? 'Creating note...' : 'Created note';
       case 'search_notes': return isActive ? 'Searching notes...' : 'Searched notes';
-      // New Arcus rebuild tool names
+      // New Boult rebuild tool names
       case 'search_gmail': return isActive ? `Searching inbox${params?.query ? ` for "${params.query}"` : '...'}` : `Searched inbox${params?.query ? ` for "${params.query}"` : ''}`;
       case 'read_email': return isActive ? 'Reading email thread...' : 'Read email thread';
       case 'get_sent_emails': return isActive ? 'Analyzing your writing style...' : 'Analyzed writing style';
@@ -3068,7 +3068,7 @@ export default function ChatInterface({
       case 'web_search': return isActive ? `Searching web${params?.query ? ` for "${params.query}"` : '...'}` : `Searched web${params?.query ? ` for "${params.query}"` : ''}`;
       case 'send_slack_message': return isActive ? `Sending Slack message${params?.channel ? ` to ${params.channel}` : '...'}` : `Sent Slack message${params?.channel ? ` to ${params.channel}` : ''}`;
       // Fallback: every other tool goes through the shared human-label map
-      // (lib/arcus/tool-labels), so the activity feed always reads like an
+      // (lib/boult/tool-labels), so the activity feed always reads like an
       // employee narrating work — never `Running gmail_bulk_read_threads...`.
       default: {
         const label = humanizeToolName(tool);
@@ -3120,7 +3120,7 @@ export default function ChatInterface({
     };
     setMessages(prev => [...prev, placeholderMsg]);
 
-    // Build conversation history from current messages to give Arcus memory
+    // Build conversation history from current messages to give Boult memory
     // G4 — Wider context: keep the last 40 turns instead of 20 so long
     // threads, multi-step approvals, and earlier instructions stay in scope.
     // 40 × ~200 tokens = ~8k of conversation history — well within budget.
@@ -3144,7 +3144,7 @@ export default function ChatInterface({
       .filter(h => h.content);
 
     try {
-      const response = await fetch('/api/arcus/chat', {
+      const response = await fetch('/api/boult/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -3393,7 +3393,7 @@ export default function ChatInterface({
                   why: pm.why || undefined,
                   details: pm.details || {},
                   // Threaded through so the card's Confirm click can POST to
-                  // /api/arcus/approval/confirm — without it the executor gate
+                  // /api/boult/approval/confirm — without it the executor gate
                   // refuses the subsequent send/schedule/post/create call.
                   approvalId: pm.approvalId || undefined,
                 };
@@ -3847,7 +3847,7 @@ export default function ChatInterface({
               streamFinishedNormally = true;
               // DO NOT destroy a document the user is reading. This used to run
               // setIsCanvasOpen(false) + setCanvasData(null) on every error, so
-              // if Arcus wrote a doc and then anything later in the run failed —
+              // if Boult wrote a doc and then anything later in the run failed —
               // a rate limit, a tool error, a timeout — the panel slammed shut
               // and the document disappeared mid-read, with the error message
               // appearing somewhere the user was no longer looking. The failure
@@ -3969,7 +3969,7 @@ export default function ChatInterface({
             case 'orchestration_plan': {
               // PART 9 — execution plan built before first tool call.
               // Stored on message meta; rendered as a collapsible plan card
-              // that shows the user what Arcus intends to do and in what order.
+              // that shows the user what Boult intends to do and in what order.
               if (data.steps?.length) {
                 const initialStepStatuses: Record<number, 'pending' | 'running' | 'completed' | 'failed'> = {};
                 data.steps.forEach((_: any, i: number) => { initialStepStatuses[i] = 'pending'; });
@@ -4124,7 +4124,7 @@ export default function ChatInterface({
       if (switchedToPlanMode) {
         setMessages(prev => prev.filter(m => m.id !== assistantMsgId));
         setAgentSteps([]);
-        toast.info('Arcus is planning this one first', {
+        toast.info('Boult is planning this one first', {
           description: 'This request is big enough to deserve a reviewable plan before execution.',
         });
         setTimeout(() => {
@@ -4273,7 +4273,7 @@ export default function ChatInterface({
         localStorage.setItem(`conversation_${conversationIdToUse}`, JSON.stringify({ ...existing, messages: unique, lastUpdated: new Date().toISOString(), messageCount: unique.length }));
 
         // Persist to Supabase (fire-and-forget — localStorage is the read cache)
-        fetch('/api/arcus/conversation', {
+        fetch('/api/boult/conversation', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ conversationId: conversationIdToUse, messages: unique, title: convTitle }),
@@ -4306,7 +4306,7 @@ export default function ChatInterface({
                 };
                 parsed.lastUpdated = new Date().toISOString();
                 localStorage.setItem(`conversation_${conversationIdToUse}`, JSON.stringify(parsed));
-                fetch('/api/arcus/conversation', {
+                fetch('/api/boult/conversation', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({ conversationId: conversationIdToUse, messages: parsed.messages, title: parsed.title }),
@@ -4329,7 +4329,7 @@ export default function ChatInterface({
             }
             localStorage.setItem(`conv_${conversationIdToUse}_title`, title);
             setChatTitle(title);
-            fetch('/api/arcus/conversation', {
+            fetch('/api/boult/conversation', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ conversationId: conversationIdToUse, messages: unique, title }),
@@ -4339,7 +4339,7 @@ export default function ChatInterface({
       }
 
       if (finalContent && (notificationsEnabled || soundEnabled)) {
-        NotificationService.notify('Arcus Response', finalContent.substring(0, 100), { soundType: 'notify', silent: !notificationsEnabled });
+        NotificationService.notify('Boult Response', finalContent.substring(0, 100), { soundType: 'notify', silent: !notificationsEnabled });
       }
 
     } catch (err: any) {
@@ -4441,8 +4441,8 @@ export default function ChatInterface({
       const requestId = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
       const approvalToken = canvasData?.approvalTokens?.[action];
 
-      console.log(`[Arcus:Canvas] Executing action '${action}' with requestId=${requestId}`);
-      const response = await fetch('/api/arcus/chat', {
+      console.log(`[Boult:Canvas] Executing action '${action}' with requestId=${requestId}`);
+      const response = await fetch('/api/boult/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -4461,7 +4461,7 @@ export default function ChatInterface({
 
       if (!response.ok) {
         const errBody = await response.text().catch(() => '(no body)');
-        console.error(`[Arcus:Canvas] POST /api/arcus/chat failed — status=${response.status}, body=${errBody}`);
+        console.error(`[Boult:Canvas] POST /api/boult/chat failed — status=${response.status}, body=${errBody}`);
       }
       const result = await response.json().catch(() => ({ error: 'Failed to parse response' }));
 
@@ -4542,7 +4542,7 @@ export default function ChatInterface({
       toast.error('Execution failed', {
         description: errorMessage
       });
-      console.error('[Arcus:Canvas] Execution error:', { action, error, message: errorMessage });
+      console.error('[Boult:Canvas] Execution error:', { action, error, message: errorMessage });
 
       // Add error to chat
       const errorAgentMessage: AgentMessage = {
@@ -4568,8 +4568,8 @@ export default function ChatInterface({
 
   const handleDeclinePlan = async (plan: any) => {
     try {
-      console.log(`[Arcus:Plan] Declining plan: ${plan.planId}`);
-      const declineRes = await fetch('/api/arcus/chat', {
+      console.log(`[Boult:Plan] Declining plan: ${plan.planId}`);
+      const declineRes = await fetch('/api/boult/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -4584,12 +4584,12 @@ export default function ChatInterface({
         })
       });
       if (!declineRes.ok) {
-        console.error(`[Arcus:Plan] Decline failed — status=${declineRes.status}`);
+        console.error(`[Boult:Plan] Decline failed — status=${declineRes.status}`);
       }
 
       toast.info('Plan declined');
     } catch (error) {
-      console.error('[Arcus:Plan] Error declining plan:', error);
+      console.error('[Boult:Plan] Error declining plan:', error);
       toast.error('Error declining plan');
     }
   };
@@ -4598,8 +4598,8 @@ export default function ChatInterface({
   const handlePlanApprove = async (planId: string, messageId: number) => {
     setIsProcessingPlan(true);
     try {
-      console.log(`[Arcus:Plan] Approving plan: ${planId}`);
-      const response = await fetch('/api/arcus/chat', {
+      console.log(`[Boult:Plan] Approving plan: ${planId}`);
+      const response = await fetch('/api/boult/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -4616,7 +4616,7 @@ export default function ChatInterface({
 
       if (!response.ok) {
         const errBody = await response.text().catch(() => '(no body)');
-        console.error(`[Arcus:Plan] Approve failed — status=${response.status}, body=${errBody}`);
+        console.error(`[Boult:Plan] Approve failed — status=${response.status}, body=${errBody}`);
       }
       const result = await response.json().catch(() => ({ error: 'Failed to parse response' }));
 
@@ -4657,7 +4657,7 @@ export default function ChatInterface({
       }
     } catch (error) {
       toast.error('Failed to approve plan');
-      console.error('[Arcus:Plan] Approval error:', error);
+      console.error('[Boult:Plan] Approval error:', error);
     } finally {
       setIsProcessingPlan(false);
     }
@@ -4711,10 +4711,10 @@ export default function ChatInterface({
         setTimeout(() => scrollToBottom(true), 150);
 
         // Check for pending AI trigger
-        const pendingId = localStorage.getItem('pending_arcus_id');
+        const pendingId = localStorage.getItem('pending_boult_id');
         if (pendingId === conversationId) {
-          const pendingMsg = localStorage.getItem('pending_arcus_message');
-          const pendingOptionsRaw = localStorage.getItem('pending_arcus_options');
+          const pendingMsg = localStorage.getItem('pending_boult_message');
+          const pendingOptionsRaw = localStorage.getItem('pending_boult_options');
 
           try {
             if (pendingMsg) {
@@ -4729,9 +4729,9 @@ export default function ChatInterface({
             }
           } finally {
             // Explicitly clear pending state to prevent cross-contamination
-            localStorage.removeItem('pending_arcus_id');
-            localStorage.removeItem('pending_arcus_message');
-            localStorage.removeItem('pending_arcus_options');
+            localStorage.removeItem('pending_boult_id');
+            localStorage.removeItem('pending_boult_message');
+            localStorage.removeItem('pending_boult_options');
           }
         }
       } catch (error) {
@@ -4739,7 +4739,7 @@ export default function ChatInterface({
       }
     } else {
       // If not in localStorage, fetch from API
-      fetch(`/api/arcus/conversation/${conversationId}`)
+      fetch(`/api/boult/conversation/${conversationId}`)
         .then(response => (response.ok ? response.json() : Promise.reject(new Error(`HTTP ${response.status}`))))
         .then(data => {
           if (data && Array.isArray(data.messages) && data.messages.length > 0) {
@@ -4926,29 +4926,29 @@ export default function ChatInterface({
           const statusData = await statusRes.json();
           const gmailConnected = statusData.integrations?.gmail || false;
           if (!gmailConnected) {
-            console.log('[Arcus:Init] Gmail not connected — skipping token fetch.');
+            console.log('[Boult:Init] Gmail not connected — skipping token fetch.');
             setGmailAccessToken(null);
             setGmailTokenSource(null);
             return;
           }
         }
 
-        console.log('[Arcus:Init] Gmail connected — fetching access token...');
+        console.log('[Boult:Init] Gmail connected — fetching access token...');
         const res = await fetch('/api/agent-talk/gmail-token');
         if (!res.ok) {
           const errBody = await res.json().catch(() => ({}));
-          console.warn(`[Arcus:Init] Gmail token not available — status=${res.status}, reason=${errBody.error || 'unknown'}.`);
+          console.warn(`[Boult:Init] Gmail token not available — status=${res.status}, reason=${errBody.error || 'unknown'}.`);
           setGmailAccessToken(null);
           setGmailTokenSource(null);
           return;
         }
 
         const data = await res.json();
-        console.log(`[Arcus:Init] Gmail token loaded successfully (source=${data.source || 'unknown'})`);
+        console.log(`[Boult:Init] Gmail token loaded successfully (source=${data.source || 'unknown'})`);
         setGmailAccessToken(data.accessToken || null);
         setGmailTokenSource(data.source || null);
       } catch (error) {
-        console.error('[Arcus:Init] Failed to load Gmail token for agent:', error);
+        console.error('[Boult:Init] Failed to load Gmail token for agent:', error);
         setGmailAccessToken(null);
         setGmailTokenSource(null);
       }
@@ -5388,7 +5388,7 @@ export default function ChatInterface({
     if (messages.length === 0 || !currentConversationId) return;
 
     try {
-      await fetch('/api/arcus/conversation', {
+      await fetch('/api/boult/conversation', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -5407,8 +5407,8 @@ export default function ChatInterface({
 
     try {
       setIsLoading(true);
-      console.log('[Arcus:Reply] Sending reply to:', draftData.recipientEmail);
-      const res = await fetch('/api/arcus/chat', {
+      console.log('[Boult:Reply] Sending reply to:', draftData.recipientEmail);
+      const res = await fetch('/api/boult/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -5422,7 +5422,7 @@ export default function ChatInterface({
 
       if (!res.ok) {
         const errBody = await res.text().catch(() => '(no body)');
-        console.error(`[Arcus:Reply] POST /api/arcus/chat failed — status=${res.status}, body=${errBody}`);
+        console.error(`[Boult:Reply] POST /api/boult/chat failed — status=${res.status}, body=${errBody}`);
         throw new Error(`Failed to send reply (${res.status})`);
       }
 
@@ -5514,11 +5514,11 @@ export default function ChatInterface({
         // Note: Run polling endpoint is not currently implemented.
         // The SSE stream already provides real-time updates.
         // This polling is a fallback for cases where the SSE stream disconnects.
-        const res = await fetch(`/api/arcus/v3/chat?pollRunId=${activeRun.runId}`);
+        const res = await fetch(`/api/boult/v3/chat?pollRunId=${activeRun.runId}`);
         if (!res.ok) {
           // Run polling is best-effort; the SSE stream handles real-time updates
           if (res.status !== 404) {
-            console.warn(`[Arcus:Poll] Run poll returned status=${res.status} for runId=${activeRun.runId}`);
+            console.warn(`[Boult:Poll] Run poll returned status=${res.status} for runId=${activeRun.runId}`);
           }
           return;
         }
@@ -5556,7 +5556,7 @@ export default function ChatInterface({
           });
         }
       } catch (error) {
-        console.error('[Arcus:Poll] Run polling failed:', error);
+        console.error('[Boult:Poll] Run polling failed:', error);
       }
     };
 
@@ -5588,7 +5588,7 @@ export default function ChatInterface({
         />
 
 
-        <div className="flex h-full w-full text-arcus-fg bg-arcus-bg selection:bg-arcus-surface selection:text-arcus-fg dark:selection:bg-arcus-surface dark:selection:text-arcus-fg overflow-hidden relative tracking-tight" style={{ height: '100vh', overflow: 'hidden' }}>
+        <div className="flex h-full w-full text-boult-fg bg-boult-bg selection:bg-boult-surface selection:text-boult-fg dark:selection:bg-boult-surface dark:selection:text-boult-fg overflow-hidden relative tracking-tight" style={{ height: '100vh', overflow: 'hidden' }}>
           {/* Apple-style Premium Grain Overlay */}
           <div className="absolute inset-0 pointer-events-none opacity-[0.03] z-[100] bg-[url('/noise.svg')] brightness-100 contrast-150" />
 
@@ -5655,7 +5655,7 @@ export default function ChatInterface({
             {/* Main Layout Wrapper - Absolute positioned to fill screen strictly */}
             <div
               className={cn(
-                "absolute inset-0 bg-arcus-bg overflow-hidden flex flex-col md:flex-row",
+                "absolute inset-0 bg-boult-bg overflow-hidden flex flex-col md:flex-row",
                 !isEmbedded ? (isSidebarCollapsed ? "md:left-20" : "md:left-64") : "left-0",
                 "left-0"
               )}
@@ -5663,11 +5663,11 @@ export default function ChatInterface({
             >
               {/* Chat Column (Order 1 - LEFT) - Premium Refinement */}
               <div
-                className="flex-1 flex flex-col relative h-full min-w-0 order-1 bg-arcus-bg backdrop-blur-3xl border-l border-arcus-border rounded-none shadow-none overflow-hidden"
+                className="flex-1 flex flex-col relative h-full min-w-0 order-1 bg-boult-bg backdrop-blur-3xl border-l border-boult-border rounded-none shadow-none overflow-hidden"
                 style={{ display: 'flex', flexDirection: 'column', height: '100%', maxHeight: '100%' }}
               >
                 {/* Header - Glassmorphic fixed height */}
-                <div className="shrink-0 z-40 bg-arcus-bg/40 backdrop-blur-md border-none" style={{ flexShrink: 0 }}>
+                <div className="shrink-0 z-40 bg-boult-bg/40 backdrop-blur-md border-none" style={{ flexShrink: 0 }}>
                   <div className="relative px-4 sm:px-8 py-4">
                     {/* Mobile menu button — only shown on small screens */}
                     <div className="md:hidden absolute left-4 top-1/2 -translate-y-1/2 z-50">
@@ -5679,7 +5679,7 @@ export default function ChatInterface({
                       </button>
                     </div>
                     {/* Centered Agent/Home Toggle */}
-                    {isInitialMode && arcusView === 'feed' && (
+                    {isInitialMode && boultView === 'feed' && (
                       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-auto">
                         <motion.div
                           initial={{ opacity: 0, y: -10 }}
@@ -5692,13 +5692,13 @@ export default function ChatInterface({
                               className={cn(
                                 "relative px-5 py-2 rounded-full text-[12px] font-bold transition-all flex items-center gap-2 select-none",
                                 dashboardTab === 'home'
-                                  ? "text-arcus-fg"
-                                  : "text-arcus-fg-tertiary hover:text-arcus-fg-secondary"
+                                  ? "text-boult-fg"
+                                  : "text-boult-fg-tertiary hover:text-boult-fg-secondary"
                               )}
                             >
                               {dashboardTab === 'home' && (
                                 <motion.div
-                                  layoutId="activeArcusTab"
+                                  layoutId="activeBoultTab"
                                   className="absolute inset-0 bg-white/[0.08] dark:bg-white/[0.12] border border-white/10 rounded-full"
                                   transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                                 />
@@ -5711,13 +5711,13 @@ export default function ChatInterface({
                               className={cn(
                                 "relative px-5 py-2 rounded-full text-[12px] font-bold transition-all flex items-center gap-2 select-none",
                                 dashboardTab === 'agents'
-                                  ? "text-arcus-fg"
-                                  : "text-arcus-fg-tertiary hover:text-arcus-fg-secondary"
+                                  ? "text-boult-fg"
+                                  : "text-boult-fg-tertiary hover:text-boult-fg-secondary"
                               )}
                             >
                               {dashboardTab === 'agents' && (
                                 <motion.div
-                                  layoutId="activeArcusTab"
+                                  layoutId="activeBoultTab"
                                   className="absolute inset-0 bg-white/[0.08] dark:bg-white/[0.12] border border-white/10 rounded-full"
                                   transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                                 />
@@ -5754,7 +5754,7 @@ export default function ChatInterface({
                         {/* Leftmost: Title and Dropdown with refined Zinc styling */}
                         {!isInitialMode && (
                           <div className="relative" ref={titleMenuRef}>
-                            <div className="flex items-center bg-arcus-surface border border-arcus-border rounded-xl overflow-hidden shadow-sm transition-all hover:border-arcus-divider group">
+                            <div className="flex items-center bg-boult-surface border border-boult-border rounded-xl overflow-hidden shadow-sm transition-all hover:border-boult-divider group">
                               {isEditingTitle ? (
                                 <input
                                   ref={titleInputRef}
@@ -5794,7 +5794,7 @@ export default function ChatInterface({
 
                         {/* Dropdown Menu */}
                         {isTitleMenuOpen && (
-                          <div className="absolute top-full left-0 mt-2 w-48 bg-[#1A1A1A] border border-arcus-border rounded-xl shadow-2xl py-1.5 z-[100] animate-in fade-in zoom-in-95 duration-200">
+                          <div className="absolute top-full left-0 mt-2 w-48 bg-[#1A1A1A] border border-boult-border rounded-xl shadow-2xl py-1.5 z-[100] animate-in fade-in zoom-in-95 duration-200">
                             <button
                               onClick={() => {
                                 setIsStarred(!isStarred);
@@ -5973,12 +5973,12 @@ export default function ChatInterface({
                 >
                   <div
                     ref={setScrollContainerRef}
-                    className="absolute inset-0 overflow-y-auto px-3 sm:px-6 py-4 scroll-smooth arcus-scrollbar"
+                    className="absolute inset-0 overflow-y-auto px-3 sm:px-6 py-4 scroll-smooth boult-scrollbar"
                     style={{ paddingBottom: isInitialMode ? undefined : '140px' }}
                   >
                     <div className="max-w-3xl mx-auto w-full">
                       {/* Plan Mode View */}
-                      {arcusView === 'plan_mode' ? (
+                      {boultView === 'plan_mode' ? (
                         <div className="py-6">
                           <PlanModeBrief
                             brief={planModeBrief}
@@ -5988,7 +5988,7 @@ export default function ChatInterface({
                         </div>
                       ) : (
                         <>
-                      {/* Arcus V3 Reactive Plan Cards */}
+                      {/* Boult V3 Reactive Plan Cards */}
                       {v3ActivePlans.length > 0 && (
                         <div className="mb-6 space-y-4">
                           {v3ActivePlans.map((plan) => (
@@ -6001,7 +6001,7 @@ export default function ChatInterface({
                           ))}
                         </div>
                       )}
-                      {/* Arcus V3 Completed Plans (collapsed) */}
+                      {/* Boult V3 Completed Plans (collapsed) */}
                       {v3CompletedPlans.length > 0 && messages.length === 0 && (
                         <div className="mb-6 space-y-2 opacity-80">
                           <div style={{
@@ -6038,10 +6038,10 @@ export default function ChatInterface({
                         />
                       )}
 
-                      {isInitialMode && arcusView === 'feed' ? (
+                      {isInitialMode && boultView === 'feed' ? (
                         <div className="flex flex-col items-center justify-center min-h-[50vh] py-8 animate-fade-in relative">
 
-                          <ArcusDashboard
+                          <BoultDashboard
                             userName={userName}
                             onSendMessage={(msg) => handleSend(msg)}
                             onSuggestionClick={(text) => setSuggestionInput({ text, id: Date.now() })}
@@ -6057,7 +6057,7 @@ export default function ChatInterface({
                               onSend={(msg, files, opts) => handleSend(msg, files, opts)}
                               onStop={() => abortControllerRef.current?.abort()}
                               isLoading={isLoading}
-                              placeholder="Tell Arcus what to do..."
+                              placeholder="Tell Boult what to do..."
                               onSearchClick={() => { }}
                               onAttachEmailClick={() => setIsEmailSelectionModalOpen(true)}
                               onPersonalityClick={() => setIsPersonalityModalOpen(true)}
@@ -6082,7 +6082,7 @@ export default function ChatInterface({
                                 setIsUsageLimitModalOpen(true);
                               }}
                             />
-                          </ArcusDashboard>
+                          </BoultDashboard>
                         </div>
                       ) : (
                         <div className="space-y-4 pt-4">
@@ -6094,7 +6094,7 @@ export default function ChatInterface({
                             >
                               <div className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'} max-w-full items-start`}>
                                 {msg.role === 'user' && (
-                                  <div className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center border overflow-hidden bg-arcus-raised border-arcus-border">
+                                  <div className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center border overflow-hidden bg-boult-raised border-boult-border">
                                     <User2 className="w-4 h-4 text-white/50" />
                                   </div>
                                 )}
@@ -6111,8 +6111,8 @@ export default function ChatInterface({
                                   <div className={`transition-all relative overflow-hidden text-black dark:text-white px-0 py-1 ${msg.role === 'user' ? 'hidden' : ''}`}>
                                     {msg.role === 'assistant' && msg.meta?.limitReached && (
                                       <div className="flex items-center gap-2 mb-3 opacity-60">
-                                        <ArcusLogo size={16} />
-                                        <span className="text-[12px] text-black dark:text-white/90 font-medium tracking-tight">Arcus AI</span>
+                                        <BoultLogo size={16} />
+                                        <span className="text-[12px] text-black dark:text-white/90 font-medium tracking-tight">Boult AI</span>
                                         <span className="px-1.5 py-0.5 bg-black/10 dark:bg-white/10 text-black dark:text-white/40 text-[9px] font-bold rounded uppercase tracking-widest leading-none">Lite</span>
                                       </div>
                                     )}
@@ -6146,7 +6146,7 @@ export default function ChatInterface({
                                        />
                                      )}
 
-                                     {/* Plan text — quiet one-line narration of what Arcus is doing */}
+                                     {/* Plan text — quiet one-line narration of what Boult is doing */}
                                      {msg.role === 'assistant' && (msg as AgentMessage).meta?.planText && (
                                        <p className="text-[13px] text-black/45 dark:text-white/40 leading-relaxed mb-3">
                                          {(msg as AgentMessage).meta!.planText}
@@ -6188,7 +6188,7 @@ export default function ChatInterface({
                                        />
                                      )}
 
-                                     {/* Proceed / Cancel buttons — shown when Arcus interpreted a vague instruction */}
+                                     {/* Proceed / Cancel buttons — shown when Boult interpreted a vague instruction */}
                                      {msg.role === 'assistant' && (msg as AgentMessage).meta?.needsConfirmation && !isLoading && (
                                        <ProceedConfirmButtons
                                          onProceed={() => handleSend('Yes, proceed.')}
@@ -6205,7 +6205,7 @@ export default function ChatInterface({
                                       <div className="mt-4 space-y-3 pt-4 border-t border-graphite-border/50">
                                         <div className="grid grid-cols-1 gap-3">
                                           {msg.notes.map((note: any, idx: number) => (
-                                            <div key={note.id || idx} className="bg-arcus-elevated border border-arcus-border rounded-xl p-4">
+                                            <div key={note.id || idx} className="bg-boult-elevated border border-boult-border rounded-xl p-4">
                                               <div className="text-graphite-text font-medium leading-snug mb-1">{note.subject || '(No Subject)'}</div>
                                               {note.content && <div className="text-graphite-muted text-sm line-clamp-2">{note.content}</div>}
                                             </div>
@@ -6215,13 +6215,13 @@ export default function ChatInterface({
                                     )}
 
                                     {msg.role === 'assistant' && msg.meta?.internalThought && (
-                                      <details className="mt-4 border-t border-arcus-border pt-3 group/thought">
+                                      <details className="mt-4 border-t border-boult-border pt-3 group/thought">
                                         <summary className="flex items-center gap-2 cursor-pointer text-black hover:text-black dark:text-white/60 transition-colors list-none">
                                           <BrainCircuit className="w-3.5 h-3.5" />
                                           <span className="text-[11px] font-bold tracking-wide uppercase">Internal Reasoning</span>
                                           <ChevronDown className="w-3 h-3 transition-transform group-open/thought:rotate-180" />
                                         </summary>
-                                        <div className="mt-2 pl-4 border-l border-arcus-border py-2">
+                                        <div className="mt-2 pl-4 border-l border-boult-border py-2">
                                           <p className="text-black dark:text-white/40 text-[12px] leading-relaxed whitespace-pre-wrap italic">
                                             {msg.meta.internalThought}
                                           </p>
@@ -6297,7 +6297,7 @@ export default function ChatInterface({
                                     {/* Phase 2: Canvas Expansion Prompt */}
                                     {msg.role === 'assistant' && (msg as AgentMessage).meta?.canvasExpansion && (
                                       <div
-                                        className="mt-4 p-4 rounded-2xl border border-arcus-border bg-arcus-elevated backdrop-blur-sm"
+                                        className="mt-4 p-4 rounded-2xl border border-boult-border bg-boult-elevated backdrop-blur-sm"
                                       >
                                         <p className="text-[13px] text-black/50 dark:text-white/50 mb-3">
                                           This content is quite rich. Would you like to expand it on the canvas for a better view?
@@ -6358,11 +6358,11 @@ export default function ChatInterface({
                                             rel="noopener noreferrer"
                                             className="text-white/40 text-[13px] hover:text-white/60 underline underline-offset-4 transition-colors w-fit break-all"
                                           >
-                                            https://mailient.xyz/pricing
+                                            https://maily.dev/pricing
                                           </a>
                                         </div>
 
-                                        <div className="group relative flex items-center justify-between gap-4 px-6 py-4 w-full max-w-[700px] bg-arcus-elevated border border-arcus-border rounded-2xl transition-all duration-500 hover:border-arcus-divider shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden mt-4">
+                                        <div className="group relative flex items-center justify-between gap-4 px-6 py-4 w-full max-w-[700px] bg-boult-elevated border border-boult-border rounded-2xl transition-all duration-500 hover:border-boult-divider shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden mt-4">
                                           {/* Premium Sweep Animation */}
                                           <motion.div
                                             className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-500/[0.05] to-transparent w-[200%]"
@@ -6381,13 +6381,13 @@ export default function ChatInterface({
                                               <Sparkles className="w-5 h-5 text-blue-400 z-10" />
                                             </div>
                                             <p className="text-white/90 text-[13.5px] font-medium tracking-tight">
-                                              {arcusCredits && (arcusCredits.remaining > 0 || arcusCredits.isUnlimited)
-                                                ? "Your credits have been updated. You can have Arcus continue working on this task."
+                                              {boultCredits && (boultCredits.remaining > 0 || boultCredits.isUnlimited)
+                                                ? "Your credits have been updated. You can have Boult continue working on this task."
                                                 : "Your credits have been used up. Please upgrade your plan for more credits."}
                                             </p>
                                           </div>
 
-                                          {arcusCredits && (arcusCredits.remaining > 0 || arcusCredits.isUnlimited) ? (
+                                          {boultCredits && (boultCredits.remaining > 0 || boultCredits.isUnlimited) ? (
                                             <button
                                               disabled={msg.meta.continueClicked}
                                               onClick={() => handleContinueWithCredits(msg.id as number)}
@@ -6410,25 +6410,25 @@ export default function ChatInterface({
                                     {msg.role === 'assistant' && (msg as AgentMessage).meta?.canvasApproval && (
                                       <div className="mt-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
                                         <div className={cn(
-                                          "relative group overflow-hidden bg-arcus-surface-hover border border-arcus-border rounded-2xl p-5 shadow-2xl transition-all",
+                                          "relative group overflow-hidden bg-boult-surface-hover border border-boult-border rounded-2xl p-5 shadow-2xl transition-all",
                                           (msg as AgentMessage).meta!.canvasApproval!.status !== 'pending' && "opacity-60"
                                         )}>
                                           <div className="flex items-start gap-3.5 relative z-10">
-                                            <div className="w-10 h-10 rounded-xl bg-arcus-elevated border border-arcus-border flex items-center justify-center shrink-0">
+                                            <div className="w-10 h-10 rounded-xl bg-boult-elevated border border-boult-border flex items-center justify-center shrink-0">
                                               <Sparkles className={cn("w-5 h-5", (msg as AgentMessage).meta!.canvasApproval!.status === 'accepted' ? "text-blue-400" : "text-black dark:text-white/40")} />
                                             </div>
                                             <div className="flex-1 min-w-0">
                                               <h4 className="text-black dark:text-white font-bold text-[14px] tracking-tight mb-1">
-                                                {(msg as AgentMessage).meta!.canvasApproval!.title || 'Launch Arcus Mission?'}
+                                                {(msg as AgentMessage).meta!.canvasApproval!.title || 'Launch Boult Mission?'}
                                               </h4>
                                               <p className="text-black dark:text-white/40 text-[12px] leading-relaxed line-clamp-2">
-                                                {(msg as AgentMessage).meta!.canvasApproval!.description || 'This request would be best handled in the specialized Arcus Workspace. Would you like to open it?'}
+                                                {(msg as AgentMessage).meta!.canvasApproval!.description || 'This request would be best handled in the specialized Boult Workspace. Would you like to open it?'}
                                               </p>
                                             </div>
                                           </div>
 
                                           {(msg as AgentMessage).meta!.canvasApproval!.status === 'pending' ? (
-                                            <div className="flex items-center gap-2 mt-5 pt-4 border-t border-arcus-border">
+                                            <div className="flex items-center gap-2 mt-5 pt-4 border-t border-boult-border">
                                               <button
                                                 onClick={() => handleAcceptCanvas(msg.id as number)}
                                                 className="px-5 py-2 bg-white hover:bg-neutral-200 text-black font-bold text-[12px] rounded-full transition-all flex items-center gap-2 active:scale-95"
@@ -6444,8 +6444,8 @@ export default function ChatInterface({
                                               </button>
                                             </div>
                                           ) : (
-                                            <div className="flex items-center gap-2 mt-5 pt-4 border-t border-arcus-border">
-                                              <div className="flex items-center gap-2 px-3 py-1.5 bg-arcus-elevated rounded-full border border-arcus-border">
+                                            <div className="flex items-center gap-2 mt-5 pt-4 border-t border-boult-border">
+                                              <div className="flex items-center gap-2 px-3 py-1.5 bg-boult-elevated rounded-full border border-boult-border">
                                                 {(msg as AgentMessage).meta!.canvasApproval!.status === 'accepted' ? (
                                                   <div className="flex items-center gap-2 text-blue-400 text-[12px] font-bold">
                                                     <Check className="w-4 h-4" />
@@ -6720,7 +6720,7 @@ export default function ChatInterface({
                                           const approvalId = (msg as AgentMessage).meta?.confirmationData?.approvalId;
                                           if (approvalId) {
                                             try {
-                                              await fetch('/api/arcus/approval/confirm', {
+                                              await fetch('/api/boult/approval/confirm', {
                                                 method: 'POST',
                                                 headers: { 'Content-Type': 'application/json' },
                                                 body: JSON.stringify({
@@ -6731,7 +6731,7 @@ export default function ChatInterface({
                                             } catch (err) {
                                               // Network failure here means the gate will refuse the write
                                               // on the next turn — surface it but don't abort the flow.
-                                              console.warn('[Arcus] approval/confirm failed:', err);
+                                              console.warn('[Boult] approval/confirm failed:', err);
                                             }
                                           }
                                           // Resume the agent with the user's decision
@@ -6763,7 +6763,7 @@ export default function ChatInterface({
                                         Transient (rate-limit / timeout) keeps the neutral palette and
                                         auto-retries after 3s. */}
                                     {msg.role === 'assistant' && (msg as AgentMessage).meta?.hasError && (
-                                      <ArcusErrorCard
+                                      <BoultErrorCard
                                         errorMessage={(msg as AgentMessage).meta?.errorMessage}
                                         onReconnect={() => setIsIntegrationsModalOpen(true)}
                                         onRetry={() => {
@@ -6878,7 +6878,7 @@ export default function ChatInterface({
                                           setMessages(prev => prev.map(m =>
                                             m.id === msg.id ? { ...m, meta: { ...(m as AgentMessage).meta, draftReply: undefined } } : m
                                           ));
-                                          // Inject a confirmation message from Arcus
+                                          // Inject a confirmation message from Boult
                                           const recipientName = (msg as AgentMessage).meta?.draftReply?.recipientName || recipientEmail.split('@')[0];
                                           const confirmId = Date.now() + 2;
                                           setMessages(prev => [...prev, {
@@ -7062,14 +7062,14 @@ export default function ChatInterface({
                   {/* Fixed Prompt Box for Conversation Mode */}
                   {!isInitialMode && (
                     <div
-                      className="absolute bottom-0 left-0 right-0 z-50 bg-arcus-bg"
-                      style={{ backgroundColor: 'var(--arcus-bg)' }}
+                      className="absolute bottom-0 left-0 right-0 z-50 bg-boult-bg"
+                      style={{ backgroundColor: 'var(--boult-bg)' }}
                     >
                       {/* Premium, theme-aware seamless fade gradient to make scrolled content merge beautifully into the page background */}
                       <div
                         className="absolute bottom-full left-0 right-0 h-10 pointer-events-none"
                         style={{
-                          background: `linear-gradient(to top, var(--arcus-bg) 0%, transparent 100%)`
+                          background: `linear-gradient(to top, var(--boult-bg) 0%, transparent 100%)`
                         }}
                       />
 
@@ -7203,7 +7203,7 @@ export default function ChatInterface({
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 20 }}
                     transition={{ duration: 0.2, ease: 'easeOut' }}
-                    className="h-full flex-shrink-0 bg-arcus-surface border border-arcus-border rounded-[32px] z-50 overflow-hidden order-2 relative shadow-2xl"
+                    className="h-full flex-shrink-0 bg-boult-surface border border-boult-border rounded-[32px] z-50 overflow-hidden order-2 relative shadow-2xl"
                   >
                     <CanvasPanel
                       isOpen={isCanvasOpen}
@@ -7249,7 +7249,7 @@ export default function ChatInterface({
             setIsEmailSelectionModalOpen(false);
           }}
         />
-        <ArcusSettingsModal
+        <BoultSettingsModal
           isOpen={isPersonalityModalOpen}
           onClose={() => setIsPersonalityModalOpen(false)}
           onSaveInstructions={handleSavePersonality}
@@ -7281,14 +7281,14 @@ export default function ChatInterface({
             <RewardsCard
               onClose={() => setIsRewardsOpen(false)}
               usageData={{
-                planType: (arcusCredits?.isUnlimited ? 'pro' : 'starter'),
+                planType: (boultCredits?.isUnlimited ? 'pro' : 'starter'),
                 features: {
-                  arcus_ai: {
-                    usage: arcusCredits?.usage ?? 0,
-                    limit: arcusCredits?.limit ?? 10,
-                    remaining: arcusCredits?.remaining ?? 10,
-                    period: arcusCredits?.period ?? 'daily',
-                    isUnlimited: !!arcusCredits?.isUnlimited
+                  boult_ai: {
+                    usage: boultCredits?.usage ?? 0,
+                    limit: boultCredits?.limit ?? 10,
+                    remaining: boultCredits?.remaining ?? 10,
+                    period: boultCredits?.period ?? 'daily',
+                    isUnlimited: !!boultCredits?.isUnlimited
                   },
                   sift_ai: { usage: 0, limit: 5, remaining: 5, isUnlimited: false, period: 'daily' }
                 }
@@ -7306,25 +7306,25 @@ export default function ChatInterface({
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: 10 }}
                 onClick={(e) => e.stopPropagation()}
-                className="bg-arcus-surface border border-arcus-border rounded-2xl w-full max-w-md overflow-hidden shadow-2xl"
+                className="bg-boult-surface border border-boult-border rounded-2xl w-full max-w-md overflow-hidden shadow-2xl"
               >
                 <div className="p-6">
                   <h3 className="text-white text-lg font-bold mb-2 tracking-tight">
                     {feedbackModal.type === 'like' ? 'What did you like about this?' : 'How can we improve this?'}
                   </h3>
-                  <p className="text-arcus-fg-tertiary text-[13px] mb-4">
-                    {feedbackModal.type === 'like' ? 'Your feedback helps Arcus learn your preferences and tailor future responses.' : 'Your feedback helps Arcus avoid mistakes and improve reasoning accuracy.'}
+                  <p className="text-boult-fg-tertiary text-[13px] mb-4">
+                    {feedbackModal.type === 'like' ? 'Your feedback helps Boult learn your preferences and tailor future responses.' : 'Your feedback helps Boult avoid mistakes and improve reasoning accuracy.'}
                   </p>
                   <textarea
-                    className="w-full h-32 bg-arcus-bg border border-arcus-border rounded-xl p-4 text-white placeholder:text-arcus-fg-muted focus:outline-none focus:border-arcus-divider resize-none text-[13px]"
+                    className="w-full h-32 bg-boult-bg border border-boult-border rounded-xl p-4 text-white placeholder:text-boult-fg-muted focus:outline-none focus:border-boult-divider resize-none text-[13px]"
                     placeholder={feedbackModal.type === 'like' ? 'I liked how...' : 'It would be better if...'}
                     autoFocus
                   />
                 </div>
-                <div className="px-6 py-4 bg-arcus-elevated border-t border-arcus-border flex items-center justify-end gap-3">
+                <div className="px-6 py-4 bg-boult-elevated border-t border-boult-border flex items-center justify-end gap-3">
                   <button onClick={() => setFeedbackModal(prev => ({ ...prev, isOpen: false }))} className="px-4 py-2 text-white/50 hover:text-white text-[13px] font-medium transition-colors">Cancel</button>
                   <button onClick={() => {
-                    toast.success('Feedback submitted', { description: 'Thank you for helping improve Arcus AI.' });
+                    toast.success('Feedback submitted', { description: 'Thank you for helping improve Boult AI.' });
                     setFeedbackModal(prev => ({ ...prev, isOpen: false }));
                   }} className="px-5 py-2 bg-white text-black text-[13px] font-bold rounded-full hover:bg-neutral-200 transition-colors">Submit</button>
                 </div>
@@ -7341,22 +7341,22 @@ export default function ChatInterface({
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: 10 }}
                 onClick={(e) => e.stopPropagation()}
-                className="bg-arcus-surface border border-arcus-border rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl"
+                className="bg-boult-surface border border-boult-border rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl"
               >
                 <div className="p-6 text-center">
-                  <div className="w-12 h-12 rounded-full bg-arcus-elevated flex items-center justify-center mx-auto mb-4 border border-arcus-border">
-                    <svg className="w-6 h-6 text-arcus-fg-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div className="w-12 h-12 rounded-full bg-boult-elevated flex items-center justify-center mx-auto mb-4 border border-boult-border">
+                    <svg className="w-6 h-6 text-boult-fg-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                     </svg>
                   </div>
-                  <h3 className="text-arcus-fg text-lg font-bold mb-2 tracking-tight">Regenerate reply?</h3>
-                  <p className="text-arcus-fg-secondary text-[13px] leading-relaxed">
-                    This will remove the current response and Arcus will attempt to generate a new one based on your request.
+                  <h3 className="text-boult-fg text-lg font-bold mb-2 tracking-tight">Regenerate reply?</h3>
+                  <p className="text-boult-fg-secondary text-[13px] leading-relaxed">
+                    This will remove the current response and Boult will attempt to generate a new one based on your request.
                   </p>
                 </div>
-                <div className="px-6 py-4 bg-arcus-elevated border-t border-arcus-border flex items-center gap-3">
-                  <button onClick={() => setRegenerateModal({ isOpen: false, msgId: null })} className="flex-1 px-4 py-2.5 text-arcus-fg-secondary hover:text-arcus-fg text-[13px] font-bold transition-colors bg-arcus-bg hover:bg-arcus-surface-hover border border-arcus-border rounded-xl">Cancel</button>
-                  <button onClick={handleConfirmRegenerate} className="flex-1 px-4 py-2.5 bg-arcus-fg text-arcus-bg text-[13px] font-bold rounded-xl hover:opacity-90 transition-opacity">Regenerate</button>
+                <div className="px-6 py-4 bg-boult-elevated border-t border-boult-border flex items-center gap-3">
+                  <button onClick={() => setRegenerateModal({ isOpen: false, msgId: null })} className="flex-1 px-4 py-2.5 text-boult-fg-secondary hover:text-boult-fg text-[13px] font-bold transition-colors bg-boult-bg hover:bg-boult-surface-hover border border-boult-border rounded-xl">Cancel</button>
+                  <button onClick={handleConfirmRegenerate} className="flex-1 px-4 py-2.5 bg-boult-fg text-boult-bg text-[13px] font-bold rounded-xl hover:opacity-90 transition-opacity">Regenerate</button>
                 </div>
               </motion.div>
             </div>
@@ -7375,11 +7375,11 @@ export default function ChatInterface({
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.97, y: 10 }}
                 onClick={(e) => e.stopPropagation()}
-                className="bg-arcus-surface border border-arcus-border rounded-2xl w-full max-w-xl overflow-hidden shadow-2xl"
+                className="bg-boult-surface border border-boult-border rounded-2xl w-full max-w-xl overflow-hidden shadow-2xl"
               >
                 <div className="px-5 pt-5 pb-3 flex items-center gap-2">
-                  <Edit className="w-4 h-4 text-arcus-fg-tertiary" />
-                  <span className="text-[12px] font-bold text-arcus-fg-secondary uppercase tracking-widest">Edit message</span>
+                  <Edit className="w-4 h-4 text-boult-fg-tertiary" />
+                  <span className="text-[12px] font-bold text-boult-fg-secondary uppercase tracking-widest">Edit message</span>
                 </div>
                 <div className="px-5 pb-2">
                   <textarea
@@ -7391,23 +7391,23 @@ export default function ChatInterface({
                       if (e.key === 'Escape') setEditModal({ isOpen: false, msgId: null, text: '' });
                     }}
                     rows={Math.min(14, Math.max(3, editModal.text.split('\n').length + 1))}
-                    className="w-full bg-arcus-bg border border-arcus-border rounded-xl p-4 text-arcus-fg text-[15px] leading-relaxed placeholder:text-arcus-fg-muted focus:outline-none focus:border-arcus-divider resize-none max-h-[50vh]"
+                    className="w-full bg-boult-bg border border-boult-border rounded-xl p-4 text-boult-fg text-[15px] leading-relaxed placeholder:text-boult-fg-muted focus:outline-none focus:border-boult-divider resize-none max-h-[50vh]"
                     placeholder="Edit your message…"
                   />
                 </div>
                 <div className="px-5 py-4 flex items-center justify-between gap-3">
-                  <span className="text-[11px] text-arcus-fg-muted">Sending replaces the reply and keeps both versions.</span>
+                  <span className="text-[11px] text-boult-fg-muted">Sending replaces the reply and keeps both versions.</span>
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => setEditModal({ isOpen: false, msgId: null, text: '' })}
-                      className="px-5 py-2.5 rounded-full text-[13px] font-bold text-arcus-fg-secondary hover:text-arcus-fg bg-arcus-elevated hover:bg-arcus-surface-hover border border-arcus-border transition-all"
+                      className="px-5 py-2.5 rounded-full text-[13px] font-bold text-boult-fg-secondary hover:text-boult-fg bg-boult-elevated hover:bg-boult-surface-hover border border-boult-border transition-all"
                     >
                       Cancel
                     </button>
                     <button
                       onClick={handleEditSubmit}
                       disabled={!editModal.text.trim()}
-                      className="px-6 py-2.5 rounded-full text-[13px] font-bold text-arcus-bg bg-arcus-fg hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                      className="px-6 py-2.5 rounded-full text-[13px] font-bold text-boult-bg bg-boult-fg hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                     >
                       Send
                     </button>

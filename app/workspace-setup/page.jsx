@@ -187,7 +187,7 @@ function WorkspaceSetupContent() {
               <ArrowRight className="w-4 h-4" />
             </button>
             <button 
-              onClick={() => window.open('mailto:mailient.xyz@gmail.com')}
+              onClick={() => window.open('mailto:support.maily@gmail.com')}
               className="w-full h-16 bg-white/[0.02] border border-white/[0.06] text-white/40 rounded-2xl font-semibold text-xs hover:bg-white/[0.04] hover:text-white transition-all flex items-center justify-center gap-2"
             >
               <Mail className="w-4 h-4" />

@@ -1,5 +1,5 @@
 /**
- * Arcus Meeting Lifecycle — Vercel Cron
+ * Boult Meeting Lifecycle — Vercel Cron
  * GET /api/cron/meeting-lifecycle
  *
  * Runs every 5 minutes. Two stages per user per tick:
@@ -9,7 +9,7 @@
  *   • POST — scans events that ENDED 30-90 min ago. For meetings not yet
  *           followed up, generates a draft reply (LLM-composed, matches
  *           voice profile) + suggested action items, and emails the user.
- *           Both stages mark their row in arcus_meeting_events so they
+ *           Both stages mark their row in boult_meeting_events so they
  *           can't double-fire.
  *
  * Required env vars:
@@ -29,10 +29,10 @@ import { getSupabaseAdmin } from '../../../../lib/supabase.js';
 // @ts-ignore — JS module path
 import { decrypt } from '../../../../lib/crypto.js';
 import { CalendarService } from '../../../../lib/calendar';
-import { composeMeetingPrep } from '../../../../lib/arcus/meeting-prep';
-import { composeMeetingFollowUp } from '../../../../lib/arcus/meeting-followup';
+import { composeMeetingPrep } from '../../../../lib/boult/meeting-prep';
+import { composeMeetingFollowUp } from '../../../../lib/boult/meeting-followup';
 // @ts-ignore — JS module path
-import { saveMemory } from '../../../../lib/arcus/memory';
+import { saveMemory } from '../../../../lib/boult/memory';
 import { logEvent } from "@/lib/logsso";
 
 export const dynamic = 'force-dynamic';
@@ -42,8 +42,8 @@ export const dynamic = 'force-dynamic';
 // fewer items per tick and rely on the next tick for the rest. (On Pro: 300.)
 export const maxDuration = 60;
 
-const CRON_SECRET = process.env.CRON_SECRET || 'arcus-cron-secret';
-const RESEND_FROM = process.env.RESEND_FROM_EMAIL || 'Arcus AI <arcus@mailient.xyz>';
+const CRON_SECRET = process.env.CRON_SECRET || 'boult-cron-secret';
+const RESEND_FROM = process.env.RESEND_FROM_EMAIL || 'Boult AI <boult@maily.dev>';
 const DEFAULT_LEAD_MINUTES = 25;
 const LOOKAHEAD_PAD_MINUTES = 6;          // pre-stage: catches meetings between ticks
 const FOLLOWUP_MIN_MINUTES_AGO = 30;      // wait this long after meeting end
@@ -54,7 +54,7 @@ export async function GET(request: NextRequest) {
   const authHeader = request.headers.get('authorization') || '';
   const isCronJobOrg =
     authHeader === `Bearer ${CRON_SECRET}` ||
-    request.headers.get('x-arcus-cron-secret') === CRON_SECRET;
+    request.headers.get('x-boult-cron-secret') === CRON_SECRET;
   const isVercelCron = request.headers.get('x-vercel-cron') === '1';
   if (!isCronJobOrg && !isVercelCron) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -96,12 +96,12 @@ export async function GET(request: NextRequest) {
     if (!userId) { skipped++; continue; }
 
     const prefs = profileMap.get(userId) || {};
-    const prepEnabled = prefs.arcus_meeting_prep_enabled !== false;
-    const followupEnabled = prefs.arcus_meeting_followup_enabled !== false;
+    const prepEnabled = prefs.boult_meeting_prep_enabled !== false;
+    const followupEnabled = prefs.boult_meeting_followup_enabled !== false;
     if (!prepEnabled && !followupEnabled) { skipped++; continue; }
 
     const leadMinutes = Math.max(5, Math.min(120,
-      Number(prefs.arcus_meeting_prep_lead_minutes) || DEFAULT_LEAD_MINUTES,
+      Number(prefs.boult_meeting_prep_lead_minutes) || DEFAULT_LEAD_MINUTES,
     ));
     const userTz = (prefs.timezone as string) || 'UTC';
 
@@ -158,7 +158,7 @@ export async function GET(request: NextRequest) {
       let existing: { id: string; prep_sent_at: string | null } | null = null;
       try {
         const { data } = await supabase
-          .from('arcus_meeting_events')
+          .from('boult_meeting_events')
           .select('id, prep_sent_at')
           .eq('user_id', userId)
           .eq('gcal_event_id', event.id)
@@ -168,7 +168,7 @@ export async function GET(request: NextRequest) {
         logEvent({ channel: "failures", event: "❌ API Error", description: String(e) });
         // Table might not exist — fail closed on this run, the user can apply the migration
         if (e?.code === '42P01') {
-          return NextResponse.json({ error: 'arcus_meeting_events table missing — apply the migration.', code: '42P01' }, { status: 500 });
+          return NextResponse.json({ error: 'boult_meeting_events table missing — apply the migration.', code: '42P01' }, { status: 500 });
         }
       }
       if (existing?.prep_sent_at) continue; // already prepped — idempotent
@@ -196,12 +196,12 @@ export async function GET(request: NextRequest) {
       try {
         if (existing) {
           await supabase
-            .from('arcus_meeting_events')
+            .from('boult_meeting_events')
             .update({ prep_sent_at: new Date().toISOString(), attendees: prep.attendeesExternal, title: event.summary || null })
             .eq('id', existing.id);
         } else {
           await supabase
-            .from('arcus_meeting_events')
+            .from('boult_meeting_events')
             .insert({
               user_id: userId,
               gcal_event_id: event.id,
@@ -271,7 +271,7 @@ export async function GET(request: NextRequest) {
         let existing: { id: string; followup_sent_at: string | null } | null = null;
         try {
           const { data } = await supabase
-            .from('arcus_meeting_events')
+            .from('boult_meeting_events')
             .select('id, followup_sent_at')
             .eq('user_id', userId)
             .eq('gcal_event_id', event.id)
@@ -280,7 +280,7 @@ export async function GET(request: NextRequest) {
         } catch (e: any) {
           logEvent({ channel: "failures", event: "❌ API Error", description: String(e) });
           if (e?.code === '42P01') {
-            return NextResponse.json({ error: 'arcus_meeting_events table missing.', code: '42P01' }, { status: 500 });
+            return NextResponse.json({ error: 'boult_meeting_events table missing.', code: '42P01' }, { status: 500 });
           }
         }
         if (existing?.followup_sent_at) continue; // already sent — idempotent
@@ -309,7 +309,7 @@ export async function GET(request: NextRequest) {
         try {
           if (existing) {
             await supabase
-              .from('arcus_meeting_events')
+              .from('boult_meeting_events')
               .update({
                 followup_sent_at: new Date().toISOString(),
                 action_items: followup.actionItems,
@@ -319,7 +319,7 @@ export async function GET(request: NextRequest) {
               .eq('id', existing.id);
           } else {
             await supabase
-              .from('arcus_meeting_events')
+              .from('boult_meeting_events')
               .insert({
                 user_id: userId,
                 gcal_event_id: event.id,
@@ -362,14 +362,14 @@ export async function GET(request: NextRequest) {
 }
 
 async function sendPrepEmail(toEmail: string, prep: { markdown: string; subject: string }): Promise<boolean> {
-  return sendArcusEmail(toEmail, prep.subject, prep.markdown, 'Arcus · meeting prep');
+  return sendBoultEmail(toEmail, prep.subject, prep.markdown, 'Boult · meeting prep');
 }
 
 async function sendFollowupEmail(toEmail: string, followup: { markdown: string; subject: string }): Promise<boolean> {
-  return sendArcusEmail(toEmail, followup.subject, followup.markdown, 'Arcus · meeting follow-up');
+  return sendBoultEmail(toEmail, followup.subject, followup.markdown, 'Boult · meeting follow-up');
 }
 
-async function sendArcusEmail(toEmail: string, subject: string, markdown: string, headerPill: string): Promise<boolean> {
+async function sendBoultEmail(toEmail: string, subject: string, markdown: string, headerPill: string): Promise<boolean> {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
     console.warn('[MeetingLifecycle] RESEND_API_KEY not set — skipping email.');
@@ -381,7 +381,7 @@ async function sendArcusEmail(toEmail: string, subject: string, markdown: string
     const html = wrapHtml(subject, markdownToHtml(markdown), headerPill);
     const { error } = await resend.emails.send({
       from: RESEND_FROM,
-      replyTo: "mailient.xyz@gmail.com",
+      replyTo: "support.maily@gmail.com",
       to: toEmail,
       subject,
       html,
@@ -466,7 +466,7 @@ function markdownToHtml(md: string): string {
   return out.join('\n');
 }
 
-function wrapHtml(title: string, body: string, headerPill: string = 'Arcus'): string {
+function wrapHtml(title: string, body: string, headerPill: string = 'Boult'): string {
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -479,7 +479,7 @@ function wrapHtml(title: string, body: string, headerPill: string = 'Arcus'): st
     <div style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#888;font-weight:600;margin-bottom:18px">${escapeHtml(headerPill)}</div>
     ${body}
     <div style="border-top:1px solid #f0f0f0;margin-top:32px;padding-top:18px;font-size:11px;color:#999;line-height:1.5">
-      Quiet notice from Arcus. Reply to silence these, or tune them in <a href="https://mailient.xyz/dashboard" style="color:#666;text-decoration:underline">settings</a>.
+      Quiet notice from Boult. Reply to silence these, or tune them in <a href="https://maily.dev/dashboard" style="color:#666;text-decoration:underline">settings</a>.
     </div>
   </div>
 </body>

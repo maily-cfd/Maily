@@ -1,4 +1,4 @@
-# Mailient — robots.txt
+# Maily — robots.txt
 # Marketing pages are open to everyone, including AI/answer-engine crawlers.
 # Private app surfaces (behind auth) are excluded from crawl.
 
@@ -40,7 +40,7 @@ Allow: /
 User-agent: Applebot-Extended
 Allow: /
 
-Sitemap: https://mailient.xyz/sitemap.xml
+Sitemap: https://maily.dev/sitemap.xml
 
 # Canonical product summary for LLMs:
-# https://mailient.xyz/llms.txt
+# https://maily.dev/llms.txt

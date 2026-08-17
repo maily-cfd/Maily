@@ -50,7 +50,7 @@ export function ChatHistoryModal({ isOpen, onClose, onConversationSelect, onConv
     setIsLoading(true);
     try {
       // Primary: Supabase via our API
-      const res = await fetch('/api/arcus/conversation');
+      const res = await fetch('/api/boult/conversation');
       const remoteSessions: Session[] = [];
       const remoteIds = new Set<string>();
 
@@ -112,7 +112,7 @@ export function ChatHistoryModal({ isOpen, onClose, onConversationSelect, onConv
     setSessions(prev => prev.map(s => s.id === id ? { ...s, title: trimmed } : s));
 
     // Update Supabase
-    fetch(`/api/arcus/conversation/${id}`, {
+    fetch(`/api/boult/conversation/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ title: trimmed }),
@@ -134,7 +134,7 @@ export function ChatHistoryModal({ isOpen, onClose, onConversationSelect, onConv
     setSessions(prev => prev.filter(s => s.id !== id));
 
     // Delete from Supabase
-    fetch(`/api/arcus/conversation/${id}`, { method: 'DELETE' }).catch(console.error);
+    fetch(`/api/boult/conversation/${id}`, { method: 'DELETE' }).catch(console.error);
 
     // Delete from localStorage
     localStorage.removeItem(`conversation_${id}`);
@@ -190,40 +190,40 @@ export function ChatHistoryModal({ isOpen, onClose, onConversationSelect, onConv
   }, [filteredSessions]);
 
   return (
-    <div className="h-full flex flex-col bg-arcus-bg dark:bg-arcus-bg-elevated text-arcus-fg overflow-hidden font-sans" onClick={e => e.stopPropagation()}>
+    <div className="h-full flex flex-col bg-boult-bg dark:bg-boult-bg-elevated text-boult-fg overflow-hidden font-sans" onClick={e => e.stopPropagation()}>
 
       {/* Header */}
       <AnimatePresence mode="wait">
         {isSearchVisible ? (
           <motion.div key="search" initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
-            className="p-4 flex items-center gap-3 border-b border-arcus-border"
+            className="p-4 flex items-center gap-3 border-b border-boult-border"
           >
-            <button onClick={() => { setIsSearchVisible(false); setSearchQuery(''); }} className="text-arcus-fg-muted hover:text-arcus-fg transition-colors">
+            <button onClick={() => { setIsSearchVisible(false); setSearchQuery(''); }} className="text-boult-fg-muted hover:text-boult-fg transition-colors">
               <ArrowLeft className="w-4 h-4" />
             </button>
             <input
               autoFocus type="text" placeholder="Search chats..."
               value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-              className="flex-1 bg-transparent border-none outline-none text-[14px] text-arcus-fg placeholder:text-arcus-fg-muted"
+              className="flex-1 bg-transparent border-none outline-none text-[14px] text-boult-fg placeholder:text-boult-fg-muted"
             />
           </motion.div>
         ) : (
           <motion.div key="header" className="p-4 space-y-1">
             <button
               onClick={onNewMission}
-              className="w-full flex items-center gap-3 p-2.5 rounded-xl bg-arcus-surface hover:bg-arcus-surface-hover border border-arcus-border transition-all group"
+              className="w-full flex items-center gap-3 p-2.5 rounded-xl bg-boult-surface hover:bg-boult-surface-hover border border-boult-border transition-all group"
             >
               <div className="w-5 h-5 flex items-center justify-center">
-                <Edit3 className="w-4 h-4 text-arcus-fg-muted group-hover:text-arcus-fg transition-colors" />
+                <Edit3 className="w-4 h-4 text-boult-fg-muted group-hover:text-boult-fg transition-colors" />
               </div>
-              <span className="text-[14px] font-medium text-arcus-fg">New mission</span>
+              <span className="text-[14px] font-medium text-boult-fg">New mission</span>
             </button>
             <div className="pt-1">
               <button onClick={() => setIsSearchVisible(true)}
-                className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-arcus-surface-hover transition-all group"
+                className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-boult-surface-hover transition-all group"
               >
-                <Search className="w-4 h-4 text-arcus-fg-muted group-hover:text-arcus-fg-secondary transition-colors" />
-                <span className="text-[14px] font-medium text-arcus-fg-secondary group-hover:text-arcus-fg transition-colors">Search</span>
+                <Search className="w-4 h-4 text-boult-fg-muted group-hover:text-boult-fg-secondary transition-colors" />
+                <span className="text-[14px] font-medium text-boult-fg-secondary group-hover:text-boult-fg transition-colors">Search</span>
               </button>
             </div>
           </motion.div>
@@ -248,7 +248,7 @@ export function ChatHistoryModal({ isOpen, onClose, onConversationSelect, onConv
               { label: 'Earlier', items: grouped.older },
             ].map(group => group.items.length > 0 && (
               <div key={group.label} className="mb-4">
-                <p className="text-[11px] font-bold tracking-wider uppercase text-arcus-fg-tertiary px-2.5 mb-1.5 mt-4 first:mt-0">
+                <p className="text-[11px] font-bold tracking-wider uppercase text-boult-fg-tertiary px-2.5 mb-1.5 mt-4 first:mt-0">
                   {group.label}
                 </p>
                 <div className="space-y-0.5">
@@ -256,7 +256,7 @@ export function ChatHistoryModal({ isOpen, onClose, onConversationSelect, onConv
                     <div key={session.id} className="group relative">
                       <div
                         onClick={() => { onConversationSelect?.(session.id); onClose(); }}
-                        className="flex items-center gap-3 p-2.5 rounded-xl transition-all cursor-pointer hover:bg-arcus-surface-hover"
+                        className="flex items-center gap-3 p-2.5 rounded-xl transition-all cursor-pointer hover:bg-boult-surface-hover"
                       >
                         <div className="w-5 h-5 flex-shrink-0 flex items-center justify-center">
                           {getSessionIcon(session.title)}
@@ -265,7 +265,7 @@ export function ChatHistoryModal({ isOpen, onClose, onConversationSelect, onConv
                         {editingId === session.id ? (
                           <input
                             autoFocus
-                            className="flex-1 bg-transparent border-none outline-none text-[14px] font-medium text-arcus-fg"
+                            className="flex-1 bg-transparent border-none outline-none text-[14px] font-medium text-boult-fg"
                             value={editValue}
                             onChange={e => setEditValue(e.target.value)}
                             onBlur={() => handleRename(session.id, editValue)}
@@ -276,7 +276,7 @@ export function ChatHistoryModal({ isOpen, onClose, onConversationSelect, onConv
                             onClick={e => e.stopPropagation()}
                           />
                         ) : (
-                          <span className="flex-1 text-[14px] font-medium text-arcus-fg-secondary group-hover:text-arcus-fg transition-colors truncate">
+                          <span className="flex-1 text-[14px] font-medium text-boult-fg-secondary group-hover:text-boult-fg transition-colors truncate">
                             {capitalizeTitle(session.title)}
                           </span>
                         )}
@@ -285,13 +285,13 @@ export function ChatHistoryModal({ isOpen, onClose, onConversationSelect, onConv
                           <div className="opacity-0 group-hover:opacity-100 flex items-center gap-1 transition-opacity flex-shrink-0">
                             <button
                               onClick={e => { e.stopPropagation(); setEditingId(session.id); setEditValue(session.title); }}
-                              className="p-1 hover:text-arcus-fg text-arcus-fg-muted"
+                              className="p-1 hover:text-boult-fg text-boult-fg-muted"
                             >
                               <Edit3 className="w-3.5 h-3.5" />
                             </button>
                             <button
                               onClick={e => { e.stopPropagation(); handleDelete(session.id); }}
-                              className="p-1 hover:text-red-400 text-arcus-fg-muted"
+                              className="p-1 hover:text-red-400 text-boult-fg-muted"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>
@@ -308,20 +308,20 @@ export function ChatHistoryModal({ isOpen, onClose, onConversationSelect, onConv
       </div>
 
       {/* Feedback footer */}
-      <div className="p-4 border-t border-arcus-border bg-arcus-surface">
+      <div className="p-4 border-t border-boult-border bg-boult-surface">
         <AnimatePresence mode="wait">
           {!isFeedbackOpen ? (
             <motion.button key="fb-prompt" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               onClick={() => setIsFeedbackOpen(true)}
-              className="w-full py-3 px-4 rounded-xl border border-dashed border-arcus-border hover:border-arcus-fg-muted hover:bg-arcus-surface-hover transition-all text-left group"
+              className="w-full py-3 px-4 rounded-xl border border-dashed border-boult-border hover:border-boult-fg-muted hover:bg-boult-surface-hover transition-all text-left group"
             >
-              <span className="text-[12px] font-medium text-arcus-fg-muted group-hover:text-arcus-fg-secondary">
-                Have Feedback? <span className="text-arcus-fg/60">Write here!</span>
+              <span className="text-[12px] font-medium text-boult-fg-muted group-hover:text-boult-fg-secondary">
+                Have Feedback? <span className="text-boult-fg/60">Write here!</span>
               </span>
             </motion.button>
           ) : (
             <motion.div key="fb-form" initial={{ opacity: 0, y: 10, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 10, scale: 0.95 }}
-              className="w-full bg-arcus-surface border border-arcus-border rounded-2xl p-4 shadow-2xl"
+              className="w-full bg-boult-surface border border-boult-border rounded-2xl p-4 shadow-2xl"
             >
               <textarea
                 autoFocus placeholder="Share your feedback..."
@@ -330,10 +330,10 @@ export function ChatHistoryModal({ isOpen, onClose, onConversationSelect, onConv
                   if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) handleSendFeedback();
                   if (e.key === 'Escape') setIsFeedbackOpen(false);
                 }}
-                className="w-full bg-arcus-bg dark:bg-[#0A0A0A] border border-arcus-border rounded-xl p-3 text-[13px] text-arcus-fg placeholder:text-arcus-fg-muted resize-none min-h-[100px] outline-none focus:border-arcus-fg-tertiary dark:focus:border-white/20 transition-all mb-4"
+                className="w-full bg-boult-bg dark:bg-[#0A0A0A] border border-boult-border rounded-xl p-3 text-[13px] text-boult-fg placeholder:text-boult-fg-muted resize-none min-h-[100px] outline-none focus:border-boult-fg-tertiary dark:focus:border-white/20 transition-all mb-4"
               />
               <div className="flex items-center justify-between">
-                <button onClick={() => window.open('mailto:mailient.xyz@gmail.com')} className="text-[12px] text-arcus-fg-muted hover:text-arcus-fg transition-colors">
+                <button onClick={() => window.open('mailto:support.maily@gmail.com')} className="text-[12px] text-boult-fg-muted hover:text-boult-fg transition-colors">
                   Need help? <span className="underline decoration-white/20">Contact us</span>
                 </button>
                 <button
@@ -341,7 +341,7 @@ export function ChatHistoryModal({ isOpen, onClose, onConversationSelect, onConv
                   disabled={!feedbackText.trim() || isSending || isSent}
                   className={cn(
                     'flex items-center gap-2 px-4 py-1.5 rounded-full text-[12px] font-bold transition-all border-none shadow-lg',
-                    isSent ? 'bg-emerald-500 text-white' : 'bg-arcus-fg dark:bg-white text-arcus-fg-inverse dark:text-black hover:bg-arcus-fg/90 dark:hover:bg-neutral-100'
+                    isSent ? 'bg-emerald-500 text-white' : 'bg-boult-fg dark:bg-white text-boult-fg-inverse dark:text-black hover:bg-boult-fg/90 dark:hover:bg-neutral-100'
                   )}
                 >
                   {isSent ? 'Sent!' : isSending ? 'Sending...' : 'Send'}

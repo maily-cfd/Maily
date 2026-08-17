@@ -36,8 +36,8 @@ export function TokenExpiryAlert({
             ? 'Google Calendar Connection Expired'
             : 'Gmail Connection Expired';
     const subtitle = target === 'gcal'
-        ? 'Reconnect to resume Arcus AI workflows and Calendar sync.'
-        : 'Reconnect to resume Arcus AI workflows and Gmail syncing.';
+        ? 'Reconnect to resume Boult AI workflows and Calendar sync.'
+        : 'Reconnect to resume Boult AI workflows and Gmail syncing.';
 
     const handleReauthenticate = () => {
         // Reconnect THROUGH the Composio-aware route (consent on Composio's
@@ -45,12 +45,12 @@ export function TokenExpiryAlert({
         // signIn('google'). signIn re-runs OUR own OAuth client, which is the one
         // looping back with the same error, and it only ever re-grants the
         // login/Gmail identity — never the separate Calendar connection — so it
-        // could never clear a Calendar expiry. /api/arcus/v3/oauth/{gmail,gcal}
+        // could never clear a Calendar expiry. /api/boult/v3/oauth/{gmail,gcal}
         // redirect to Composio when COMPOSIO_* is configured, else fall back to
         // our own OAuth automatically.
         const rt = returnTo
             || (typeof window !== 'undefined' ? window.location.pathname + window.location.search : '/home-feed');
-        const path = target === 'gcal' ? '/api/arcus/v3/oauth/gcal' : '/api/arcus/v3/oauth/gmail';
+        const path = target === 'gcal' ? '/api/boult/v3/oauth/gcal' : '/api/boult/v3/oauth/gmail';
         window.location.href = `${path}?returnTo=${encodeURIComponent(rt)}`;
     };
 

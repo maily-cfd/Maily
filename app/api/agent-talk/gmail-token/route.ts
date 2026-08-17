@@ -15,7 +15,7 @@ export async function GET() {
     const supabase = getSupabaseAdmin();
 
     const { data, error } = await supabase
-      .from('arcus_integrations')
+      .from('boult_integrations')
       .select('access_token, expires_at')
       .eq('user_id', userId)
       .eq('provider', 'gmail')
@@ -33,7 +33,7 @@ export async function GET() {
     return NextResponse.json({
       accessToken,
       expiresAt: data.expires_at ?? null,
-      source: 'arcus_integrations',
+      source: 'boult_integrations',
     });
   } catch (err: any) {
     logEvent({ channel: "failures", event: "❌ API Error", description: String(err) });

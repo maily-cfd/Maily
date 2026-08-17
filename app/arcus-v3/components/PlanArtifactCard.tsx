@@ -1,6 +1,6 @@
 'use client';
 /**
- * Arcus V3 — Plan Artifact Card
+ * Boult V3 — Plan Artifact Card
  * 
  * State machine component with exactly 4 states:
  * detected → plan_built → executing → completed
@@ -102,13 +102,13 @@ export default function PlanArtifactCard({ plan, isNew, onUpdate }: PlanArtifact
   async function handleBuildPlan() {
     setLoading(true);
     try {
-      const res = await fetch(`/api/arcus/v3/plans/${plan.id}/approve`, {
+      const res = await fetch(`/api/boult/v3/plans/${plan.id}/approve`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ selectedOption }),
       });
       if (res.ok) {
-        const planRes = await fetch(`/api/arcus/v3/plans/${plan.id}`);
+        const planRes = await fetch(`/api/boult/v3/plans/${plan.id}`);
         if (planRes.ok) {
           const updated = await planRes.json();
           setSteps(updated.steps || []);
@@ -125,7 +125,7 @@ export default function PlanArtifactCard({ plan, isNew, onUpdate }: PlanArtifact
   async function handleExecute() {
     setLoading(true);
     try {
-      const res = await fetch(`/api/arcus/v3/plans/${plan.id}/execute`, { method: 'POST' });
+      const res = await fetch(`/api/boult/v3/plans/${plan.id}/execute`, { method: 'POST' });
       if (res.ok) setStatus('executing');
     } catch (err) {
       console.error('Execution trigger failed:', err);
@@ -136,7 +136,7 @@ export default function PlanArtifactCard({ plan, isNew, onUpdate }: PlanArtifact
 
   async function handleDismiss() {
     try {
-      await fetch(`/api/arcus/v3/plans/${plan.id}/dismiss`, { method: 'POST' });
+      await fetch(`/api/boult/v3/plans/${plan.id}/dismiss`, { method: 'POST' });
       setStatus('dismissed');
       onUpdate?.();
     } catch (err) {
@@ -166,10 +166,10 @@ export default function PlanArtifactCard({ plan, isNew, onUpdate }: PlanArtifact
   const finding = plan.findings?.[0];
 
   return (
-    <div className={`glass-surface ${isNew ? 'arcus-card-enter' : ''}`} style={{ padding: 'var(--space-6)' }}>
+    <div className={`glass-surface ${isNew ? 'boult-card-enter' : ''}`} style={{ padding: 'var(--space-6)' }}>
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-4)' }}>
-        <span className={`arcus-badge arcus-badge-${plan.severity || 'low'}`}>
+        <span className={`boult-badge boult-badge-${plan.severity || 'low'}`}>
           {severity.label}
         </span>
         <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-on-dark-tertiary)' }}>
@@ -208,12 +208,12 @@ export default function PlanArtifactCard({ plan, isNew, onUpdate }: PlanArtifact
                 }}
               >
                 <div style={{ width: 16, height: 16, borderRadius: '50%', border: `1.5px solid ${selectedOption === idx ? '#FFF' : 'rgba(255,255,255,0.3)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
-                  {selectedOption === idx && <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#FFF' }} className="arcus-option-pop" />}
+                  {selectedOption === idx && <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#FFF' }} className="boult-option-pop" />}
                 </div>
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                     <span style={{ fontSize: 'var(--text-sm)', fontWeight: 500, color: 'var(--text-on-dark-primary)' }}>{option.label}</span>
-                    <span className="arcus-effort-badge">{option.effort}</span>
+                    <span className="boult-effort-badge">{option.effort}</span>
                   </div>
                   <div style={{ fontSize: 'var(--text-xs)', color: option.irreversible ? 'var(--color-warning)' : 'var(--text-on-dark-tertiary)' }}>
                     {option.irreversible && '⚠ '}
@@ -225,8 +225,8 @@ export default function PlanArtifactCard({ plan, isNew, onUpdate }: PlanArtifact
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <button className="arcus-btn arcus-btn-primary" onClick={handleBuildPlan} disabled={loading}>
-              {loading ? <span className="arcus-spinner arcus-spinner-small" /> : 'Build Plan'}
+            <button className="boult-btn boult-btn-primary" onClick={handleBuildPlan} disabled={loading}>
+              {loading ? <span className="boult-spinner boult-spinner-small" /> : 'Build Plan'}
             </button>
           </div>
         </>
@@ -237,15 +237,15 @@ export default function PlanArtifactCard({ plan, isNew, onUpdate }: PlanArtifact
         <>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', marginBottom: 'var(--space-4)' }}>
             {steps.map((step, idx) => (
-              <div key={step.id} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', padding: 'var(--space-2) var(--space-3)', borderRadius: 'var(--radius-md)', background: step.status === 'completed' ? 'rgba(52,211,153,0.08)' : 'transparent' }} className={step.status === 'completed' ? 'arcus-step-flash' : ''}>
+              <div key={step.id} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', padding: 'var(--space-2) var(--space-3)', borderRadius: 'var(--radius-md)', background: step.status === 'completed' ? 'rgba(52,211,153,0.08)' : 'transparent' }} className={step.status === 'completed' ? 'boult-step-flash' : ''}>
                 <div style={{ width: 20, height: 20, borderRadius: '50%', background: step.status === 'completed' ? 'var(--color-success-bg)' : 'rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 'var(--text-xs)', color: 'var(--text-on-dark-secondary)' }}>
                   {step.status === 'pending' && (idx + 1)}
-                  {step.status === 'executing' && <span className="arcus-spinner arcus-spinner-small" />}
+                  {step.status === 'executing' && <span className="boult-spinner boult-spinner-small" />}
                   {step.status === 'completed' && <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5L4 7L8 3" stroke="var(--color-success)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                   {step.status === 'failed' && <span style={{ color: 'var(--color-danger)' }}>×</span>}
                 </div>
                 <span style={{ flex: 1, fontSize: 'var(--text-sm)', color: 'var(--text-on-dark-primary)' }}>{step.human_readable}</span>
-                <span className="arcus-step-app-chip">{step.app}</span>
+                <span className="boult-step-app-chip">{step.app}</span>
               </div>
             ))}
           </div>
@@ -253,14 +253,14 @@ export default function PlanArtifactCard({ plan, isNew, onUpdate }: PlanArtifact
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-3)' }}>
             {status === 'approved' && (
               <>
-                <button className="arcus-btn arcus-btn-ghost" onClick={handleDismiss}>Dismiss</button>
-                <button className="arcus-btn arcus-btn-primary" onClick={handleExecute} disabled={loading}>
-                  {loading ? <span className="arcus-spinner arcus-spinner-small" /> : 'Execute'}
+                <button className="boult-btn boult-btn-ghost" onClick={handleDismiss}>Dismiss</button>
+                <button className="boult-btn boult-btn-primary" onClick={handleExecute} disabled={loading}>
+                  {loading ? <span className="boult-spinner boult-spinner-small" /> : 'Execute'}
                 </button>
               </>
             )}
-            {status === 'executing' && <button className="arcus-btn arcus-btn-ghost" disabled>Running…</button>}
-            {status === 'failed' && <button className="arcus-btn arcus-btn-destructive" onClick={() => setStatus('approved')}>Retry</button>}
+            {status === 'executing' && <button className="boult-btn boult-btn-ghost" disabled>Running…</button>}
+            {status === 'failed' && <button className="boult-btn boult-btn-destructive" onClick={() => setStatus('approved')}>Retry</button>}
           </div>
         </>
       )}

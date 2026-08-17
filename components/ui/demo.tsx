@@ -1,5 +1,9 @@
-import { CTASection } from "@/components/ui/hero-dithering-card";
+import Home from "@/components/ui/hero-ascii";
 
 export default function DemoOne() {
-  return <CTASection />;
+  return (
+    <div className="w-screen h-screen">
+      <Home />
+    </div>
+  );
 }

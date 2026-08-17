@@ -1,6 +1,6 @@
 /**
- * Arcus V3 — Preferences API
- * POST /api/arcus/v3/preferences
+ * Boult V3 — Preferences API
+ * POST /api/boult/v3/preferences
  *
  * Updates user preferences in their profile.
  */
@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ status: 'updated' });
   } catch (error) {
     logEvent({ channel: "failures", event: "❌ API Error", description: String(error) });
-    console.error('[Arcus V3] Preferences API error:', (error as Error).message);
+    console.error('[Boult V3] Preferences API error:', (error as Error).message);
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }

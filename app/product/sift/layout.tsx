@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Sift — only the emails that deserve your attention | Mailient",
+  title: "Sift — only the emails that deserve your attention | Maily",
   description:
-    "Mailient reads everything and surfaces the deals, decisions, and real requests. Newsletters and noise never reach you. You read almost nothing.",
-  alternates: { canonical: "https://mailient.xyz/product/sift" },
+    "Maily reads everything and surfaces the deals, decisions, and real requests. Newsletters and noise never reach you. You read almost nothing.",
+  alternates: { canonical: "https://maily.dev/product/sift" },
   openGraph: {
-    title: "Sift — only the emails that deserve your attention | Mailient",
+    title: "Sift — only the emails that deserve your attention | Maily",
     description:
       "It reads everything. You read almost nothing. Deals, decisions, and real requests surface; noise disappears.",
-    url: "https://mailient.xyz/product/sift",
-    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Sift — only what needs you" }],
+    url: "https://maily.dev/product/sift",
+    images: [{ url: "/logo-maily.png", width: 1200, height: 630, alt: "Sift — only what needs you" }],
   },
 };
 

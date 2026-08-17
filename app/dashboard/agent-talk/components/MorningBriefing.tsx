@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * MorningBriefing — Premium daily summary card for Arcus
+ * MorningBriefing — Premium daily summary card for Boult
  * Shows overnight email activity, meetings, and actionable items
  */
 
@@ -338,7 +338,7 @@ export function MorningBriefing({
         <p className="text-[15px] text-black/40 dark:text-white/40 leading-relaxed max-w-xl">
           {stats.total > 0
             ? `${stats.total} emails arrived. ${stats.drafted} replies drafted. ${stats.archived} archived. ${stats.flagged > 0 ? `${stats.flagged} need your attention.` : 'Your inbox is clear.'}`
-            : 'Your inbox intelligence is ready. Ask Arcus to triage, draft, or schedule anything.'}
+            : 'Your inbox intelligence is ready. Ask Boult to triage, draft, or schedule anything.'}
         </p>
       </motion.div>
 

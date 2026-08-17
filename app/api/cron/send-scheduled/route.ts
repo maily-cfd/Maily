@@ -6,24 +6,24 @@
  * if you want tighter send-time accuracy. Same CRON_SECRET auth as run-agents.
  *
  *   GET /api/cron/send-scheduled
- *   Authorization: Bearer $CRON_SECRET   (or x-arcus-cron-secret: $CRON_SECRET)
+ *   Authorization: Bearer $CRON_SECRET   (or x-boult-cron-secret: $CRON_SECRET)
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '../../../../lib/supabase.js';
-import { drainScheduledEmails } from '../../../../lib/arcus/scheduled-send';
+import { drainScheduledEmails } from '../../../../lib/boult/scheduled-send';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
-const CRON_SECRET = process.env.CRON_SECRET || 'arcus-cron-secret';
+const CRON_SECRET = process.env.CRON_SECRET || 'boult-cron-secret';
 
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get('authorization') || '';
   const ok =
     authHeader === `Bearer ${CRON_SECRET}` ||
-    request.headers.get('x-arcus-cron-secret') === CRON_SECRET ||
+    request.headers.get('x-boult-cron-secret') === CRON_SECRET ||
     request.headers.get('x-vercel-cron') === '1';
   if (!ok) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 

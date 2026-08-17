@@ -1,12 +1,12 @@
 /**
- * BrandIcon — monochrome SVGs for the apps Arcus orchestrates.
+ * BrandIcon — monochrome SVGs for the apps Boult orchestrates.
  *
  * Each icon uses currentColor so it inherits whatever text color the parent
  * row sets — keeps the chat surface consistent (gray inline, slightly
  * stronger when the row is active). Sized at 14px to match the Lucide
  * icons used elsewhere in LiveStepTracker.
  *
- * Includes only the apps Arcus has tools for today: Notion, Gmail,
+ * Includes only the apps Boult has tools for today: Notion, Gmail,
  * Google Calendar, Slack. Add more as we wire integrations.
  */
 

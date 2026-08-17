@@ -125,8 +125,8 @@ JSON ONLY.`;
                             headers: {
                                 'Authorization': `Bearer ${openRouterKey}`,
                                 'Content-Type': 'application/json',
-                                'HTTP-Referer': 'https://mailient.xyz',
-                                'X-Title': 'Mailient'
+                                'HTTP-Referer': 'https://maily.dev',
+                                'X-Title': 'Maily'
                             },
                             body: JSON.stringify({
                                 model,

@@ -13,7 +13,7 @@ import { X, Link2, Sparkles } from 'lucide-react';
 import { 
   getBannerConnectors,
   hasConnectedAccounts 
-} from '@/lib/arcus-connector-registry';
+} from '@/lib/boult-connector-registry';
 
 interface ConnectedAccount {
   id: string;
@@ -70,7 +70,7 @@ export function ConnectorBanner({
               <Sparkles className="w-3.5 h-3.5 text-yellow-400" />
             </div>
             <p className="text-white text-xs mt-0.5">
-              Connectors allow Arcus to interact with apps directly in conversations.
+              Connectors allow Boult to interact with apps directly in conversations.
             </p>
           </div>
 

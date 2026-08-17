@@ -1,8 +1,8 @@
 /**
  * Agent Approvals API
  * 
- * GET  /api/arcus/agent-approvals — list pending actions for the current user
- * POST /api/arcus/agent-approvals — approve or reject a specific action
+ * GET  /api/boult/agent-approvals — list pending actions for the current user
+ * POST /api/boult/agent-approvals — approve or reject a specific action
  *
  * When an action is approved, the corresponding tool is executed immediately
  * using the stored tool_input. The row is then marked 'approved' with a
@@ -13,9 +13,9 @@ import { NextRequest, NextResponse } from 'next/server';
 // @ts-ignore
 import { auth as nextAuth } from '@/lib/auth.js';
 import { getSupabaseAdmin } from '../../../../lib/supabase.js';
-import { executeTool } from '../../../../lib/arcus/tools';
-import { recordLearningEvent } from '../../../../lib/arcus/autonomy';
-import { recordDecision, toolToGrantAction, grantTargetKey } from '../../../../lib/arcus/autonomy-grants';
+import { executeTool } from '../../../../lib/boult/tools';
+import { recordLearningEvent } from '../../../../lib/boult/autonomy';
+import { recordDecision, toolToGrantAction, grantTargetKey } from '../../../../lib/boult/autonomy-grants';
 import { logEvent } from "@/lib/logsso";
 
 // Count an approve/reject toward the graduated-autonomy ladder for this target.
@@ -45,7 +45,7 @@ export async function GET() {
 
   const supabase = getSupabaseAdmin();
   const { data, error } = await supabase
-    .from('arcus_agent_pending_actions')
+    .from('boult_agent_pending_actions')
     .select(`
       id,
       agent_id,
@@ -55,7 +55,7 @@ export async function GET() {
       status,
       created_at,
       resolved_at,
-      arcus_agents!inner ( name )
+      boult_agents!inner ( name )
     `)
     .eq('user_id', email.toLowerCase())
     .eq('status', 'pending')
@@ -70,7 +70,7 @@ export async function GET() {
   const actions = (data || []).map((row: any) => ({
     id: row.id,
     agentId: row.agent_id,
-    agentName: row.arcus_agents?.name || 'Unknown Agent',
+    agentName: row.boult_agents?.name || 'Unknown Agent',
     runId: row.run_id,
     toolName: row.tool_name,
     toolInput: row.tool_input,
@@ -119,10 +119,10 @@ export async function POST(request: NextRequest) {
   const supabase = getSupabaseAdmin();
 
   // Fetch the action — verify it belongs to this user and is still pending.
-  // Join arcus_agents to pull the agent name for the learning-loop record.
+  // Join boult_agents to pull the agent name for the learning-loop record.
   const { data: action, error: fetchErr } = await supabase
-    .from('arcus_agent_pending_actions')
-    .select('*, arcus_agents!inner ( name )')
+    .from('boult_agent_pending_actions')
+    .select('*, boult_agents!inner ( name )')
     .eq('id', actionId)
     .eq('user_id', email.toLowerCase())
     .eq('status', 'pending')
@@ -136,12 +136,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Action not found, already resolved, or does not belong to you.' }, { status: 404 });
   }
 
-  const agentName = (action as any).arcus_agents?.name as string | undefined;
+  const agentName = (action as any).boult_agents?.name as string | undefined;
 
   // ── Reject path ──────────────────────────────────────────────────────────
   if (decision === 'reject') {
     await supabase
-      .from('arcus_agent_pending_actions')
+      .from('boult_agent_pending_actions')
       .update({ status: 'rejected', resolved_at: new Date().toISOString() })
       .eq('id', actionId);
 
@@ -172,7 +172,7 @@ export async function POST(request: NextRequest) {
     );
 
     await supabase
-      .from('arcus_agent_pending_actions')
+      .from('boult_agent_pending_actions')
       .update({ status: 'approved', resolved_at: new Date().toISOString() })
       .eq('id', actionId);
 

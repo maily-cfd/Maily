@@ -92,10 +92,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Fetch Gmail access token — try arcus_integrations first, then user_tokens fallback
+    // Fetch Gmail access token — try boult_integrations first, then user_tokens fallback
     const supabase = getSupabaseAdmin();
     const { data } = await supabase
-      .from('arcus_integrations')
+      .from('boult_integrations')
       .select('access_token')
       .eq('user_id', userId)
       .eq('provider', 'gmail')
@@ -133,7 +133,7 @@ export async function POST(req: NextRequest) {
     // googleFetch routes through Composio Proxy Execute for Composio-managed
     // users (masking-proof — the stored token is a composio: marker, not a
     // usable bearer) and does a direct authed fetch for legacy users.
-    const { googleFetch } = await import('../../../../lib/arcus/tools/http-tokens');
+    const { googleFetch } = await import('../../../../lib/boult/tools/http-tokens');
     const gmailRes = await googleFetch(
       userId, 'gmail',
       'https://gmail.googleapis.com/gmail/v1/users/me/messages/send',

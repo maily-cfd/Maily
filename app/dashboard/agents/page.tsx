@@ -623,7 +623,7 @@ function NewScheduleModal({ open, onClose, onSave, initial }: {
   const todayStr = new Date().toISOString().split('T')[0];
 
   const handleSave = async () => {
-    if (!task.trim()) { toast.error('Describe what you want Arcus to do.'); return; }
+    if (!task.trim()) { toast.error('Describe what you want Boult to do.'); return; }
     if (patternKey === 'custom' && !customCron.trim()) { toast.error('Enter a cron expression.'); return; }
     if (hasExpiry && !expiresAt) { toast.error('Pick an expiration date or disable expiration.'); return; }
     setSaving(true);
@@ -704,7 +704,7 @@ function NewScheduleModal({ open, onClose, onSave, initial }: {
             <div className="lg:col-span-7 space-y-6">
               {/* Task description */}
               <div>
-                <label className="block text-[13px] font-bold text-zinc-600 dark:text-zinc-400 mb-2">What should Arcus do?</label>
+                <label className="block text-[13px] font-bold text-zinc-600 dark:text-zinc-400 mb-2">What should Boult do?</label>
                 <textarea
                   value={task}
                   onChange={e => setTask(e.target.value)}
@@ -1302,24 +1302,10 @@ function ScheduledPageInner() {
   const [gateOk, setGateOk] = useState(false);
 
   // PAYWALL: agents is a paid surface. Unpaid users go to the single paywall —
-  // onboarding step 13 — until they pay & activate. Fails closed.
+  // All authenticated users have access — no subscription check.
   useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const r = await fetch(`/api/subscription/status?t=${Date.now()}`);
-        const d = r.ok ? await r.json() : null;
-        const pt = d?.subscription?.planType;
-        const isPaid = !!pt && pt !== 'free' && pt !== 'none' && !d?.subscription?.isExpired;
-        if (cancelled) return;
-        if (isPaid) { setGateOk(true); }
-        else { router.replace('/onboarding?step=13'); }
-      } catch {
-        if (!cancelled) router.replace('/onboarding?step=13');
-      }
-    })();
-    return () => { cancelled = true; };
-  }, [router]);
+    setGateOk(true);
+  }, []);
 
   const setTab = (t: 'calendar' | 'tasks' | 'marketplace') => {
     const params = new URLSearchParams(searchParams.toString());
@@ -1329,7 +1315,7 @@ function ScheduledPageInner() {
 
   const fetchAgents = async () => {
     try {
-      const res = await fetch('/api/arcus/agents');
+      const res = await fetch('/api/boult/agents');
       const data = await res.json();
       if (data.error?.includes('not set up')) { setTableError(true); return; }
       setAgents(data.agents || []);
@@ -1346,7 +1332,7 @@ function ScheduledPageInner() {
   const saveTimezone = async (tz: string) => {
     if (!tz) return;
     try {
-      await fetch('/api/arcus/agents/timezone', {
+      await fetch('/api/boult/agents/timezone', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ timezone: tz }),
@@ -1356,7 +1342,7 @@ function ScheduledPageInner() {
 
   const handleCreate = async (data: Partial<Agent> & { _timezone?: string }) => {
     const { _timezone, ...agentData } = data;
-    const res = await fetch('/api/arcus/agents', {
+    const res = await fetch('/api/boult/agents', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: agentData.name, taskDescription: agentData.task_description, cronSchedule: agentData.cron_schedule, outputChannel: agentData.output_channel, slackChannel: agentData.slack_channel, skipConfirmations: agentData.skip_confirmations, expiresAt: agentData.expires_at ?? null }),
@@ -1371,7 +1357,7 @@ function ScheduledPageInner() {
   const handleEdit = async (data: Partial<Agent> & { _timezone?: string }) => {
     if (!editAgent) return;
     const { _timezone, ...agentData } = data;
-    const res = await fetch('/api/arcus/agents', {
+    const res = await fetch('/api/boult/agents', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: editAgent.id, ...agentData }),
@@ -1386,14 +1372,14 @@ function ScheduledPageInner() {
 
   const handleToggle = async (agent: Agent) => {
     const newStatus = agent.status === 'paused' ? 'active' : 'paused';
-    await fetch('/api/arcus/agents', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: agent.id, status: newStatus }) });
+    await fetch('/api/boult/agents', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: agent.id, status: newStatus }) });
     setAgents(prev => prev.map(a => a.id === agent.id ? { ...a, status: newStatus } : a));
     if (selectedAgent?.id === agent.id) setSelectedAgent(a => a ? { ...a, status: newStatus } : a);
   };
 
   const handleToggleConfirmations = async (agent: Agent) => {
     const newVal = !agent.skip_confirmations;
-    await fetch('/api/arcus/agents', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: agent.id, skip_confirmations: newVal }) });
+    await fetch('/api/boult/agents', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: agent.id, skip_confirmations: newVal }) });
     setAgents(prev => prev.map(a => a.id === agent.id ? { ...a, skip_confirmations: newVal } : a));
     if (selectedAgent?.id === agent.id) setSelectedAgent(a => a ? { ...a, skip_confirmations: newVal } : a);
   };
@@ -1404,7 +1390,7 @@ function ScheduledPageInner() {
     setAgents(prev => prev.filter(a => a.id !== agent.id));
     if (selectedAgent?.id === agent.id) setSelectedAgent(null);
     try {
-      const res = await fetch(`/api/arcus/agents?id=${agent.id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/boult/agents?id=${agent.id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error();
       toast.success(`"${agent.name}" deleted`);
     } catch {

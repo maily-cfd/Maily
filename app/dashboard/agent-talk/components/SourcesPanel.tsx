@@ -76,14 +76,14 @@ export function SourcesPanel({ sources }: SourcesPanelProps) {
         onClick={() => setOpen(o => !o)}
         className={cn(
           'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium transition-all',
-          'border border-arcus-border bg-arcus-surface/50 hover:bg-arcus-surface',
-          'text-arcus-fg-tertiary hover:text-arcus-fg-secondary',
+          'border border-boult-border bg-boult-surface/50 hover:bg-boult-surface',
+          'text-boult-fg-tertiary hover:text-boult-fg-secondary',
         )}
         aria-expanded={open}
         aria-controls="sources-panel"
       >
         <span>Sources</span>
-        <span className="tabular-nums font-mono text-[10px] text-arcus-fg-muted">{totalCount}</span>
+        <span className="tabular-nums font-mono text-[10px] text-boult-fg-muted">{totalCount}</span>
         <ChevronDown
           className={cn(
             'w-3 h-3 transition-transform duration-200',
@@ -102,7 +102,7 @@ export function SourcesPanel({ sources }: SourcesPanelProps) {
             transition={{ duration: 0.18, ease: [0.4, 0, 0.2, 1] }}
             className="overflow-hidden"
           >
-            <div className="mt-2 rounded-xl border border-arcus-border bg-arcus-surface/40 p-3 space-y-3">
+            <div className="mt-2 rounded-xl border border-boult-border bg-boult-surface/40 p-3 space-y-3">
               {groups.map(([cat, items]) => {
                 const meta = CATEGORY_META[cat];
                 const Icon = meta.icon;
@@ -113,17 +113,17 @@ export function SourcesPanel({ sources }: SourcesPanelProps) {
                       <span className={cn('text-[10.5px] font-bold uppercase tracking-wider', meta.color)}>
                         {meta.label}
                       </span>
-                      <span className="text-[10px] font-mono text-arcus-fg-muted tabular-nums">{items.length}</span>
+                      <span className="text-[10px] font-mono text-boult-fg-muted tabular-nums">{items.length}</span>
                     </div>
                     <ul className="space-y-1 pl-4">
                       {items.map((item, i) => (
-                        <li key={i} className="text-[12px] text-arcus-fg-secondary leading-snug">
+                        <li key={i} className="text-[12px] text-boult-fg-secondary leading-snug">
                           {item.url ? (
                             <a
                               href={item.url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-start gap-1.5 hover:text-arcus-fg transition-colors group"
+                              className="inline-flex items-start gap-1.5 hover:text-boult-fg transition-colors group"
                             >
                               <span className="line-clamp-2">{item.title || item.url}</span>
                               <ExternalLink className="w-2.5 h-2.5 mt-0.5 opacity-50 group-hover:opacity-100 flex-shrink-0" />
@@ -132,7 +132,7 @@ export function SourcesPanel({ sources }: SourcesPanelProps) {
                             <span className="line-clamp-2">{item.title || '(untitled)'}</span>
                           )}
                           {item.context && (
-                            <div className="text-[10.5px] text-arcus-fg-muted mt-0.5 line-clamp-1">{item.context}</div>
+                            <div className="text-[10.5px] text-boult-fg-muted mt-0.5 line-clamp-1">{item.context}</div>
                           )}
                         </li>
                       ))}

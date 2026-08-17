@@ -1,5 +1,5 @@
 /**
- * Mailient referrals — codes, attribution, and payout.
+ * Maily referrals — codes, attribution, and payout.
  *
  * THE DEAL
  *   Friend  → a free MONTH instead of the 3-day trial.

@@ -12,13 +12,13 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { CanvasEditor } from './CanvasEditor';
-import { normalizeDocumentMarkdown } from '@/lib/arcus/markdown-normalize';
+import { normalizeDocumentMarkdown } from '@/lib/boult/markdown-normalize';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import {
-  ArcusTable, parseArcusTable,
-  ArcusSteps, parseArcusSteps,
-  ArcusGallery, parseArcusGallery,
+  BoultTable, parseBoultTable,
+  BoultSteps, parseBoultSteps,
+  BoultGallery, parseBoultGallery,
 } from './CanvasBlocks';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -67,22 +67,22 @@ const TYPE_CONFIG: Record<string, {
   badge: string;
   badgeText: string;
 }> = {
-  email_draft:     { label: 'Email Draft',   Icon: Mail,      accent: '#ffffff', badge: 'bg-arcus-elevated border-arcus-border', badgeText: 'text-arcus-fg-secondary' },
-  reply:           { label: 'Reply',          Icon: Mail,      accent: '#ffffff', badge: 'bg-arcus-elevated border-arcus-border', badgeText: 'text-arcus-fg-secondary' },
-  report:          { label: 'Report',         Icon: FileText,  accent: '#ffffff', badge: 'bg-arcus-elevated border-arcus-border', badgeText: 'text-arcus-fg-secondary' },
-  notes:           { label: 'Notes',          Icon: Edit3,     accent: '#ffffff', badge: 'bg-arcus-elevated border-arcus-border', badgeText: 'text-arcus-fg-secondary' },
-  analysis:        { label: 'Analysis',       Icon: BarChart3, accent: '#ffffff', badge: 'bg-arcus-elevated border-arcus-border', badgeText: 'text-arcus-fg-secondary' },
-  analytics:       { label: 'Analytics',      Icon: BarChart3, accent: '#ffffff', badge: 'bg-arcus-elevated border-arcus-border', badgeText: 'text-arcus-fg-secondary' },
-  action_plan:     { label: 'Action Plan',    Icon: Zap,       accent: '#ffffff', badge: 'bg-arcus-elevated border-arcus-border', badgeText: 'text-arcus-fg-secondary' },
-  research:        { label: 'Research',       Icon: Globe,     accent: '#ffffff', badge: 'bg-arcus-elevated border-arcus-border', badgeText: 'text-arcus-fg-secondary' },
-  summary:         { label: 'Summary',        Icon: FileText,  accent: '#ffffff', badge: 'bg-arcus-elevated border-arcus-border', badgeText: 'text-arcus-fg-secondary' },
-  meeting_schedule:{ label: 'Schedule',       Icon: Calendar,  accent: '#ffffff', badge: 'bg-arcus-elevated border-arcus-border', badgeText: 'text-arcus-fg-secondary' },
-  workflow:        { label: 'Workflow',        Icon: Sparkles,  accent: '#ffffff', badge: 'bg-arcus-elevated border-arcus-border', badgeText: 'text-arcus-fg-secondary' },
-  execution:       { label: 'Execution',       Icon: Play,      accent: '#ffffff', badge: 'bg-arcus-elevated border-arcus-border', badgeText: 'text-arcus-fg-secondary' },
-  artifacts:       { label: 'Files',           Icon: FileText,  accent: '#ffffff', badge: 'bg-arcus-elevated border-arcus-border', badgeText: 'text-arcus-fg-secondary' },
-  action_outputs:  { label: 'Results',         Icon: CheckCircle2, accent: '#ffffff', badge: 'bg-arcus-elevated border-arcus-border', badgeText: 'text-arcus-fg-secondary' },
-  next_actions:    { label: 'Next Steps',      Icon: ArrowRight, accent: '#ffffff', badge: 'bg-arcus-elevated border-arcus-border', badgeText: 'text-arcus-fg-secondary' },
-  none:            { label: 'Document',        Icon: Sparkles,  accent: '#ffffff', badge: 'bg-arcus-elevated border-arcus-border', badgeText: 'text-arcus-fg-secondary' },
+  email_draft:     { label: 'Email Draft',   Icon: Mail,      accent: '#ffffff', badge: 'bg-boult-elevated border-boult-border', badgeText: 'text-boult-fg-secondary' },
+  reply:           { label: 'Reply',          Icon: Mail,      accent: '#ffffff', badge: 'bg-boult-elevated border-boult-border', badgeText: 'text-boult-fg-secondary' },
+  report:          { label: 'Report',         Icon: FileText,  accent: '#ffffff', badge: 'bg-boult-elevated border-boult-border', badgeText: 'text-boult-fg-secondary' },
+  notes:           { label: 'Notes',          Icon: Edit3,     accent: '#ffffff', badge: 'bg-boult-elevated border-boult-border', badgeText: 'text-boult-fg-secondary' },
+  analysis:        { label: 'Analysis',       Icon: BarChart3, accent: '#ffffff', badge: 'bg-boult-elevated border-boult-border', badgeText: 'text-boult-fg-secondary' },
+  analytics:       { label: 'Analytics',      Icon: BarChart3, accent: '#ffffff', badge: 'bg-boult-elevated border-boult-border', badgeText: 'text-boult-fg-secondary' },
+  action_plan:     { label: 'Action Plan',    Icon: Zap,       accent: '#ffffff', badge: 'bg-boult-elevated border-boult-border', badgeText: 'text-boult-fg-secondary' },
+  research:        { label: 'Research',       Icon: Globe,     accent: '#ffffff', badge: 'bg-boult-elevated border-boult-border', badgeText: 'text-boult-fg-secondary' },
+  summary:         { label: 'Summary',        Icon: FileText,  accent: '#ffffff', badge: 'bg-boult-elevated border-boult-border', badgeText: 'text-boult-fg-secondary' },
+  meeting_schedule:{ label: 'Schedule',       Icon: Calendar,  accent: '#ffffff', badge: 'bg-boult-elevated border-boult-border', badgeText: 'text-boult-fg-secondary' },
+  workflow:        { label: 'Workflow',        Icon: Sparkles,  accent: '#ffffff', badge: 'bg-boult-elevated border-boult-border', badgeText: 'text-boult-fg-secondary' },
+  execution:       { label: 'Execution',       Icon: Play,      accent: '#ffffff', badge: 'bg-boult-elevated border-boult-border', badgeText: 'text-boult-fg-secondary' },
+  artifacts:       { label: 'Files',           Icon: FileText,  accent: '#ffffff', badge: 'bg-boult-elevated border-boult-border', badgeText: 'text-boult-fg-secondary' },
+  action_outputs:  { label: 'Results',         Icon: CheckCircle2, accent: '#ffffff', badge: 'bg-boult-elevated border-boult-border', badgeText: 'text-boult-fg-secondary' },
+  next_actions:    { label: 'Next Steps',      Icon: ArrowRight, accent: '#ffffff', badge: 'bg-boult-elevated border-boult-border', badgeText: 'text-boult-fg-secondary' },
+  none:            { label: 'Document',        Icon: Sparkles,  accent: '#ffffff', badge: 'bg-boult-elevated border-boult-border', badgeText: 'text-boult-fg-secondary' },
 };
 
 /**
@@ -260,7 +260,7 @@ export function CanvasPanel({
 
     setDownloadingDocx(true);
     try {
-      const { markdownToDocxBlob, triggerDocxDownload } = await import('@/lib/arcus/docx-export');
+      const { markdownToDocxBlob, triggerDocxDownload } = await import('@/lib/boult/docx-export');
       const blob = await markdownToDocxBlob(text, canvasData?.title || 'document');
       triggerDocxDownload(blob, safeName);
     } catch {
@@ -348,7 +348,7 @@ export function CanvasPanel({
       transition={{ duration: 0.34, ease: [0.16, 1, 0.3, 1] }}
       className={cn(
         'flex flex-col flex-shrink-0 relative',
-        'bg-arcus-elevated border border-arcus-border shadow-[0_12px_48px_-12px_rgba(0,0,0,0.18)] dark:shadow-[0_32px_80px_-8px_rgba(0,0,0,0.8)]',
+        'bg-boult-elevated border border-boult-border shadow-[0_12px_48px_-12px_rgba(0,0,0,0.18)] dark:shadow-[0_32px_80px_-8px_rgba(0,0,0,0.8)]',
         'overflow-hidden select-text',
         isMobile
           ? 'fixed inset-x-2 bottom-2 top-auto rounded-[24px] z-[200]'
@@ -366,11 +366,11 @@ export function CanvasPanel({
       {/* Resize handle */}
       <div
         onMouseDown={startResizing}
-        className="hidden md:block absolute left-0 top-0 bottom-0 w-1 cursor-ew-resize z-10 hover:bg-arcus-surface-hover transition-colors"
+        className="hidden md:block absolute left-0 top-0 bottom-0 w-1 cursor-ew-resize z-10 hover:bg-boult-surface-hover transition-colors"
       />
 
       {/* ── Header ─────────────────────────────────────────────────────────── */}
-      <header className="shrink-0 flex items-center justify-between gap-3 px-4 py-3 border-b border-black/[0.05] dark:border-white/[0.03] bg-arcus-elevated">
+      <header className="shrink-0 flex items-center justify-between gap-3 px-4 py-3 border-b border-black/[0.05] dark:border-white/[0.03] bg-boult-elevated">
         {/* Identity block: icon TILE, then title over a metadata line. The old
             header put a coloured type-badge beside the title on one row, which
             spent the most valuable space in the panel on a label the user
@@ -384,10 +384,10 @@ export function CanvasPanel({
             <cfg.Icon className="w-[18px] h-[18px]" />
           </span>
           <div className="min-w-0">
-            <h2 className="text-[14px] font-semibold text-arcus-fg truncate leading-tight">
+            <h2 className="text-[14px] font-semibold text-boult-fg truncate leading-tight">
               {displayedData.title || 'Document'}
             </h2>
-            <p className="text-[11.5px] text-arcus-fg-tertiary leading-tight mt-0.5">
+            <p className="text-[11.5px] text-boult-fg-tertiary leading-tight mt-0.5">
               {cfg.label}
               {docSizeLabel ? <> · {docSizeLabel}</> : null}
             </p>
@@ -407,7 +407,7 @@ export function CanvasPanel({
               // reference uses a blue pill, but this design system is
               // monochrome — importing an accent colour for one button would
               // make it the only coloured thing in the product.
-              className="flex items-center gap-1.5 h-8 pl-3 pr-2.5 rounded-full bg-arcus-fg text-arcus-fg-inverse text-[12.5px] font-semibold hover:opacity-90 transition-opacity"
+              className="flex items-center gap-1.5 h-8 pl-3 pr-2.5 rounded-full bg-boult-fg text-boult-fg-inverse text-[12.5px] font-semibold hover:opacity-90 transition-opacity"
             >
               {downloadingDocx
                 ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -421,22 +421,22 @@ export function CanvasPanel({
                 {/* Click-away. A menu that only closes on re-click strands the
                     user behind an invisible layer if they reach elsewhere. */}
                 <div className="fixed inset-0 z-40" onClick={() => setDownloadMenu(false)} />
-                <div className="absolute right-0 top-9 z-50 w-44 py-1 rounded-xl border border-arcus-border bg-arcus-elevated shadow-xl">
+                <div className="absolute right-0 top-9 z-50 w-44 py-1 rounded-xl border border-boult-border bg-boult-elevated shadow-xl">
                   <button
                     onClick={() => { setDownloadMenu(false); handleDownloadDocx(); }}
-                    className="w-full text-left px-3 py-2 text-[12.5px] text-arcus-fg-secondary hover:bg-arcus-surface transition-colors"
+                    className="w-full text-left px-3 py-2 text-[12.5px] text-boult-fg-secondary hover:bg-boult-surface transition-colors"
                   >
                     {isEmail ? 'Plain text (.txt)' : 'Word (.docx)'}
                   </button>
                   <button
                     onClick={() => { setDownloadMenu(false); handleExportPdf(); }}
-                    className="w-full text-left px-3 py-2 text-[12.5px] text-arcus-fg-secondary hover:bg-arcus-surface transition-colors"
+                    className="w-full text-left px-3 py-2 text-[12.5px] text-boult-fg-secondary hover:bg-boult-surface transition-colors"
                   >
                     PDF
                   </button>
                   <button
                     onClick={() => { setDownloadMenu(false); handleCopy(); }}
-                    className="w-full text-left px-3 py-2 text-[12.5px] text-arcus-fg-secondary hover:bg-arcus-surface transition-colors"
+                    className="w-full text-left px-3 py-2 text-[12.5px] text-boult-fg-secondary hover:bg-boult-surface transition-colors"
                   >
                     {copied ? 'Copied' : 'Copy as Markdown'}
                   </button>
@@ -448,7 +448,7 @@ export function CanvasPanel({
           <button
             onClick={() => setExpanded(v => !v)}
             title={expanded ? 'Collapse' : 'Expand'}
-            className="hidden md:flex w-8 h-8 items-center justify-center rounded-lg hover:bg-arcus-surface text-arcus-fg-tertiary hover:text-arcus-fg-secondary transition-all"
+            className="hidden md:flex w-8 h-8 items-center justify-center rounded-lg hover:bg-boult-surface text-boult-fg-tertiary hover:text-boult-fg-secondary transition-all"
           >
             {expanded ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
           </button>
@@ -457,16 +457,16 @@ export function CanvasPanel({
               onClick={handleSend}
               title="Send as Email"
               disabled={isExecuting}
-              className="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-arcus-surface text-arcus-fg-tertiary hover:text-emerald-600 dark:hover:text-emerald-400 transition-all disabled:opacity-40"
+              className="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-boult-surface text-boult-fg-tertiary hover:text-emerald-600 dark:hover:text-emerald-400 transition-all disabled:opacity-40"
             >
               {isExecuting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
             </button>
           )}
-          <div className="w-px h-4 bg-arcus-border mx-1" />
+          <div className="w-px h-4 bg-boult-border mx-1" />
           <button
             onClick={onClose}
             title="Close"
-            className="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-arcus-surface text-arcus-fg-tertiary hover:text-arcus-fg-secondary transition-all"
+            className="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-boult-surface text-boult-fg-tertiary hover:text-boult-fg-secondary transition-all"
           >
             <X className="w-4 h-4" />
           </button>
@@ -475,7 +475,7 @@ export function CanvasPanel({
 
       {/* ── Email metadata strip ────────────────────────────────────────────── */}
       {isEmail && (
-        <div className="shrink-0 border-b border-black/[0.05] dark:border-white/[0.03] bg-arcus-elevated/60">
+        <div className="shrink-0 border-b border-black/[0.05] dark:border-white/[0.03] bg-boult-elevated/60">
           <EmailField label="To"      value={displayedData.content?.to      || ''} />
           <EmailField label="Subject" value={displayedData.content?.subject || ''} last />
         </div>
@@ -502,12 +502,12 @@ export function CanvasPanel({
                   <textarea
                     value={editedBody}
                     onChange={e => setEditedBody(e.target.value)}
-                    className="w-full min-h-[360px] bg-transparent text-[15.5px] text-arcus-fg leading-[1.75] resize-none focus:outline-none font-sans"
+                    className="w-full min-h-[360px] bg-transparent text-[15.5px] text-boult-fg leading-[1.75] resize-none focus:outline-none font-sans"
                     autoFocus
                     placeholder="Email body…"
                   />
                 ) : (
-                  <div className="prose-canvas text-[14px] text-arcus-fg-secondary leading-relaxed whitespace-pre-wrap font-sans">
+                  <div className="prose-canvas text-[14px] text-boult-fg-secondary leading-relaxed whitespace-pre-wrap font-sans">
                     {displayedData.content?.body || extractEmailBody(displayedData.raw || '')}
                   </div>
                 )}
@@ -547,15 +547,15 @@ export function CanvasPanel({
       </div>
 
       {/* ── Footer ───────────────────────────────────────────────────────────── */}
-      <footer className="shrink-0 border-t border-black/[0.05] dark:border-white/[0.03] bg-arcus-elevated px-5 py-3.5 flex items-center justify-between gap-3">
+      <footer className="shrink-0 border-t border-black/[0.05] dark:border-white/[0.03] bg-boult-elevated px-5 py-3.5 flex items-center justify-between gap-3">
         <div className="flex items-center gap-2.5">
-          <span className="text-[11px] text-arcus-fg-muted tabular-nums">
+          <span className="text-[11px] text-boult-fg-muted tabular-nums">
             {wordCount(getTextContent())} words
           </span>
           {isEmail && (
             <>
-              <span className="w-px h-3 bg-arcus-border" />
-              <span className="text-[11px] text-arcus-fg-muted tabular-nums">
+              <span className="w-px h-3 bg-boult-border" />
+              <span className="text-[11px] text-boult-fg-muted tabular-nums">
                 {(editMode ? editedBody : (displayedData.content?.body || extractEmailBody(displayedData.raw || ''))).length} characters
               </span>
             </>
@@ -584,7 +584,7 @@ export function CanvasPanel({
             // toggle nothing, and Download already lives in the header as the
             // primary action. Duplicating it here just gave the same command two
             // homes with different weights. The doc footer is now status only.
-            <span className="text-[11px] text-arcus-fg-muted">
+            <span className="text-[11px] text-boult-fg-muted">
               Saved to this conversation
             </span>
           )}
@@ -600,8 +600,8 @@ export function CanvasPanel({
 function EmailField({ label, value, last }: { label: string; value: string; last?: boolean }) {
   return (
     <div className={cn('flex items-start gap-3 px-6 py-2.5', !last && 'border-b border-black/[0.05] dark:border-white/[0.03]')}>
-      <span className="text-[11px] font-semibold text-arcus-fg-muted uppercase tracking-widest w-[42px] shrink-0 pt-[1px]">{label}</span>
-      <span className="text-[13px] text-arcus-fg-secondary leading-snug">{value || '—'}</span>
+      <span className="text-[11px] font-semibold text-boult-fg-muted uppercase tracking-widest w-[42px] shrink-0 pt-[1px]">{label}</span>
+      <span className="text-[13px] text-boult-fg-secondary leading-snug">{value || '—'}</span>
     </div>
   );
 }
@@ -624,8 +624,8 @@ function FooterButton({
       className={cn(
         'flex items-center gap-1.5 px-3.5 h-8 rounded-xl text-[12px] font-semibold transition-all active:scale-95 disabled:opacity-50',
         variant === 'primary'
-          ? 'bg-arcus-fg text-arcus-fg-inverse hover:opacity-90'
-          : 'text-arcus-fg-tertiary hover:text-arcus-fg-secondary hover:bg-arcus-surface',
+          ? 'bg-boult-fg text-boult-fg-inverse hover:opacity-90'
+          : 'text-boult-fg-tertiary hover:text-boult-fg-secondary hover:bg-boult-surface',
       )}
     >
       {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : icon}
@@ -674,9 +674,9 @@ function MetaInsights({ type, content }: { type: string; content: string }) {
   const tags = getTags();
 
   return (
-    <div className="flex flex-wrap items-center gap-2 mb-6 p-3 px-4 rounded-xl bg-arcus-elevated border border-arcus-border backdrop-blur-md">
-      <div className="flex items-center gap-1.5 text-[10px] font-bold text-arcus-fg-muted uppercase tracking-widest mr-2 shrink-0">
-        <Sparkles className="w-3.5 h-3.5 text-arcus-fg-secondary" />
+    <div className="flex flex-wrap items-center gap-2 mb-6 p-3 px-4 rounded-xl bg-boult-elevated border border-boult-border backdrop-blur-md">
+      <div className="flex items-center gap-1.5 text-[10px] font-bold text-boult-fg-muted uppercase tracking-widest mr-2 shrink-0">
+        <Sparkles className="w-3.5 h-3.5 text-boult-fg-secondary" />
         Meta Insights
       </div>
       <div className="flex flex-wrap gap-2">
@@ -689,7 +689,7 @@ function MetaInsights({ type, content }: { type: string; content: string }) {
                 ? "bg-black text-white border-black dark:bg-white dark:text-black dark:border-white animate-pulse"
                 : tag === 'Revenue Deal'
                 ? "bg-black/80 text-white border-black dark:bg-white/80 dark:text-black dark:border-white"
-                : "bg-arcus-elevated border-arcus-border text-arcus-fg-secondary"
+                : "bg-boult-elevated border-boult-border text-boult-fg-secondary"
             )}
           >
             {tag}
@@ -808,7 +808,7 @@ function InteractiveChart({ data }: { data: ChartData }) {
     const circumference = 2 * Math.PI * radius;
 
     return (
-      <div className="my-6 p-6 rounded-2xl bg-arcus-elevated border border-arcus-border flex flex-col sm:flex-row items-center gap-8 backdrop-blur-md">
+      <div className="my-6 p-6 rounded-2xl bg-boult-elevated border border-boult-border flex flex-col sm:flex-row items-center gap-8 backdrop-blur-md">
         <div className="relative w-[180px] h-[180px] flex-shrink-0">
           <svg viewBox="0 0 200 200" className="w-full h-full transform -rotate-90">
             {values.map((v, idx) => {
@@ -839,13 +839,13 @@ function InteractiveChart({ data }: { data: ChartData }) {
             })}
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-            <span className="text-[10px] text-arcus-fg-muted font-semibold uppercase tracking-wider">Total</span>
-            <span className="text-[20px] font-bold text-arcus-fg tracking-tight">{total}</span>
+            <span className="text-[10px] text-boult-fg-muted font-semibold uppercase tracking-wider">Total</span>
+            <span className="text-[20px] font-bold text-boult-fg tracking-tight">{total}</span>
           </div>
         </div>
 
         <div className="flex-1 flex flex-col gap-3 w-full">
-          {data.title && <h4 className="text-[13px] font-bold text-arcus-fg mb-1">{data.title}</h4>}
+          {data.title && <h4 className="text-[13px] font-bold text-boult-fg mb-1">{data.title}</h4>}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {data.labels.map((label, idx) => {
               const val = values[idx] || 0;
@@ -858,19 +858,19 @@ function InteractiveChart({ data }: { data: ChartData }) {
                   className={cn(
                     "flex items-center justify-between p-2 rounded-xl border transition-all duration-200 cursor-pointer",
                     isHovered
-                      ? "bg-arcus-surface border-arcus-divider scale-[1.02]"
-                      : "bg-arcus-elevated border-transparent"
+                      ? "bg-boult-surface border-boult-divider scale-[1.02]"
+                      : "bg-boult-elevated border-transparent"
                   )}
                   onMouseEnter={() => setHoveredIdx(idx)}
                   onMouseLeave={() => setHoveredIdx(null)}
                 >
                   <div className="flex items-center gap-2 min-w-0">
                     <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: colors[idx % colors.length] }} />
-                    <span className="text-[12px] font-medium text-arcus-fg-secondary truncate">{label}</span>
+                    <span className="text-[12px] font-medium text-boult-fg-secondary truncate">{label}</span>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    <span className="text-[12px] font-semibold text-arcus-fg">{val}</span>
-                    <span className="text-[10px] text-arcus-fg-tertiary font-mono">({pct}%)</span>
+                    <span className="text-[12px] font-semibold text-boult-fg">{val}</span>
+                    <span className="text-[10px] text-boult-fg-tertiary font-mono">({pct}%)</span>
                   </div>
                 </div>
               );
@@ -906,15 +906,15 @@ function InteractiveChart({ data }: { data: ChartData }) {
   const getY = (value: number) => chartHeight - paddingY - ((value - minVal) * (chartHeight - paddingY * 2)) / gridMax;
 
   return (
-    <div className="my-6 p-6 rounded-2xl bg-arcus-elevated border border-arcus-border flex flex-col gap-4 backdrop-blur-md">
+    <div className="my-6 p-6 rounded-2xl bg-boult-elevated border border-boult-border flex flex-col gap-4 backdrop-blur-md">
       {data.title && (
         <div className="flex items-center justify-between">
-          <h4 className="text-[13px] font-bold text-arcus-fg">{data.title}</h4>
+          <h4 className="text-[13px] font-bold text-boult-fg">{data.title}</h4>
           <div className="flex items-center gap-3">
             {datasets.map((d, idx) => (
               <div key={idx} className="flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: colors[idx % colors.length] }} />
-                <span className="text-[10px] text-arcus-fg-tertiary font-medium">{d.label}</span>
+                <span className="text-[10px] text-boult-fg-tertiary font-medium">{d.label}</span>
               </div>
             ))}
           </div>
@@ -1038,13 +1038,13 @@ function InteractiveChart({ data }: { data: ChartData }) {
 
         {hoveredIdx !== null && (
           <div 
-            className="absolute z-10 px-2.5 py-1.5 rounded-lg bg-arcus-bg/90 border border-arcus-divider text-[10px] text-arcus-fg flex flex-col gap-1 pointer-events-none shadow-lg"
+            className="absolute z-10 px-2.5 py-1.5 rounded-lg bg-boult-bg/90 border border-boult-divider text-[10px] text-boult-fg flex flex-col gap-1 pointer-events-none shadow-lg"
             style={{
               left: `${Math.min(getX(hoveredIdx) * 0.9, 240)}px`,
               top: '10px'
             }}
           >
-            <span className="font-bold text-arcus-fg-tertiary uppercase">{labels[hoveredIdx]}</span>
+            <span className="font-bold text-boult-fg-tertiary uppercase">{labels[hoveredIdx]}</span>
             {datasets.map((d, dIdx) => (
               <div key={dIdx} className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: colors[dIdx % colors.length] }} />
@@ -1097,8 +1097,8 @@ function normalizeInlineEnumeration(md: string): string {
 function MarkdownView({ content }: { content: string }) {
   if (!content) return (
     <div className="flex flex-col items-center justify-center py-20 opacity-30">
-      <Sparkles className="w-8 h-8 text-arcus-fg-muted mb-3" />
-      <p className="text-[13px] text-arcus-fg-tertiary">No content</p>
+      <Sparkles className="w-8 h-8 text-boult-fg-muted mb-3" />
+      <p className="text-[13px] text-boult-fg-tertiary">No content</p>
     </div>
   );
   // Defensive normalization before ReactMarkdown. normalizeDocumentMarkdown is
@@ -1122,41 +1122,41 @@ function MarkdownView({ content }: { content: string }) {
         // structure from SIZE and SPACE, so the rules are gone and the steps
         // between levels are wide enough to see at a glance.
         h1: ({ children }) => (
-          <h1 className="text-[30px] font-bold text-arcus-fg leading-[1.15] tracking-[-0.02em] mb-5 mt-1">{children}</h1>
+          <h1 className="text-[30px] font-bold text-boult-fg leading-[1.15] tracking-[-0.02em] mb-5 mt-1">{children}</h1>
         ),
         h2: ({ children }) => (
-          <h2 className="text-[21px] font-bold text-arcus-fg leading-snug tracking-[-0.015em] mt-9 mb-3">{children}</h2>
+          <h2 className="text-[21px] font-bold text-boult-fg leading-snug tracking-[-0.015em] mt-9 mb-3">{children}</h2>
         ),
         h3: ({ children }) => (
-          <h3 className="text-[16px] font-semibold text-arcus-fg leading-snug mt-6 mb-2.5">{children}</h3>
+          <h3 className="text-[16px] font-semibold text-boult-fg leading-snug mt-6 mb-2.5">{children}</h3>
         ),
         // Body sits at full foreground contrast. It was fg-secondary, which is
         // correct for chat chrome and wrong for the thing the user came to read.
         p: ({ children }) => (
-          <p className="text-[15.5px] text-arcus-fg leading-[1.75] mb-4">{children}</p>
+          <p className="text-[15.5px] text-boult-fg leading-[1.75] mb-4">{children}</p>
         ),
         ul: ({ children }) => (
           <ul className="mb-4 space-y-1.5 list-none pl-0">{children}</ul>
         ),
         ol: ({ children }) => (
-          <ol className="mb-4 space-y-1.5 pl-5 list-decimal marker:text-arcus-fg-muted">{children}</ol>
+          <ol className="mb-4 space-y-1.5 pl-5 list-decimal marker:text-boult-fg-muted">{children}</ol>
         ),
         li: ({ children, ...props }: any) => (
           props.ordered
-            ? <li className="text-[15px] text-arcus-fg leading-[1.7] pl-1">{children}</li>
-            : <li className="flex items-start gap-2.5 text-[15px] text-arcus-fg leading-[1.7] list-none">
-                <span className="w-1.5 h-1.5 rounded-full bg-arcus-fg-muted mt-[9px] shrink-0" />
+            ? <li className="text-[15px] text-boult-fg leading-[1.7] pl-1">{children}</li>
+            : <li className="flex items-start gap-2.5 text-[15px] text-boult-fg leading-[1.7] list-none">
+                <span className="w-1.5 h-1.5 rounded-full bg-boult-fg-muted mt-[9px] shrink-0" />
                 <span className="flex-1">{children}</span>
               </li>
         ),
         strong: ({ children }) => (
-          <strong className="font-semibold text-arcus-fg">{children}</strong>
+          <strong className="font-semibold text-boult-fg">{children}</strong>
         ),
         em: ({ children }) => (
-          <em className="italic text-arcus-fg-secondary">{children}</em>
+          <em className="italic text-boult-fg-secondary">{children}</em>
         ),
         blockquote: ({ children }) => (
-          <blockquote className="border-l-2 border-arcus-fg-muted pl-4 my-4 text-[13.5px] text-arcus-fg-tertiary italic leading-relaxed">
+          <blockquote className="border-l-2 border-boult-fg-muted pl-4 my-4 text-[13.5px] text-boult-fg-tertiary italic leading-relaxed">
             {children}
           </blockquote>
         ),
@@ -1171,53 +1171,53 @@ function MarkdownView({ content }: { content: string }) {
             }
           }
 
-          // ── Arcus rich blocks ────────────────────────────────────────────
-          if (!inline && lang.includes('arcus-table')) {
-            const parsed = parseArcusTable(rawText);
-            if (parsed) return <ArcusTable data={parsed} />;
+          // ── Boult rich blocks ────────────────────────────────────────────
+          if (!inline && lang.includes('boult-table')) {
+            const parsed = parseBoultTable(rawText);
+            if (parsed) return <BoultTable data={parsed} />;
           }
-          if (!inline && lang.includes('arcus-steps')) {
-            const parsed = parseArcusSteps(rawText);
-            if (parsed) return <ArcusSteps data={parsed} />;
+          if (!inline && lang.includes('boult-steps')) {
+            const parsed = parseBoultSteps(rawText);
+            if (parsed) return <BoultSteps data={parsed} />;
           }
-          if (!inline && lang.includes('arcus-gallery')) {
-            const parsed = parseArcusGallery(rawText);
-            if (parsed) return <ArcusGallery data={parsed} />;
+          if (!inline && lang.includes('boult-gallery')) {
+            const parsed = parseBoultGallery(rawText);
+            if (parsed) return <BoultGallery data={parsed} />;
           }
 
           return inline ? (
-            <code className="px-1.5 py-0.5 rounded-md bg-arcus-surface text-[12.5px] font-mono text-arcus-fg-secondary border border-arcus-divider">
+            <code className="px-1.5 py-0.5 rounded-md bg-boult-surface text-[12.5px] font-mono text-boult-fg-secondary border border-boult-divider">
               {children}
             </code>
           ) : (
-            <pre className="my-4 rounded-xl bg-arcus-surface border border-arcus-border overflow-x-auto">
-              <code className="block p-4 text-[12.5px] font-mono text-arcus-fg-secondary leading-relaxed">{children}</code>
+            <pre className="my-4 rounded-xl bg-boult-surface border border-boult-border overflow-x-auto">
+              <code className="block p-4 text-[12.5px] font-mono text-boult-fg-secondary leading-relaxed">{children}</code>
             </pre>
           );
         },
-        hr: () => <hr className="my-6 border-arcus-border" />,
+        hr: () => <hr className="my-6 border-boult-border" />,
         a: ({ href, children }) => (
           <a href={href} target="_blank" rel="noopener noreferrer"
-            className="text-arcus-fg underline underline-offset-2 hover:opacity-80 transition-opacity">
+            className="text-boult-fg underline underline-offset-2 hover:opacity-80 transition-opacity">
             {children}
           </a>
         ),
         table: ({ children }) => (
-          <div className="my-5 overflow-x-auto rounded-xl border border-arcus-border">
+          <div className="my-5 overflow-x-auto rounded-xl border border-boult-border">
             <table className="w-full text-[13px]">{children}</table>
           </div>
         ),
         thead: ({ children }) => (
-          <thead className="bg-arcus-elevated border-b border-arcus-border">{children}</thead>
+          <thead className="bg-boult-elevated border-b border-boult-border">{children}</thead>
         ),
         tbody: ({ children }) => (
-          <tbody className="divide-y divide-arcus-border">{children}</tbody>
+          <tbody className="divide-y divide-boult-border">{children}</tbody>
         ),
         th: ({ children }) => (
-          <th className="px-4 py-2.5 text-left text-[11px] font-semibold text-arcus-fg-tertiary uppercase tracking-wider">{children}</th>
+          <th className="px-4 py-2.5 text-left text-[11px] font-semibold text-boult-fg-tertiary uppercase tracking-wider">{children}</th>
         ),
         td: ({ children }) => (
-          <td className="px-4 py-3 text-arcus-fg-secondary">{children}</td>
+          <td className="px-4 py-3 text-boult-fg-secondary">{children}</td>
         ),
       }}
     >

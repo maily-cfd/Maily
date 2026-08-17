@@ -22,7 +22,7 @@ export const dynamic = 'force-dynamic';
 async function modifyThreadInbox(userId: string, threadId: string, archive: boolean): Promise<void> {
   if (!threadId) return;
   try {
-    const { getGmailToken, refreshGoogleToken, googleFetch } = await import('@/lib/arcus/tools/http-tokens');
+    const { getGmailToken, refreshGoogleToken, googleFetch } = await import('@/lib/boult/tools/http-tokens');
     let token = await getGmailToken(userId);
     if (!token) return;
     const body = JSON.stringify(archive ? { removeLabelIds: ['INBOX'] } : { addLabelIds: ['INBOX'] });
@@ -60,7 +60,7 @@ export async function POST(req: Request) {
       ? modifyThreadInbox(userId, threadId, true)
       : Promise.resolve();
     await Promise.all([
-      supabase.from('arcus_today_dismissals').upsert({ user_id: userId, item_id: itemId, item_type: itemType }, { onConflict: 'user_id,item_id' }),
+      supabase.from('boult_today_dismissals').upsert({ user_id: userId, item_id: itemId, item_type: itemType }, { onConflict: 'user_id,item_id' }),
       archive,
     ]);
     return NextResponse.json({ ok: true });
@@ -87,7 +87,7 @@ export async function DELETE(req: Request) {
     const supabase = getSupabaseAdmin();
     // Undo: drop the dismissal record AND move the thread back to the inbox.
     await Promise.all([
-      supabase.from('arcus_today_dismissals').delete().eq('user_id', userId).eq('item_id', itemId),
+      supabase.from('boult_today_dismissals').delete().eq('user_id', userId).eq('item_id', itemId),
       threadId ? modifyThreadInbox(userId, threadId, false) : Promise.resolve(),
     ]);
     return NextResponse.json({ ok: true });

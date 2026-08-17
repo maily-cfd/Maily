@@ -1,8 +1,8 @@
 /**
- * Arcus V3 — Gmail OAuth Callback
+ * Boult V3 — Gmail OAuth Callback
  *
  * Exchanges the authorization code for Gmail tokens,
- * encrypts and stores them in arcus_integrations under provider='gmail'.
+ * encrypts and stores them in boult_integrations under provider='gmail'.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -33,14 +33,14 @@ export async function GET(request: NextRequest) {
     }
 
     // CSRF check
-    const storedState = request.cookies.get('arcus_gmail_state')?.value;
+    const storedState = request.cookies.get('boult_gmail_state')?.value;
     if (!state || !storedState || state !== storedState) {
       return NextResponse.redirect(new URL('/dashboard/agent-talk?error=csrf', request.url));
     }
 
     // Exchange code for tokens
     const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
-    const redirectUri = `${baseUrl}/api/arcus/v3/oauth/gmail/callback`;
+    const redirectUri = `${baseUrl}/api/boult/v3/oauth/gmail/callback`;
 
     const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
       method: 'POST',
@@ -56,7 +56,7 @@ export async function GET(request: NextRequest) {
 
     if (!tokenResponse.ok) {
       const err = await tokenResponse.text();
-      console.error('[Arcus V3] Gmail token exchange failed:', err);
+      console.error('[Boult V3] Gmail token exchange failed:', err);
       return NextResponse.redirect(new URL('/dashboard/agent-talk?error=token_exchange', request.url));
     }
 
@@ -72,7 +72,7 @@ export async function GET(request: NextRequest) {
       ? new Date(Date.now() + expires_in * 1000).toISOString()
       : null;
 
-    const { error: dbError } = await supabase.from('arcus_integrations').upsert({
+    const { error: dbError } = await supabase.from('boult_integrations').upsert({
       user_id: userId,
       provider: 'gmail',
       access_token: encrypt(access_token),
@@ -83,22 +83,22 @@ export async function GET(request: NextRequest) {
     }, { onConflict: 'user_id,provider' });
 
     if (dbError) {
-      console.error('[Arcus V3] Gmail DB store error:', dbError.message);
+      console.error('[Boult V3] Gmail DB store error:', dbError.message);
       return NextResponse.redirect(new URL('/dashboard/agent-talk?error=db_store', request.url));
     }
 
-    await auditLogger.log(userId, 'arcus.gmail_connected', { hasRefreshToken: !!refresh_token });
+    await auditLogger.log(userId, 'boult.gmail_connected', { hasRefreshToken: !!refresh_token });
 
     const successUrl = new URL('/dashboard/agent-talk', request.url);
     successUrl.searchParams.set('success', 'connected');
     successUrl.searchParams.set('provider', 'gmail');
     const response = NextResponse.redirect(successUrl);
-    response.cookies.delete('arcus_gmail_state');
+    response.cookies.delete('boult_gmail_state');
     return response;
 
   } catch (err) {
     logEvent({ channel: "failures", event: "❌ API Error", description: String(err) });
-    console.error('[Arcus V3] Gmail callback error:', (err as Error).message);
+    console.error('[Boult V3] Gmail callback error:', (err as Error).message);
     return NextResponse.redirect(new URL('/dashboard/agent-talk?error=callback', request.url));
   }
 }

@@ -1,8 +1,8 @@
-# Mailient Design Language — Apple-grade software UI
+# Maily Design Language — Apple-grade software UI
 
 The bar: what a customer expects when they pay **$29/mo**. Modeled on Apple's
 software design (HIG + Liquid Glass, incl. the 2026 revision), adapted to
-Mailient's graphite system. This doc is the contract every surface pass follows.
+Maily's graphite system. This doc is the contract every surface pass follows.
 
 Sources: Apple HIG (developer.apple.com/design/human-interface-guidelines),
 "Meet Liquid Glass" (WWDC25 session 219), Apple Newsroom Jun 2025, Liquid Glass
@@ -23,7 +23,7 @@ Sources: Apple HIG (developer.apple.com/design/human-interface-guidelines),
 
 Apple's rule: **glass is for floating controls, not for content.**
 
-- **Glass** (`.arcus-glass`, `.arcus-glass-card`, `.arcus-glass-pill` in
+- **Glass** (`.boult-glass`, `.boult-glass-card`, `.boult-glass-pill` in
   `globals.css`): things that float *over* content — sticky bars, the
   composer, processing-trace cards, result/artifact cards, message pills,
   confirmation cards, modals' chrome.
@@ -36,7 +36,7 @@ Apple's rule: **glass is for floating controls, not for content.**
   FloatingNavbar — which also layers the `#liquid-glass-distortion` SVG
   turbulence filter). Radius comes from markup so one vocabulary covers
   circles, pills, and cards.
-- **Calm opaque ground** (`bg-arcus-bg/-elevated/-surface` tokens): content
+- **Calm opaque ground** (`bg-boult-bg/-elevated/-surface` tokens): content
   areas — document bodies (CanvasPanel body), email text, list interiors,
   settings panes.
 - **Never stack glass on glass.** A control inside a blurred bar stays a
@@ -48,9 +48,9 @@ Apple's rule: **glass is for floating controls, not for content.**
 
 ## 3. Color
 
-- Only **semantic tokens** (`arcus-fg`, `-fg-secondary`, `-fg-tertiary`,
-  `-fg-muted`, `-fg-inverse`; `arcus-bg`, `-elevated`, `-surface`,
-  `-surface-hover`, `-raised`; `arcus-border`, `-divider`) or explicit
+- Only **semantic tokens** (`boult-fg`, `-fg-secondary`, `-fg-tertiary`,
+  `-fg-muted`, `-fg-inverse`; `boult-bg`, `-elevated`, `-surface`,
+  `-surface-hover`, `-raised`; `boult-border`, `-divider`) or explicit
   light/dark **pairs** (`text-black/60 dark:text-white/60`). Never a bare
   `text-white/…`, `bg-[#hex]`, or `zinc-…` without its counterpart.
 - Accent colors carry **meaning only**: emerald = success/sent, rose = error,
@@ -91,7 +91,7 @@ One family, hierarchy by weight/size — not by color gymnastics.
   (`rgba(0,0,0,0.14–0.22)` vs `0.6–0.8`).
 - Hairlines: `border-black/[0.05–0.08] dark:border-white/[0.06–0.10]`.
 - Hover lift: −1px translateY + slightly deeper shadow
-  (`.arcus-glass-hover`), 200–300ms `cubic-bezier(0.22,1,0.36,1)`.
+  (`.boult-glass-hover`), 200–300ms `cubic-bezier(0.22,1,0.36,1)`.
 
 ## 7. Motion
 

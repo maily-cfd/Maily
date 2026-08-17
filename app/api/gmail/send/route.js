@@ -44,12 +44,12 @@ export async function POST(request) {
       }
     }
 
-    // Final fallback: check arcus_integrations (Gmail connected via integrations page)
+    // Final fallback: check boult_integrations (Gmail connected via integrations page)
     if (!accessToken) {
       try {
         const supabase = getSupabaseAdmin();
         const { data: integData } = await supabase
-          .from('arcus_integrations')
+          .from('boult_integrations')
           .select('access_token')
           .eq('user_id', userEmail.toLowerCase())
           .eq('provider', 'gmail')
@@ -59,7 +59,7 @@ export async function POST(request) {
         }
       } catch (integError) {
         logEvent({ channel: "failures", event: "❌ API Error", description: String(integError) });
-        console.error('[send] arcus_integrations fallback error:', integError);
+        console.error('[send] boult_integrations fallback error:', integError);
       }
     }
 

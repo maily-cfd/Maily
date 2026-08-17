@@ -1,5 +1,5 @@
 /**
- * Arcus V3 — Gmail connect.
+ * Boult V3 — Gmail connect.
  *
  * Composio-ONLY by design (founder directive 2026-07-23: every Google
  * connection — Gmail, Calendar, Meet — goes through Composio's VERIFIED client;
@@ -17,7 +17,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '../../../../../../lib/auth.js';
 import { logEvent } from "@/lib/logsso";
-import { composioEnabled, initiateComposioConnection } from '../../../../../../lib/arcus/composio';
+import { composioEnabled, initiateComposioConnection } from '../../../../../../lib/boult/composio';
 
 export async function GET(request: NextRequest) {
   try {

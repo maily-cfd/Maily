@@ -16,12 +16,12 @@
  * else: the next turn's prompt already carries the relevant feedback as
  * context the LLM reads before drafting.
  *
- * POST /api/arcus/learn/draft-feedback
+ * POST /api/boult/learn/draft-feedback
  *   body: {
  *     recipientEmail: string,
  *     recipientName?: string,
  *     subject?: string,
- *     originalBody: string,     // draft text Arcus produced
+ *     originalBody: string,     // draft text Boult produced
  *     finalBody?: string,       // body the user actually sent (omit on cancel)
  *     action: 'sent' | 'edited_and_sent' | 'cancelled',
  *   }
@@ -30,7 +30,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 // @ts-ignore — JS module
 import { auth as nextAuth } from '../../../../../lib/auth.js';
-import { saveMemory } from '../../../../../lib/arcus/memory';
+import { saveMemory } from '../../../../../lib/boult/memory';
 import { logEvent } from "@/lib/logsso";
 
 const auth: any = nextAuth;

@@ -38,7 +38,7 @@ New flow:
 ```
 POST /api/home-feed/recommendations
   → auth()                          (existing)
-  → connected = getConnectedIntegrations(userId)   (lib/arcus/system-prompt.ts)
+  → connected = getConnectedIntegrations(userId)   (lib/boult/system-prompt.ts)
   → signals = await gatherSignals(userId, connected, clientBuckets)  (NEW)
        • only fetch from CONNECTED apps
        • each source wrapped in its own try/catch + AbortSignal.timeout
@@ -55,7 +55,7 @@ thread/event id.
 
 ## 3. Per-app signals (all use existing helpers — no new auth work)
 
-Token helpers already exist in `lib/arcus/tools/http-tokens.ts`:
+Token helpers already exist in `lib/boult/tools/http-tokens.ts`:
 `getGmailToken`, `getGcalToken`, `getNotionToken`, `getSlackToken`; Cal.com via
 `getCalClient(userId)` (per-user API key).
 

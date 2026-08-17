@@ -4,19 +4,19 @@ import { BlogLayout } from "@/components/BlogLayout";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "AI Email Agent vs. AI Email Assistant // Mailient Blog",
+  title: "AI Email Agent vs. AI Email Assistant // Maily Blog",
   description: "An assistant answers questions. An agent takes action. Understanding this distinction is the key to choosing the right tool for your inbox.",
   openGraph: {
-    title: "AI Email Agent vs. AI Email Assistant // Mailient Blog",
+    title: "AI Email Agent vs. AI Email Assistant // Maily Blog",
     description: "An assistant answers questions. An agent takes action. Understanding this distinction is the key to choosing the right tool for your inbox.",
-    url: "https://mailient.xyz/blogs/ai-email-agent-vs-assistant",
+    url: "https://maily.dev/blogs/ai-email-agent-vs-assistant",
     type: "article",
     publishedTime: "2026-05-21T00:00:00.000Z",
-    authors: ["Maulik"],
+    authors: ["Maily"],
   },
   twitter: {
     card: "summary_large_image",
-    title: "AI Email Agent vs. AI Email Assistant // Mailient Blog",
+    title: "AI Email Agent vs. AI Email Assistant // Maily Blog",
     description: "An assistant answers questions. An agent takes action. Understanding this distinction is the key to choosing the right tool for your inbox.",
   },
 };
@@ -28,14 +28,14 @@ const meta = {
   readTime: "8 min read",
   category: "Industry",
   slug: "ai-email-agent-vs-assistant",
-  author: "Maulik",
+  author: "Maily",
 };
 
 const tableOfContents = [
   { id: "assistant-trap", label: "The Assistant Trap" },
   { id: "what-makes-agent", label: "What Makes an Agent" },
   { id: "agent-loop", label: "The Agent Loop Explained" },
-  { id: "where-arcus-fits", label: "Where Arcus Fits" },
+  { id: "where-boult-fits", label: "Where Boult Fits" },
   { id: "when-to-use-which", label: "When to Use Which" },
 ];
 
@@ -157,16 +157,16 @@ export default function AgentVsAssistantPage() {
 
       <hr />
 
-      <h2 id="where-arcus-fits">Where Arcus Fits</h2>
+      <h2 id="where-boult-fits">Where Boult Fits</h2>
       <p>
-        <Link href="/product/arcus">Arcus</Link> is Mailient's agent — not an assistant. It implements the full agent loop described above, running in secure background loops that sweep your inbox on schedule. Here's what that looks like in practice:
+        <Link href="/product/boult">Boult</Link> is Maily's agent — not an assistant. It implements the full agent loop described above, running in secure background loops that sweep your inbox on schedule. Here's what that looks like in practice:
       </p>
       <ul>
         <li><strong>Inbox triage</strong> — powered by <Link href="/product/sift">Sift AI</Link>, incoming messages are categorized by urgency and business impact. Newsletters and promotional emails are archived silently. Priority conversations surface immediately.</li>
-        <li><strong>Voice-matched drafting</strong> — using the <Link href="/blogs/ai-learns-your-writing-style">Neural Voice Profile</Link> built from your last 90 days of sent mail, Arcus drafts replies that match your writing style — greeting, tone, sentence structure, sign-off.</li>
-        <li><strong>Calendar coordination</strong> — when a meeting request comes in, Arcus checks your Google Calendar, finds available slots, generates a Google Meet link, and includes everything in the draft.</li>
+        <li><strong>Voice-matched drafting</strong> — using the <Link href="/blogs/ai-learns-your-writing-style">Neural Voice Profile</Link> built from your last 90 days of sent mail, Boult drafts replies that match your writing style — greeting, tone, sentence structure, sign-off.</li>
+        <li><strong>Calendar coordination</strong> — when a meeting request comes in, Boult checks your Google Calendar, finds available slots, generates a Google Meet link, and includes everything in the draft.</li>
         <li><strong>Scheduling Agents</strong> — autonomous tasks you define in plain English that run on a schedule with no tab open. You wake up to the results in your inbox.</li>
-        <li><strong>Canvas workspace</strong> — for complex tasks like proposals, weekly digests, or meeting prep documents, Arcus writes into a full workspace that you can edit, export as PDF, or send directly.</li>
+        <li><strong>Canvas workspace</strong> — for complex tasks like proposals, weekly digests, or meeting prep documents, Boult writes into a full workspace that you can edit, export as PDF, or send directly.</li>
       </ul>
       <p>
         Crucially, nothing sends without explicit approval. Every draft is presented for review. You maintain final authority over every outbound message. The autonomy is in the preparation — the send is always yours.
@@ -202,7 +202,7 @@ export default function AgentVsAssistantPage() {
 
       <div className="callout-box">
         <p>
-          <strong>Arcus is not an assistant.</strong> It's an autonomous inbox engine that reads, drafts, schedules, and coordinates — all while you sleep.{" "}
+          <strong>Boult is not an assistant.</strong> It's an autonomous inbox engine that reads, drafts, schedules, and coordinates — all while you sleep.{" "}
           <a href="/auth/signup">Start free trial →</a>
         </p>
       </div>

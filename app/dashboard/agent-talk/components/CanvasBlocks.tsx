@@ -8,9 +8,9 @@
  * detects the fence language and dispatches to one of these renderers.
  *
  * Block types:
- *   ```arcus-table   → ArcusTable    (Clay-style typed table)
- *   ```arcus-steps   → ArcusSteps    (numbered process steps with status)
- *   ```arcus-gallery → ArcusGallery  (image grid)
+ *   ```boult-table   → BoultTable    (Clay-style typed table)
+ *   ```boult-steps   → BoultSteps    (numbered process steps with status)
+ *   ```boult-gallery → BoultGallery  (image grid)
  *
  * Every block accepts a JSON payload. The parser is tolerant: if JSON is
  * invalid or missing required fields, the renderer falls through to a plain
@@ -21,7 +21,7 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 
 // ─────────────────────────────────────────────────────────────────────────────
-// arcus-table
+// boult-table
 // ─────────────────────────────────────────────────────────────────────────────
 
 export type TableColumnType =
@@ -43,7 +43,7 @@ export interface TableColumn {
   width?: number;
 }
 
-export interface ArcusTableData {
+export interface BoultTableData {
   /** Title shown above the table (matches the Clay-style header card). */
   title?: string;
   /** Optional subtitle/description. */
@@ -56,11 +56,11 @@ export interface ArcusTableData {
   cta?: { label: string; url?: string };
 }
 
-export function parseArcusTable(raw: string): ArcusTableData | null {
+export function parseBoultTable(raw: string): BoultTableData | null {
   try {
     const parsed = JSON.parse(raw);
     if (!parsed || !Array.isArray(parsed.columns) || !Array.isArray(parsed.rows)) return null;
-    return parsed as ArcusTableData;
+    return parsed as BoultTableData;
   } catch {
     return null;
   }
@@ -79,13 +79,13 @@ function hostnameOf(url: string): string {
 
 function renderCell(value: any, col: TableColumn) {
   if (value === undefined || value === null || value === '') {
-    return <span className="text-arcus-fg-muted/40">—</span>;
+    return <span className="text-boult-fg-muted/40">—</span>;
   }
   const type = col.type || 'text';
   switch (type) {
     case 'score': {
       const n = Number(value);
-      if (isNaN(n)) return <span className="text-arcus-fg-secondary">{String(value)}</span>;
+      if (isNaN(n)) return <span className="text-boult-fg-secondary">{String(value)}</span>;
       const { bg, text } = scoreColor(n);
       return (
         <span className={cn('inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md font-mono text-[11.5px] font-semibold', bg, text)}>
@@ -96,7 +96,7 @@ function renderCell(value: any, col: TableColumn) {
     }
     case 'badge':
       return (
-        <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-arcus-surface text-[11px] font-medium text-arcus-fg-secondary border border-arcus-border">
+        <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-boult-surface text-[11px] font-medium text-boult-fg-secondary border border-boult-border">
           {String(value)}
         </span>
       );
@@ -113,43 +113,43 @@ function renderCell(value: any, col: TableColumn) {
       const url = String(value);
       return (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={url} alt="" className="w-7 h-7 rounded-md object-cover border border-arcus-border" />
+        <img src={url} alt="" className="w-7 h-7 rounded-md object-cover border border-boult-border" />
       );
     }
     case 'email':
-      return <span className="text-[12.5px] font-mono text-arcus-fg-secondary truncate inline-block max-w-[220px]">{String(value)}</span>;
+      return <span className="text-[12.5px] font-mono text-boult-fg-secondary truncate inline-block max-w-[220px]">{String(value)}</span>;
     case 'date':
-      return <span className="text-[12.5px] text-arcus-fg-tertiary">{String(value)}</span>;
+      return <span className="text-[12.5px] text-boult-fg-tertiary">{String(value)}</span>;
     case 'number':
-      return <span className="text-[12.5px] font-mono text-arcus-fg-secondary tabular-nums">{String(value)}</span>;
+      return <span className="text-[12.5px] font-mono text-boult-fg-secondary tabular-nums">{String(value)}</span>;
     case 'text':
     default:
-      return <span className="text-[12.5px] text-arcus-fg-secondary line-clamp-2">{String(value)}</span>;
+      return <span className="text-[12.5px] text-boult-fg-secondary line-clamp-2">{String(value)}</span>;
   }
 }
 
-export function ArcusTable({ data }: { data: ArcusTableData }) {
+export function BoultTable({ data }: { data: BoultTableData }) {
   return (
-    <div className="my-5 rounded-2xl border border-arcus-border overflow-hidden bg-arcus-surface/40">
+    <div className="my-5 rounded-2xl border border-boult-border overflow-hidden bg-boult-surface/40">
       {(data.title || data.subtitle || data.cta) && (
-        <div className="flex items-center justify-between px-4 py-3 border-b border-arcus-border bg-arcus-elevated/40">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-boult-border bg-boult-elevated/40">
           <div className="min-w-0">
             {data.title && (
               <div className="flex items-baseline gap-2">
-                <h3 className="text-[14px] font-semibold text-arcus-fg truncate">{data.title}</h3>
-                <span className="text-[11px] text-arcus-fg-tertiary">{data.columns.length} columns · {data.rows.length} rows</span>
+                <h3 className="text-[14px] font-semibold text-boult-fg truncate">{data.title}</h3>
+                <span className="text-[11px] text-boult-fg-tertiary">{data.columns.length} columns · {data.rows.length} rows</span>
               </div>
             )}
-            {data.subtitle && <p className="text-[11.5px] text-arcus-fg-muted mt-0.5 truncate">{data.subtitle}</p>}
+            {data.subtitle && <p className="text-[11.5px] text-boult-fg-muted mt-0.5 truncate">{data.subtitle}</p>}
           </div>
           {data.cta && (
             data.cta.url ? (
               <a href={data.cta.url} target="_blank" rel="noopener noreferrer"
-                className="shrink-0 px-3 py-1.5 rounded-lg bg-arcus-fg text-arcus-fg-inverse text-[11.5px] font-semibold hover:opacity-90 transition-all">
+                className="shrink-0 px-3 py-1.5 rounded-lg bg-boult-fg text-boult-fg-inverse text-[11.5px] font-semibold hover:opacity-90 transition-all">
                 {data.cta.label}
               </a>
             ) : (
-              <span className="shrink-0 px-3 py-1.5 rounded-lg bg-arcus-raised/60 text-arcus-fg-secondary text-[11.5px] font-semibold border border-arcus-border">
+              <span className="shrink-0 px-3 py-1.5 rounded-lg bg-boult-raised/60 text-boult-fg-secondary text-[11.5px] font-semibold border border-boult-border">
                 {data.cta.label}
               </span>
             )
@@ -159,10 +159,10 @@ export function ArcusTable({ data }: { data: ArcusTableData }) {
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="bg-arcus-elevated/20">
+            <tr className="bg-boult-elevated/20">
               {data.columns.map((c, i) => (
                 <th key={i} style={c.width ? { width: c.width } : undefined}
-                  className="px-4 py-2.5 text-[10.5px] font-bold text-arcus-fg-tertiary uppercase tracking-wider border-b border-arcus-border whitespace-nowrap">
+                  className="px-4 py-2.5 text-[10.5px] font-bold text-boult-fg-tertiary uppercase tracking-wider border-b border-boult-border whitespace-nowrap">
                   {c.label}
                 </th>
               ))}
@@ -170,8 +170,8 @@ export function ArcusTable({ data }: { data: ArcusTableData }) {
           </thead>
           <tbody>
             {data.rows.map((row, ri) => (
-              <tr key={ri} className={cn('border-b border-arcus-border/60 last:border-0 hover:bg-arcus-elevated/30 transition-colors',
-                ri % 2 === 1 && 'bg-arcus-elevated/10')}>
+              <tr key={ri} className={cn('border-b border-boult-border/60 last:border-0 hover:bg-boult-elevated/30 transition-colors',
+                ri % 2 === 1 && 'bg-boult-elevated/10')}>
                 {data.columns.map((col, ci) => (
                   <td key={ci} className="px-4 py-2.5 align-middle">
                     {renderCell(row[ci], col)}
@@ -182,7 +182,7 @@ export function ArcusTable({ data }: { data: ArcusTableData }) {
           </tbody>
         </table>
         {data.rows.length === 0 && (
-          <div className="py-8 text-center text-[12.5px] text-arcus-fg-muted">No rows.</div>
+          <div className="py-8 text-center text-[12.5px] text-boult-fg-muted">No rows.</div>
         )}
       </div>
     </div>
@@ -190,27 +190,27 @@ export function ArcusTable({ data }: { data: ArcusTableData }) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// arcus-steps
+// boult-steps
 // ─────────────────────────────────────────────────────────────────────────────
 
 export type StepStatus = 'pending' | 'running' | 'completed' | 'failed';
 
-export interface ArcusStep {
+export interface BoultStep {
   label: string;
   description?: string;
   status?: StepStatus;
 }
 
-export interface ArcusStepsData {
+export interface BoultStepsData {
   title?: string;
-  steps: ArcusStep[];
+  steps: BoultStep[];
 }
 
-export function parseArcusSteps(raw: string): ArcusStepsData | null {
+export function parseBoultSteps(raw: string): BoultStepsData | null {
   try {
     const parsed = JSON.parse(raw);
     if (!parsed || !Array.isArray(parsed.steps)) return null;
-    return parsed as ArcusStepsData;
+    return parsed as BoultStepsData;
   } catch {
     return null;
   }
@@ -226,27 +226,27 @@ function statusDot(status?: StepStatus) {
       return <span className="w-[18px] h-[18px] rounded-full bg-rose-500/20 flex items-center justify-center"><span className="w-2 h-2 rounded-full bg-rose-400" /></span>;
     case 'pending':
     default:
-      return <span className="w-[18px] h-[18px] rounded-full border border-arcus-border flex items-center justify-center"><span className="w-1.5 h-1.5 rounded-full bg-arcus-fg-muted" /></span>;
+      return <span className="w-[18px] h-[18px] rounded-full border border-boult-border flex items-center justify-center"><span className="w-1.5 h-1.5 rounded-full bg-boult-fg-muted" /></span>;
   }
 }
 
-export function ArcusSteps({ data }: { data: ArcusStepsData }) {
+export function BoultSteps({ data }: { data: BoultStepsData }) {
   return (
     <div className="my-5">
       {data.title && (
-        <div className="text-[10.5px] font-bold text-arcus-fg-tertiary uppercase tracking-wider mb-3">{data.title}</div>
+        <div className="text-[10.5px] font-bold text-boult-fg-tertiary uppercase tracking-wider mb-3">{data.title}</div>
       )}
       <ol className="list-none pl-0 space-y-3">
         {data.steps.map((step, i) => (
           <li key={i} className="relative pl-7">
             {/* Vertical connector — not on the last item */}
             {i < data.steps.length - 1 && (
-              <span className="absolute left-[8.5px] top-[20px] bottom-[-12px] w-px bg-arcus-border" />
+              <span className="absolute left-[8.5px] top-[20px] bottom-[-12px] w-px bg-boult-border" />
             )}
             <span className="absolute left-0 top-[1px]">{statusDot(step.status)}</span>
-            <div className="text-[13.5px] text-arcus-fg-secondary leading-relaxed">{step.label}</div>
+            <div className="text-[13.5px] text-boult-fg-secondary leading-relaxed">{step.label}</div>
             {step.description && (
-              <div className="text-[12.5px] text-arcus-fg-muted mt-1 leading-relaxed">{step.description}</div>
+              <div className="text-[12.5px] text-boult-fg-muted mt-1 leading-relaxed">{step.description}</div>
             )}
           </li>
         ))}
@@ -256,7 +256,7 @@ export function ArcusSteps({ data }: { data: ArcusStepsData }) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// arcus-gallery
+// boult-gallery
 // ─────────────────────────────────────────────────────────────────────────────
 
 export interface GalleryImage {
@@ -266,28 +266,28 @@ export interface GalleryImage {
   url?: string;
 }
 
-export interface ArcusGalleryData {
+export interface BoultGalleryData {
   title?: string;
   layout?: 'grid' | 'row';
   images: GalleryImage[];
 }
 
-export function parseArcusGallery(raw: string): ArcusGalleryData | null {
+export function parseBoultGallery(raw: string): BoultGalleryData | null {
   try {
     const parsed = JSON.parse(raw);
     if (!parsed || !Array.isArray(parsed.images)) return null;
-    return parsed as ArcusGalleryData;
+    return parsed as BoultGalleryData;
   } catch {
     return null;
   }
 }
 
-export function ArcusGallery({ data }: { data: ArcusGalleryData }) {
+export function BoultGallery({ data }: { data: BoultGalleryData }) {
   const layout = data.layout || 'grid';
   return (
     <div className="my-5">
       {data.title && (
-        <div className="text-[10.5px] font-bold text-arcus-fg-tertiary uppercase tracking-wider mb-3">{data.title}</div>
+        <div className="text-[10.5px] font-bold text-boult-fg-tertiary uppercase tracking-wider mb-3">{data.title}</div>
       )}
       <div className={cn(
         layout === 'row'
@@ -300,11 +300,11 @@ export function ArcusGallery({ data }: { data: ArcusGalleryData }) {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={img.src} alt={img.alt || ''}
                 className={cn(
-                  'rounded-xl object-cover border border-arcus-border bg-arcus-surface w-full',
+                  'rounded-xl object-cover border border-boult-border bg-boult-surface w-full',
                   layout === 'row' ? 'h-32 w-32 shrink-0' : 'aspect-square',
                 )} />
               {img.caption && (
-                <p className="text-[11.5px] text-arcus-fg-muted mt-1.5 line-clamp-2">{img.caption}</p>
+                <p className="text-[11.5px] text-boult-fg-muted mt-1.5 line-clamp-2">{img.caption}</p>
               )}
             </>
           );

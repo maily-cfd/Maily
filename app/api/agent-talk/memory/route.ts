@@ -11,7 +11,7 @@ async function getSupabase() {
 
 // ── Supermemory secondary-store helpers ──────────────────────────────────────
 //
-// arcus_memories (Supabase) is the SOURCE OF TRUTH. Supermemory mirrors
+// boult_memories (Supabase) is the SOURCE OF TRUTH. Supermemory mirrors
 // writes/deletes when configured so semantic recall stays in sync. The UI
 // reads from Supabase; the AI's mid-turn searchMemoriesRaw reads from both
 // (Supabase first, Supermemory for semantic fuzz-match).
@@ -58,11 +58,11 @@ export async function GET() {
       .ilike('user_id', userId)
       .maybeSingle();
     const prefs = (profile?.preferences as Record<string, unknown>) || {};
-    const memoryEnabled = prefs.arcus_memory_enabled !== false;
+    const memoryEnabled = prefs.boult_memory_enabled !== false;
 
     // Memories — durable, paginated
     const { data: rows } = await supabase
-      .from('arcus_memories')
+      .from('boult_memories')
       .select('id, content, tags, source, created_at, updated_at')
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
@@ -77,12 +77,12 @@ export async function GET() {
       updatedAt: r.updated_at,
     }));
 
-    // The human portrait — "What Mailient knows about you" (VIPs, your style,
+    // The human portrait — "What Maily knows about you" (VIPs, your style,
     // what you delegate). The rich, felt understanding vs the raw memory log.
     // Fail-soft to '' so the memory list still renders if the model read fails.
     let founderModel = '';
     try {
-      const { getUserModelSummary } = await import('../../../../lib/arcus/user-model');
+      const { getUserModelSummary } = await import('../../../../lib/boult/user-model');
       founderModel = await getUserModelSummary(userId);
     } catch {
       logEvent({ channel: "failures", event: "❌ API Error", description: "Unknown error" }); /* portrait is best-effort */ }
@@ -124,7 +124,7 @@ export async function POST(request: NextRequest) {
       .ilike('user_id', userId)
       .maybeSingle();
     const existingPrefs = (existing?.preferences as Record<string, unknown>) || {};
-    const updatedPrefs = { ...existingPrefs, arcus_memory_enabled: memoryEnabled };
+    const updatedPrefs = { ...existingPrefs, boult_memory_enabled: memoryEnabled };
     if (existing) {
       await supabase.from('user_profiles').update({ preferences: updatedPrefs }).ilike('user_id', userId);
     } else {
@@ -141,7 +141,7 @@ export async function POST(request: NextRequest) {
   const tags = Array.isArray(body.tags) ? body.tags.filter((t: any) => typeof t === 'string').slice(0, 10) : [];
 
   const { data: inserted, error } = await supabase
-    .from('arcus_memories')
+    .from('boult_memories')
     .insert({
       user_id: userId,
       content: content.slice(0, 2000),
@@ -200,7 +200,7 @@ export async function PUT(request: NextRequest) {
   if (tags !== null) update.tags = tags;
 
   const { data, error } = await supabase
-    .from('arcus_memories')
+    .from('boult_memories')
     .update(update)
     .eq('id', memoryId)
     .eq('user_id', userId)
@@ -243,7 +243,7 @@ export async function DELETE(request: NextRequest) {
 
   const supabase = await getSupabase();
   const { error } = await supabase
-    .from('arcus_memories')
+    .from('boult_memories')
     .delete()
     .eq('id', memoryId)
     .eq('user_id', userId);

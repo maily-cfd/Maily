@@ -218,8 +218,8 @@ export async function GET(
                             headers: {
                                 'Content-Type': 'application/json',
                                 'Authorization': `Bearer ${apiKey}`,
-                                'HTTP-Referer': process.env.HOST || 'https://mailient.xyz',
-                                'X-Title': 'Mailient'
+                                'HTTP-Referer': process.env.HOST || 'https://maily.dev',
+                                'X-Title': 'Maily'
                             },
                             body: JSON.stringify({
                                 model,

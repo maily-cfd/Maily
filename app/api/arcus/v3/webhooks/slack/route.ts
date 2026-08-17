@@ -1,6 +1,6 @@
 /**
- * Arcus V3 — Webhook: Slack Event API
- * POST /api/arcus/v3/webhooks/slack
+ * Boult V3 — Webhook: Slack Event API
+ * POST /api/boult/v3/webhooks/slack
  * 
  * Receives Slack Event API webhooks.
  * Verifies request signature using HMAC-SHA256.
@@ -10,7 +10,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { getSupabaseAdmin } from '../../../../../../lib/supabase.js';
-import { enqueueEvent } from '../../../../../../lib/arcus-v3/queue';
+import { enqueueEvent } from '../../../../../../lib/boult-v3/queue';
 import { logEvent } from "@/lib/logsso";
 
 export async function POST(request: NextRequest) {
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     // 4. Verify HMAC-SHA256 signature
     const signingSecret = process.env.SLACK_SIGNING_SECRET;
     if (!signingSecret) {
-      console.error('[Arcus V3] SLACK_SIGNING_SECRET not configured');
+      console.error('[Boult V3] SLACK_SIGNING_SECRET not configured');
       return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
     }
 
@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
     const sigBuffer = Buffer.from(signature);
     const expectedBuffer = Buffer.from(expectedSig);
     if (sigBuffer.length !== expectedBuffer.length || !crypto.timingSafeEqual(sigBuffer, expectedBuffer)) {
-      console.warn('[Arcus V3] Slack webhook: invalid signature');
+      console.warn('[Boult V3] Slack webhook: invalid signature');
       return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
     }
 
@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
       // Find the user who owns this Slack workspace
       const supabase = getSupabaseAdmin();
       const { data: integration } = await supabase
-        .from('arcus_integrations')
+        .from('boult_integrations')
         .select('user_id')
         .eq('provider', 'slack')
         .filter('workspace_info->>team_id', 'eq', teamId)
@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     logEvent({ channel: "failures", event: "❌ API Error", description: String(error) });
-    console.error('[Arcus V3] Slack webhook error:', (error as Error).message);
+    console.error('[Boult V3] Slack webhook error:', (error as Error).message);
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }

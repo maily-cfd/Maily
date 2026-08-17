@@ -1,5 +1,6 @@
 import { LinearLanding } from "@/components/LinearLanding";
 import { landingFaqs } from "@/lib/landing-faqs";
+import Script from "next/script";
 
 // FAQPage structured data — built from the SAME array the landing accordion
 // renders, so the schema can never drift from the visible copy.
@@ -16,7 +17,8 @@ const faqJsonLd = {
 export default function Home() {
   return (
     <>
-      <script
+      <Script
+        id="faq-jsonld"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />

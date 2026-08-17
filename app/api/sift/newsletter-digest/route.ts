@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 // @ts-ignore
 import { auth } from '@/lib/auth.js';
-import { runNewsletterDigest } from '@/lib/arcus/tools';
+import { runNewsletterDigest } from '@/lib/boult/tools';
 import { logEvent } from "@/lib/logsso";
 
 export const maxDuration = 60;
@@ -9,7 +9,7 @@ export const maxDuration = 60;
 /**
  * Sift newsletter digest — find the newsletters cluttering the inbox, condense
  * them into one digest, and (optionally) archive them out so the user's mind is
- * clear. Reuses the same engine as the Arcus `digest_newsletters` tool.
+ * clear. Reuses the same engine as the Boult `digest_newsletters` tool.
  */
 export async function POST(request: Request) {
   try {

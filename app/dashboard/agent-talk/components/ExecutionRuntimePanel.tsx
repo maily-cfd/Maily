@@ -2,7 +2,7 @@
 
 /**
  * ExecutionRuntimePanel - Manus AI Style
- * Real-time execution visualization for Arcus AI
+ * Real-time execution visualization for Boult AI
  * Premium dark interface with smooth animations
  */
 

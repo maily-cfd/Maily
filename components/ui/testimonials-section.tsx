@@ -81,7 +81,7 @@ export function TestimonialsSection() {
           pill="Customers"
           icon={Heart}
           heading="What founders say."
-          subtitle="From people running their inbox on Mailient every day."
+          subtitle="From people running their inbox on Maily every day."
         />
       </BlurFade>
 

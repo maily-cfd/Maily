@@ -1,4 +1,4 @@
-/* Arcus V3 — Design Tokens
+/* Boult V3 — Design Tokens
  * Every component uses ONLY these tokens.
  * No hardcoded hex values, no arbitrary spacing.
  */
@@ -209,45 +209,45 @@
 
 /* ─── Animations ───────────────────────────────────────────────────────────── */
 
-@keyframes arcus-card-enter {
+@keyframes boult-card-enter {
   from { transform: translateY(12px); opacity: 0; }
   to   { transform: translateY(0); opacity: 1; }
 }
 
-@keyframes arcus-step-flash {
+@keyframes boult-step-flash {
   0%   { background-color: var(--color-success-bg); }
   100% { background-color: transparent; }
 }
 
-@keyframes arcus-shimmer {
+@keyframes boult-shimmer {
   0%   { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
 
-@keyframes arcus-spinner {
+@keyframes boult-spinner {
   to { transform: rotate(360deg); }
 }
 
-@keyframes arcus-pulse {
+@keyframes boult-pulse {
   0%, 100% { opacity: 0.4; }
   50%      { opacity: 1; }
 }
 
-@keyframes arcus-dot-pulse {
+@keyframes boult-dot-pulse {
   0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
   40% { opacity: 1; transform: scale(1); }
 }
 
-.arcus-card-enter {
-  animation: arcus-card-enter var(--duration-slow) var(--ease-out) both;
+.boult-card-enter {
+  animation: boult-card-enter var(--duration-slow) var(--ease-out) both;
 }
 
-.arcus-step-flash {
-  animation: arcus-step-flash 600ms var(--ease-out) both;
+.boult-step-flash {
+  animation: boult-step-flash 600ms var(--ease-out) both;
 }
 
 /* Skeleton shimmer */
-.arcus-skeleton {
+.boult-skeleton {
   background: linear-gradient(
     90deg,
     rgba(255,255,255,0) 0%,
@@ -255,20 +255,20 @@
     rgba(255,255,255,0) 100%
   );
   background-size: 200% 100%;
-  animation: arcus-shimmer 1.5s infinite;
+  animation: boult-shimmer 1.5s infinite;
 }
 
 /* Spinner */
-.arcus-spinner {
+.boult-spinner {
   width: 20px;
   height: 20px;
   border: 2px solid rgba(255,255,255,0.20);
   border-top-color: #FFFFFF;
   border-radius: 50%;
-  animation: arcus-spinner 600ms linear infinite;
+  animation: boult-spinner 600ms linear infinite;
 }
 
-.arcus-spinner-small {
+.boult-spinner-small {
   width: 14px;
   height: 14px;
   border-width: 1.5px;
@@ -276,9 +276,9 @@
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  .arcus-card-enter { animation: none; opacity: 1; transform: none; }
-  .arcus-step-flash { animation: none; }
-  .arcus-skeleton { animation: none; }
+  .boult-card-enter { animation: none; opacity: 1; transform: none; }
+  .boult-step-flash { animation: none; }
+  .boult-skeleton { animation: none; }
   .glass-surface:hover { transition: none; }
 }
 

@@ -1,9 +1,9 @@
 /**
- * POST /api/arcus/connectors/disconnect
+ * POST /api/boult/connectors/disconnect
  *
- * Single source of truth for "delete this connector" from the Arcus UI.
+ * Single source of truth for "delete this connector" from the Boult UI.
  * Deletes the user's tokens from EVERY table that may hold them:
- *   - arcus_integrations  (newer V3 store)
+ *   - boult_integrations  (newer V3 store)
  *   - integration_credentials  (legacy V2 store)
  *   - user_tokens  (Google login fallback; only cleared for gmail/gcal,
  *     never blown away unless the user is explicitly disconnecting Google)
@@ -12,7 +12,7 @@
  *
  * The legacy DELETE /api/connectors was bearer-auth-only (Supabase auth token)
  * and only deleted from one table. This route uses the same NextAuth session
- * cookie everything else in Arcus uses, and reaches every store.
+ * cookie everything else in Boult uses, and reaches every store.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -31,29 +31,29 @@ export const dynamic = 'force-dynamic';
 // Map UI provider id → the values each table actually stores under provider/user_email.
 // Some legacy rows are under "google" / "google_calendar"; we delete both shapes.
 function getDeletionKeys(provider: string): {
-  arcusKeys: string[];
+  boultKeys: string[];
   legacyKeys: string[];
   clearGoogleTokens: boolean;
 } {
   switch (provider) {
     case 'gmail':
-      return { arcusKeys: ['gmail'], legacyKeys: ['google', 'gmail'], clearGoogleTokens: true };
+      return { boultKeys: ['gmail'], legacyKeys: ['google', 'gmail'], clearGoogleTokens: true };
     case 'gcal':
     case 'google-calendar':
     case 'google_calendar':
-      return { arcusKeys: ['gcal'], legacyKeys: ['google_calendar', 'gcal'], clearGoogleTokens: true };
+      return { boultKeys: ['gcal'], legacyKeys: ['google_calendar', 'gcal'], clearGoogleTokens: true };
     case 'notion':
-      return { arcusKeys: ['notion', 'notion_calendar'], legacyKeys: ['notion'], clearGoogleTokens: false };
+      return { boultKeys: ['notion', 'notion_calendar'], legacyKeys: ['notion'], clearGoogleTokens: false };
     case 'slack':
-      return { arcusKeys: ['slack'], legacyKeys: ['slack'], clearGoogleTokens: false };
+      return { boultKeys: ['slack'], legacyKeys: ['slack'], clearGoogleTokens: false };
     case 'cal_com':
     case 'cal-com':
-      return { arcusKeys: ['cal_com'], legacyKeys: ['cal_com'], clearGoogleTokens: false };
+      return { boultKeys: ['cal_com'], legacyKeys: ['cal_com'], clearGoogleTokens: false };
     case 'google-meet':
     case 'google_meet':
-      return { arcusKeys: ['google_meet'], legacyKeys: ['google_meet'], clearGoogleTokens: false };
+      return { boultKeys: ['google_meet'], legacyKeys: ['google_meet'], clearGoogleTokens: false };
     default:
-      return { arcusKeys: [provider], legacyKeys: [provider], clearGoogleTokens: false };
+      return { boultKeys: [provider], legacyKeys: [provider], clearGoogleTokens: false };
   }
 }
 
@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'provider is required' }, { status: 400 });
   }
 
-  const { arcusKeys, legacyKeys, clearGoogleTokens } = getDeletionKeys(provider);
+  const { boultKeys, legacyKeys, clearGoogleTokens } = getDeletionKeys(provider);
   const supabase = getSupabaseAdmin();
 
   // PART 68 — Resolve all possible user-key shapes. Different flows wrote
@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
   const userKeyList = Array.from(userKeys);
 
   const deletions = {
-    arcus_integrations: 0,
+    boult_integrations: 0,
     integration_credentials: 0,
     user_tokens: 0,
   };
@@ -106,10 +106,10 @@ export async function POST(request: NextRequest) {
   //    the user can never truly disconnect. Best-effort; the local delete
   //    below is what makes the app forget it regardless.
   try {
-    for (const key of arcusKeys) {
+    for (const key of boultKeys) {
       for (const uk of userKeyList) {
         const { data: row } = await supabase
-          .from('arcus_integrations')
+          .from('boult_integrations')
           .select('access_token')
           .eq('user_id', uk)
           .eq('provider', key)
@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
         let marker = '';
         try { marker = row?.access_token ? decrypt(row.access_token) : ''; } catch { marker = ''; }
         if (marker.startsWith('composio:')) {
-          const { deleteComposioConnection } = await import('../../../../../lib/arcus/composio');
+          const { deleteComposioConnection } = await import('../../../../../lib/boult/composio');
           await deleteComposioConnection(marker.slice('composio:'.length));
         }
       }
@@ -126,21 +126,21 @@ export async function POST(request: NextRequest) {
     console.warn('[Disconnect] Composio revoke failed (non-fatal):', err.message);
   }
 
-  // 1. arcus_integrations (newer) — delete by every resolved key shape.
+  // 1. boult_integrations (newer) — delete by every resolved key shape.
   try {
-    for (const key of arcusKeys) {
+    for (const key of boultKeys) {
       for (const uk of userKeyList) {
         const { count } = await supabase
-          .from('arcus_integrations')
+          .from('boult_integrations')
           .delete({ count: 'exact' })
           .eq('user_id', uk)
           .eq('provider', key);
-        if (count) deletions.arcus_integrations += count;
+        if (count) deletions.boult_integrations += count;
       }
     }
   } catch (err: any) {
     logEvent({ channel: "failures", event: "❌ API Error", description: String(err) });
-    console.warn('[Disconnect] arcus_integrations delete failed:', err.message);
+    console.warn('[Disconnect] boult_integrations delete failed:', err.message);
   }
 
   // 2. integration_credentials (legacy) — delete by both columns AND every key.
@@ -173,9 +173,9 @@ export async function POST(request: NextRequest) {
   //    user disconnects gmail OR gcal AND no other Google product remains.)
   if (clearGoogleTokens) {
     try {
-      // Check if any OTHER Google product is still connected via arcus_integrations
+      // Check if any OTHER Google product is still connected via boult_integrations
       const { data: remaining } = await supabase
-        .from('arcus_integrations')
+        .from('boult_integrations')
         .select('provider')
         .eq('user_id', userId)
         .in('provider', ['gmail', 'gcal', 'google_meet']);
@@ -196,7 +196,7 @@ export async function POST(request: NextRequest) {
   // Invalidate any cached scope-probe so the next chat turn re-checks.
   if (provider === 'gmail' || provider === 'gcal') {
     try {
-      const { invalidateGmailScope } = await import('../../../../../lib/arcus/gmail-scope');
+      const { invalidateGmailScope } = await import('../../../../../lib/boult/gmail-scope');
       await invalidateGmailScope(userId);
     } catch {
       logEvent({ channel: "failures", event: "❌ API Error", description: "Unknown error" }); /* non-fatal */ }
@@ -206,6 +206,6 @@ export async function POST(request: NextRequest) {
     success: true,
     provider,
     deleted: deletions,
-    totalRows: deletions.arcus_integrations + deletions.integration_credentials + deletions.user_tokens,
+    totalRows: deletions.boult_integrations + deletions.integration_credentials + deletions.user_tokens,
   });
 }

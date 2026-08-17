@@ -81,7 +81,7 @@ export function CTASection() {
 
             {/* Description */}
             <p className="text-neutral-500 dark:text-[#8a8f98] text-sm md:text-base max-w-xl mb-10 leading-relaxed font-sans font-light select-none">
-              Mailient removes email from your to-do list entirely. Connect your Gmail tonight — tomorrow morning, open one briefing. Not Gmail.
+              Maily removes email from your to-do list entirely. Connect your Gmail tonight — tomorrow morning, open one briefing. Not Gmail.
             </p>
 
             {/* Buttons row matching the screenshot */}
@@ -93,12 +93,12 @@ export function CTASection() {
 
               {/* Right Button: Transparent/Black Pill */}
               <CircleExpandButton
-                href="https://x.com/maulik_5"
+                href="https://github.com/maily-cfd/Maily"
                 target="_blank"
                 rel="noopener noreferrer"
                 variant="secondary"
               >
-                Talk to Founder
+                Star on GitHub
               </CircleExpandButton>
             </div>
           </div>

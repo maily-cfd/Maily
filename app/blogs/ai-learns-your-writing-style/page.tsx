@@ -4,31 +4,31 @@ import { BlogLayout } from "@/components/BlogLayout";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "How AI Learns to Write Exactly Like You // Mailient Blog",
-  description: "Generic AI drafts damage relationships. Learn how Mailient's 90-day voice analysis builds a writing profile that mirrors your tone, sign-offs, and sentence patterns.",
+  title: "How AI Learns to Write Exactly Like You // Maily Blog",
+  description: "Generic AI drafts damage relationships. Learn how Maily's 90-day voice analysis builds a writing profile that mirrors your tone, sign-offs, and sentence patterns.",
   openGraph: {
-    title: "How AI Learns to Write Exactly Like You // Mailient Blog",
-    description: "Generic AI drafts damage relationships. Learn how Mailient's 90-day voice analysis builds a writing profile that mirrors your tone, sign-offs, and sentence patterns.",
-    url: "https://mailient.xyz/blogs/ai-learns-your-writing-style",
+    title: "How AI Learns to Write Exactly Like You // Maily Blog",
+    description: "Generic AI drafts damage relationships. Learn how Maily's 90-day voice analysis builds a writing profile that mirrors your tone, sign-offs, and sentence patterns.",
+    url: "https://maily.dev/blogs/ai-learns-your-writing-style",
     type: "article",
     publishedTime: "2026-05-22T00:00:00.000Z",
-    authors: ["Maulik"],
+    authors: ["Maily"],
   },
   twitter: {
     card: "summary_large_image",
-    title: "How AI Learns to Write Exactly Like You // Mailient Blog",
-    description: "Generic AI drafts damage relationships. Learn how Mailient's 90-day voice analysis builds a writing profile that mirrors your tone, sign-offs, and sentence patterns.",
+    title: "How AI Learns to Write Exactly Like You // Maily Blog",
+    description: "Generic AI drafts damage relationships. Learn how Maily's 90-day voice analysis builds a writing profile that mirrors your tone, sign-offs, and sentence patterns.",
   },
 };
 
 const meta = {
-  title: "How AI Learns to Write Exactly Like You: Inside Mailient's Neural Voice Profile",
-  description: "Generic AI drafts damage relationships. Learn how Mailient's 90-day voice analysis builds a writing profile that mirrors your tone, sign-offs, and sentence patterns.",
+  title: "How AI Learns to Write Exactly Like You: Inside Maily's Neural Voice Profile",
+  description: "Generic AI drafts damage relationships. Learn how Maily's 90-day voice analysis builds a writing profile that mirrors your tone, sign-offs, and sentence patterns.",
   date: "May 22, 2026",
   readTime: "7 min read",
   category: "Engineering",
   slug: "ai-learns-your-writing-style",
-  author: "Maulik",
+  author: "Maily",
 };
 
 const tableOfContents = [
@@ -41,7 +41,7 @@ const tableOfContents = [
 
 const relatedPosts = [
   {
-    title: "Zero-Knowledge Encryption Explained: How Mailient Protects Your Email Without Reading It",
+    title: "Zero-Knowledge Encryption Explained: How Maily Protects Your Email Without Reading It",
     slug: "zero-knowledge-encryption-email-privacy",
     category: "Security",
     readTime: "8 min read",
@@ -81,12 +81,12 @@ export default function AILearnsWritingStylePage() {
 
       <h2 id="what-voice-captures">What a Voice Profile Actually Captures</h2>
       <p>
-        Mailient's Neural Voice Profile is built by analyzing the specific patterns that make your writing yours. These aren't superficial style preferences — they're the deep structural signatures that define your communication identity.
+        Maily's Neural Voice Profile is built by analyzing the specific patterns that make your writing yours. These aren't superficial style preferences — they're the deep structural signatures that define your communication identity.
       </p>
 
       <h3>Greeting Patterns</h3>
       <p>
-        How you open an email says a lot about your communication style. Some people always write "Hey Sarah," while others use "Hi Sarah —" or simply start with the message. Mailient tracks which greeting styles you use with different types of contacts — more formal with new connections, more casual with established ones.
+        How you open an email says a lot about your communication style. Some people always write "Hey Sarah," while others use "Hi Sarah —" or simply start with the message. Maily tracks which greeting styles you use with different types of contacts — more formal with new connections, more casual with established ones.
       </p>
 
       <h3>Sentence Structure and Length</h3>
@@ -96,12 +96,12 @@ export default function AILearnsWritingStylePage() {
 
       <h3>Tone Calibration by Relationship</h3>
       <p>
-        The way you write to a potential investor is different from how you write to a close collaborator. Mailient's voice analysis recognizes these contextual shifts. It measures your formality bias — the percentage of your emails that use formal language versus casual — and adjusts the generated tone based on the recipient and thread context.
+        The way you write to a potential investor is different from how you write to a close collaborator. Maily's voice analysis recognizes these contextual shifts. It measures your formality bias — the percentage of your emails that use formal language versus casual — and adjusts the generated tone based on the recipient and thread context.
       </p>
 
       <h3>Sign-Off Signatures</h3>
       <p>
-        "Best," "Thanks," "Looking forward to it," "Cheers," or no sign-off at all. Your preferred valediction is one of the most recognizable elements of your email voice. Mailient identifies your most common sign-offs and applies them contextually — matching the tone of the conversation.
+        "Best," "Thanks," "Looking forward to it," "Cheers," or no sign-off at all. Your preferred valediction is one of the most recognizable elements of your email voice. Maily identifies your most common sign-offs and applies them contextually — matching the tone of the conversation.
       </p>
 
       <h3>Vocabulary Preferences</h3>
@@ -113,10 +113,10 @@ export default function AILearnsWritingStylePage() {
 
       <h2 id="90-day-analysis">The 90-Day Analysis Process</h2>
       <p>
-        When you connect Gmail to Mailient, the voice profiling engine reads your last <strong>90 days of sent emails</strong>. This window is deliberate — it's long enough to capture a representative sample of your writing across different contexts, but recent enough to reflect how you write <em>now</em>, not how you wrote two years ago.
+        When you connect Gmail to Maily, the voice profiling engine reads your last <strong>90 days of sent emails</strong>. This window is deliberate — it's long enough to capture a representative sample of your writing across different contexts, but recent enough to reflect how you write <em>now</em>, not how you wrote two years ago.
       </p>
       <p>
-        The analysis happens entirely in your browser. Your sent emails are processed client-side, and the resulting voice profile is stored locally using <Link href="/blogs/zero-knowledge-encryption-email-privacy">Mailient's zero-knowledge encryption</Link>. The profile never reaches Mailient's servers.
+        The analysis happens entirely in your browser. Your sent emails are processed client-side, and the resulting voice profile is stored locally using <Link href="/blogs/zero-knowledge-encryption-email-privacy">Maily's zero-knowledge encryption</Link>. The profile never reaches Maily's servers.
       </p>
       <p>
         Here's what the process extracts:
@@ -130,7 +130,7 @@ export default function AILearnsWritingStylePage() {
         <li><strong>Response patterns</strong> — how your style shifts between initiating emails and replying to threads</li>
       </ul>
       <p>
-        The result is a semantic fingerprint of your writing voice — a set of parameters that every <Link href="/product/arcus">Arcus</Link>-generated draft is filtered through before it reaches your outbox.
+        The result is a semantic fingerprint of your writing voice — a set of parameters that every <Link href="/product/boult">Boult</Link>-generated draft is filtered through before it reaches your outbox.
       </p>
 
       <hr />
@@ -145,13 +145,13 @@ export default function AILearnsWritingStylePage() {
         Thank you for reaching out! I would be happy to schedule a meeting at your earliest convenience. Please let me know your availability, and I will coordinate accordingly. Looking forward to connecting with you.
       </blockquote>
 
-      <h3>With Mailient's Voice Profile</h3>
+      <h3>With Maily's Voice Profile</h3>
       <blockquote>
         Hey Sarah — Tuesday at 3 PM works great on my end. I've added a calendar invite with a Meet link. Looking forward to it.
       </blockquote>
 
       <p>
-        The first version is correct but generic. It sounds like a template. The second version reflects an actual human writing style — direct, specific, and personal. It includes concrete availability (pulled from <Link href="/product/arcus">Google Calendar integration</Link>), uses the greeting style the sender actually uses, and closes with their natural sign-off.
+        The first version is correct but generic. It sounds like a template. The second version reflects an actual human writing style — direct, specific, and personal. It includes concrete availability (pulled from <Link href="/product/boult">Google Calendar integration</Link>), uses the greeting style the sender actually uses, and closes with their natural sign-off.
       </p>
       <p>
         Over time, the voice profile continues to refine itself as you send more emails and provide feedback on drafts. Each correction — shortening a paragraph, changing a word, adjusting tone — feeds back into the model's understanding of your voice.
@@ -161,7 +161,7 @@ export default function AILearnsWritingStylePage() {
 
       <h2 id="privacy-of-voice">Privacy of Your Voice Data</h2>
       <p>
-        Your voice profile is one of the most personal data structures Mailient creates. It captures not just what you say, but how you say it — your communication identity distilled into parameters. Accordingly, it receives the highest level of privacy protection in the system.
+        Your voice profile is one of the most personal data structures Maily creates. It captures not just what you say, but how you say it — your communication identity distilled into parameters. Accordingly, it receives the highest level of privacy protection in the system.
       </p>
       <p>
         The voice profile is:
@@ -170,15 +170,15 @@ export default function AILearnsWritingStylePage() {
         <li><strong>Generated client-side</strong> — your sent emails are analyzed in your browser, not on a server</li>
         <li><strong>Encrypted locally</strong> — stored using AES-256-GCM with keys that never leave your device</li>
         <li><strong>Never transmitted</strong> — the profile exists only on your machine</li>
-        <li><strong>Never used for training</strong> — Mailient does not use your voice data to train any AI model</li>
+        <li><strong>Never used for training</strong> — Maily does not use your voice data to train any AI model</li>
       </ul>
       <p>
-        This means your writing voice remains yours. It's used to serve you — to write drafts that sound like you — and for nothing else. You can read more about Mailient's full privacy architecture on the <Link href="/security">security page</Link>.
+        This means your writing voice remains yours. It's used to serve you — to write drafts that sound like you — and for nothing else. You can read more about Maily's full privacy architecture on the <Link href="/security">security page</Link>.
       </p>
 
       <div className="callout-box">
         <p>
-          <strong>Your voice. Your replies. AI's work.</strong> Mailient drafts emails that sound like you because it learned from you.{" "}
+          <strong>Your voice. Your replies. AI's work.</strong> Maily drafts emails that sound like you because it learned from you.{" "}
           <a href="/auth/signup">Start free trial →</a>
         </p>
       </div>

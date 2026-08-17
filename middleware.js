@@ -18,7 +18,7 @@ export async function middleware(request) {
       const url = request.nextUrl.clone();
       url.pathname = '/onboarding';
       const response = NextResponse.redirect(url);
-      if (ref) response.cookies.set('mailient_referral', ref, { maxAge: 60 * 60 * 24 * 30, path: '/' });
+      if (ref) response.cookies.set('maily_referral', ref, { maxAge: 60 * 60 * 24 * 30, path: '/' });
       addSecurityHeaders(response);
       return response;
     }
@@ -37,7 +37,7 @@ export async function middleware(request) {
   ) {
     if (ref) {
       const response = NextResponse.next();
-      response.cookies.set('mailient_referral', ref, { maxAge: 60 * 60 * 24 * 30, path: '/' }); // 30 days
+      response.cookies.set('maily_referral', ref, { maxAge: 60 * 60 * 24 * 30, path: '/' }); // 30 days
       addSecurityHeaders(response);
       return response;
     }
@@ -48,7 +48,7 @@ export async function middleware(request) {
 
   if (ref) {
     const response = NextResponse.next();
-    response.cookies.set('mailient_referral', ref, { maxAge: 60 * 60 * 24 * 30, path: '/' });
+    response.cookies.set('maily_referral', ref, { maxAge: 60 * 60 * 24 * 30, path: '/' });
     addSecurityHeaders(response);
     return response;
   }

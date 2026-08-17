@@ -14,7 +14,7 @@ export const dynamic = 'force-dynamic';
  *
  * Cal.com cloud authenticates with an API key, not OAuth — so the user pastes
  * their own key (cal.com → Settings → Developer → API keys). We validate it,
- * then store it as their cal_com credential. Arcus's Cal.com tools then book on
+ * then store it as their cal_com credential. Boult's Cal.com tools then book on
  * the user's own account (falling back to the app's shared CAL_API_KEY only if a
  * user hasn't connected one).
  */

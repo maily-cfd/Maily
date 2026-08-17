@@ -9,7 +9,7 @@ import {
   composioFetchByAccount,
   isComposioMarker,
   composioAccountIdFromMarker,
-} from './arcus/tools/http-tokens';
+} from './boult/tools/http-tokens';
 
 export class GmailService {
   constructor(accessToken, refreshToken = '') {

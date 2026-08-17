@@ -1,6 +1,6 @@
 // @ts-nocheck
 /**
- * POST / api / arcus / agents / create
+ * POST / api / boult / agents / create
   * Direct agent creation — skips the LLM loop, used by IntegrationRequiredCard
     * after the user connects all missing integrations.
  */
@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
 
     const supabase = getSupabaseAdmin();
     const { data, error } = await supabase
-      .from('arcus_agents')
+      .from('boult_agents')
       .insert({
         user_id: userId,
         name: name.trim(),

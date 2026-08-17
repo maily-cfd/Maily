@@ -24,8 +24,8 @@ import crypto from 'crypto';
 import { getSupabaseAdmin } from '../../../../../lib/supabase.js';
 // @ts-ignore — JS module
 import { decrypt } from '../../../../../lib/crypto.js';
-import { markIntegrationNeedsReauth } from '../../../../../lib/arcus/tools/http-tokens';
-import { COMPOSIO_TOKEN_PREFIX } from '../../../../../lib/arcus/composio';
+import { markIntegrationNeedsReauth } from '../../../../../lib/boult/tools/http-tokens';
+import { COMPOSIO_TOKEN_PREFIX } from '../../../../../lib/boult/composio';
 
 export const dynamic = 'force-dynamic';
 
@@ -70,7 +70,7 @@ function verifySignature(rawBody: string, headers: Headers): boolean {
 async function findRowByAccountId(accountId: string): Promise<{ userId: string; provider: 'gmail' | 'gcal' } | null> {
   const supabase = getSupabaseAdmin();
   const { data } = await supabase
-    .from('arcus_integrations')
+    .from('boult_integrations')
     .select('user_id, provider, access_token')
     .in('provider', ['gmail', 'gcal']);
   for (const row of data || []) {

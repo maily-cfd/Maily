@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Mail, Send, Archive, Trash2, Star, Settings, Plus, ChevronRight, User, MessageCircle, Clock } from "lucide-react";
+import { Mail, Send, Archive, Trash2, Star, Settings, Plus, ChevronRight, User, MessageCircle, Clock , Mail} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import ProfileBubble from "@/components/ui/profile-bubble";
@@ -39,7 +39,7 @@ const CustomSidebar = ({ currentLabel, onLabelChange, labelCounts = {}, onCompos
       <div className="p-4 border-b border-gray-700">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img src="/logo.svg" alt="Arcus Logo" className="w-8 h-8 rounded-full" />
+            <Mail className="w-full h-full p-1 text-inherit" />
             <span className="text-white font-semibold text-lg">Mailient</span>
           </div>
           <ProfileBubble />

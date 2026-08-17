@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Contact | Mailient",
-  description: "Talk to Maulik directly — mailient.xyz@gmail.com or @maulik_5 on X. Real founder, real replies.",
-  alternates: { canonical: "https://mailient.xyz/contact" },
+  title: "Contact | Maily",
+  description: "Get in touch with the Maily team — open an issue on GitHub or reach us at @Mailycfd on X.",
+  alternates: { canonical: "https://maily.dev/contact" },
   openGraph: {
-    title: "Contact | Mailient",
-    description: "Talk to Maulik directly — mailient.xyz@gmail.com or @maulik_5 on X.",
-    url: "https://mailient.xyz/contact",
-    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Contact Mailient" }],
+    title: "Contact | Maily",
+    description: "Get in touch with the Maily team — open an issue on GitHub or reach us at @Mailycfd on X.",
+    url: "https://maily.dev/contact",
+    images: [{ url: "/logo-maily.png", width: 1200, height: 630, alt: "Contact Maily" }],
   },
 };
 

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { auth as getSession } from '@/lib/auth';
-import { ArcusIntegrationManager } from '@/lib/arcus-integration-manager';
+import { BoultIntegrationManager } from '@/lib/boult-integration-manager';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { encrypt } from '@/lib/crypto';
 import { logEvent } from "@/lib/logsso";
@@ -40,7 +40,7 @@ const db = {
   }
 };
 
-const integrationManager = new ArcusIntegrationManager(db);
+const integrationManager = new BoultIntegrationManager(db);
 
 /**
  * GET /api/integrations/google_calendar/callback
@@ -92,9 +92,9 @@ export async function GET(request) {
       scopes: credentials.scopes
     });
 
-    // Write encrypted tokens to arcus_integrations so the v3 agent dispatcher can use them
+    // Write encrypted tokens to boult_integrations so the v3 agent dispatcher can use them
     const supabase = getSupabaseAdmin();
-    await supabase.from('arcus_integrations').upsert({
+    await supabase.from('boult_integrations').upsert({
       user_id: userEmail.toLowerCase(),
       provider: 'gcal',
       access_token: encrypt(credentials.accessToken),

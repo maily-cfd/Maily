@@ -32,16 +32,16 @@ export async function POST(request) {
 
         // Define reward amounts
         const REWARDS = {
-            'referral_bonus_25': { amount: 25, feature: FEATURE_TYPES.ARCUS_AI },
-            'welcome_bonus_10': { amount: 10, feature: FEATURE_TYPES.ARCUS_AI },
-            'welcome_bonus_slot': { amount: 10, feature: FEATURE_TYPES.ARCUS_AI }, // Generic slot
+            'referral_bonus_25': { amount: 25, feature: FEATURE_TYPES.BOULT_AI },
+            'welcome_bonus_10': { amount: 10, feature: FEATURE_TYPES.BOULT_AI },
+            'welcome_bonus_slot': { amount: 10, feature: FEATURE_TYPES.BOULT_AI }, // Generic slot
         };
 
         let rewardConfig = REWARDS[rewardId];
         
         // Handle referral slots dynamically
         if (rewardId.startsWith('referral_bonus_slot_')) {
-            rewardConfig = { amount: 50, feature: FEATURE_TYPES.ARCUS_AI };
+            rewardConfig = { amount: 50, feature: FEATURE_TYPES.BOULT_AI };
         }
 
         if (!rewardConfig) {
@@ -115,7 +115,7 @@ export async function GET() {
             rewards.push({
                 id: 'welcome_bonus_10',
                 title: "Welcome Gift",
-                value: "+10 Arcus Credits",
+                value: "+10 Boult Credits",
                 desc: "One-time account creation gift.",
                 icon: 'Gift',
                 status: 'available'
@@ -134,7 +134,7 @@ export async function GET() {
                     rewards.push({
                         id: slotId,
                         title: `Referral Bonus #${i}`,
-                        value: "+50 Arcus Credits",
+                        value: "+50 Boult Credits",
                         desc: `Reward for your ${i}${i === 1 ? 'st' : i === 2 ? 'nd' : i === 3 ? 'rd' : 'th'} successful invite.`,
                         icon: 'Sparkles',
                         status: 'available'
@@ -146,10 +146,10 @@ export async function GET() {
         // Include some claimed history for UI
         claimed.forEach(rid => {
             if (rid === 'welcome_bonus_10') {
-                rewards.push({ id: rid, title: "Welcome Gift", value: "+10 Arcus Credits", desc: "First-time account gift.", icon: 'Gift', status: 'claimed' });
+                rewards.push({ id: rid, title: "Welcome Gift", value: "+10 Boult Credits", desc: "First-time account gift.", icon: 'Gift', status: 'claimed' });
             } else if (rid.startsWith('referral_bonus_slot_')) {
                 const idx = rid.split('_').pop();
-                rewards.push({ id: rid, title: `Referral Bonus #${idx}`, value: "+50 Arcus Credits", desc: "Successfully claimed.", icon: 'Sparkles', status: 'claimed' });
+                rewards.push({ id: rid, title: `Referral Bonus #${idx}`, value: "+50 Boult Credits", desc: "Successfully claimed.", icon: 'Sparkles', status: 'claimed' });
             }
         });
 

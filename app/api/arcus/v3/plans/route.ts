@@ -1,7 +1,7 @@
 /**
- * Arcus V3 — Plans API
- * GET  /api/arcus/v3/plans        — List plans for authenticated user (paginated)
- * POST /api/arcus/v3/plans        — (internal) Create a plan
+ * Boult V3 — Plans API
+ * GET  /api/boult/v3/plans        — List plans for authenticated user (paginated)
+ * POST /api/boult/v3/plans        — (internal) Create a plan
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
 
     // Build query — always scoped to userId
     let query = supabase
-      .from('arcus_plans')
+      .from('boult_plans')
       .select('*')
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
@@ -53,10 +53,10 @@ export async function GET(request: NextRequest) {
         error.message?.includes('relation') ||
         error.code === '42P01';
       if (isMissingTable) {
-        console.warn('[Arcus V3] arcus_plans table not found — returning empty list');
+        console.warn('[Boult V3] boult_plans table not found — returning empty list');
         return NextResponse.json({ plans: [], nextCursor: null });
       }
-      console.error('[Arcus V3] Plans list error:', error.message, error.code);
+      console.error('[Boult V3] Plans list error:', error.message, error.code);
       return NextResponse.json({ plans: [], nextCursor: null, _error: error.message }, { status: 200 });
     }
 
@@ -69,7 +69,7 @@ export async function GET(request: NextRequest) {
       plans.map(async (plan) => {
         try {
           const { data: steps } = await supabase
-            .from('arcus_plan_steps')
+            .from('boult_plan_steps')
             .select('*')
             .eq('plan_id', plan.id)
             .order('position', { ascending: true });
@@ -90,7 +90,7 @@ export async function GET(request: NextRequest) {
 
   } catch (error: any) {
     logEvent({ channel: "failures", event: "❌ API Error", description: String(error) });
-    console.error('[Arcus V3] Plans API unhandled error:', error.message, error.stack?.slice(0, 300));
+    console.error('[Boult V3] Plans API unhandled error:', error.message, error.stack?.slice(0, 300));
     // Always return a valid shape — never 500 on a feed poll
     return NextResponse.json({ plans: [], nextCursor: null }, { status: 200 });
   }

@@ -1,4 +1,5 @@
 'use client';
+import { Mail } from "lucide-react";
 
 import React, { useState, useEffect } from 'react';
 import { ToggleSwitch } from './toggle-switch';
@@ -143,8 +144,8 @@ const BrandIcons = {
       </defs>
     </svg>
   ),
-  Mailient: () => (
-    <img src="/mailient-logo-premium.png" alt="mailient.xyz" className="w-5 h-5 object-cover rounded-[25%] shrink-0" />
+  Maily: () => (
+    <Mail className="w-full h-full p-1 text-inherit" />
   )
 };
 
@@ -161,9 +162,9 @@ export function IntegrationsModal({ isOpen, onClose }: IntegrationsModalProps) {
   const [calcomConnecting, setCalcomConnecting] = useState(false);
   const [integrations, setIntegrations] = useState<Integration[]>([
     {
-      id: 'mailient',
-      name: 'mailient.xyz',
-      logo: <BrandIcons.Mailient />,
+      id: 'maily',
+      name: 'maily.dev',
+      logo: <BrandIcons.Maily />,
       enabled: true,
       disabled: true,
       description: 'Founding platform workspace core engine.'
@@ -195,7 +196,7 @@ export function IntegrationsModal({ isOpen, onClose }: IntegrationsModalProps) {
       name: 'Cal.com',
       logo: <BrandIcons.CalCom />,
       enabled: false,
-      description: 'Share custom booking links and sync calendars straight from Arcus.'
+      description: 'Share custom booking links and sync calendars straight from Boult.'
     },
     {
       id: 'notion',
@@ -229,7 +230,7 @@ export function IntegrationsModal({ isOpen, onClose }: IntegrationsModalProps) {
         
         setIntegrations(prev =>
           prev.map(integration => {
-            if (integration.id === 'mailient' || integration.id === 'gmail') {
+            if (integration.id === 'maily' || integration.id === 'gmail') {
               return integration;
             }
             const match = statuses.find((s: any) => s.provider === integration.id);
@@ -297,13 +298,13 @@ export function IntegrationsModal({ isOpen, onClose }: IntegrationsModalProps) {
   };
 
   const handleToggle = async (id: string, currentlyEnabled: boolean) => {
-    if (id === 'mailient' || id === 'gmail') return;
+    if (id === 'maily' || id === 'gmail') return;
 
     if (currentlyEnabled) {
       const label = id === 'cal_com' ? 'Cal.com' : id.replace('_', ' ').replace(/\b\w/g, c => c.toUpperCase());
       // Styled confirmation toast instead of the browser's native confirm().
       toast(`Disconnect ${label}?`, {
-        description: `Arcus will lose access to ${label} until you reconnect it.`,
+        description: `Boult will lose access to ${label} until you reconnect it.`,
         action: { label: 'Disconnect', onClick: () => disconnectIntegration(id, label) },
         cancel: { label: 'Cancel', onClick: () => {} },
       });
@@ -316,10 +317,10 @@ export function IntegrationsModal({ isOpen, onClose }: IntegrationsModalProps) {
       }
 
       const V3_DIRECT_ROUTES: Record<string, string> = {
-        google_calendar:  '/api/arcus/v3/oauth/gcal',
-        slack:            '/api/arcus/v3/oauth/slack',
-        notion:           '/api/arcus/v3/oauth/notion',
-        notion_calendar:  '/api/arcus/v3/oauth/notion', // Notion Calendar redirects via Notion OAuth
+        google_calendar:  '/api/boult/v3/oauth/gcal',
+        slack:            '/api/boult/v3/oauth/slack',
+        notion:           '/api/boult/v3/oauth/notion',
+        notion_calendar:  '/api/boult/v3/oauth/notion', // Notion Calendar redirects via Notion OAuth
       };
 
       if (V3_DIRECT_ROUTES[id]) {
@@ -378,7 +379,7 @@ export function IntegrationsModal({ isOpen, onClose }: IntegrationsModalProps) {
 
         {/* Description */}
         <p className="text-[12px] leading-relaxed text-neutral-500 font-sans font-light">
-          Configure security credentials and dynamic loops with external systems straight into your autonomous Arcus core.
+          Configure security credentials and dynamic loops with external systems straight into your autonomous Boult core.
         </p>
 
         {/* Integration Items */}
@@ -411,7 +412,7 @@ export function IntegrationsModal({ isOpen, onClose }: IntegrationsModalProps) {
                     Cal.com connects with a personal API key — there's no login popup. Create a key, then paste it below.
                   </p>
                   <a
-                    href="https://app.cal.com/settings/developer/api-keys?createKey=Mailient"
+                    href="https://app.cal.com/settings/developer/api-keys?createKey=Maily"
                     target="_blank"
                     rel="noreferrer"
                     className="flex items-center gap-2 text-[11px] font-semibold text-indigo-400 hover:text-indigo-300 transition-colors"

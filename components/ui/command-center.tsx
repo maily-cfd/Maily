@@ -9,7 +9,7 @@
  *
  * Structure (top → bottom), each section a real data source, none invented:
  *   1. Hero      — greeting + one-line AI summary of the day + four stat tiles.
- *   2. Your week — a real 7-day activity chart (arcus_agent_runs; empty state is
+ *   2. Your week — a real 7-day activity chart (boult_agent_runs; empty state is
  *                  honest, never a fabricated trend).
  *   3. Key conversations — THE new capability. Your important threads and where
  *                  each currently STANDS (awaiting you / waiting on them /
@@ -20,8 +20,8 @@
  *   6. Worth your time — cross-app recommendations (Gmail·Cal·Notion·Slack).
  *   7. While you were away — what your agents did.
  *
- * Every action is a one-click handoff to Arcus with a prefilled prompt
- * (sessionStorage 'arcus_prefill' → /dashboard/agent-talk), the same proven flow
+ * Every action is a one-click handoff to Boult with a prefilled prompt
+ * (sessionStorage 'boult_prefill' → /dashboard/agent-talk), the same proven flow
  * the recommendations already use — so we reuse the real draft/schedule engine
  * rather than reproducing a streaming editor here.
  */
@@ -75,7 +75,7 @@ interface TodayData {
 }
 interface WeekDay { date: string; label: string; isToday: boolean; runs: number; actions: number; }
 interface WeekData { days: WeekDay[]; totalRuns: number; totalActions: number; hasData: boolean; }
-interface Rec { id: string; category: string; title: string; summary: string; arcusPrompt: string; ctaLabel: string; stat: { value: number; label: string }; atRisk?: boolean; }
+interface Rec { id: string; category: string; title: string; summary: string; boultPrompt: string; ctaLabel: string; stat: { value: number; label: string }; atRisk?: boolean; }
 // Real per-app signal counts from /api/home-feed/recommendations — already
 // connection-gated there (a gatherer only ever produces a signal for an app
 // with a live token) and toggle-gated by Customize Briefing, so a nonzero
@@ -85,7 +85,7 @@ interface AppCounts { gmail: number; calendar: number; notion: number; slack: nu
 // field on the one LLM call already being made (no added cost/latency).
 interface SiftSummary { headline: string; analysis: string; }
 // What the existing Gmail draft for a thread looks like, handed to the Inbox
-// tab's draft-reply box so it can open pre-filled instead of going to Arcus.
+// tab's draft-reply box so it can open pre-filled instead of going to Boult.
 interface ExistingDraft { threadId: string; to: string; subject: string; body: string; isHtml: boolean; }
 
 // ── "Your world" — the cross-app synthesis from /api/home-feed/world. A relationship
@@ -177,14 +177,14 @@ export function CommandCenter({ userName, onOpenExistingDraft }: {
   });
   const [showConnectors, setShowConnectors] = useState(false);
   const [integrationsNudgeDismissed, setIntegrationsNudgeDismissed] = useState(() => {
-    try { return localStorage.getItem('mailient_integrations_nudge_dismissed') === '1'; } catch { return false; }
+    try { return localStorage.getItem('maily_integrations_nudge_dismissed') === '1'; } catch { return false; }
   });
 
-  const openArcus = useCallback((prompt: string) => {
-    // ONE CLICK: open the Arcus command palette (the Ctrl+K panel) right here and
+  const openBoult = useCallback((prompt: string) => {
+    // ONE CLICK: open the Boult command palette (the Ctrl+K panel) right here and
     // auto-send the prompt — no redirect to /dashboard/agent-talk, no manual send.
-    // The globally-mounted ArcusCommandPalette listens for this event and does both.
-    window.dispatchEvent(new CustomEvent('arcus:submit', { detail: { prompt } }));
+    // The globally-mounted BoultCommandPalette listens for this event and does both.
+    window.dispatchEvent(new CustomEvent('boult:submit', { detail: { prompt } }));
   }, []);
 
   // Force a fresh Today recompute (bypasses the server cache) — the retry behind
@@ -234,15 +234,15 @@ export function CommandCenter({ userName, onOpenExistingDraft }: {
 
   const dismissIntegrationsNudge = useCallback(() => {
     setIntegrationsNudgeDismissed(true);
-    try { localStorage.setItem('mailient_integrations_nudge_dismissed', '1'); } catch { /* */ }
+    try { localStorage.setItem('maily_integrations_nudge_dismissed', '1'); } catch { /* */ }
   }, []);
 
   // "Needs a reply" → Draft reply: check for an already-existing Gmail draft on
-  // this thread FIRST. If one exists, this is NOT an Arcus job — hand it to the
+  // this thread FIRST. If one exists, this is NOT an Boult job — hand it to the
   // Inbox tab's own draft-reply box (pre-filled, ready to review/send) instead
-  // of sending a redundant "draft a reply" prompt to Arcus, which would either
+  // of sending a redundant "draft a reply" prompt to Boult, which would either
   // duplicate the draft or confuse the user about which one is current. Fails
-  // soft to the normal Arcus prompt on any error/timeout/missing callback.
+  // soft to the normal Boult prompt on any error/timeout/missing callback.
   const handleDraftReply = useCallback(async (d: DecideItem) => {
     const prompt = `Draft a reply to ${d.sender.name || d.sender.email} about "${d.subject}". Read the thread first, then write it in my voice.`;
     if (onOpenExistingDraft) {
@@ -255,10 +255,10 @@ export function CommandCenter({ userName, onOpenExistingDraft }: {
             return;
           }
         }
-      } catch { /* fall through to Arcus */ }
+      } catch { /* fall through to Boult */ }
     }
-    openArcus(prompt);
-  }, [onOpenExistingDraft, openArcus]);
+    openBoult(prompt);
+  }, [onOpenExistingDraft, openBoult]);
 
   // Refresh BOTH sources the analytics panel actually draws from: week-activity
   // (the area chart / spark tiles / radar) AND recommendations (the donut +
@@ -369,7 +369,7 @@ export function CommandCenter({ userName, onOpenExistingDraft }: {
     [],
   );
 
-  // ── The four headline stats — the state of the USER'S world, not Mailient's
+  // ── The four headline stats — the state of the USER'S world, not Maily's
   // activity. "handled for you" (an agent-activity metric) was dropped from the
   // hero (it's now the demoted "Handled quietly" strip at the bottom) and
   // replaced with the founder's own open commitments — the things on their plate.
@@ -455,13 +455,13 @@ export function CommandCenter({ userName, onOpenExistingDraft }: {
       <motion.section initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="relative -mx-2 px-2 py-3 sm:-mx-4 sm:px-4">
         <DitherAmbient />
         <div className="relative z-10">
-        <p className="text-[13px] font-medium text-arcus-fg-tertiary">{dateLabel}</p>
-        <h1 className="mt-1 text-[28px] sm:text-[34px] font-semibold tracking-tight text-arcus-fg">
+        <p className="text-[13px] font-medium text-boult-fg-tertiary">{dateLabel}</p>
+        <h1 className="mt-1 text-[28px] sm:text-[34px] font-semibold tracking-tight text-boult-fg">
           {greeting}{userName ? `, ${userName}` : ''}.
         </h1>
         <div className="mt-2 max-w-2xl">
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-arcus-fg-tertiary">Sift says…</p>
-          <p className="mt-1 text-[15px] font-medium leading-relaxed text-arcus-fg">
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-boult-fg-tertiary">Sift says…</p>
+          <p className="mt-1 text-[15px] font-medium leading-relaxed text-boult-fg">
             {hasReconnectIssue
               ? `Your ${[gmailNeedsReconnect && 'Gmail', calendarNeedsReconnect && 'Calendar'].filter(Boolean).join(' and ')} connection expired — reconnect above to see what actually needs you.`
               : sift?.headline
@@ -480,7 +480,7 @@ export function CommandCenter({ userName, onOpenExistingDraft }: {
               "Sift says…". Loads a beat after the headline (rides the recs call),
               so the hero never shows a gap while waiting. */}
           {sift?.analysis && (
-            <p className="mt-2 text-[14px] leading-[1.6] text-arcus-fg-secondary">{sift.analysis}</p>
+            <p className="mt-2 text-[14px] leading-[1.6] text-boult-fg-secondary">{sift.analysis}</p>
           )}
         </div>
 
@@ -494,10 +494,10 @@ export function CommandCenter({ userName, onOpenExistingDraft }: {
       </motion.section>
 
       {needsIntegrationsNudge && (
-        <div className="arcus-glass-card rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+        <div className="boult-glass-card rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
           <div className="min-w-0 flex-1">
-            <p className="text-[14px] font-semibold text-arcus-fg tracking-tight">Connect Slack &amp; Notion when you’re ready</p>
-            <p className="text-[12.5px] text-arcus-fg-secondary mt-0.5 leading-relaxed">
+            <p className="text-[14px] font-semibold text-boult-fg tracking-tight">Connect Slack &amp; Notion when you’re ready</p>
+            <p className="text-[12.5px] text-boult-fg-secondary mt-0.5 leading-relaxed">
               Optional — briefings in Slack, deals and notes in Notion. Skip anytime; you can always connect from Your stack.
             </p>
           </div>
@@ -505,14 +505,14 @@ export function CommandCenter({ userName, onOpenExistingDraft }: {
             <button
               type="button"
               onClick={dismissIntegrationsNudge}
-              className="h-9 px-3.5 rounded-xl border border-arcus-border text-[12.5px] font-medium text-arcus-fg-tertiary hover:text-arcus-fg hover:bg-arcus-surface-hover transition-colors"
+              className="h-9 px-3.5 rounded-xl border border-boult-border text-[12.5px] font-medium text-boult-fg-tertiary hover:text-boult-fg hover:bg-boult-surface-hover transition-colors"
             >
               Not now
             </button>
             <button
               type="button"
               onClick={() => setShowConnectors(true)}
-              className="h-9 px-3.5 rounded-xl bg-arcus-fg text-arcus-fg-inverse text-[12.5px] font-medium hover:opacity-90 transition-opacity inline-flex items-center gap-1.5"
+              className="h-9 px-3.5 rounded-xl bg-boult-fg text-boult-fg-inverse text-[12.5px] font-medium hover:opacity-90 transition-opacity inline-flex items-center gap-1.5"
             >
               Connect <ArrowRight className="w-3.5 h-3.5" />
             </button>
@@ -525,7 +525,7 @@ export function CommandCenter({ userName, onOpenExistingDraft }: {
           connect. Skeleton until the status fetch resolves. ────────────────── */}
       {connectedApps
         ? <YourStack connected={connectedApps} onManage={() => setShowConnectors(true)} />
-        : <div className="arcus-glass-card rounded-2xl h-[104px] animate-pulse" />}
+        : <div className="boult-glass-card rounded-2xl h-[104px] animate-pulse" />}
 
       {/* 2 ── WHAT'S SLIPPING — the loss-aversion lane. What's genuinely at risk
           ACROSS every app, ranked by cost-to-miss. A founder loses deals by never
@@ -534,7 +534,7 @@ export function CommandCenter({ userName, onOpenExistingDraft }: {
         <Section title="What’s slipping" sub="At risk across your apps — ranked by what it costs to miss">
           <div className="space-y-2">
             {slipping.slice(0, 4).map(e => (
-              <SlippingRow key={e.key} e={e} onHandle={() => openArcus(e.nextAction)} />
+              <SlippingRow key={e.key} e={e} onHandle={() => openBoult(e.nextAction)} />
             ))}
           </div>
         </Section>
@@ -549,14 +549,14 @@ export function CommandCenter({ userName, onOpenExistingDraft }: {
           {world?.aiError && <div className="mb-2.5"><FeedErrorCard message={world.aiError} onRetry={refetchWorld} /></div>}
           <div className="grid sm:grid-cols-2 gap-2.5">
             {worldEntities.map(e => (
-              <WorldCard key={e.key} e={e} onHandle={() => openArcus(e.nextAction)} />
+              <WorldCard key={e.key} e={e} onHandle={() => openBoult(e.nextAction)} />
             ))}
           </div>
         </Section>
       ) : worldLoading ? (
         <Section title="Your world right now" sub="Reading across your connected apps…">
           <div className="grid sm:grid-cols-2 gap-2.5">
-            {[0, 1, 2, 3].map(i => <div key={i} className="h-32 rounded-2xl bg-arcus-surface animate-pulse" />)}
+            {[0, 1, 2, 3].map(i => <div key={i} className="h-32 rounded-2xl bg-boult-surface animate-pulse" />)}
           </div>
         </Section>
       ) : world?.error ? (
@@ -600,7 +600,7 @@ export function CommandCenter({ userName, onOpenExistingDraft }: {
               <CommitmentRow
                 key={a.id}
                 item={a}
-                onDo={() => openArcus(`Help me handle this commitment: "${a.text}"${a.meetingTitle ? ` (from my "${a.meetingTitle}" meeting)` : ''}. Suggest the next step and draft anything needed.`)}
+                onDo={() => openBoult(`Help me handle this commitment: "${a.text}"${a.meetingTitle ? ` (from my "${a.meetingTitle}" meeting)` : ''}. Suggest the next step and draft anything needed.`)}
               />
             ))}
           </div>
@@ -612,7 +612,7 @@ export function CommandCenter({ userName, onOpenExistingDraft }: {
         <Section
           title="Your meetings"
           sub={meetingsSub}
-          action={{ label: 'Schedule something', onClick: () => openArcus('Find a free 30-minute slot this week and schedule a meeting. Ask me who with and what about.') }}
+          action={{ label: 'Schedule something', onClick: () => openBoult('Find a free 30-minute slot this week and schedule a meeting. Ask me who with and what about.') }}
         >
           <div className="space-y-2">
             {today.showUp.slice(0, 5).map(m => (
@@ -623,7 +623,7 @@ export function CommandCenter({ userName, onOpenExistingDraft }: {
                 attendeeCount={m.attendeeCount}
                 isExternal={m.isExternal}
                 meetLink={m.meetLink || m.hangoutLink}
-                onPrep={() => openArcus(`Prep me for "${m.title}". Pull recent email and calendar context on the attendees.`)}
+                onPrep={() => openBoult(`Prep me for "${m.title}". Pull recent email and calendar context on the attendees.`)}
               />
             ))}
           </div>
@@ -639,7 +639,7 @@ export function CommandCenter({ userName, onOpenExistingDraft }: {
         <Section title="Worth your time" sub="Across Gmail, Calendar, Notion & Slack">
           <div className="grid sm:grid-cols-2 gap-2.5">
             {recs.slice(0, 4).map(r => (
-              <RecCard key={r.id} r={r} onDo={() => openArcus(r.arcusPrompt)} />
+              <RecCard key={r.id} r={r} onDo={() => openBoult(r.boultPrompt)} />
             ))}
           </div>
         </Section>
@@ -647,9 +647,9 @@ export function CommandCenter({ userName, onOpenExistingDraft }: {
 
       {/* 8 ── HANDLED QUIETLY (demoted agent-activity footer) ──────────────────
           FRAME FLIP: this used to be TWO headline sections ("Your week" analytics
-          + "While you were away") reporting what MAILIENT did — making the tool
+          + "While you were away") reporting what MAILY did — making the tool
           the protagonist of its own user's home. Founder feedback: "displays
-          tasks completed by Mailient rather than those performed by the user."
+          tasks completed by Maily rather than those performed by the user."
           Collapsed to one quiet, honest reassurance line by default; the same
           rich analytics (KPI pills, chart, cross-app donut) still live one click
           away for anyone who wants them — nothing was deleted, just demoted. ─── */}
@@ -661,7 +661,7 @@ export function CommandCenter({ userName, onOpenExistingDraft }: {
         recsError={recsError}
         refreshing={analyticsRefreshing}
         onRefresh={refreshAnalytics}
-        onSchedule={() => openArcus('Set up a scheduled agent that gives me a morning briefing every weekday at 8am.')}
+        onSchedule={() => openBoult('Set up a scheduled agent that gives me a morning briefing every weekday at 8am.')}
         agentRuns={today?.agentRuns || []}
       />
 
@@ -699,12 +699,12 @@ function FeedErrorCard({ message, onRetry }: { message: string; onRetry?: () => 
       <AlertTriangle className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
       <div className="min-w-0 flex-1">
         <p className="text-[13px] font-semibold text-rose-600 dark:text-rose-400">AI error</p>
-        <p className="text-[12.5px] text-arcus-fg-secondary mt-0.5 break-words leading-relaxed">{message}</p>
+        <p className="text-[12.5px] text-boult-fg-secondary mt-0.5 break-words leading-relaxed">{message}</p>
       </div>
       {onRetry && (
         <button
           onClick={onRetry}
-          className="shrink-0 inline-flex items-center gap-1 h-7 px-2.5 rounded-lg border border-arcus-border text-[12px] font-medium text-arcus-fg-secondary hover:bg-arcus-surface-hover transition-colors"
+          className="shrink-0 inline-flex items-center gap-1 h-7 px-2.5 rounded-lg border border-boult-border text-[12px] font-medium text-boult-fg-secondary hover:bg-boult-surface-hover transition-colors"
         >
           <RefreshCw className="w-3 h-3" /> Retry
         </button>
@@ -718,11 +718,11 @@ function Section({ title, sub, action, children }: { title: string; sub?: string
     <motion.section initial={{ opacity: 0, y: 8 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-40px' }} transition={{ duration: 0.4 }}>
       <div className="flex items-end justify-between mb-3">
         <div>
-          <h2 className="text-[17px] font-semibold tracking-tight text-arcus-fg">{title}</h2>
-          {sub && <p className="text-[12.5px] text-arcus-fg-tertiary mt-0.5">{sub}</p>}
+          <h2 className="text-[17px] font-semibold tracking-tight text-boult-fg">{title}</h2>
+          {sub && <p className="text-[12.5px] text-boult-fg-tertiary mt-0.5">{sub}</p>}
         </div>
         {action && (
-          <button onClick={action.onClick} className="inline-flex items-center gap-1 text-[12.5px] font-medium text-arcus-fg-secondary hover:text-arcus-fg transition-colors">
+          <button onClick={action.onClick} className="inline-flex items-center gap-1 text-[12.5px] font-medium text-boult-fg-secondary hover:text-boult-fg transition-colors">
             {action.label} <ArrowRight className="w-3.5 h-3.5" />
           </button>
         )}
@@ -734,17 +734,17 @@ function Section({ title, sub, action, children }: { title: string; sub?: string
 
 function StatTile({ icon, value, label, tone }: { icon: React.ReactNode; value: number; label: string; tone: 'attn' | 'calm' | 'good' }) {
   return (
-    <div className="rounded-2xl arcus-glass-card px-4 py-3.5">
+    <div className="rounded-2xl boult-glass-card px-4 py-3.5">
       <div className={cn(
         'inline-flex items-center justify-center w-8 h-8 rounded-xl mb-2',
         tone === 'attn' ? 'bg-amber-500/10 text-amber-500'
           : tone === 'good' ? 'bg-emerald-500/10 text-emerald-500'
-            : 'bg-arcus-elevated text-arcus-fg-tertiary',
+            : 'bg-boult-elevated text-boult-fg-tertiary',
       )}>
         {icon}
       </div>
-      <div className="text-[26px] font-semibold tracking-tight text-arcus-fg tabular-nums leading-none">{value}</div>
-      <div className="text-[12px] text-arcus-fg-tertiary mt-1">{label}</div>
+      <div className="text-[26px] font-semibold tracking-tight text-boult-fg tabular-nums leading-none">{value}</div>
+      <div className="text-[12px] text-boult-fg-tertiary mt-1">{label}</div>
     </div>
   );
 }
@@ -757,7 +757,7 @@ function StatTile({ icon, value, label, tone }: { icon: React.ReactNode; value: 
 // the pulse chart and the cards below it read as one system.
 const STATUS_META: Record<ConvoStatus, { label: string; cls: string; fill: string; Icon: any }> = {
   awaiting_you: { label: 'Awaiting your reply', cls: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20', fill: 'bg-amber-500', Icon: Reply },
-  waiting_on_them: { label: 'Waiting on them', cls: 'bg-arcus-elevated text-arcus-fg-tertiary border-arcus-border', fill: 'bg-arcus-fg-muted', Icon: Clock },
+  waiting_on_them: { label: 'Waiting on them', cls: 'bg-boult-elevated text-boult-fg-tertiary border-boult-border', fill: 'bg-boult-fg-muted', Icon: Clock },
   meeting_booked: { label: 'Meeting booked', cls: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20', fill: 'bg-indigo-500', Icon: Calendar },
   active: { label: 'Active thread', cls: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20', fill: 'bg-blue-500', Icon: MessageSquare },
 };
@@ -765,11 +765,11 @@ const STATUS_META: Record<ConvoStatus, { label: string; cls: string; fill: strin
 // signal on a world card. This is what makes "email quiet 8d · meets Thu · Slack
 // waiting" read as one relationship living across the founder's whole stack.
 const WORLD_APP_META: Record<WorldApp, { Icon: any; label: string; varName: string }> = {
-  gmail:    { Icon: Mail,         label: 'Gmail',    varName: '--arcus-chart-blue' },
-  calendar: { Icon: Calendar,     label: 'Calendar', varName: '--arcus-chart-green' },
-  calcom:   { Icon: CalendarPlus, label: 'Cal.com',  varName: '--arcus-chart-aqua' },
-  notion:   { Icon: FileText,     label: 'Notion',   varName: '--arcus-chart-magenta' },
-  slack:    { Icon: Hash,         label: 'Slack',    varName: '--arcus-chart-yellow' },
+  gmail:    { Icon: Mail,         label: 'Gmail',    varName: '--boult-chart-blue' },
+  calendar: { Icon: Calendar,     label: 'Calendar', varName: '--boult-chart-green' },
+  calcom:   { Icon: CalendarPlus, label: 'Cal.com',  varName: '--boult-chart-aqua' },
+  notion:   { Icon: FileText,     label: 'Notion',   varName: '--boult-chart-magenta' },
+  slack:    { Icon: Hash,         label: 'Slack',    varName: '--boult-chart-yellow' },
 };
 const APP_ORDER: WorldApp[] = ['gmail', 'calendar', 'calcom', 'notion', 'slack'];
 
@@ -790,9 +790,9 @@ const KIND_META: Record<RelationshipKind, { label: string; cls: string }> = {
 // sees what was *said*, not a paraphrase. Empty bodies simply render nothing.
 function ReceiptQuote({ text }: { text: string }) {
   return (
-    <div className="mt-2.5 flex gap-2 rounded-xl bg-arcus-elevated/70 border border-arcus-border/70 px-2.5 py-2">
-      <Quote className="w-3.5 h-3.5 text-arcus-fg-muted shrink-0 mt-[1px]" />
-      <p className="text-[12px] text-arcus-fg-secondary italic leading-relaxed line-clamp-2">{text}</p>
+    <div className="mt-2.5 flex gap-2 rounded-xl bg-boult-elevated/70 border border-boult-border/70 px-2.5 py-2">
+      <Quote className="w-3.5 h-3.5 text-boult-fg-muted shrink-0 mt-[1px]" />
+      <p className="text-[12px] text-boult-fg-secondary italic leading-relaxed line-clamp-2">{text}</p>
     </div>
   );
 }
@@ -846,20 +846,20 @@ function YourStack({ connected, onManage }: { connected: Set<string>; onManage: 
   const all = count === apps.length;
   return (
     <motion.section initial={{ opacity: 0, y: 8 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-40px' }} transition={{ duration: 0.4 }}>
-      <div className="arcus-glass-card rounded-2xl p-4 sm:p-[18px]">
+      <div className="boult-glass-card rounded-2xl p-4 sm:p-[18px]">
         <div className="flex items-center justify-between gap-3 mb-3.5">
           <div className="flex items-center gap-2.5 min-w-0">
-            <span className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-arcus-elevated text-arcus-fg-tertiary shrink-0">
+            <span className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-boult-elevated text-boult-fg-tertiary shrink-0">
               <Layers className="w-3.5 h-3.5" />
             </span>
             <div className="min-w-0">
-              <h2 className="text-[14.5px] font-semibold tracking-tight text-arcus-fg leading-tight">Your stack</h2>
-              <p className="text-[12px] text-arcus-fg-tertiary leading-tight mt-0.5">
+              <h2 className="text-[14.5px] font-semibold tracking-tight text-boult-fg leading-tight">Your stack</h2>
+              <p className="text-[12px] text-boult-fg-tertiary leading-tight mt-0.5">
                 {all ? 'Every app is fused into your world' : `${count} of ${apps.length} connected · connect more to see your whole world fuse`}
               </p>
             </div>
           </div>
-          <button onClick={onManage} className="shrink-0 inline-flex items-center gap-1 text-[12.5px] font-medium text-arcus-fg-secondary hover:text-arcus-fg transition-colors">
+          <button onClick={onManage} className="shrink-0 inline-flex items-center gap-1 text-[12.5px] font-medium text-boult-fg-secondary hover:text-boult-fg transition-colors">
             Manage <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>
@@ -875,17 +875,17 @@ function YourStack({ connected, onManage }: { connected: Set<string>; onManage: 
                 className={cn(
                   'group inline-flex items-center gap-2 h-9 pl-2.5 pr-2.5 rounded-xl border transition-all duration-200',
                   on
-                    ? 'border-arcus-border bg-arcus-elevated/60'
-                    : 'border-arcus-border/60 hover:bg-arcus-elevated/40 hover:border-arcus-fg-muted/40 hover:-translate-y-px',
+                    ? 'border-boult-border bg-boult-elevated/60'
+                    : 'border-boult-border/60 hover:bg-boult-elevated/40 hover:border-boult-fg-muted/40 hover:-translate-y-px',
                 )}
               >
                 <span className={cn('inline-flex items-center justify-center w-[18px] h-[18px] shrink-0 transition-all', on ? '' : 'grayscale opacity-40 group-hover:opacity-70')}>
                   <Icon className="w-[18px] h-[18px]" />
                 </span>
-                <span className={cn('text-[12.5px] font-medium', on ? 'text-arcus-fg' : 'text-arcus-fg-tertiary')}>{app.name}</span>
+                <span className={cn('text-[12.5px] font-medium', on ? 'text-boult-fg' : 'text-boult-fg-tertiary')}>{app.name}</span>
                 {on
                   ? <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0" strokeWidth={2.5} />
-                  : <Plus className="w-3.5 h-3.5 text-arcus-fg-muted shrink-0 group-hover:text-arcus-fg-tertiary" />}
+                  : <Plus className="w-3.5 h-3.5 text-boult-fg-muted shrink-0 group-hover:text-boult-fg-tertiary" />}
               </button>
             );
           })}
@@ -914,7 +914,7 @@ function AppChip({ chip }: { chip: WorldAppChip }) {
   return (
     <span
       title={chip.evidence}
-      className="inline-flex items-center gap-1 text-[10.5px] px-2 py-0.5 rounded-full bg-arcus-elevated border border-arcus-border text-arcus-fg-tertiary"
+      className="inline-flex items-center gap-1 text-[10.5px] px-2 py-0.5 rounded-full bg-boult-elevated border border-boult-border text-boult-fg-tertiary"
     >
       <Icon className="w-3 h-3 shrink-0" style={{ color: `var(${meta.varName})` }} />
       {chip.label}
@@ -924,7 +924,7 @@ function AppChip({ chip }: { chip: WorldAppChip }) {
 
 // A world card — one person/company as a LIVING relationship: status, what it's
 // about, the AI "why now" line, and the fused cross-app chips. The whole card
-// hands its next move to Arcus on click.
+// hands its next move to Boult on click.
 function WorldCard({ e, onHandle }: { e: WorldEntry; onHandle: () => void }) {
   const s = STATUS_META[e.status];
   const kind = e.kind ? KIND_META[e.kind] : null;
@@ -936,13 +936,13 @@ function WorldCard({ e, onHandle }: { e: WorldEntry; onHandle: () => void }) {
     <button
       onClick={onHandle}
       className={cn(
-        'group text-left rounded-2xl arcus-glass-card arcus-glass-hover p-4',
+        'group text-left rounded-2xl boult-glass-card boult-glass-hover p-4',
         e.atRisk && 'ring-1 ring-rose-500/30',
       )}
     >
       <div className="flex items-center justify-between gap-2 mb-2">
         <div className="flex items-center gap-1.5 min-w-0">
-          <span className="text-[14px] font-semibold text-arcus-fg truncate">{e.name}</span>
+          <span className="text-[14px] font-semibold text-boult-fg truncate">{e.name}</span>
           {kind && (
             <span className={cn('shrink-0 px-1.5 py-0.5 rounded-md border text-[9.5px] font-semibold uppercase tracking-wide', kind.cls)}>
               {kind.label}
@@ -959,8 +959,8 @@ function WorldCard({ e, onHandle }: { e: WorldEntry; onHandle: () => void }) {
           </span>
         )}
       </div>
-      <p className="text-[13px] text-arcus-fg-secondary line-clamp-1 mb-1">{e.headline}</p>
-      <p className="text-[12.5px] text-arcus-fg-tertiary line-clamp-2 leading-relaxed">{e.whyNow}</p>
+      <p className="text-[13px] text-boult-fg-secondary line-clamp-1 mb-1">{e.headline}</p>
+      <p className="text-[12.5px] text-boult-fg-tertiary line-clamp-2 leading-relaxed">{e.whyNow}</p>
       {receipt && <ReceiptQuote text={receipt} />}
       {chips.length > 0 && (
         <div className="flex flex-wrap gap-1.5 mt-2.5">
@@ -968,8 +968,8 @@ function WorldCard({ e, onHandle }: { e: WorldEntry; onHandle: () => void }) {
         </div>
       )}
       <div className="flex items-center justify-between mt-3">
-        <span className="text-[11px] text-arcus-fg-muted">{e.messageCount} msg{e.messageCount === 1 ? '' : 's'} · {relTime(e.lastActivityIso)}</span>
-        <span className="inline-flex items-center gap-1 text-[12px] font-medium text-arcus-fg-tertiary group-hover:text-arcus-fg transition-colors">
+        <span className="text-[11px] text-boult-fg-muted">{e.messageCount} msg{e.messageCount === 1 ? '' : 's'} · {relTime(e.lastActivityIso)}</span>
+        <span className="inline-flex items-center gap-1 text-[12px] font-medium text-boult-fg-tertiary group-hover:text-boult-fg transition-colors">
           Handle it <ChevronRight className="w-3.5 h-3.5" />
         </span>
       </div>
@@ -991,7 +991,7 @@ function SlippingRow({ e, onHandle }: { e: WorldEntry; onHandle: () => void }) {
       <div className="min-w-0 flex-1">
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-1.5 min-w-0">
-            <span className="text-[14px] font-semibold text-arcus-fg truncate">{e.name}</span>
+            <span className="text-[14px] font-semibold text-boult-fg truncate">{e.name}</span>
             {kind && (
               <span className={cn('shrink-0 px-1.5 py-0.5 rounded-md border text-[9.5px] font-semibold uppercase tracking-wide', kind.cls)}>
                 {kind.label}
@@ -1000,7 +1000,7 @@ function SlippingRow({ e, onHandle }: { e: WorldEntry; onHandle: () => void }) {
           </div>
           <span className="text-[11px] text-rose-600 dark:text-rose-400 font-medium shrink-0">at risk</span>
         </div>
-        <p className="text-[12.5px] text-arcus-fg-secondary mt-0.5 line-clamp-2 leading-relaxed">
+        <p className="text-[12.5px] text-boult-fg-secondary mt-0.5 line-clamp-2 leading-relaxed">
           {e.riskReason ? e.riskReason.replace(/^[^:]+:\s*/, '') : e.whyNow}
         </p>
         {receipt && <ReceiptQuote text={receipt} />}
@@ -1010,7 +1010,7 @@ function SlippingRow({ e, onHandle }: { e: WorldEntry; onHandle: () => void }) {
           </div>
         )}
         <div className="flex items-center gap-2 mt-2.5">
-          <button onClick={onHandle} className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-arcus-fg text-arcus-fg-inverse text-[12.5px] font-semibold hover:opacity-90 transition-opacity">
+          <button onClick={onHandle} className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-boult-fg text-boult-fg-inverse text-[12.5px] font-semibold hover:opacity-90 transition-opacity">
             <Zap className="w-3.5 h-3.5" /> Handle it
           </button>
         </div>
@@ -1021,29 +1021,29 @@ function SlippingRow({ e, onHandle }: { e: WorldEntry; onHandle: () => void }) {
 
 function ReplyRow({ who, subject, reason, when, signals, onDraft, onOpen }: { who: string; subject: string; reason: string; when: string; signals?: string[]; onDraft: () => void; onOpen: () => void }) {
   return (
-    <div className="rounded-2xl arcus-glass-card p-4 flex items-start gap-3">
-      <div className="w-9 h-9 rounded-xl bg-arcus-elevated flex items-center justify-center shrink-0 text-arcus-fg-tertiary">
+    <div className="rounded-2xl boult-glass-card p-4 flex items-start gap-3">
+      <div className="w-9 h-9 rounded-xl bg-boult-elevated flex items-center justify-center shrink-0 text-boult-fg-tertiary">
         <Mail className="w-4 h-4" />
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex items-center justify-between gap-2">
-          <span className="text-[14px] font-semibold text-arcus-fg truncate">{who}</span>
-          <span className="text-[11.5px] text-arcus-fg-muted shrink-0">{when}</span>
+          <span className="text-[14px] font-semibold text-boult-fg truncate">{who}</span>
+          <span className="text-[11.5px] text-boult-fg-muted shrink-0">{when}</span>
         </div>
-        <p className="text-[13px] text-arcus-fg-secondary truncate">{subject}</p>
-        {reason && <p className="text-[12.5px] text-arcus-fg-tertiary mt-1 line-clamp-2 leading-relaxed">{reason}</p>}
+        <p className="text-[13px] text-boult-fg-secondary truncate">{subject}</p>
+        {reason && <p className="text-[12.5px] text-boult-fg-tertiary mt-1 line-clamp-2 leading-relaxed">{reason}</p>}
         {signals && signals.length > 0 && (
           <div className="flex flex-wrap gap-1.5 mt-2">
             {signals.slice(0, 3).map((s, i) => (
-              <span key={i} className="text-[10.5px] px-2 py-0.5 rounded-full bg-arcus-elevated text-arcus-fg-tertiary border border-arcus-border">{s}</span>
+              <span key={i} className="text-[10.5px] px-2 py-0.5 rounded-full bg-boult-elevated text-boult-fg-tertiary border border-boult-border">{s}</span>
             ))}
           </div>
         )}
         <div className="flex items-center gap-2 mt-2.5">
-          <button onClick={onDraft} className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-arcus-fg text-arcus-fg-inverse text-[12.5px] font-semibold hover:opacity-90 transition-opacity">
+          <button onClick={onDraft} className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-boult-fg text-boult-fg-inverse text-[12.5px] font-semibold hover:opacity-90 transition-opacity">
             <Reply className="w-3.5 h-3.5" /> Draft reply
           </button>
-          <button onClick={onOpen} className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border border-arcus-border text-arcus-fg-secondary text-[12.5px] font-medium hover:bg-arcus-surface-hover transition-colors">
+          <button onClick={onOpen} className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border border-boult-border text-boult-fg-secondary text-[12.5px] font-medium hover:bg-boult-surface-hover transition-colors">
             Open thread
           </button>
         </div>
@@ -1054,25 +1054,25 @@ function ReplyRow({ who, subject, reason, when, signals, onDraft, onOpen }: { wh
 
 function MeetingRow({ title, start, attendeeCount, isExternal, meetLink, onPrep }: { title: string; start: string; attendeeCount: number; isExternal: boolean; meetLink: string | null; onPrep: () => void }) {
   return (
-    <div className="rounded-2xl arcus-glass-card p-4 flex items-center gap-3">
+    <div className="rounded-2xl boult-glass-card p-4 flex items-center gap-3">
       <div className="flex flex-col items-center justify-center w-14 shrink-0">
-        <span className="text-[15px] font-semibold text-arcus-fg tabular-nums leading-none">{clockTime(start)}</span>
-        <span className="text-[10.5px] text-arcus-fg-muted mt-1">{relTime(start)}</span>
+        <span className="text-[15px] font-semibold text-boult-fg tabular-nums leading-none">{clockTime(start)}</span>
+        <span className="text-[10.5px] text-boult-fg-muted mt-1">{relTime(start)}</span>
       </div>
-      <div className="w-px self-stretch bg-arcus-border" />
+      <div className="w-px self-stretch bg-boult-border" />
       <div className="min-w-0 flex-1">
-        <p className="text-[14px] font-semibold text-arcus-fg truncate">{title}</p>
-        <p className="text-[12px] text-arcus-fg-tertiary mt-0.5">
+        <p className="text-[14px] font-semibold text-boult-fg truncate">{title}</p>
+        <p className="text-[12px] text-boult-fg-tertiary mt-0.5">
           {attendeeCount} attendee{attendeeCount === 1 ? '' : 's'}{isExternal ? ' · external' : ''}
         </p>
       </div>
       <div className="flex items-center gap-2 shrink-0">
         {meetLink && (
-          <a href={meetLink} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border border-arcus-border text-arcus-fg-secondary text-[12.5px] font-medium hover:bg-arcus-surface-hover transition-colors">
+          <a href={meetLink} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border border-boult-border text-boult-fg-secondary text-[12.5px] font-medium hover:bg-boult-surface-hover transition-colors">
             Join
           </a>
         )}
-        <button onClick={onPrep} className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-arcus-fg text-arcus-fg-inverse text-[12.5px] font-semibold hover:opacity-90 transition-opacity">
+        <button onClick={onPrep} className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-boult-fg text-boult-fg-inverse text-[12.5px] font-semibold hover:opacity-90 transition-opacity">
           <Zap className="w-3.5 h-3.5" /> Prep me
         </button>
       </div>
@@ -1081,26 +1081,26 @@ function MeetingRow({ title, start, attendeeCount, isExternal, meetLink, onPrep 
 }
 
 // A commitment the founder made (from meeting notes) — real text, due date /
-// overdue flag, the meeting it came from, and one click to hand it to Arcus.
+// overdue flag, the meeting it came from, and one click to hand it to Boult.
 function CommitmentRow({ item, onDo }: { item: any; onDo: () => void }) {
   const due = item?.dueAt ? new Date(item.dueAt) : null;
   const dueLabel = due && !isNaN(due.getTime()) ? due.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : null;
   const overdue = !!item?.isOverdue;
   return (
-    <div className={cn('rounded-2xl border p-4 flex items-start gap-3', overdue ? 'border-rose-500/30 bg-rose-500/[0.06]' : 'border-arcus-border bg-arcus-surface')}>
-      <div className={cn('w-9 h-9 rounded-xl flex items-center justify-center shrink-0', overdue ? 'bg-rose-500/10 text-rose-500' : 'bg-arcus-elevated text-arcus-fg-tertiary')}>
+    <div className={cn('rounded-2xl border p-4 flex items-start gap-3', overdue ? 'border-rose-500/30 bg-rose-500/[0.06]' : 'border-boult-border bg-boult-surface')}>
+      <div className={cn('w-9 h-9 rounded-xl flex items-center justify-center shrink-0', overdue ? 'bg-rose-500/10 text-rose-500' : 'bg-boult-elevated text-boult-fg-tertiary')}>
         <CheckCircle2 className="w-4 h-4" />
       </div>
       <div className="min-w-0 flex-1">
-        <p className="text-[13.5px] text-arcus-fg leading-snug line-clamp-2">{item?.text}</p>
+        <p className="text-[13.5px] text-boult-fg leading-snug line-clamp-2">{item?.text}</p>
         <div className="flex items-center gap-2 mt-1 flex-wrap">
-          {item?.meetingTitle && <span className="text-[11.5px] text-arcus-fg-tertiary truncate max-w-[220px]">from “{item.meetingTitle}”</span>}
+          {item?.meetingTitle && <span className="text-[11.5px] text-boult-fg-tertiary truncate max-w-[220px]">from “{item.meetingTitle}”</span>}
           {overdue
             ? <span className="text-[11px] font-semibold text-rose-600 dark:text-rose-400">overdue</span>
-            : dueLabel && <span className="text-[11.5px] text-arcus-fg-muted">due {dueLabel}</span>}
+            : dueLabel && <span className="text-[11.5px] text-boult-fg-muted">due {dueLabel}</span>}
         </div>
       </div>
-      <button onClick={onDo} className="shrink-0 inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border border-arcus-border text-arcus-fg-secondary text-[12.5px] font-medium hover:bg-arcus-surface-hover transition-colors">
+      <button onClick={onDo} className="shrink-0 inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border border-boult-border text-boult-fg-secondary text-[12.5px] font-medium hover:bg-boult-surface-hover transition-colors">
         <Zap className="w-3.5 h-3.5" /> Do it
       </button>
     </div>
@@ -1109,17 +1109,17 @@ function CommitmentRow({ item, onDo }: { item: any; onDo: () => void }) {
 
 function RecCard({ r, onDo }: { r: Rec; onDo: () => void }) {
   return (
-    <button onClick={onDo} className="group text-left rounded-2xl arcus-glass-card arcus-glass-hover p-4">
+    <button onClick={onDo} className="group text-left rounded-2xl boult-glass-card boult-glass-hover p-4">
       <div className="flex items-start justify-between gap-2 mb-1.5">
-        <span className="text-[14px] font-semibold text-arcus-fg leading-snug">{r.title}</span>
+        <span className="text-[14px] font-semibold text-boult-fg leading-snug">{r.title}</span>
         {r.atRisk && (
           <span className="shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 text-[10.5px] font-medium">
             <AlertTriangle className="w-3 h-3" /> at risk
           </span>
         )}
       </div>
-      <p className="text-[12.5px] text-arcus-fg-tertiary leading-relaxed line-clamp-2">{r.summary}</p>
-      <span className="inline-flex items-center gap-1 mt-2.5 text-[12px] font-medium text-arcus-fg-secondary group-hover:text-arcus-fg transition-colors">
+      <p className="text-[12.5px] text-boult-fg-tertiary leading-relaxed line-clamp-2">{r.summary}</p>
+      <span className="inline-flex items-center gap-1 mt-2.5 text-[12px] font-medium text-boult-fg-secondary group-hover:text-boult-fg transition-colors">
         {r.ctaLabel || 'Do it'} <ChevronRight className="w-3.5 h-3.5" />
       </span>
     </button>
@@ -1131,23 +1131,23 @@ function AgentRunRow({ run }: { run: AgentRunItem }) {
   const chips = (['gmail', 'calendar', 'notion', 'slack'] as const)
     .map(k => ({ k, n: run.artifactCounts[k] })).filter(x => x.n > 0);
   return (
-    <div className="rounded-2xl arcus-glass-card p-4 flex items-start gap-3">
+    <div className="rounded-2xl boult-glass-card p-4 flex items-start gap-3">
       <div className={cn('w-9 h-9 rounded-xl flex items-center justify-center shrink-0',
         run.status === 'error' || run.status === 'transient_error' ? 'bg-rose-500/10 text-rose-500' : 'bg-emerald-500/10 text-emerald-500')}>
         {run.status === 'running' ? <Clock className="w-4 h-4 animate-pulse" /> : <CheckCircle2 className="w-4 h-4" />}
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex items-center justify-between gap-2">
-          <span className="text-[14px] font-semibold text-arcus-fg truncate">{run.agentName}</span>
-          <span className="text-[11.5px] text-arcus-fg-muted shrink-0">{relTime(run.ranAt)}</span>
+          <span className="text-[14px] font-semibold text-boult-fg truncate">{run.agentName}</span>
+          <span className="text-[11.5px] text-boult-fg-muted shrink-0">{relTime(run.ranAt)}</span>
         </div>
-        {run.summary && <p className="text-[12.5px] text-arcus-fg-tertiary mt-0.5 line-clamp-2 leading-relaxed">{run.summary}</p>}
+        {run.summary && <p className="text-[12.5px] text-boult-fg-tertiary mt-0.5 line-clamp-2 leading-relaxed">{run.summary}</p>}
         {chips.length > 0 && (
           <div className="flex flex-wrap gap-1.5 mt-2">
             {chips.map(({ k, n }) => {
               const I = APP_ICON[k];
               return (
-                <span key={k} className="inline-flex items-center gap-1 text-[10.5px] px-2 py-0.5 rounded-full bg-arcus-elevated text-arcus-fg-tertiary border border-arcus-border capitalize">
+                <span key={k} className="inline-flex items-center gap-1 text-[10.5px] px-2 py-0.5 rounded-full bg-boult-elevated text-boult-fg-tertiary border border-boult-border capitalize">
                   <I className="w-3 h-3" /> {n} {k}
                 </span>
               );
@@ -1211,17 +1211,17 @@ function StatPill({ icon, value, label, accent }: {
   icon: React.ReactNode; value: string; label: string; accent?: string;
 }) {
   return (
-    <div className="arcus-glass-pill arcus-glass-hover rounded-2xl p-4 relative overflow-hidden">
+    <div className="boult-glass-pill boult-glass-hover rounded-2xl p-4 relative overflow-hidden">
       <GlassTexture />
       <div className="relative">
         <span
-          className="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-arcus-elevated"
-          style={{ color: accent ? `var(${accent})` : 'var(--arcus-fg-tertiary)' }}
+          className="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-boult-elevated"
+          style={{ color: accent ? `var(${accent})` : 'var(--boult-fg-tertiary)' }}
         >
           {icon}
         </span>
-        <div className="text-[26px] font-semibold tracking-tight text-arcus-fg tabular-nums leading-none mt-3">{value}</div>
-        <div className="text-[12px] text-arcus-fg-tertiary mt-1 truncate">{label}</div>
+        <div className="text-[26px] font-semibold tracking-tight text-boult-fg tabular-nums leading-none mt-3">{value}</div>
+        <div className="text-[12px] text-boult-fg-tertiary mt-1 truncate">{label}</div>
       </div>
     </div>
   );
@@ -1235,17 +1235,17 @@ function WeekAreaChart({ week, onRefresh, refreshing }: { week: WeekData; onRefr
   const id = `week-${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
   const peak = Math.max(...week.days.map((d) => d.actions), 0);
   return (
-    <div className="arcus-glass-card rounded-2xl p-5 relative overflow-hidden">
+    <div className="boult-glass-card rounded-2xl p-5 relative overflow-hidden">
       <GlassTexture />
       <div className="relative flex items-start justify-between mb-1">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-arcus-fg-tertiary">Actions per day</p>
-          <p className="text-[12px] text-arcus-fg-muted mt-0.5">What Arcus handled each day, last 7 days</p>
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-boult-fg-tertiary">Actions per day</p>
+          <p className="text-[12px] text-boult-fg-muted mt-0.5">What Boult handled each day, last 7 days</p>
         </div>
         <button
           onClick={onRefresh}
           aria-label="Refresh this week's activity"
-          className="w-8 h-8 rounded-lg flex items-center justify-center text-arcus-fg-tertiary hover:text-arcus-fg hover:bg-arcus-elevated transition-colors shrink-0"
+          className="w-8 h-8 rounded-lg flex items-center justify-center text-boult-fg-tertiary hover:text-boult-fg hover:bg-boult-elevated transition-colors shrink-0"
         >
           <RefreshCw className={cn('w-3.5 h-3.5', refreshing && 'animate-spin')} />
         </button>
@@ -1253,20 +1253,20 @@ function WeekAreaChart({ week, onRefresh, refreshing }: { week: WeekData; onRefr
       <div className="relative h-[190px] mt-2">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={week.days} margin={{ top: 14, right: 8, bottom: 0, left: 8 }}>
-            {stippleDefs(id, 'var(--arcus-chart-blue)')}
+            {stippleDefs(id, 'var(--boult-chart-blue)')}
             <XAxis
               dataKey="label" tickLine={false} axisLine={false}
-              tick={{ fontSize: 11, fill: 'var(--arcus-fg-muted, #9a9a9a)' }} dy={6}
+              tick={{ fontSize: 11, fill: 'var(--boult-fg-muted, #9a9a9a)' }} dy={6}
             />
             <RTooltip
-              cursor={{ stroke: 'var(--arcus-border, #d4d4d4)', strokeWidth: 1 } as any}
+              cursor={{ stroke: 'var(--boult-border, #d4d4d4)', strokeWidth: 1 } as any}
               content={({ active, payload }) => {
                 if (!active || !payload?.length) return null;
                 const d = payload[0].payload as WeekDay;
                 return (
-                  <div className="arcus-glass-card rounded-lg px-2.5 py-1.5">
-                    <div className="text-[11px] font-semibold text-arcus-fg">{d.label}{d.isToday ? ' · so far' : ''}</div>
-                    <div className="text-[11px] text-arcus-fg-tertiary">{d.actions} action{d.actions === 1 ? '' : 's'} · {d.runs} run{d.runs === 1 ? '' : 's'}</div>
+                  <div className="boult-glass-card rounded-lg px-2.5 py-1.5">
+                    <div className="text-[11px] font-semibold text-boult-fg">{d.label}{d.isToday ? ' · so far' : ''}</div>
+                    <div className="text-[11px] text-boult-fg-tertiary">{d.actions} action{d.actions === 1 ? '' : 's'} · {d.runs} run{d.runs === 1 ? '' : 's'}</div>
                   </div>
                 );
               }}
@@ -1274,7 +1274,7 @@ function WeekAreaChart({ week, onRefresh, refreshing }: { week: WeekData; onRefr
             <Area type="monotone" dataKey="actions" stroke="none" fill={`url(#${id}-wash)`} />
             <Area type="monotone" dataKey="actions" stroke="none" fill={`url(#${id}-dots)`} />
             <Area
-              type="monotone" dataKey="actions" stroke="var(--arcus-chart-blue)" strokeWidth={2} fill="none"
+              type="monotone" dataKey="actions" stroke="var(--boult-chart-blue)" strokeWidth={2} fill="none"
               // Selective emphasis — the busiest day gets a larger ringed dot so
               // the eye lands on it; every other point is a quiet 2.5px dot. The
               // number itself lives in the "busiest" pill above, so we don't
@@ -1286,13 +1286,13 @@ function WeekAreaChart({ week, onRefresh, refreshing }: { week: WeekData; onRefr
                     key={`d-${props?.payload?.date ?? props?.index}`}
                     cx={props.cx} cy={props.cy}
                     r={isPeak ? 4.5 : 2.5}
-                    fill="var(--arcus-chart-blue)"
-                    stroke={isPeak ? 'var(--arcus-surface)' : 'none'}
+                    fill="var(--boult-chart-blue)"
+                    stroke={isPeak ? 'var(--boult-surface)' : 'none'}
                     strokeWidth={isPeak ? 2 : 0}
                   />
                 );
               }}
-              activeDot={{ r: 5, stroke: 'var(--arcus-surface)', strokeWidth: 2 }}
+              activeDot={{ r: 5, stroke: 'var(--boult-surface)', strokeWidth: 2 }}
             />
           </AreaChart>
         </ResponsiveContainer>
@@ -1310,11 +1310,11 @@ function WeekAreaChart({ week, onRefresh, refreshing }: { week: WeekData; onRefr
 // (part-to-whole, ≤5 clearly-separated segments with a legend) rather than the
 // bar-length comparison used elsewhere on this page.
 const APP_CHART_META = {
-  gmail:    { label: 'Gmail',    Icon: Mail,         varName: '--arcus-chart-blue' },
-  calendar: { label: 'Calendar', Icon: Calendar,     varName: '--arcus-chart-green' },
-  notion:   { label: 'Notion',   Icon: FileText,     varName: '--arcus-chart-magenta' },
-  slack:    { label: 'Slack',    Icon: Hash,         varName: '--arcus-chart-yellow' },
-  calcom:   { label: 'Cal.com',  Icon: CalendarPlus, varName: '--arcus-chart-aqua' },
+  gmail:    { label: 'Gmail',    Icon: Mail,         varName: '--boult-chart-blue' },
+  calendar: { label: 'Calendar', Icon: Calendar,     varName: '--boult-chart-green' },
+  notion:   { label: 'Notion',   Icon: FileText,     varName: '--boult-chart-magenta' },
+  slack:    { label: 'Slack',    Icon: Hash,         varName: '--boult-chart-yellow' },
+  calcom:   { label: 'Cal.com',  Icon: CalendarPlus, varName: '--boult-chart-aqua' },
 } as const;
 
 function AppsDonut({ counts }: { counts: AppCounts | null }) {
@@ -1330,12 +1330,12 @@ function AppsDonut({ counts }: { counts: AppCounts | null }) {
   const total = rows.reduce((n, r) => n + r.value, 0);
 
   return (
-    <div className="arcus-glass-card rounded-2xl p-5 relative overflow-hidden">
+    <div className="boult-glass-card rounded-2xl p-5 relative overflow-hidden">
       <GlassTexture />
-      <p className="relative text-[11px] font-semibold uppercase tracking-wide text-arcus-fg-tertiary mb-2.5">Across your apps</p>
+      <p className="relative text-[11px] font-semibold uppercase tracking-wide text-boult-fg-tertiary mb-2.5">Across your apps</p>
       <div className="relative flex flex-wrap gap-x-3 gap-y-1.5 mb-3">
         {rows.map((r) => (
-          <span key={r.key} className="inline-flex items-center gap-1.5 text-[11.5px] text-arcus-fg-tertiary">
+          <span key={r.key} className="inline-flex items-center gap-1.5 text-[11.5px] text-boult-fg-tertiary">
             <span className="w-2 h-2 rounded-[2px] shrink-0" style={{ background: `var(${r.varName})` }} />
             {r.label}
           </span>
@@ -1347,7 +1347,7 @@ function AppsDonut({ counts }: { counts: AppCounts | null }) {
             <Pie
               data={rows} dataKey="value" nameKey="label"
               innerRadius="64%" outerRadius="100%" paddingAngle={2}
-              stroke="var(--arcus-surface)" strokeWidth={3}
+              stroke="var(--boult-surface)" strokeWidth={3}
             >
               {rows.map((r) => <Cell key={r.key} fill={`var(${r.varName})`} />)}
             </Pie>
@@ -1356,9 +1356,9 @@ function AppsDonut({ counts }: { counts: AppCounts | null }) {
                 if (!active || !payload?.length) return null;
                 const p = payload[0].payload as (typeof rows)[number];
                 return (
-                  <div className="arcus-glass-card rounded-lg px-2.5 py-1.5">
-                    <div className="text-[11px] font-semibold text-arcus-fg">{p.label}</div>
-                    <div className="text-[11px] text-arcus-fg-tertiary">{p.value} signal{p.value === 1 ? '' : 's'}</div>
+                  <div className="boult-glass-card rounded-lg px-2.5 py-1.5">
+                    <div className="text-[11px] font-semibold text-boult-fg">{p.label}</div>
+                    <div className="text-[11px] text-boult-fg-tertiary">{p.value} signal{p.value === 1 ? '' : 's'}</div>
                   </div>
                 );
               }}
@@ -1366,8 +1366,8 @@ function AppsDonut({ counts }: { counts: AppCounts | null }) {
           </PieChart>
         </ResponsiveContainer>
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-          <span className="text-[24px] font-semibold tracking-tight text-arcus-fg tabular-nums leading-none">{total}</span>
-          <span className="text-[10.5px] text-arcus-fg-tertiary mt-1">signals right now</span>
+          <span className="text-[24px] font-semibold tracking-tight text-boult-fg tabular-nums leading-none">{total}</span>
+          <span className="text-[10.5px] text-boult-fg-tertiary mt-1">signals right now</span>
         </div>
       </div>
     </div>
@@ -1385,28 +1385,28 @@ function WeekInsights({ week }: { week: WeekData }) {
   const maxActions = Math.max(...week.days.map((d) => d.actions), 1);
   const activeDays = week.days.filter((d) => d.runs > 0).length;
   const perRun = week.totalRuns > 0 ? week.totalActions / week.totalRuns : 0;
-  const blue = 'var(--arcus-chart-blue)';
+  const blue = 'var(--boult-chart-blue)';
   return (
-    <div className="arcus-glass-card rounded-2xl p-5 relative overflow-hidden">
+    <div className="boult-glass-card rounded-2xl p-5 relative overflow-hidden">
       <GlassTexture />
-      <p className="relative text-[11px] font-semibold uppercase tracking-wide text-arcus-fg-tertiary mb-4">This week, in short</p>
+      <p className="relative text-[11px] font-semibold uppercase tracking-wide text-boult-fg-tertiary mb-4">This week, in short</p>
       <div className="relative space-y-4">
         {/* Busiest day — with a share-of-peak bar */}
         <div>
           <div className="flex items-baseline justify-between mb-1.5">
-            <span className="text-[12.5px] text-arcus-fg-secondary">Busiest day</span>
-            <span className="text-[12.5px] font-semibold text-arcus-fg tabular-nums">
+            <span className="text-[12.5px] text-boult-fg-secondary">Busiest day</span>
+            <span className="text-[12.5px] font-semibold text-boult-fg tabular-nums">
               {busiest.label} · {busiest.actions} action{busiest.actions === 1 ? '' : 's'}
             </span>
           </div>
-          <div className="h-1.5 rounded-full bg-arcus-elevated overflow-hidden">
+          <div className="h-1.5 rounded-full bg-boult-elevated overflow-hidden">
             <div className="h-full rounded-full transition-[width] duration-500 ease-out" style={{ width: `${(busiest.actions / maxActions) * 100}%`, background: blue }} />
           </div>
         </div>
 
         {/* Active days — 7 dots, one lit per day with a run */}
         <div className="flex items-center justify-between">
-          <span className="text-[12.5px] text-arcus-fg-secondary">Active days</span>
+          <span className="text-[12.5px] text-boult-fg-secondary">Active days</span>
           <div className="flex items-center gap-2.5">
             <div className="flex items-center gap-1">
               {week.days.map((d) => (
@@ -1414,18 +1414,18 @@ function WeekInsights({ week }: { week: WeekData }) {
                   key={d.date}
                   title={`${d.label}: ${d.runs} run${d.runs === 1 ? '' : 's'}`}
                   className="w-1.5 h-1.5 rounded-full"
-                  style={{ background: d.runs > 0 ? blue : 'var(--arcus-fg-muted)', opacity: d.runs > 0 ? 1 : 0.3 }}
+                  style={{ background: d.runs > 0 ? blue : 'var(--boult-fg-muted)', opacity: d.runs > 0 ? 1 : 0.3 }}
                 />
               ))}
             </div>
-            <span className="text-[12.5px] font-semibold text-arcus-fg tabular-nums">{activeDays}/7</span>
+            <span className="text-[12.5px] font-semibold text-boult-fg tabular-nums">{activeDays}/7</span>
           </div>
         </div>
 
         {/* Efficiency — actions per run */}
         <div className="flex items-center justify-between">
-          <span className="text-[12.5px] text-arcus-fg-secondary">Actions per run</span>
-          <span className="text-[12.5px] font-semibold text-arcus-fg tabular-nums">
+          <span className="text-[12.5px] text-boult-fg-secondary">Actions per run</span>
+          <span className="text-[12.5px] font-semibold text-boult-fg tabular-nums">
             {perRun > 0 ? `~${perRun.toFixed(1)}` : '—'}
           </span>
         </div>
@@ -1438,7 +1438,7 @@ function WeekInsights({ week }: { week: WeekData }) {
 // blank flash. Used both for first-load (nothing fetched yet) and to fill the
 // donut's slot while recommendations are still in flight. Frosted to match.
 function AnalyticsTileSkeleton({ h }: { h: string }) {
-  return <div className={cn('arcus-glass-pill rounded-2xl animate-pulse', h)} />;
+  return <div className={cn('boult-glass-pill rounded-2xl animate-pulse', h)} />;
 }
 
 // ── Orchestrates the whole analytics dashboard: a real loading skeleton while
@@ -1470,16 +1470,16 @@ function AnalyticsSection({ week, weekLoaded, appCounts, recsLoaded, recsError, 
 
   if (!week || !week.hasData) {
     return (
-      <Section title="Your week" sub="Arcus activity, last 7 days">
-        <div className="arcus-glass-card rounded-2xl p-8 text-center relative overflow-hidden">
+      <Section title="Your week" sub="Boult activity, last 7 days">
+        <div className="boult-glass-card rounded-2xl p-8 text-center relative overflow-hidden">
           <GlassTexture />
           <div className="relative">
-            <div className="w-11 h-11 rounded-2xl bg-arcus-elevated flex items-center justify-center mx-auto mb-3 text-arcus-fg-tertiary">
+            <div className="w-11 h-11 rounded-2xl bg-boult-elevated flex items-center justify-center mx-auto mb-3 text-boult-fg-tertiary">
               <Zap className="w-5 h-5" />
             </div>
-            <p className="text-[14px] font-medium text-arcus-fg">No agent activity yet this week</p>
-            <p className="text-[12.5px] text-arcus-fg-tertiary mt-1 max-w-sm mx-auto">Schedule an agent and this fills in — a daily briefing, an inbox sweep, meeting prep.</p>
-            <button onClick={onSchedule} className="mt-4 inline-flex items-center gap-1.5 h-9 px-4 rounded-full bg-arcus-fg text-arcus-fg-inverse text-[12.5px] font-semibold hover:opacity-90 transition-opacity">
+            <p className="text-[14px] font-medium text-boult-fg">No agent activity yet this week</p>
+            <p className="text-[12.5px] text-boult-fg-tertiary mt-1 max-w-sm mx-auto">Schedule an agent and this fills in — a daily briefing, an inbox sweep, meeting prep.</p>
+            <button onClick={onSchedule} className="mt-4 inline-flex items-center gap-1.5 h-9 px-4 rounded-full bg-boult-fg text-boult-fg-inverse text-[12.5px] font-semibold hover:opacity-90 transition-opacity">
               <CalendarPlus className="w-4 h-4" /> Schedule an agent
             </button>
           </div>
@@ -1504,10 +1504,10 @@ function AnalyticsSection({ week, weekLoaded, appCounts, recsLoaded, recsError, 
       <div className={cn('transition-opacity duration-300', refreshing && 'opacity-50 pointer-events-none animate-pulse')}>
         {/* Textured glass KPI pills — the scalar headlines, once each. */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 mb-2.5">
-          <StatPill icon={<Zap className="w-4 h-4" />} value={week.totalActions.toLocaleString()} label="actions this week" accent="--arcus-chart-blue" />
-          <StatPill icon={<Sparkles className="w-4 h-4" />} value={String(week.totalRuns)} label={`agent run${week.totalRuns === 1 ? '' : 's'}`} accent="--arcus-chart-aqua" />
+          <StatPill icon={<Zap className="w-4 h-4" />} value={week.totalActions.toLocaleString()} label="actions this week" accent="--boult-chart-blue" />
+          <StatPill icon={<Sparkles className="w-4 h-4" />} value={String(week.totalRuns)} label={`agent run${week.totalRuns === 1 ? '' : 's'}`} accent="--boult-chart-aqua" />
           <StatPill icon={<Clock className="w-4 h-4" />} value={String(avg)} label="daily average" />
-          <StatPill icon={<Calendar className="w-4 h-4" />} value={String(busiestDay.actions)} label={`busiest · ${busiestDay.label}`} accent="--arcus-chart-blue" />
+          <StatPill icon={<Calendar className="w-4 h-4" />} value={String(busiestDay.actions)} label={`busiest · ${busiestDay.label}`} accent="--boult-chart-blue" />
         </div>
         <WeekAreaChart week={week} onRefresh={onRefresh} refreshing={refreshing} />
         <div className={cn('grid gap-2.5 mt-2.5', showDonutSlot && 'lg:grid-cols-2')}>
@@ -1522,9 +1522,9 @@ function AnalyticsSection({ week, weekLoaded, appCounts, recsLoaded, recsError, 
 }
 
 // ── "Handled quietly" — the demoted home for everything that reports what
-// MAILIENT did (was two headline sections: "Your week" analytics + "While you
+// MAILY did (was two headline sections: "Your week" analytics + "While you
 // were away"). FRAME FLIP (founder feedback: the feed showed "tasks completed
-// by Mailient rather than those performed by the user"): this collapses both
+// by Maily rather than those performed by the user"): this collapses both
 // into ONE quiet reassurance line at the very bottom of the feed. Nothing is
 // deleted — AnalyticsSection (the glass KPI pills / chart / cross-app donut /
 // insights) and the agent-run list are exactly what shipped before, just
@@ -1549,17 +1549,17 @@ function HandledQuietlyStrip({
     : `${agentRuns.length} recent run${agentRuns.length === 1 ? '' : 's'}`;
 
   return (
-    <div className="pt-1 border-t border-arcus-border/60">
+    <div className="pt-1 border-t border-boult-border/60">
       <button
         onClick={() => setExpanded((v) => !v)}
         aria-expanded={expanded}
         className="w-full flex items-center justify-between gap-2 py-3 text-left group"
       >
-        <span className="inline-flex items-center gap-2 text-[12.5px] text-arcus-fg-tertiary group-hover:text-arcus-fg-secondary transition-colors">
+        <span className="inline-flex items-center gap-2 text-[12.5px] text-boult-fg-tertiary group-hover:text-boult-fg-secondary transition-colors">
           <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500/70 shrink-0" />
           Handled quietly · {summary}
         </span>
-        <ChevronRight className={cn('w-3.5 h-3.5 text-arcus-fg-tertiary shrink-0 transition-transform duration-200', expanded && 'rotate-90')} />
+        <ChevronRight className={cn('w-3.5 h-3.5 text-boult-fg-tertiary shrink-0 transition-transform duration-200', expanded && 'rotate-90')} />
       </button>
       <AnimatePresence initial={false}>
         {expanded && (
@@ -1579,7 +1579,7 @@ function HandledQuietlyStrip({
               )}
               {agentRuns.length > 0 && (
                 <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-wide text-arcus-fg-tertiary mb-2">While you were away</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-boult-fg-tertiary mb-2">While you were away</p>
                   <div className="space-y-2">
                     {agentRuns.slice(0, 4).map((r) => <AgentRunRow key={r.id} run={r} />)}
                   </div>
@@ -1598,16 +1598,16 @@ function CommandCenterSkeleton() {
   return (
     <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 py-6 space-y-8 animate-pulse">
       <div className="space-y-3">
-        <div className="h-4 w-32 bg-arcus-surface rounded" />
-        <div className="h-8 w-64 bg-arcus-surface rounded" />
-        <div className="h-4 w-96 max-w-full bg-arcus-surface rounded" />
+        <div className="h-4 w-32 bg-boult-surface rounded" />
+        <div className="h-8 w-64 bg-boult-surface rounded" />
+        <div className="h-4 w-96 max-w-full bg-boult-surface rounded" />
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-2">
-          {[0, 1, 2, 3].map(i => <div key={i} className="h-24 bg-arcus-surface rounded-2xl" />)}
+          {[0, 1, 2, 3].map(i => <div key={i} className="h-24 bg-boult-surface rounded-2xl" />)}
         </div>
       </div>
-      <div className="h-40 bg-arcus-surface rounded-2xl" />
+      <div className="h-40 bg-boult-surface rounded-2xl" />
       <div className="grid sm:grid-cols-2 gap-2.5">
-        {[0, 1, 2, 3].map(i => <div key={i} className="h-28 bg-arcus-surface rounded-2xl" />)}
+        {[0, 1, 2, 3].map(i => <div key={i} className="h-28 bg-boult-surface rounded-2xl" />)}
       </div>
     </div>
   );

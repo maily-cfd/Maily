@@ -32,7 +32,7 @@ export async function GET(request) {
     let refreshToken = session.refreshToken || '';
 
     // Resolve the Gmail access token through the UNIFIED, hardened resolver
-    // (lib/arcus/tools/http-tokens.getGmailToken): it checks arcus_integrations →
+    // (lib/boult/tools/http-tokens.getGmailToken): it checks boult_integrations →
     // integration_credentials → user_tokens, proactively refreshes an expiring
     // token, and survives duplicate token rows. This is the SAME source of truth
     // the connectors / Settings UI uses — so "Gmail connected in Settings" and
@@ -42,7 +42,7 @@ export async function GET(request) {
     // "Failed to load Inbox" while Settings showed connected.
     let accessToken = null;
     try {
-      const { getGmailToken } = await import('@/lib/arcus/tools/http-tokens');
+      const { getGmailToken } = await import('@/lib/boult/tools/http-tokens');
       accessToken = await getGmailToken(userEmail);
     } catch (e) {
       logEvent({ channel: "failures", event: "❌ API Error", description: String(e) });
@@ -149,7 +149,7 @@ export async function GET(request) {
         const session2 = await auth();
         const uid = session2?.user?.email?.toLowerCase();
         if (uid) {
-          const { markIntegrationNeedsReauth } = await import('@/lib/arcus/tools/http-tokens');
+          const { markIntegrationNeedsReauth } = await import('@/lib/boult/tools/http-tokens');
           await markIntegrationNeedsReauth(uid, 'gmail');
         }
       } catch {

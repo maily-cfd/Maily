@@ -1,5 +1,5 @@
 /**
- * Arcus V3 — Slack OAuth Callback
+ * Boult V3 — Slack OAuth Callback
  * 
  * Handles the redirect from Slack after consent.
  * Exchanges the code for a bot access token via oauth.v2.access,
@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
     const error = searchParams.get('error');
 
     if (error) {
-      console.error('[Arcus V3] Slack OAuth error:', error);
+      console.error('[Boult V3] Slack OAuth error:', error);
       return NextResponse.redirect(new URL('/dashboard/agent-talk?error=slack_denied', request.url));
     }
 
@@ -41,15 +41,15 @@ export async function GET(request: NextRequest) {
     }
 
     // 3. Validate CSRF state
-    const storedState = request.cookies.get('arcus_slack_state')?.value;
+    const storedState = request.cookies.get('boult_slack_state')?.value;
     if (!state || !storedState || state !== storedState) {
-      console.error('[Arcus V3] Slack OAuth state mismatch');
+      console.error('[Boult V3] Slack OAuth state mismatch');
       return NextResponse.redirect(new URL('/dashboard/agent-talk?error=csrf', request.url));
     }
 
     // 4. Exchange code for token via Slack's oauth.v2.access
     const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
-    const redirectUri = `${baseUrl}/api/arcus/v3/oauth/slack/callback`;
+    const redirectUri = `${baseUrl}/api/boult/v3/oauth/slack/callback`;
 
     const tokenResponse = await fetch('https://slack.com/api/oauth.v2.access', {
       method: 'POST',
@@ -64,14 +64,14 @@ export async function GET(request: NextRequest) {
 
     if (!tokenResponse.ok) {
       const errorText = await tokenResponse.text();
-      console.error('[Arcus V3] Slack token exchange HTTP error:', errorText);
+      console.error('[Boult V3] Slack token exchange HTTP error:', errorText);
       return NextResponse.redirect(new URL('/dashboard/agent-talk?error=token_exchange', request.url));
     }
 
     const tokenData = await tokenResponse.json();
 
     if (!tokenData.ok) {
-      console.error('[Arcus V3] Slack token exchange API error:', tokenData.error);
+      console.error('[Boult V3] Slack token exchange API error:', tokenData.error);
       return NextResponse.redirect(new URL('/dashboard/agent-talk?error=slack_api', request.url));
     }
 
@@ -89,7 +89,7 @@ export async function GET(request: NextRequest) {
     // 5. Store encrypted token
     const supabase = getSupabaseAdmin();
     const { error: dbError } = await supabase
-      .from('arcus_integrations')
+      .from('boult_integrations')
       .upsert({
         user_id: userId,
         provider: 'slack',
@@ -105,12 +105,12 @@ export async function GET(request: NextRequest) {
       }, { onConflict: 'user_id,provider' });
 
     if (dbError) {
-      console.error('[Arcus V3] DB store error:', dbError.message);
+      console.error('[Boult V3] DB store error:', dbError.message);
       return NextResponse.redirect(new URL('/dashboard/agent-talk?error=db_store', request.url));
     }
 
     // 6. Audit log
-    await auditLogger.log(userId, 'arcus.slack_connected', {
+    await auditLogger.log(userId, 'boult.slack_connected', {
       teamId,
       teamName,
       botUserId,
@@ -121,12 +121,12 @@ export async function GET(request: NextRequest) {
     successUrl.searchParams.set('success', 'connected');
     successUrl.searchParams.set('provider', 'slack');
     const response = NextResponse.redirect(successUrl);
-    response.cookies.delete('arcus_slack_state');
+    response.cookies.delete('boult_slack_state');
     return response;
 
   } catch (error) {
     logEvent({ channel: "failures", event: "❌ API Error", description: String(error) });
-    console.error('[Arcus V3] Slack callback error:', (error as Error).message);
+    console.error('[Boult V3] Slack callback error:', (error as Error).message);
     return NextResponse.redirect(new URL('/dashboard/agent-talk?error=callback', request.url));
   }
 }

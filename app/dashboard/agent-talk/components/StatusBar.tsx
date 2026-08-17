@@ -1,9 +1,9 @@
 'use client';
 
 /**
- * StatusBar — Arcus top-level metrics bar
+ * StatusBar — Boult top-level metrics bar
  * Shows emails triaged today, drafts waiting, meetings booked, agents running
- * Persistent across the Arcus workspace
+ * Persistent across the Boult workspace
  */
 
 import React from 'react';

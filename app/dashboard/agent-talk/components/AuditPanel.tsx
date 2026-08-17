@@ -61,7 +61,7 @@ export function AuditPanel({ open, onClose }: Props) {
   const fetch = async () => {
     setLoading(true);
     try {
-      const res = await window.fetch('/api/arcus/audit');
+      const res = await window.fetch('/api/boult/audit');
       if (res.ok) {
         const data = await res.json();
         setEntries(data.entries ?? []);
@@ -122,7 +122,7 @@ export function AuditPanel({ open, onClose }: Props) {
               ) : entries.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-40 gap-2 text-center px-6">
                   <Shield className="w-8 h-8 text-white/10" />
-                  <p className="text-[12px] text-white/25">No tool calls logged yet. Run Arcus to see what actions it takes.</p>
+                  <p className="text-[12px] text-white/25">No tool calls logged yet. Run Boult to see what actions it takes.</p>
                 </div>
               ) : (
                 <div className="p-4 space-y-3">

@@ -16,7 +16,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'mailient.xyz',
+        hostname: 'maily.dev',
       },
       {
         protocol: 'https',

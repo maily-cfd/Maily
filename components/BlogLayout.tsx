@@ -51,20 +51,20 @@ export function BlogLayout({ meta, children, tableOfContents = [], relatedPosts 
     headline: meta.title,
     description: meta.description,
     datePublished: new Date(meta.date).toISOString(),
-    url: `https://mailient.xyz/blogs/${meta.slug}`,
-    mainEntityOfPage: `https://mailient.xyz/blogs/${meta.slug}`,
-    author: { "@type": "Person", name: meta.author || "Maulik", url: "https://x.com/maulik_5" },
+    url: `https://maily.dev/blogs/${meta.slug}`,
+    mainEntityOfPage: `https://maily.dev/blogs/${meta.slug}`,
+    author: { "@type": "Organization", name: "Maily", url: "https://x.com/Mailycfd" },
     publisher: {
       "@type": "Organization",
-      name: "Mailient",
-      url: "https://mailient.xyz",
-      logo: { "@type": "ImageObject", url: "https://mailient.xyz/mailient-logo-v3.png" },
+      name: "Maily",
+      url: "https://maily.dev",
+      logo: { "@type": "ImageObject", url: "https://maily.dev/logo-maily.png" },
     },
   };
 
   useEffect(() => {
     setMounted(true);
-    document.title = `${meta.title} // Mailient Blog`;
+    document.title = `${meta.title} // Maily Blog`;
   }, [meta.title]);
 
   const isDark = mounted && (resolvedTheme === "dark" || theme === "dark");
@@ -187,7 +187,7 @@ export function BlogLayout({ meta, children, tableOfContents = [], relatedPosts 
               {meta.readTime}
             </span>
             <span className="w-1 h-1 rounded-full bg-neutral-700" />
-            <span>{meta.author || "Maulik"}</span>
+            <span>{meta.author || "Maily"}</span>
           </div>
         </BlurFade>
 
@@ -275,7 +275,7 @@ export function BlogLayout({ meta, children, tableOfContents = [], relatedPosts 
             Ready to reclaim your inbox?
           </h3>
           <p className="text-sm text-neutral-600 dark:text-neutral-400 font-light max-w-md mx-auto relative z-10">
-            Mailient handles your email while you sleep. Autonomous triage, voice-matched drafts, and encrypted privacy — all on autopilot.
+            Maily handles your email while you sleep. Autonomous triage, voice-matched drafts, and encrypted privacy — all on autopilot.
           </p>
           <a
             href="/auth/signup"

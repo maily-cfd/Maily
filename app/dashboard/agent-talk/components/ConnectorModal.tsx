@@ -22,7 +22,7 @@ import {
   CONNECTOR_STATUS,
   getAllConnectors,
   getConnectedConnectors
-} from '@/lib/arcus-connector-registry';
+} from '@/lib/boult-connector-registry';
 import { ConnectorDetailModal } from './ConnectorDetailModal';
 
 interface Connector {
@@ -183,33 +183,33 @@ export function ConnectorModal({
 
             {/* Modal */}
             <motion.div
-              className="fixed inset-4 md:inset-y-10 md:inset-x-8 lg:inset-y-16 lg:inset-x-48 bg-arcus-bg-elevated rounded-[2rem] z-50 
-                         flex flex-col overflow-hidden shadow-[0_32px_128px_-16px_rgba(0,0,0,0.8)] border border-arcus-border"
+              className="fixed inset-4 md:inset-y-10 md:inset-x-8 lg:inset-y-16 lg:inset-x-48 bg-boult-bg-elevated rounded-[2rem] z-50 
+                         flex flex-col overflow-hidden shadow-[0_32px_128px_-16px_rgba(0,0,0,0.8)] border border-boult-border"
             >
               {/* Header */}
-              <div className="flex items-center justify-between p-8 pb-6 border-b border-arcus-border">
+              <div className="flex items-center justify-between p-8 pb-6 border-b border-boult-border">
                 <div>
-                  <h2 className="text-2xl font-semibold text-arcus-fg">Connectors</h2>
-                  <p className="text-arcus-fg-secondary text-sm mt-1">
+                  <h2 className="text-2xl font-semibold text-boult-fg">Connectors</h2>
+                  <p className="text-boult-fg-secondary text-sm mt-1">
                     Connect your tools to enable AI-powered workflows
                   </p>
                 </div>
                 <button
                   onClick={onClose}
-                  className="p-2 hover:bg-arcus-surface rounded-lg transition-colors"
+                  className="p-2 hover:bg-boult-surface rounded-lg transition-colors"
                 >
-                  <X className="w-5 h-5 text-arcus-fg-muted" />
+                  <X className="w-5 h-5 text-boult-fg-muted" />
                 </button>
               </div>
 
               {/* Tabs */}
-              <div className="flex items-center gap-1 p-2 px-8 border-b border-arcus-border">
+              <div className="flex items-center gap-1 p-2 px-8 border-b border-boult-border">
                 <button
                   onClick={() => setActiveTab('apps')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     activeTab === 'apps'
-                      ? 'bg-arcus-surface text-arcus-fg'
-                      : 'text-arcus-fg-secondary hover:text-arcus-fg hover:bg-arcus-surface'
+                      ? 'bg-boult-surface text-boult-fg'
+                      : 'text-boult-fg-secondary hover:text-boult-fg hover:bg-boult-surface'
                   }`}
                 >
                   Apps
@@ -218,8 +218,8 @@ export function ConnectorModal({
                   onClick={() => setActiveTab('connected')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
                     activeTab === 'connected'
-                      ? 'bg-arcus-surface text-arcus-fg'
-                      : 'text-arcus-fg-secondary hover:text-arcus-fg hover:bg-arcus-surface'
+                      ? 'bg-boult-surface text-boult-fg'
+                      : 'text-boult-fg-secondary hover:text-boult-fg hover:bg-boult-surface'
                   }`}
                 >
                   Connected
@@ -236,13 +236,13 @@ export function ConnectorModal({
                 {activeTab === 'apps' ? (
                   <>
                     {/* Sidebar - Categories */}
-                    <div className="w-72 border-r border-arcus-border p-6 overflow-y-auto hidden md:block bg-arcus-bg-elevated/40">
+                    <div className="w-72 border-r border-boult-border p-6 overflow-y-auto hidden md:block bg-boult-bg-elevated/40">
                       <button
                         onClick={() => setSelectedCategory(null)}
                         className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors mb-1 ${
                           !selectedCategory
-                            ? 'bg-arcus-fg text-arcus-fg-inverse font-bold shadow-lg'
-                            : 'text-arcus-fg-secondary hover:text-arcus-fg hover:bg-arcus-surface'
+                            ? 'bg-boult-fg text-boult-fg-inverse font-bold shadow-lg'
+                            : 'text-boult-fg-secondary hover:text-boult-fg hover:bg-boult-surface'
                         }`}
                       >
                         All Apps
@@ -256,12 +256,12 @@ export function ConnectorModal({
                             onClick={() => setSelectedCategory(key)}
                             className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors mb-1 flex items-center justify-between ${
                               selectedCategory === key
-                                ? 'bg-arcus-fg text-arcus-fg-inverse font-bold shadow-lg'
-                                : 'text-arcus-fg-secondary hover:text-arcus-fg hover:bg-arcus-surface'
+                                ? 'bg-boult-fg text-boult-fg-inverse font-bold shadow-lg'
+                                : 'text-boult-fg-secondary hover:text-boult-fg hover:bg-boult-surface'
                             }`}
                           >
                             <span>{label}</span>
-                            <span className="text-xs text-arcus-fg-muted">{count}</span>
+                            <span className="text-xs text-boult-fg-muted">{count}</span>
                           </button>
                         );
                       })}
@@ -270,20 +270,20 @@ export function ConnectorModal({
                     {/* Main Content */}
                     <div className="flex-1 relative overflow-hidden">
                       {/* Fade Overlays */}
-                      <div className="absolute top-0 left-0 right-0 h-12 bg-gradient-to-b from-arcus-bg-elevated to-transparent z-10 pointer-events-none" />
-                      <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-arcus-bg-elevated to-transparent z-10 pointer-events-none" />
+                      <div className="absolute top-0 left-0 right-0 h-12 bg-gradient-to-b from-boult-bg-elevated to-transparent z-10 pointer-events-none" />
+                      <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-boult-bg-elevated to-transparent z-10 pointer-events-none" />
                       
                       <div className="h-full overflow-y-auto p-10 py-12 custom-scrollbar">
                       {/* Search */}
                       <div className="relative mb-6">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-arcus-fg-muted" />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-boult-fg-muted" />
                         <input
                           type="text"
                           placeholder="Search connectors..."
                           value={searchQuery}
                           onChange={(e) => setSearchQuery(e.target.value)}
-                          className="w-full bg-arcus-surface border border-arcus-border rounded-2xl pl-12 pr-4 py-4 
-                                     text-arcus-fg placeholder-arcus-fg-muted focus:outline-none focus:border-arcus-fg-tertiary
+                          className="w-full bg-boult-surface border border-boult-border rounded-2xl pl-12 pr-4 py-4 
+                                     text-boult-fg placeholder-boult-fg-muted focus:outline-none focus:border-boult-fg-tertiary
                                      transition-all"
                         />
                       </div>
@@ -291,7 +291,7 @@ export function ConnectorModal({
                       {/* Connectors Grid - Clickable cards */}
                       {Object.entries(connectorsByCategory).map(([category, connectors]) => (
                         <div key={category} className="mb-8">
-                          <h3 className="text-sm font-medium text-arcus-fg-secondary uppercase tracking-wider mb-4">
+                          <h3 className="text-sm font-medium text-boult-fg-secondary uppercase tracking-wider mb-4">
                             {categoryLabels[category] || category}
                           </h3>
                           
@@ -304,11 +304,11 @@ export function ConnectorModal({
                                   key={connector.id}
                                   onClick={() => handleConnectorClick(connector)}
                                   whileHover={{ scale: 1.01 }}
-                                  className={`bg-arcus-surface/40 border rounded-[1.5rem] p-6 flex items-center gap-6 
+                                  className={`bg-boult-surface/40 border rounded-[1.5rem] p-6 flex items-center gap-6 
                                              transition-all text-left w-full group ${
                                     connected
                                       ? 'border-emerald-500/30 bg-emerald-500/5'
-                                      : 'border-arcus-border hover:border-arcus-divider hover:bg-arcus-surface/80'
+                                      : 'border-boult-border hover:border-boult-divider hover:bg-boult-surface/80'
                                   }`}
                                 >
                                   {/* Icon */}
@@ -329,20 +329,20 @@ export function ConnectorModal({
                                   {/* Info */}
                                   <div className="flex-1 min-w-0">
                                     <div className="flex items-center gap-2">
-                                      <h4 className="text-lg font-bold text-arcus-fg truncate">
+                                      <h4 className="text-lg font-bold text-boult-fg truncate">
                                         {connector.name}
                                       </h4>
                                       {connected && (
                                         <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
                                       )}
                                     </div>
-                                    <p className="text-arcus-fg-secondary text-sm mt-1 line-clamp-2 leading-relaxed">
+                                    <p className="text-boult-fg-secondary text-sm mt-1 line-clamp-2 leading-relaxed">
                                       {connector.description}
                                     </p>
                                   </div>
 
                                   {/* Arrow */}
-                                  <ChevronRight className="w-5 h-5 text-arcus-fg-muted flex-shrink-0" />
+                                  <ChevronRight className="w-5 h-5 text-boult-fg-muted flex-shrink-0" />
                                 </motion.button>
                               );
                             })}
@@ -353,13 +353,13 @@ export function ConnectorModal({
                       {/* Empty State */}
                       {filteredConnectors.length === 0 && (
                         <div className="text-center py-12">
-                          <div className="w-16 h-16 bg-arcus-surface rounded-2xl flex items-center justify-center mx-auto mb-4">
-                            <Search className="w-8 h-8 text-arcus-fg-muted" />
+                          <div className="w-16 h-16 bg-boult-surface rounded-2xl flex items-center justify-center mx-auto mb-4">
+                            <Search className="w-8 h-8 text-boult-fg-muted" />
                           </div>
-                          <h3 className="text-lg font-medium text-arcus-fg mb-2">
+                          <h3 className="text-lg font-medium text-boult-fg mb-2">
                             No connectors found
                           </h3>
-                          <p className="text-arcus-fg-muted">
+                          <p className="text-boult-fg-muted">
                             Try adjusting your search or category filter
                           </p>
                         </div>
@@ -371,8 +371,8 @@ export function ConnectorModal({
                   // Connected Tab
                   <div className="flex-1 relative overflow-hidden">
                     {/* Fade Overlays */}
-                    <div className="absolute top-0 left-0 right-0 h-12 bg-gradient-to-b from-arcus-bg-elevated to-transparent z-10 pointer-events-none" />
-                    <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-arcus-bg-elevated to-transparent z-10 pointer-events-none" />
+                    <div className="absolute top-0 left-0 right-0 h-12 bg-gradient-to-b from-boult-bg-elevated to-transparent z-10 pointer-events-none" />
+                    <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-boult-bg-elevated to-transparent z-10 pointer-events-none" />
                     
                     <div className="h-full overflow-y-auto p-10 py-12 custom-scrollbar">
                     {connectedWithInfo.length > 0 ? (
@@ -386,8 +386,8 @@ export function ConnectorModal({
                             }}
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="w-full bg-arcus-surface/40 border border-emerald-500/30 rounded-[1.5rem] p-6 
-                                       flex items-center gap-6 text-left hover:bg-arcus-surface transition-all group"
+                            className="w-full bg-boult-surface/40 border border-emerald-500/30 rounded-[1.5rem] p-6 
+                                       flex items-center gap-6 text-left hover:bg-boult-surface transition-all group"
                           >
                             <div
                               className="w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm transition-transform group-hover:scale-110"
@@ -402,37 +402,37 @@ export function ConnectorModal({
                             
                             <div className="flex-1">
                               <div className="flex items-center gap-2">
-                                <h4 className="text-lg font-bold text-arcus-fg">
+                                <h4 className="text-lg font-bold text-boult-fg">
                                   {connection.name}
                                 </h4>
                                 <CheckCircle2 className="w-5 h-5 text-emerald-500" />
                               </div>
                               {connection.email && (
-                                <p className="text-arcus-fg-secondary text-sm mt-1">{connection.email}</p>
+                                <p className="text-boult-fg-secondary text-sm mt-1">{connection.email}</p>
                               )}
                               <p className="text-emerald-500/60 text-xs mt-1 font-medium">
                                 Connected {new Date(connection.connectedAt || '').toLocaleDateString()}
                               </p>
                             </div>
                             
-                            <ChevronRight className="w-5 h-5 text-arcus-fg-muted" />
+                            <ChevronRight className="w-5 h-5 text-boult-fg-muted" />
                           </motion.button>
                         ))}
                       </div>
                     ) : (
                       <div className="text-center py-12">
-                        <div className="w-16 h-16 bg-arcus-surface rounded-2xl flex items-center justify-center mx-auto mb-4">
-                          <Link2 className="w-8 h-8 text-arcus-fg-muted" />
+                        <div className="w-16 h-16 bg-boult-surface rounded-2xl flex items-center justify-center mx-auto mb-4">
+                          <Link2 className="w-8 h-8 text-boult-fg-muted" />
                         </div>
-                        <h3 className="text-lg font-medium text-arcus-fg mb-2">
+                        <h3 className="text-lg font-medium text-boult-fg mb-2">
                           No connected accounts
                         </h3>
-                        <p className="text-arcus-fg-muted mb-6">
+                        <p className="text-boult-fg-muted mb-6">
                           Connect your tools to enable AI-powered workflows
                         </p>
                         <button
                           onClick={() => setActiveTab('apps')}
-                          className="px-6 py-3 bg-arcus-fg text-arcus-fg-inverse rounded-xl font-medium
+                          className="px-6 py-3 bg-boult-fg text-boult-fg-inverse rounded-xl font-medium
                                      hover:opacity-90 transition-colors"
                         >
                           Browse Connectors

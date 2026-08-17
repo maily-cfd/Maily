@@ -1,9 +1,9 @@
 /**
- * Arcus V3 — Google Calendar OAuth Callback
+ * Boult V3 — Google Calendar OAuth Callback
  * 
  * Handles the redirect from Google after the user consents.
  * Exchanges the authorization code for tokens, encrypts them,
- * stores in arcus_integrations, and registers a Watch API channel.
+ * stores in boult_integrations, and registers a Watch API channel.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
     const error = searchParams.get('error');
 
     if (error) {
-      console.error('[Arcus V3] GCal OAuth error:', error);
+      console.error('[Boult V3] GCal OAuth error:', error);
       return NextResponse.redirect(new URL('/dashboard/agent-talk?error=gcal_denied', request.url));
     }
 
@@ -42,15 +42,15 @@ export async function GET(request: NextRequest) {
     }
 
     // 3. Validate CSRF state
-    const storedState = request.cookies.get('arcus_gcal_state')?.value;
+    const storedState = request.cookies.get('boult_gcal_state')?.value;
     if (!state || !storedState || state !== storedState) {
-      console.error('[Arcus V3] GCal OAuth state mismatch');
+      console.error('[Boult V3] GCal OAuth state mismatch');
       return NextResponse.redirect(new URL('/dashboard/agent-talk?error=csrf', request.url));
     }
 
     // 4. Exchange code for tokens
     const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
-    const redirectUri = `${baseUrl}/api/arcus/v3/oauth/gcal/callback`;
+    const redirectUri = `${baseUrl}/api/boult/v3/oauth/gcal/callback`;
 
     const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
       method: 'POST',
@@ -66,7 +66,7 @@ export async function GET(request: NextRequest) {
 
     if (!tokenResponse.ok) {
       const errorText = await tokenResponse.text();
-      console.error('[Arcus V3] Token exchange failed:', errorText);
+      console.error('[Boult V3] Token exchange failed:', errorText);
       return NextResponse.redirect(new URL('/dashboard/agent-talk?error=token_exchange', request.url));
     }
 
@@ -80,7 +80,7 @@ export async function GET(request: NextRequest) {
     // 5. Register GCal Watch API channel for push notifications
     const channelId = crypto.randomUUID();
     const channelToken = crypto.randomBytes(32).toString('hex');
-    const webhookUrl = `${baseUrl}/api/arcus/v3/webhooks/gcal`;
+    const webhookUrl = `${baseUrl}/api/boult/v3/webhooks/gcal`;
 
     let channelExpiry: string | null = null;
     try {
@@ -110,25 +110,25 @@ export async function GET(request: NextRequest) {
         channelExpiry = watchData.expiration
           ? new Date(parseInt(watchData.expiration, 10)).toISOString()
           : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
-        console.log(`[Arcus V3] GCal Watch registered for ${userId}, expires: ${channelExpiry}`);
+        console.log(`[Boult V3] GCal Watch registered for ${userId}, expires: ${channelExpiry}`);
       } else {
         const watchError = await watchResponse.text();
-        console.warn('[Arcus V3] GCal Watch registration failed:', watchError);
+        console.warn('[Boult V3] GCal Watch registration failed:', watchError);
         // Continue — webhooks are optional, polling can be used as fallback
       }
     } catch (watchErr) {
       logEvent({ channel: "failures", event: "❌ API Error", description: String(watchErr) });
-      console.warn('[Arcus V3] GCal Watch error:', (watchErr as Error).message);
+      console.warn('[Boult V3] GCal Watch error:', (watchErr as Error).message);
     }
 
-    // 6. Store encrypted tokens in arcus_integrations
+    // 6. Store encrypted tokens in boult_integrations
     const supabase = getSupabaseAdmin();
     const expiresAt = expires_in
       ? new Date(Date.now() + expires_in * 1000).toISOString()
       : null;
 
     const { error: dbError } = await supabase
-      .from('arcus_integrations')
+      .from('boult_integrations')
       .upsert({
         user_id: userId,
         provider: 'gcal',
@@ -143,12 +143,12 @@ export async function GET(request: NextRequest) {
       }, { onConflict: 'user_id,provider' });
 
     if (dbError) {
-      console.error('[Arcus V3] DB store error:', dbError.message);
+      console.error('[Boult V3] DB store error:', dbError.message);
       return NextResponse.redirect(new URL('/dashboard/agent-talk?error=db_store', request.url));
     }
 
     // 7. Audit log
-    await auditLogger.log(userId, 'arcus.gcal_connected', {
+    await auditLogger.log(userId, 'boult.gcal_connected', {
       channelId,
       hasRefreshToken: !!refresh_token,
       watchRegistered: !!channelExpiry,
@@ -159,12 +159,12 @@ export async function GET(request: NextRequest) {
     successUrl.searchParams.set('success', 'connected');
     successUrl.searchParams.set('provider', 'google_calendar');
     const response = NextResponse.redirect(successUrl);
-    response.cookies.delete('arcus_gcal_state');
+    response.cookies.delete('boult_gcal_state');
     return response;
 
   } catch (error) {
     logEvent({ channel: "failures", event: "❌ API Error", description: String(error) });
-    console.error('[Arcus V3] GCal callback error:', (error as Error).message);
+    console.error('[Boult V3] GCal callback error:', (error as Error).message);
     return NextResponse.redirect(new URL('/dashboard/agent-talk?error=callback', request.url));
   }
 }

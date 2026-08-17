@@ -22,7 +22,7 @@ import {
   getComposioAccountStatus,
   getComposioIdentity,
   COMPOSIO_TOKEN_PREFIX,
-} from '../../../../../lib/arcus/composio';
+} from '../../../../../lib/boult/composio';
 
 export const dynamic = 'force-dynamic';
 
@@ -58,12 +58,12 @@ export async function GET(request: NextRequest) {
     }
     const email = identity.email;
 
-    // 3. Persist the Gmail marker row under the real email, so Arcus can use
+    // 3. Persist the Gmail marker row under the real email, so Boult can use
     //    Gmail from the first turn (no second connect step).
     const supabase = getSupabaseAdmin();
-    // NOTE: arcus_integrations has NO `status` column — writing it makes the
+    // NOTE: boult_integrations has NO `status` column — writing it makes the
     // whole upsert fail with PGRST204. A row's mere existence = connected.
-    const { error: dbError } = await supabase.from('arcus_integrations').upsert({
+    const { error: dbError } = await supabase.from('boult_integrations').upsert({
       user_id: email,
       provider: 'gmail',
       access_token: encrypt(`${COMPOSIO_TOKEN_PREFIX}${accountId}`),

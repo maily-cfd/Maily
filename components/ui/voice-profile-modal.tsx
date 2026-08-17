@@ -275,7 +275,7 @@ export const VoiceProfileModal = ({ isOpen, onClose, profile, onReAnalyze, onCre
   const handleRefine = async () => {
     const instruction = customInstructions.trim();
     if (instruction.length < 4) {
-      toast.error('Tell Arcus what to change first.');
+      toast.error('Tell Boult what to change first.');
       return;
     }
     setIsRefining(true);
@@ -390,7 +390,7 @@ export const VoiceProfileModal = ({ isOpen, onClose, profile, onReAnalyze, onCre
                 )}
               </div>
               <p className="text-[13px] text-black/40 dark:text-white/35 font-light">
-                Mailient uses this to draft replies that sound like you.
+                Maily uses this to draft replies that sound like you.
               </p>
             </div>
             <button
@@ -494,9 +494,9 @@ export const VoiceProfileModal = ({ isOpen, onClose, profile, onReAnalyze, onCre
 
             {/* ── PROMPT-EDIT YOUR VOICE ── */}
             <div className="bg-black/[0.02] dark:bg-white/[0.03] border border-black/[0.06] dark:border-white/[0.06] rounded-2xl p-6 space-y-3">
-              <h3 className="text-[11px] uppercase tracking-[0.2em] font-bold text-black/30 dark:text-white/25">Tell Arcus how to sound like you</h3>
+              <h3 className="text-[11px] uppercase tracking-[0.2em] font-bold text-black/30 dark:text-white/25">Tell Boult how to sound like you</h3>
               <p className="text-[12px] text-black/40 dark:text-white/30 font-light">
-                Say what&apos;s off, in plain words. Arcus turns it into rules it follows on every draft.
+                Say what&apos;s off, in plain words. Boult turns it into rules it follows on every draft.
               </p>
               <textarea
                 value={customInstructions}
@@ -549,7 +549,7 @@ export const VoiceProfileModal = ({ isOpen, onClose, profile, onReAnalyze, onCre
                 <div>
                   <p className="text-[14px] font-semibold text-black/80 dark:text-white/80">Auto-improve from sent mail</p>
                   <p className="text-[12px] text-black/40 dark:text-white/30 font-light mt-0.5">
-                    Mailient reads your edits to AI drafts and refines this profile
+                    Maily reads your edits to AI drafts and refines this profile
                   </p>
                 </div>
                 <button

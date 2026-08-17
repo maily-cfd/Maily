@@ -22,7 +22,7 @@ import { VoiceProfileModal } from './voice-profile-modal';
 import { triggerSuccessConfetti } from '@/lib/confetti';
 import { useDashboardSettings } from '@/lib/DashboardSettingsContext';
 import ChatInterface from '../../app/dashboard/agent-talk/ChatInterface';
-import { ArcusQuickChat } from './arcus-quick-chat';
+import { BoultQuickChat } from './boult-quick-chat';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { Maximize01Icon, Minimize01Icon } from '@hugeicons/core-free-icons';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from './tooltip';
@@ -619,7 +619,7 @@ export function GmailInterfaceFixed({ forceTraditionalView = false }: GmailInter
 
                 if (!isLoadMore && data.insights && data.insights.length > 0) {
                     playSystemSound('success');
-                    showNotification('Arcus Sift AI', {
+                    showNotification('Boult Sift AI', {
                         body: `Discovered ${data.insights.length} new structural insights.`,
                         icon: '/favicon.ico'
                     });
@@ -1059,7 +1059,7 @@ export function GmailInterfaceFixed({ forceTraditionalView = false }: GmailInter
     const [draftOriginalEmailBody, setDraftOriginalEmailBody] = useState('');
 
     // Command Center hands off an ALREADY-EXISTING Gmail draft here (sessionStorage
-    // key 'hf_open_draft', same handoff pattern as 'arcus_prefill') when the user
+    // key 'hf_open_draft', same handoff pattern as 'boult_prefill') when the user
     // clicks "Draft reply" on a thread that already has one — instead of a fresh AI
     // generation, open that real content directly in this editor, ready to review
     // and send. Runs once per mount of the Inbox tab; the key is cleared immediately
@@ -1295,17 +1295,17 @@ export function GmailInterfaceFixed({ forceTraditionalView = false }: GmailInter
     };
 
 
-    const [isArcusQuickChatOpen, setIsArcusQuickChatOpen] = useState(false);
+    const [isBoultQuickChatOpen, setIsBoultQuickChatOpen] = useState(false);
     const [quickChatContext, setQuickChatContext] = useState<{ emailId?: string; subject?: string } | null>(null);
 
     const handleSendAskAI = async (forcedQuery?: string, context?: { emailId?: string; subject?: string }) => {
         const queryToSend = forcedQuery || 'What is this about?';
         
         // Save the pending message and context to localStorage for handover
-        localStorage.setItem('pending_arcus_message', queryToSend);
+        localStorage.setItem('pending_boult_message', queryToSend);
         
         if (context?.emailId) {
-            localStorage.setItem('pending_arcus_options', JSON.stringify({
+            localStorage.setItem('pending_boult_options', JSON.stringify({
                 emailId: context.emailId,
                 subject: context.subject,
                 source: 'gmail_interface'
@@ -1315,7 +1315,7 @@ export function GmailInterfaceFixed({ forceTraditionalView = false }: GmailInter
         if (context) {
             setQuickChatContext(context);
         }
-        setIsArcusQuickChatOpen(true);
+        setIsBoultQuickChatOpen(true);
     };
 
     // --- Sift Refinement Logic ---
@@ -1571,17 +1571,17 @@ export function GmailInterfaceFixed({ forceTraditionalView = false }: GmailInter
         }
     };
 
-    // Hand the newsletter pile-up to Arcus: it digests them into a Canvas summary
+    // Hand the newsletter pile-up to Boult: it digests them into a Canvas summary
     // and asks before clearing them out — reusing the tested agentic pipeline.
     const handleDigestNewsletters = () => {
         try {
             localStorage.setItem(
-                'pending_arcus_message',
+                'pending_boult_message',
                 'I am subscribed to too many newsletters and have no time to read them. Digest my newsletters from the last 7 days into one clean summary of what actually matters, then ask me before archiving them out of my inbox.'
             );
-            localStorage.removeItem('pending_arcus_options');
+            localStorage.removeItem('pending_boult_options');
         } catch { /* localStorage unavailable — navigation still works */ }
-        toast.success('Opening Arcus to digest your newsletters…');
+        toast.success('Opening Boult to digest your newsletters…');
         window.location.href = '/dashboard/agent-talk';
     };
 
@@ -1652,12 +1652,12 @@ export function GmailInterfaceFixed({ forceTraditionalView = false }: GmailInter
         const toastId = toast.loading('Sending email...');
         console.log('📡 Sending email to:', draftTo, 'Subject:', draftSubject);
 
-        // Create the "Made by Mailient" footer
+        // Create the "Made by Maily" footer
         const footerHtml = `
             <br/><br/>
             <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #eaeaea; color: #888; font-family: system-ui, sans-serif;">
-                <span style="opacity: 0.7; font-size: 12px; margin-right: 12px;">Made by Mailient</span>
-                <a href="https://mailient.xyz/auth/signup" style="background-color: #ffffff; color: #000000; padding: 8px 16px; text-decoration: none; border-radius: 6px; font-weight: 500; border: 1px solid #e5e5e5; font-size: 12px; display: inline-block;">Join Now!</a>
+                <span style="opacity: 0.7; font-size: 12px; margin-right: 12px;">Made by Maily</span>
+                <a href="https://maily.dev/auth/signup" style="background-color: #ffffff; color: #000000; padding: 8px 16px; text-decoration: none; border-radius: 6px; font-weight: 500; border: 1px solid #e5e5e5; font-size: 12px; display: inline-block;">Join Now!</a>
             </div>
         `;
 
@@ -1767,7 +1767,7 @@ export function GmailInterfaceFixed({ forceTraditionalView = false }: GmailInter
 
         switch (insight.section) {
             case 'opportunities': return 'opportunity' as const;
-            case 'ai-highlights': return 'arcus-suggestion' as const;
+            case 'ai-highlights': return 'boult-suggestion' as const;
             case 'founder-execution': return 'founder-progress' as const;
             default: return 'inbox-intelligence' as const;
         }
@@ -1802,8 +1802,8 @@ export function GmailInterfaceFixed({ forceTraditionalView = false }: GmailInter
         setIsClient(true);
     }, []);
 
-    const setIsArcusOpen = (open: boolean) => {
-        setIsArcusQuickChatOpen(open);
+    const setIsBoultOpen = (open: boolean) => {
+        setIsBoultQuickChatOpen(open);
     };
 
     return (
@@ -1851,7 +1851,7 @@ export function GmailInterfaceFixed({ forceTraditionalView = false }: GmailInter
                             usageData={usageData || {
                                 planType: 'free',
                                 features: {
-                                    arcus_ai: { usage: 0, limit: 10, remaining: 10, isUnlimited: false, period: 'daily' },
+                                    boult_ai: { usage: 0, limit: 10, remaining: 10, isUnlimited: false, period: 'daily' },
                                     sift_ai: { usage: 0, limit: 5, remaining: 5, isUnlimited: false, period: 'daily' }
                                 }
                             }}
@@ -1881,7 +1881,7 @@ export function GmailInterfaceFixed({ forceTraditionalView = false }: GmailInter
                             </button>
                             <span className="font-bold text-sm tracking-tight text-neutral-900 dark:text-white whitespace-nowrap">Home Feed</span>
                             <button
-                                onClick={() => setIsArcusOpen(true)}
+                                onClick={() => setIsBoultOpen(true)}
                                 className="p-2 bg-black dark:bg-white text-white dark:text-black rounded-lg"
                             >
                                 <Sparkles className="w-4 h-4" />
@@ -1896,14 +1896,14 @@ export function GmailInterfaceFixed({ forceTraditionalView = false }: GmailInter
                             <UsageBadge
                                 icon={<Sparkles className="h-3.5 w-3.5 text-amber-500" />}
                                 planName={(usageData.planType as string) === 'starter' ? 'Starter' : (usageData.planType as string) === 'pro' ? 'Pro' : 'Free'}
-                                usage={usageData.features?.arcus_ai?.usage || 0}
-                                limit={usageData.features?.arcus_ai?.limit || 5}
+                                usage={usageData.features?.boult_ai?.usage || 0}
+                                limit={usageData.features?.boult_ai?.limit || 5}
                                 tooltipContent={
                                     <p className="text-[10px] font-medium uppercase tracking-wider">
                                         {(usageData.planType as string) === 'starter' ? 'Starter' : (usageData.planType as string) === 'pro' ? 'Pro' : 'Free'} Plan
                                         <br />
                                         <span className="text-black dark:text-white/40 font-light lowercase">
-                                            {usageData.features?.arcus_ai?.remaining ?? 5} credits left
+                                            {usageData.features?.boult_ai?.remaining ?? 5} credits left
                                         </span>
                                     </p>
                                 }
@@ -2354,7 +2354,7 @@ export function GmailInterfaceFixed({ forceTraditionalView = false }: GmailInter
                                         </div>
                                         <h3 className="text-3xl font-medium text-black dark:text-white mb-4 tracking-tight">Connect your Workspace</h3>
                                         <p className="text-neutral-600 dark:text-neutral-400 mb-12 font-light leading-relaxed">
-                                            Mailient needs access to your Gmail to detect opportunities, summarize threads, and help you handle your inbox like a pro.
+                                            Maily needs access to your Gmail to detect opportunities, summarize threads, and help you handle your inbox like a pro.
                                         </p>
                                         <div className="flex flex-col gap-5 items-center">
                                             <Button
@@ -2427,7 +2427,7 @@ export function GmailInterfaceFixed({ forceTraditionalView = false }: GmailInter
                                                                     className="w-9 h-9 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-blue-500/20 rounded-xl text-black dark:text-white/30 hover:text-black dark:hover:text-blue-400 transition-all border border-neutral-200 dark:border-white/5 group/ai flex items-center justify-center overflow-hidden"
                                                                     title="Ask AI"
                                                                 >
-                                                                    <img src="/arcus-ai-icon.jpg" alt="Ask AI" className="w-full h-full object-cover brightness-90 group-hover:brightness-110 transition-all grayscale" />
+                                                                    <img src="/boult-ai-icon.jpg" alt="Ask AI" className="w-full h-full object-cover brightness-90 group-hover:brightness-110 transition-all grayscale" />
                                                                 </button>
                                                                 <button
                                                                     onClick={(e) => {
@@ -2591,8 +2591,8 @@ export function GmailInterfaceFixed({ forceTraditionalView = false }: GmailInter
                                                                     />
                                                                     {isGenerating && (
                                                                         <div className="flex items-center gap-2 mt-4 px-1">
-                                                                            <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-[arcus-dot-pulse_1.5s_infinite]" />
-                                                                            <span className="text-[10px] uppercase tracking-widest text-black/50 dark:text-zinc-500 font-bold">Arcus Generating...</span>
+                                                                            <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-[boult-dot-pulse_1.5s_infinite]" />
+                                                                            <span className="text-[10px] uppercase tracking-widest text-black/50 dark:text-zinc-500 font-bold">Boult Generating...</span>
                                                                         </div>
                                                                     )}
                                                                     {/* Attachment chips */}
@@ -3085,7 +3085,7 @@ export function GmailInterfaceFixed({ forceTraditionalView = false }: GmailInter
                     pointer-events: auto !important;
                 }
 
-                @keyframes arcus-dot-pulse {
+                @keyframes boult-dot-pulse {
                     0% { transform: scale(0.7); opacity: 0.8; }
                     50% { transform: scale(1.2); opacity: 1; }
                     100% { transform: scale(0.7); opacity: 0.8; }
@@ -3102,10 +3102,10 @@ export function GmailInterfaceFixed({ forceTraditionalView = false }: GmailInter
                     isAnalyzing={isAnalyzingVoice}
                     onProfileUpdated={(p: any) => setUserVoiceProfile(p)}
                 />
-                {/* Arcus Quick Chat Replacement */}
-                <ArcusQuickChat 
-                    isOpen={isArcusQuickChatOpen}
-                    onClose={() => setIsArcusQuickChatOpen(false)}
+                {/* Boult Quick Chat Replacement */}
+                <BoultQuickChat 
+                    isOpen={isBoultQuickChatOpen}
+                    onClose={() => setIsBoultQuickChatOpen(false)}
                     context={quickChatContext}
                 />
             </div>

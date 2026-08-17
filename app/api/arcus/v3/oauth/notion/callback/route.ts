@@ -1,9 +1,9 @@
 /**
- * Arcus V3 — Notion OAuth Callback
+ * Boult V3 — Notion OAuth Callback
  * 
  * Handles the redirect from Notion after the user consents.
  * Exchanges the authorization code for an access token, encrypts it,
- * and stores it in arcus_integrations.
+ * and stores it in boult_integrations.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
     const error = searchParams.get('error');
 
     if (error) {
-      console.error('[Arcus V3] Notion OAuth error:', error);
+      console.error('[Boult V3] Notion OAuth error:', error);
       return NextResponse.redirect(new URL('/dashboard/agent-talk?error=notion_denied', request.url));
     }
 
@@ -38,15 +38,15 @@ export async function GET(request: NextRequest) {
     }
 
     // 3. Validate CSRF state
-    const storedState = request.cookies.get('arcus_notion_state')?.value;
+    const storedState = request.cookies.get('boult_notion_state')?.value;
     if (!state || !storedState || state !== storedState) {
-      console.error('[Arcus V3] Notion OAuth state mismatch');
+      console.error('[Boult V3] Notion OAuth state mismatch');
       return NextResponse.redirect(new URL('/dashboard/agent-talk?error=csrf', request.url));
     }
 
     // 4. Exchange code for access token
     const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
-    const redirectUri = `${baseUrl}/api/arcus/v3/oauth/notion/callback`;
+    const redirectUri = `${baseUrl}/api/boult/v3/oauth/notion/callback`;
     
     const clientId = process.env.NOTION_CLIENT_ID || '';
     const clientSecret = process.env.NOTION_CLIENT_SECRET || '';
@@ -67,7 +67,7 @@ export async function GET(request: NextRequest) {
 
     if (!tokenResponse.ok) {
       const errorText = await tokenResponse.text();
-      console.error('[Arcus V3] Notion token exchange failed:', errorText);
+      console.error('[Boult V3] Notion token exchange failed:', errorText);
       return NextResponse.redirect(new URL('/dashboard/agent-talk?error=token_exchange', request.url));
     }
 
@@ -78,10 +78,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(new URL('/dashboard/agent-talk?error=no_token', request.url));
     }
 
-    // 5. Store encrypted token in arcus_integrations
+    // 5. Store encrypted token in boult_integrations
     const supabase = getSupabaseAdmin();
     const { error: dbError } = await supabase
-      .from('arcus_integrations')
+      .from('boult_integrations')
       .upsert({
         user_id: userId,
         provider: 'notion',
@@ -96,12 +96,12 @@ export async function GET(request: NextRequest) {
       }, { onConflict: 'user_id,provider' });
 
     if (dbError) {
-      console.error('[Arcus V3] DB store error:', dbError.message);
+      console.error('[Boult V3] DB store error:', dbError.message);
       return NextResponse.redirect(new URL('/dashboard/agent-talk?error=db_store', request.url));
     }
 
     // 6. Audit log
-    await auditLogger.log(userId, 'arcus.notion_connected', {
+    await auditLogger.log(userId, 'boult.notion_connected', {
       workspaceName: workspace_name,
       workspaceId: workspace_id,
     });
@@ -111,12 +111,12 @@ export async function GET(request: NextRequest) {
     successUrl.searchParams.set('success', 'connected');
     successUrl.searchParams.set('provider', 'notion');
     const response = NextResponse.redirect(successUrl);
-    response.cookies.delete('arcus_notion_state');
+    response.cookies.delete('boult_notion_state');
     return response;
 
   } catch (error) {
     logEvent({ channel: "failures", event: "❌ API Error", description: String(error) });
-    console.error('[Arcus V3] Notion callback error:', (error as Error).message);
+    console.error('[Boult V3] Notion callback error:', (error as Error).message);
     return NextResponse.redirect(new URL('/dashboard/agent-talk?error=callback', request.url));
   }
 }

@@ -40,7 +40,7 @@ const PRICING_FAQS = [
   },
   {
     q: "How does the Weekly plan work?",
-    a: "It's $8.99 per week for the complete product — nothing is held back compared to the larger plans. It renews every 7 days until you cancel, and you can cancel from your billing portal at any time; access runs to the end of the week you've already paid for. It's the lowest-commitment way to find out whether Mailient earns its place in your week."
+    a: "It's $8.99 per week for the complete product — nothing is held back compared to the larger plans. It renews every 7 days until you cancel, and you can cancel from your billing portal at any time; access runs to the end of the week you've already paid for. It's the lowest-commitment way to find out whether Maily earns its place in your week."
   },
   {
     q: "Can I upgrade or downgrade anytime?",
@@ -48,7 +48,7 @@ const PRICING_FAQS = [
   },
   {
     q: "How does the Lifetime founding tier work?",
-    a: "The Lifetime tier is a one-time purchase of $499. You secure full access to everything Mailient does, forever — same unlimited product as every other plan. You just never pay again."
+    a: "The Lifetime tier is a one-time purchase of $499. You secure full access to everything Maily does, forever — same unlimited product as every other plan. You just never pay again."
   },
   {
     q: "Are there any hidden API fees?",
@@ -65,7 +65,7 @@ export default function PricingPage() {
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
 
   useEffect(() => {
-    document.title = "Pricing / Mailient";
+    document.title = "Pricing / Maily";
     fetchSubscriptionStatus();
   }, []);
 
@@ -96,19 +96,19 @@ export default function PricingPage() {
     }
 
     // After this checkout, land the user in the app — NOT back in onboarding.
-    // /payment-success reads mailient_checkout_return; set it explicitly to
+    // /payment-success reads maily_checkout_return; set it explicitly to
     // /home-feed so a stale onboarding value can't hijack the redirect. The
     // pending_plan markers let /home-feed's just-paid poller wait for the webhook
     // to activate the subscription before granting access.
     try {
-      localStorage.setItem("mailient_checkout_return", "/home-feed");
+      localStorage.setItem("maily_checkout_return", "/home-feed");
       localStorage.setItem("pending_plan", planId);
       localStorage.setItem("pending_plan_timestamp", String(Date.now()));
     } catch { /* localStorage unavailable — payment-success still defaults to /home-feed */ }
 
     const params = new URLSearchParams();
     if (session?.user?.email) params.set("email", session.user.email);
-    const baseUrl = typeof window !== "undefined" ? window.location.origin : "https://mailient.xyz";
+    const baseUrl = typeof window !== "undefined" ? window.location.origin : "https://maily.dev";
     params.set("redirect_url", `${baseUrl}/payment-success`);
 
     window.location.href = `${checkoutUrl}?${params.toString()}`;

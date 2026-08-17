@@ -25,15 +25,15 @@ const auth: any = nextAuth;
 export const dynamic = 'force-dynamic';
 
 export const metadata = {
-  title: 'Give a free month · Mailient',
-  description: 'Give a friend a free month of Mailient. Get a free month when they stay.',
+  title: 'Give a free month · Maily',
+  description: 'Give a friend a free month of Maily. Get a free month when they stay.',
 };
 
 export default async function ReferralsPage() {
   const session = await auth();
   if (!session?.user?.email) redirect('/auth/signin?callbackUrl=/referrals');
 
-  const origin = process.env.NEXTAUTH_URL || 'https://mailient.xyz';
+  const origin = process.env.NEXTAUTH_URL || 'https://maily.dev';
   const stats = await getReferralStats(session.user.email, origin);
 
   return (

@@ -35,7 +35,7 @@
  * window and not be nudged — an acceptable v1 gap, not a silent bug.
  *
  *   GET /api/cron/lifecycle-nudge
- *   Authorization: Bearer $CRON_SECRET   (or x-arcus-cron-secret: $CRON_SECRET)
+ *   Authorization: Bearer $CRON_SECRET   (or x-boult-cron-secret: $CRON_SECRET)
  *   ?dry=1  → compute and RETURN the cohorts without sending anything.
  */
 
@@ -47,7 +47,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
-const CRON_SECRET = process.env.CRON_SECRET || 'arcus-cron-secret';
+const CRON_SECRET = process.env.CRON_SECRET || 'boult-cron-secret';
 
 // Signup age band. 24h wide so a once-daily run catches each account exactly
 // once; offset by 2 days so we nudge people who have had a beat to act, not
@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
   const authHeader = request.headers.get('authorization') || '';
   const ok =
     authHeader === `Bearer ${CRON_SECRET}` ||
-    request.headers.get('x-arcus-cron-secret') === CRON_SECRET ||
+    request.headers.get('x-boult-cron-secret') === CRON_SECRET ||
     request.headers.get('x-vercel-cron') === '1';
   if (!ok) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 

@@ -1,6 +1,6 @@
 /**
- * Arcus V3 — GCal Channel Renewal Cron
- * GET /api/arcus/v3/cron/renew-channels
+ * Boult V3 — GCal Channel Renewal Cron
+ * GET /api/boult/v3/cron/renew-channels
  *
  * Checks for Google Calendar webhook channels expiring within 24 hours
  * and renews them to ensure continuous event ingestion.
@@ -9,8 +9,8 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { renewExpiredChannels } from '../../../../../../lib/arcus-v3/gcal-watch';
-import { renewGmailWatches } from '../../../../../../lib/arcus-v3/gmail-watch';
+import { renewExpiredChannels } from '../../../../../../lib/boult-v3/gcal-watch';
+import { renewGmailWatches } from '../../../../../../lib/boult-v3/gmail-watch';
 import { logEvent } from "@/lib/logsso";
 
 export const dynamic = 'force-dynamic';
@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ status: 'ok', gcal, gmail });
   } catch (error) {
     logEvent({ channel: "failures", event: "❌ API Error", description: String(error) });
-    console.error('[Arcus V3] Channel renewal cron error:', (error as Error).message);
+    console.error('[Boult V3] Channel renewal cron error:', (error as Error).message);
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }

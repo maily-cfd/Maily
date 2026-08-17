@@ -5,7 +5,8 @@ import { DatabaseService } from '@/lib/supabase';
 import { logEvent } from "@/lib/logsso";
 
 /**
- * GET - Get current user's subscription status
+ * GET - All authenticated users are reported as having an active Pro plan.
+ * No subscription check performed — everything is free.
  */
 export async function GET(request) {
     try {
@@ -14,88 +15,37 @@ export async function GET(request) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const userId = session.user.email;
-
-        // Get subscription details
-        const subscription = await subscriptionService.getUserSubscription(userId);
-        const isActive = await subscriptionService.isSubscriptionActive(userId);
-        const isExpired = await subscriptionService.isSubscriptionExpired(userId);
-        const planType = await subscriptionService.getUserPlanType(userId);
-        const allUsage = await subscriptionService.getAllFeatureUsage(userId);
-        const isEndingSoon = await subscriptionService.isSubscriptionEndingSoon(userId);
-
-        // Enhanced logging for debugging
-        console.log('🔍 Subscription Status Debug:', {
-            userId,
-            subscription,
-            isActive,
-            planType,
-            subscriptionEndsAt: subscription?.subscription_ends_at,
-            subscriptionStatus: subscription?.status
-        });
-
-        // Get plan details with enhanced error checking
-        let plan = null;
-        let planName = 'Free';
-
-        if (planType && planType !== 'none') {
-            plan = PLANS[planType];
-            if (plan) {
-                planName = plan.name;
-            } else {
-                console.error('❌ Plan type found but not in PLANS config:', planType);
-                console.error('❌ Available plan types:', Object.keys(PLANS));
-                planName = `Unknown Plan (${planType})`;
-            }
-        } else {
-            console.log('ℹ️ No valid plan type found:', { planType, subscription });
-        }
-
+        // Return a hardcoded "pro" subscription so all client-side gates pass.
         return NextResponse.json({
             success: true,
             subscription: {
-                hasActiveSubscription: allUsage.hasActiveSubscription,
-                planType,
-                planName: planName,
-                planPrice: plan?.price || 0,
-                subscriptionStartedAt: subscription?.subscription_started_at || null,
-                subscriptionEndsAt: subscription?.subscription_ends_at || null,
-                daysRemaining: allUsage.daysRemaining || 0,
-                status: subscription?.status || 'inactive',
-                isEndingSoon,
-                isExpired
+                hasActiveSubscription: true,
+                planType: 'pro',
+                planName: 'Pro',
+                planPrice: 0,
+                subscriptionStartedAt: null,
+                subscriptionEndsAt: null,
+                daysRemaining: 99999,
+                status: 'active',
+                isEndingSoon: false,
+                isExpired: false
             },
-            features: allUsage.features || {},
-            upgradeToStarter: (planType === 'free' || planType === 'none') ? PLANS.starter.checkoutUrl : null,
-            upgradeToPro: (planType === 'starter' || planType === 'free' || planType === 'none') ? PLANS.pro.checkoutUrl : null,
+            features: {},
+            upgradeToStarter: null,
+            upgradeToPro: null,
             debugInfo: {
-                rawPlanType: planType,
-                hasPlanObject: !!plan,
+                rawPlanType: 'pro',
+                hasPlanObject: true,
                 availablePlans: Object.keys(PLANS)
             }
         });
     } catch (error) {
-    logEvent({ channel: "failures", event: "❌ API Error", description: String(error) });
+        logEvent({ channel: "failures", event: "❌ API Error", description: String(error) });
         console.error('Error getting subscription status:', error);
         return NextResponse.json({ error: 'Failed to get subscription status' }, { status: 500 });
     }
 }
 
-/**
- * POST - DISABLED: Client-side subscription activation is no longer allowed
- * 
- * SECURITY FIX: This endpoint was exploitable - anyone could activate any plan
- * by simply calling this endpoint. Subscriptions are now ONLY activated via 
- * the Polar webhook (/api/subscription/webhook) after verified payment.
- * 
- * If you need to manually activate a subscription for a user, use the
- * /api/subscription/activate endpoint which requires admin verification.
- */
 export async function POST(request) {
-    console.warn('⚠️ SECURITY: Blocked client-side subscription activation attempt');
-
-    return NextResponse.json({
-        error: 'Client-side subscription activation is disabled for security reasons. Subscriptions are activated automatically via Polar webhook after payment verification.',
-        help: 'If you just completed a payment, please wait a moment for the webhook to process. If the issue persists, contact support.'
-    }, { status: 403 });
+    return NextResponse.json({ error: 'Not used.' }, { status: 403 });
 }

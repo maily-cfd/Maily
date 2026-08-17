@@ -42,7 +42,7 @@ export async function POST(request) {
                 
                 // Send notification to support team
                 const notificationEmail = {
-                    to: 'mailient.xyz@gmail.com',
+                    to: 'support.maily@gmail.com',
                     subject: `🚨 URGENT: Escalated Message from ${session.user.email}`,
                     body: `A user has escalated an urgent message that requires immediate attention.
 

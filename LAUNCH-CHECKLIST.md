@@ -1,4 +1,4 @@
-# Mailient — 5-Day Launch Checklist
+# Maily — 5-Day Launch Checklist
 
 **Launch target: ~2026-06-16.** Today: 2026-06-11.
 
@@ -18,13 +18,13 @@ So the order is: ship-stable → demos → landing → marketing assets → PH l
 These gate every demo and screenshot. Nothing else matters until they're green.
 
 - [ ] **Apply ALL Supabase migrations** (SQL editor — no runner in repo). Verify each table exists after:
-  - [ ] `arcus_agents.sql`
-  - [ ] `arcus_agent_runs.sql` + `arcus_agent_runs_part60_signal.sql` + `arcus_agent_runs_plan.sql`
-  - [ ] `arcus_audit_log.sql`
-  - [ ] `arcus_user_model.sql`  ← new this session (HomeFeed run-detail + agent thinking depend on it)
+  - [ ] `boult_agents.sql`
+  - [ ] `boult_agent_runs.sql` + `boult_agent_runs_part60_signal.sql` + `boult_agent_runs_plan.sql`
+  - [ ] `boult_audit_log.sql`
+  - [ ] `boult_user_model.sql`  ← new this session (HomeFeed run-detail + agent thinking depend on it)
   - [ ] all other `supabase/migrations/*.sql` (memories, contacts, canvas, etc.)
-- [ ] **Set `ALLOW_PAID_MODELS=true`** in Vercel env (lifts the free-model quality ceiling — this is the single biggest quality jump). To make paid PRIMARY, reorder the 3 model lists: `lib/arcus/engine.ts` PAID_MODELS, `lib/openrouter-ai.js` FREE_MODELS/DEFAULT_MODEL, `lib/ai-constants.js` DEFAULT_AI_MODELS.
-- [ ] **Verify env vars in Vercel**: OPENROUTER_API_KEY(1-5), SUPABASE_URL + SERVICE_ROLE_KEY, RESEND_API_KEY + RESEND_FROM_EMAIL, **CRON_SECRET (set a real one — defaults to 'arcus-cron-secret')**, Polar checkout URLs, NEXTAUTH config.
+- [ ] **Set `ALLOW_PAID_MODELS=true`** in Vercel env (lifts the free-model quality ceiling — this is the single biggest quality jump). To make paid PRIMARY, reorder the 3 model lists: `lib/boult/engine.ts` PAID_MODELS, `lib/openrouter-ai.js` FREE_MODELS/DEFAULT_MODEL, `lib/ai-constants.js` DEFAULT_AI_MODELS.
+- [ ] **Verify env vars in Vercel**: OPENROUTER_API_KEY(1-5), SUPABASE_URL + SERVICE_ROLE_KEY, RESEND_API_KEY + RESEND_FROM_EMAIL, **CRON_SECRET (set a real one — defaults to 'boult-cron-secret')**, Polar checkout URLs, NEXTAUTH config.
 - [ ] **Confirm cron-job.org** hits `/api/cron/run-agents` with `Authorization: Bearer <CRON_SECRET>`, timeout ≥60s.
 - [ ] **Deploy current main to production** and confirm the build is live (all this session's fixes only take effect after deploy; reports only render the new format on the NEXT scheduled run).
 
@@ -48,7 +48,7 @@ Demos live or die on these flows. Walk each one as a real user on production:
 
 You can't market without these. Keep them SHORT and real (no narration polish needed for v1).
 
-- [ ] **Hero demo (60-90s):** the "founder wakes up" story — open Mailient, see HomeFeed "While you were away," expand a run, see what the agent did overnight. This IS the product.
+- [ ] **Hero demo (60-90s):** the "founder wakes up" story — open Maily, see HomeFeed "While you were away," expand a run, see what the agent did overnight. This IS the product.
 - [ ] **Agent creation demo (30-45s):** type a goal in plain English → agent spec → confirm → live agent. Shows the "describe once, it runs" promise.
 - [ ] **Draft-in-your-voice demo (20-30s):** click a thread → watch it draft a reply that sounds like you (the blur-fade stream looks great on video).
 - [ ] Record at 1440p+, clean browser (no bookmarks bar, incognito, hide personal data).
@@ -109,7 +109,7 @@ Product Hunt assets:
 
 ## What is NOT a blocker (defer to post-launch)
 - The phased "todo panel" UI feature (flagged earlier — it's polish, not launch-critical).
-- The 3-generation Arcus consolidation.
+- The 3-generation Boult consolidation.
 - Any "feels mediocre" cosmetic item that isn't on the golden path.
 - Perfect free-model behavior (paid models fix most of it).
 

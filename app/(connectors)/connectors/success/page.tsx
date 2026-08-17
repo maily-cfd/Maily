@@ -10,7 +10,7 @@ import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { CheckCircle2, ArrowRight, Sparkles } from 'lucide-react';
-import { getConnector } from '@/lib/arcus-connector-registry';
+import { getConnector } from '@/lib/boult-connector-registry';
 
 function ConnectorSuccessContent() {
   const searchParams = useSearchParams();
@@ -117,7 +117,7 @@ function ConnectorSuccessContent() {
             className="flex items-center gap-2 px-6 py-3 bg-white text-black rounded-xl
                        font-medium hover:bg-gray-200 transition-colors"
           >
-            Continue to Arcus
+            Continue to Boult
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>

@@ -1,4 +1,4 @@
-// Neural Context Engine - The brain behind Mailient Matrix
+// Neural Context Engine - The brain behind Maily Matrix
 export interface EmailContext {
     id: string
     sender: string

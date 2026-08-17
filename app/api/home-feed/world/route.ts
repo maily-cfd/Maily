@@ -2,7 +2,7 @@
  * GET /api/home-feed/world — the cross-app synthesis engine ("Your world").
  *
  * WHY: the founder's verdict on the old feed — "displays tasks completed by
- * Mailient rather than those performed by the user … relies only on Gmail,
+ * Maily rather than those performed by the user … relies only on Gmail,
  * shallow, not integrating other apps." The one loved section (Key
  * conversations) was Gmail-only, while the five cross-app gatherers' output was
  * wasted on a donut. This route is the fix: it takes the Gmail relationship
@@ -23,7 +23,7 @@
  *    directive: direct errors, no masking fallbacks) while the cards keep their
  *    deterministic real-fact lines (data, not filler).
  *
- * CACHE: arcus_today_cache under `${email}::world`, 15-min TTL, ?refresh=1
+ * CACHE: boult_today_cache under `${email}::world`, 15-min TTL, ?refresh=1
  * busts. Same table/pattern as the old ::convos cache it supersedes.
  */
 
@@ -33,7 +33,7 @@ import { auth as nextAuth } from '@/lib/auth.js';
 // @ts-ignore — JS module
 import { getSupabaseAdmin } from '@/lib/supabase.js';
 import { assertPaidAccess } from '@/lib/subscription-protection.js';
-import { getBriefingPrefs } from '@/lib/arcus/briefing-prefs';
+import { getBriefingPrefs } from '@/lib/boult/briefing-prefs';
 import {
   gatherGmailRelationships, gatherServerSignals,
   type GatheredSignal, type RelationshipThread,
@@ -85,7 +85,7 @@ export interface WorldEntry {
   daysSince: number;
   lastActivityIso: string;
   messageCount: number;
-  /** Handed to Arcus via the arcus_prefill flow on click. */
+  /** Handed to Boult via the boult_prefill flow on click. */
   nextAction: string;
 }
 
@@ -308,7 +308,7 @@ async function aiSharpen(entities: WorldEntry[], threadByKey: Map<string, Relati
         if (/nemotron/i.test(model)) reqBody.reasoning = { enabled: false };
         const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
           method: 'POST',
-          headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json', 'HTTP-Referer': 'https://mailient.xyz', 'X-Title': 'Mailient' },
+          headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json', 'HTTP-Referer': 'https://maily.dev', 'X-Title': 'Maily' },
           body: JSON.stringify(reqBody),
           signal: AbortSignal.timeout(10000),
         });
@@ -341,7 +341,7 @@ async function buildWorld(email: string): Promise<WorldPayload> {
   const [threads, signals, founderModel] = await Promise.all([
     gatherGmailRelationships(email, MAX_ENTITIES),
     gatherServerSignals(email, prefs.apps, { calendarFull: true }).catch(() => [] as GatheredSignal[]),
-    (async () => { try { const { getUserModelSummary } = await import('@/lib/arcus/user-model'); return await getUserModelSummary(email); } catch { return ''; } })(),
+    (async () => { try { const { getUserModelSummary } = await import('@/lib/boult/user-model'); return await getUserModelSummary(email); } catch { return ''; } })(),
   ]);
 
   // Spine: one entity per Gmail counterparty.
@@ -410,7 +410,7 @@ async function buildWorld(email: string): Promise<WorldPayload> {
 async function readCache(email: string): Promise<{ payload: WorldPayload; generatedAt: string } | null> {
   try {
     const { data } = await getSupabaseAdmin()
-      .from('arcus_today_cache')
+      .from('boult_today_cache')
       .select('payload, generated_at')
       .eq('user_id', `${email.toLowerCase()}::world`)
       .maybeSingle();
@@ -422,7 +422,7 @@ async function readCache(email: string): Promise<{ payload: WorldPayload; genera
 async function writeCache(email: string, payload: WorldPayload): Promise<void> {
   try {
     await getSupabaseAdmin()
-      .from('arcus_today_cache')
+      .from('boult_today_cache')
       .upsert({ user_id: `${email.toLowerCase()}::world`, payload, generated_at: new Date().toISOString() }, { onConflict: 'user_id' });
   } catch (e: any) {
     logEvent({ channel: 'failures', event: '❌ API Error', description: String(e?.message || e) });

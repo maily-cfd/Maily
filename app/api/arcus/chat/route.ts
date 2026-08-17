@@ -1,9 +1,9 @@
 /**
- * Arcus Chat — Main agentic chat endpoint.
- * POST /api/arcus/chat
+ * Boult Chat — Main agentic chat endpoint.
+ * POST /api/boult/chat
  *
  * Rebuilds the chat system from scratch:
- * - Tool_use via OpenRouter free models (see lib/arcus/engine.ts TOOL_CAPABLE_MODELS)
+ * - Tool_use via OpenRouter free models (see lib/boult/engine.ts TOOL_CAPABLE_MODELS)
  * - Supermemory v3 for cross-session memory
  * - Full conversation history on every call
  * - Real tool execution (Gmail, Calendar, Notion, Canvas, Web, Slack)
@@ -15,13 +15,13 @@ import { NextRequest } from 'next/server';
 import { auth as nextAuth } from '../../../../lib/auth.js';
 // @ts-ignore
 const auth: any = nextAuth;
-import { runAgentLoop } from '../../../../lib/arcus/loop';
-import { buildSystemPrompt, getConnectedIntegrations } from '../../../../lib/arcus/system-prompt';
-import { shouldDispatchParallelVAs } from '../../../../lib/arcus/inbox-pipeline';
-import { expandSlashCommand } from '../../../../lib/arcus/skills';
-import { searchMemories, extractAndSaveInsights } from '../../../../lib/arcus/memory';
-import { verifyGmailScopes } from '../../../../lib/arcus/gmail-scope';
-import { getCanvasState } from '../../../../lib/arcus/canvas-state';
+import { runAgentLoop } from '../../../../lib/boult/loop';
+import { buildSystemPrompt, getConnectedIntegrations } from '../../../../lib/boult/system-prompt';
+import { shouldDispatchParallelVAs } from '../../../../lib/boult/inbox-pipeline';
+import { expandSlashCommand } from '../../../../lib/boult/skills';
+import { searchMemories, extractAndSaveInsights } from '../../../../lib/boult/memory';
+import { verifyGmailScopes } from '../../../../lib/boult/gmail-scope';
+import { getCanvasState } from '../../../../lib/boult/canvas-state';
 // @ts-ignore
 import { subscriptionService, FEATURE_TYPES } from '../../../../lib/subscription-service.js';
 import { assertPaidAccess } from '../../../../lib/subscription-protection.js';
@@ -72,7 +72,7 @@ function buildPlanSystemPrompt(userName: string, connectedIntegrations: string[]
       : '',
   ].filter(Boolean).join('\n');
 
-  return `You are Arcus, a strategic planning expert. Today is ${today}. The user's name is ${userName}.
+  return `You are Boult, a strategic planning expert. Today is ${today}. The user's name is ${userName}.
 
 Your only job right now is to produce a plan document the user would be proud to hand to an investor or a consultant — comprehensive, specific, and beautifully structured. The bar is a $500/hr operator's working document, not a chat reply.
 
@@ -94,13 +94,13 @@ ${integrationSection}
 - NEVER use emojis. NEVER use bracketed placeholders like [TBD] or [insert X here]. Every item is concrete.
 - Ground every claim in what the user actually told you or what is verifiably true. NEVER invent metrics, user counts, or dates.
 
-## Steps section — USE arcus-steps JSON BLOCK (mandatory)
+## Steps section — USE boult-steps JSON BLOCK (mandatory)
 
-The Steps section MUST be a fenced arcus-steps JSON block — NEVER inline-numbered prose like "1. Foo 2. Bar 3. Baz" (which renders as a wall of text), and NEVER a JSON blob without the arcus-steps tag. The renderer lays each step out as a numbered row. A real plan has 6–12 steps. Each step: a short label (3–6 words) + ONE concrete sentence — the action, the tool or owner, and the deliverable.
+The Steps section MUST be a fenced boult-steps JSON block — NEVER inline-numbered prose like "1. Foo 2. Bar 3. Baz" (which renders as a wall of text), and NEVER a JSON blob without the boult-steps tag. The renderer lays each step out as a numbered row. A real plan has 6–12 steps. Each step: a short label (3–6 words) + ONE concrete sentence — the action, the tool or owner, and the deliverable.
 
 The JSON must be COMPLETE and VALID — every string closed, the array closed with ] }. Example of the EXACT format:
 
-\`\`\`arcus-steps
+\`\`\`boult-steps
 { "steps": [
     { "label": "Search Gmail for newsletters", "description": "Use search_gmail with query 'category:promotions newer_than:7d'." },
     { "label": "Read top 20 candidates", "description": "Use gmail_bulk_read_threads to pull bodies in one call." },
@@ -109,11 +109,11 @@ The JSON must be COMPLETE and VALID — every string closed, the array closed wi
 ] }
 \`\`\`
 
-## Timeline & Success Metrics — USE arcus-table JSON BLOCKS
+## Timeline & Success Metrics — USE boult-table JSON BLOCKS
 
-Render the Timeline and the Success Metrics as fenced arcus-table blocks so they lay out as real tables:
+Render the Timeline and the Success Metrics as fenced boult-table blocks so they lay out as real tables:
 
-\`\`\`arcus-table
+\`\`\`boult-table
 { "title": "Timeline", "columns": [{ "label": "Phase", "type": "text" }, { "label": "Focus", "type": "text" }, { "label": "Duration", "type": "text" }], "rows": [["Phase 1", "Fix the retention blocker", "Days 1-3"], ["Phase 2", "Pilot outreach to 25 founders", "Days 4-10"]] }
 \`\`\`
 
@@ -125,13 +125,13 @@ ANTI-PATTERN 1 — params dump. The plan is for a HUMAN to read. Do NOT output b
   output_channel: "gmail"
 These are tool inputs, not a plan. Translate them into narrative: "The agent runs nightly at 2:00 AM, delivers the digest to your Gmail inbox."
 
-ANTI-PATTERN 2 — inline-numbered steps. Do NOT collapse the Steps section into a single paragraph like "1. Search Gmail 2. Read threads 3. Summarize". Use the arcus-steps JSON block above — every step gets its own row.
+ANTI-PATTERN 2 — inline-numbered steps. Do NOT collapse the Steps section into a single paragraph like "1. Search Gmail 2. Read threads 3. Summarize". Use the boult-steps JSON block above — every step gets its own row.
 
 ANTI-PATTERN 3 — inline headings or separators. Do NOT write "Use Gmail. ## Phase 2: Schedule the run." Headings and \`---\` MUST each be on their own line with blank lines around them.
 
 ANTI-PATTERN 4 — recap of what the user said. Do NOT begin with "You asked me to plan X" or "Based on your request to do Y". Skip directly to the plan.
 
-ANTI-PATTERN 5 — raw JSON as content. The ONLY JSON in the document lives inside \`\`\`arcus-steps and \`\`\`arcus-table fences. JSON anywhere else (in Steps as a plain code block, in prose, unfenced) is a hard failure.
+ANTI-PATTERN 5 — raw JSON as content. The ONLY JSON in the document lives inside \`\`\`boult-steps and \`\`\`boult-table fences. JSON anywhere else (in Steps as a plain code block, in prose, unfenced) is a hard failure.
 
 ## Plan structure — use this exact skeleton
 
@@ -145,10 +145,10 @@ ANTI-PATTERN 5 — raw JSON as content. The ONLY JSON in the document lives insi
 <3-5 bullets grounding the plan in the user's actual situation — only facts from their request or the conversation. No invented numbers.>
 
 ## Steps
-<arcus-steps block, 6-12 steps>
+<boult-steps block, 6-12 steps>
 
 ## Timeline
-<arcus-table block: Phase | Focus | Duration>
+<boult-table block: Phase | Focus | Duration>
 
 ## Success Metrics
 <3-5 measurable checkpoints as bullets — each one verifiable, e.g. "10 paying users on 30-day pilots", "landing LCP under 2.5s">
@@ -239,8 +239,8 @@ async function embedTextAttachments(
 }
 function log(level: 'info' | 'warn' | 'error', msg: string, extra?: Record<string, unknown>) {
   const line = extra
-    ? `[Arcus:Route] ${ts()} ${msg} ${JSON.stringify(extra)}`
-    : `[Arcus:Route] ${ts()} ${msg}`;
+    ? `[Boult:Route] ${ts()} ${msg} ${JSON.stringify(extra)}`
+    : `[Boult:Route] ${ts()} ${msg}`;
   if (level === 'error') console.error(line);
   else if (level === 'warn') console.warn(line);
   else console.log(line);
@@ -258,7 +258,7 @@ export async function POST(request: NextRequest) {
   const userId = session.user.email.toLowerCase();
   const userName = session.user.name?.split(' ')[0] || 'there';
 
-  // STRICT paywall — Arcus compute is paid-only. The client redirect is not
+  // STRICT paywall — Boult compute is paid-only. The client redirect is not
   // enough; block the API directly so a free/expired user (or a replayed
   // request) can't drive the agent without a paid/trial plan.
   const gate = await assertPaidAccess(userId);
@@ -326,7 +326,7 @@ export async function POST(request: NextRequest) {
       fetchPersonality(userId),
       getVoiceContext(userId),
       fetchUserStylePrefs(userId),
-      (async () => { try { const { getUserModelSummary } = await import('../../../../lib/arcus/user-model'); return await getUserModelSummary(userId); } catch {
+      (async () => { try { const { getUserModelSummary } = await import('../../../../lib/boult/user-model'); return await getUserModelSummary(userId); } catch {
           logEvent({ channel: "failures", event: "❌ API Error", description: "Unknown error" }); return ''; } })(),
     ]);
     // Combine, dedup by line content
@@ -382,7 +382,7 @@ export async function POST(request: NextRequest) {
   let ruleFocus: string | null = null;
   if (!isPlanMode) {
     try {
-      const { getRecentViolationFocus } = await import('@/lib/arcus/rule-violations');
+      const { getRecentViolationFocus } = await import('@/lib/boult/rule-violations');
       ruleFocus = await getRecentViolationFocus(userId, 24);
     } catch {
       logEvent({ channel: "failures", event: "❌ API Error", description: "Unknown error" }); /* telemetry table optional */ }
@@ -406,7 +406,7 @@ export async function POST(request: NextRequest) {
       });
 
   // ── Live canvas grounding ────────────────────────────────────────────────────
-  // THE root cause of "Arcus can't edit the document" — found by tracing what
+  // THE root cause of "Boult can't edit the document" — found by tracing what
   // actually reaches the model on a follow-up turn. The `history` array sent
   // with every request (both here and client-side in ChatInterface.tsx) carries
   // ONLY the short chat-bubble text for each assistant turn — never the
@@ -417,7 +417,7 @@ export async function POST(request: NextRequest) {
   // a replacement from a vague memory of the topic, which is exactly why edits
   // come back short and generic instead of a precise change to the real text.
   //
-  // getCanvasState is DB-persisted per conversationId (arcus_canvas_state),
+  // getCanvasState is DB-persisted per conversationId (boult_canvas_state),
   // independent of what the client includes in `history` — so it is reachable
   // here even though the lossy history is not fixable without touching the
   // client's message-storage shape everywhere it's read. Injecting the actual
@@ -475,7 +475,7 @@ export async function POST(request: NextRequest) {
         if (m) {
           const fact = (group === 0 ? m[0] : m[group])?.trim();
           if (fact && fact.length >= 8 && fact.length <= 300) {
-            const { saveMemory } = await import('../../../../lib/arcus/memory');
+            const { saveMemory } = await import('../../../../lib/boult/memory');
             await saveMemory(userId, fact, ['user-stated'], 'user');
             log('info', 'Auto-extracted user memory', { fact: fact.slice(0, 120) });
             break; // one extraction per message — avoid double-saves
@@ -514,7 +514,7 @@ export async function POST(request: NextRequest) {
             connectors: [{
               id: 'gmail',
               name: 'Gmail',
-              description: 'Your Gmail token is missing the scopes Arcus needs. Reconnecting takes 5 seconds and lets me search your inbox, draft, and send mail.',
+              description: 'Your Gmail token is missing the scopes Boult needs. Reconnecting takes 5 seconds and lets me search your inbox, draft, and send mail.',
               connected: false,
             }],
             waitingForUser: true,
@@ -608,7 +608,7 @@ export async function POST(request: NextRequest) {
   saveMemoryAsync(userId, message, conversationId);
 
   // Fire-and-forget usage tracking (non-blocking)
-  subscriptionService.incrementFeatureUsage(userId, FEATURE_TYPES.ARCUS_AI).catch(() => {});
+  subscriptionService.incrementFeatureUsage(userId, FEATURE_TYPES.BOULT_AI).catch(() => {});
 
   return new Response(stream, {
     headers: {
@@ -626,11 +626,11 @@ async function saveMemoryAsync(userId: string, userMessage: string, _conversatio
     await extractAndSaveInsights(userId, userMessage, '');
   } catch (e: any) {
     logEvent({ channel: "failures", event: "❌ API Error", description: String(e) });
-    console.warn(`[Arcus:Route] ${ts()} Memory save failed (non-fatal)`, { error: e.message });
+    console.warn(`[Boult:Route] ${ts()} Memory save failed (non-fatal)`, { error: e.message });
   }
 }
 
-/** Fetch user's Arcus personality setting from user_profiles.preferences.
+/** Fetch user's Boult personality setting from user_profiles.preferences.
  *  PART 53 — respects the instructionsEnabled toggle: returns '' when the
  *  user has disabled instructions in settings, so the chat route doesn't
  *  pass a stale personality block into the prompt. */
@@ -644,8 +644,8 @@ async function fetchPersonality(userId: string): Promise<string> {
       .ilike('user_id', userId)
       .maybeSingle();
     const prefs = (data?.preferences as Record<string, unknown>) || {};
-    if (prefs.arcus_instructions_enabled === false) return '';
-    return (prefs.arcus_personality as string) || '';
+    if (prefs.boult_instructions_enabled === false) return '';
+    return (prefs.boult_personality as string) || '';
   } catch {
     logEvent({ channel: "failures", event: "❌ API Error", description: "Unknown error" });
     return '';
@@ -671,9 +671,9 @@ async function fetchUserStylePrefs(userId: string): Promise<{
       .ilike('user_id', userId)
       .maybeSingle();
     const prefs = (data?.preferences as Record<string, unknown>) || {};
-    const style = prefs.arcus_communication_style as string | undefined;
-    const verb = prefs.arcus_verbosity as string | undefined;
-    const action = prefs.arcus_action_mode as string | undefined;
+    const style = prefs.boult_communication_style as string | undefined;
+    const verb = prefs.boult_verbosity as string | undefined;
+    const action = prefs.boult_action_mode as string | undefined;
     return {
       communicationStyle: style === 'direct' || style === 'balanced' || style === 'warm' ? style : undefined,
       verbosity: verb === 'brief' || verb === 'normal' || verb === 'detailed' ? verb : undefined,
@@ -730,7 +730,7 @@ async function bootstrapVoiceProfile(userId: string, voiceProfileService: any): 
     const supabase = getSupabaseAdmin();
 
     const { data } = await supabase
-      .from('arcus_integrations')
+      .from('boult_integrations')
       .select('access_token, refresh_token')
       .eq('user_id', userId)
       .eq('provider', 'gmail')

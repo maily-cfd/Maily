@@ -2,13 +2,14 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, Mail, Cpu, Send, Layers } from "lucide-react";
 import { useSession, signIn, signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
 import { LiquidButton } from "@/components/ui/liquid-glass-button";
-import { ArcusLogo } from "@/components/ui/arcus-logo";
+import { BoultLogo } from "@/components/ui/boult-logo";
 
 interface NavbarProps {
   theme?: "light" | "dark";
@@ -91,18 +92,14 @@ export function Navbar({ theme = "light" }: NavbarProps) {
 
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2.5 group relative z-10">
-          <div className="relative w-7 h-7 rounded-[25%] overflow-hidden transition-all duration-500 group-hover:scale-105 border border-white/10 shadow-md bg-white">
-            <img 
-              src="/mailient-logo-premium.png" 
-              alt="Mailient Logo" 
-              className="w-full h-full object-cover"
-            />
+          <div className="relative w-7 h-7 rounded-[25%] overflow-hidden transition-all duration-500 group-hover:scale-105 border border-white/10 shadow-md bg-white flex items-center justify-center">
+            <Image src="/logo-maily.png" alt="Maily Logo" width={28} height={28} className="w-full h-full object-cover" />
           </div>
           <span className={cn(
             "font-extrabold text-[15px] tracking-tight transition-colors font-satoshi",
             isDark ? "text-white group-hover:text-neutral-200" : "text-neutral-900 group-hover:text-black"
           )}>
-            Mailient
+            Maily
           </span>
         </Link>
 
@@ -175,16 +172,16 @@ export function Navbar({ theme = "light" }: NavbarProps) {
 
                       {/* Column 2 */}
                       <div className="flex flex-col space-y-6 pr-4 border-r border-white/[0.04]">
-                        <Link href="/product/arcus" className="group block cursor-pointer select-none">
+                        <Link href="/product/boult" className="group block cursor-pointer select-none">
                           <span className="text-[10px] font-medium tracking-wide text-neutral-500 uppercase block mb-1">
-                            Arcus Engine
+                            Boult Engine
                           </span>
                           <span className="text-[13px] font-semibold text-neutral-300 leading-snug group-hover:text-white transition-all duration-300 block">
                             Delegate complex scheduling and tasks overnight
                           </span>
                         </Link>
 
-                        <Link href="/product/arcus" className="group block cursor-pointer select-none">
+                        <Link href="/product/boult" className="group block cursor-pointer select-none">
                           <span className="text-[10px] font-medium tracking-wide text-neutral-500 uppercase block mb-1">
                             Encryption
                           </span>
@@ -234,27 +231,15 @@ export function Navbar({ theme = "light" }: NavbarProps) {
           </div>
 
           <Link
-            href="/product/arcus"
+            href="/product/boult"
             className={cn(
               "transition-colors",
               isDark 
-                ? pathname === "/product/arcus" ? "text-white font-bold" : "hover:text-white"
-                : pathname === "/product/arcus" ? "text-neutral-950 font-bold" : "hover:text-neutral-950"
+                ? pathname === "/product/boult" ? "text-white font-bold" : "hover:text-white"
+                : pathname === "/product/boult" ? "text-neutral-950 font-bold" : "hover:text-neutral-950"
             )}
           >
-            Arcus
-          </Link>
-
-          <Link
-            href="/pricing"
-            className={cn(
-              "transition-colors",
-              isDark 
-                ? pathname === "/pricing" ? "text-white font-bold" : "hover:text-white"
-                : pathname === "/pricing" ? "text-neutral-950 font-bold" : "hover:text-neutral-950"
-            )}
-          >
-            Pricing
+            Boult
           </Link>
 
           <Link
@@ -284,6 +269,17 @@ export function Navbar({ theme = "light" }: NavbarProps) {
 
         {/* Action Buttons */}
         <div className="flex items-center gap-4 relative z-10">
+          <a 
+            href="https://github.com/maily-cfd/Maily" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className={cn("hidden md:flex transition-colors", isDark ? "text-neutral-400 hover:text-white" : "text-neutral-500 hover:text-black")}
+            aria-label="Star on GitHub"
+          >
+            <svg viewBox="0 0 24 24" className="w-[18px] h-[18px] fill-current" aria-hidden="true">
+              <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z" />
+            </svg>
+          </a>
           {status === "authenticated" ? (
             <>
               <Link
@@ -319,14 +315,14 @@ export function Navbar({ theme = "light" }: NavbarProps) {
               {/* Real anchor, not a router.push button — the primary conversion
                   CTA must be middle-clickable, openable in a new tab, and
                   crawlable as a link to /auth/signup. */}
-              <Link href="/auth/signup" aria-label="Start 3-day free trial with Mailient">
+              <Link href="/auth/signup" aria-label="Start for free">
                 <LiquidButton
                   variant={isDark ? "default" : "light"}
                   size="sm"
                   className="rounded-full !h-8.5 px-4 font-bold text-[11px] tracking-tight hover:shadow-[0_0_30px_rgba(255,255,255,0.15)] flex items-center gap-1.5"
                 >
                   <Mail className="w-3.5 h-3.5" />
-                  Start free trial
+                  Start for free
                 </LiquidButton>
               </Link>
             </>

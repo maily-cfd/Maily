@@ -4,19 +4,19 @@ import { BlogLayout } from "@/components/BlogLayout";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Why Founders Lose Deals in Their Inbox // Mailient Blog",
+  title: "Why Founders Lose Deals in Their Inbox // Maily Blog",
   description: "The hidden cost of inbox overload isn't just wasted time — it's missed revenue. Here's how high-stakes emails slip through the cracks, and what to do about it.",
   openGraph: {
-    title: "Why Founders Lose Deals in Their Inbox // Mailient Blog",
+    title: "Why Founders Lose Deals in Their Inbox // Maily Blog",
     description: "The hidden cost of inbox overload isn't just wasted time — it's missed revenue. Here's how high-stakes emails slip through the cracks, and what to do about it.",
-    url: "https://mailient.xyz/blogs/founders-lose-deals-inbox",
+    url: "https://maily.dev/blogs/founders-lose-deals-inbox",
     type: "article",
     publishedTime: "2026-05-24T00:00:00.000Z",
-    authors: ["Maulik"],
+    authors: ["Maily"],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Why Founders Lose Deals in Their Inbox // Mailient Blog",
+    title: "Why Founders Lose Deals in Their Inbox // Maily Blog",
     description: "The hidden cost of inbox overload isn't just wasted time — it's missed revenue.",
   },
 };
@@ -28,7 +28,7 @@ const meta = {
   readTime: "7 min read",
   category: "Productivity",
   slug: "founders-lose-deals-inbox",
-  author: "Maulik",
+  author: "Maily",
 };
 
 const tableOfContents = [
@@ -36,7 +36,7 @@ const tableOfContents = [
   { id: "how-deals-slip", label: "How Deals Slip Through" },
   { id: "4d-framework", label: "Why the 4D Framework Fails" },
   { id: "what-agents-do", label: "What AI Agents Do Differently" },
-  { id: "mailient-approach", label: "The Mailient Approach" },
+  { id: "maily-approach", label: "The Maily Approach" },
 ];
 
 const relatedPosts = [
@@ -131,18 +131,18 @@ export default function FoundersLoseDealsPage() {
 
       <hr />
 
-      <h2 id="mailient-approach">The Mailient Approach</h2>
+      <h2 id="maily-approach">The Maily Approach</h2>
       <p>
-        <Link href="/product/sift">Mailient's Sift AI</Link> handles the first problem — signal drowning — by performing semantic triage on every incoming message. Instead of matching keywords, Sift reads with human-like comprehension. It understands that an email titled "Quick question about timeline" from a known investor contact is a priority deal conversation, not a routine status update.
+        <Link href="/product/sift">Maily's Sift AI</Link> handles the first problem — signal drowning — by performing semantic triage on every incoming message. Instead of matching keywords, Sift reads with human-like comprehension. It understands that an email titled "Quick question about timeline" from a known investor contact is a priority deal conversation, not a routine status update.
       </p>
       <p>
-        Critical emails surface immediately. Newsletters, promotional digests, and CC chains are archived silently. When you open Mailient, you see the emails that actually move your business forward — nothing else.
+        Critical emails surface immediately. Newsletters, promotional digests, and CC chains are archived silently. When you open Maily, you see the emails that actually move your business forward — nothing else.
       </p>
       <p>
-        <Link href="/product/arcus">Arcus</Link>, Mailient's autonomous agent, handles the second and third problems. It reads your threads, checks your calendar for open slots, and drafts replies that match your writing style — your greeting, your sign-off, your typical sentence structure. Everything is based on a <Link href="/blogs/ai-learns-your-writing-style">Neural Voice Profile</Link> built from your last 90 days of sent emails.
+        <Link href="/product/boult">Boult</Link>, Maily's autonomous agent, handles the second and third problems. It reads your threads, checks your calendar for open slots, and drafts replies that match your writing style — your greeting, your sign-off, your typical sentence structure. Everything is based on a <Link href="/blogs/ai-learns-your-writing-style">Neural Voice Profile</Link> built from your last 90 days of sent emails.
       </p>
       <p>
-        Nothing sends without your explicit approval. Arcus queues drafts in your Gmail outbox, shows you a diff view of what it changed, and waits. You approve with one click, edit inline, or discard. The control is absolute — the time savings are the same.
+        Nothing sends without your explicit approval. Boult queues drafts in your Gmail outbox, shows you a diff view of what it changed, and waits. You approve with one click, edit inline, or discard. The control is absolute — the time savings are the same.
       </p>
       <p>
         For founders who spend their days building product, closing deals, and managing teams, reclaiming 3 hours of daily email processing isn't a marginal improvement. It's the difference between having time to do the work that matters and drowning in the work that doesn't.
@@ -150,7 +150,7 @@ export default function FoundersLoseDealsPage() {
 
       <div className="callout-box">
         <p>
-          <strong>Ready to stop losing deals in your inbox?</strong> Mailient handles your email while you focus on building.{" "}
+          <strong>Ready to stop losing deals in your inbox?</strong> Maily handles your email while you focus on building.{" "}
           <a href="/auth/signup">Start free trial →</a>
         </p>
       </div>

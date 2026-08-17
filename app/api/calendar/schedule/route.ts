@@ -54,8 +54,8 @@ export async function POST(request: Request) {
 
         // Create the event
         const event = await calendarService.createMeeting({
-            summary: summary || 'Meeting with Mailient User',
-            description: description || 'Scheduled via Mailient',
+            summary: summary || 'Meeting with Maily User',
+            description: description || 'Scheduled via Maily',
             startTime,
             endTime,
             attendees: attendees || []
@@ -88,7 +88,7 @@ Join here: ${meetLink}
 Looking forward to it!
 
 Best regards,
-${session.user.name || 'Mailient User'}
+${session.user.name || 'Maily User'}
 `.trim();
 
                     await gmailService.sendEmail({

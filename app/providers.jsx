@@ -10,8 +10,8 @@ import { Toaster } from "../components/ui/sonner";
 import { DashboardSettingsProvider } from "../lib/DashboardSettingsContext";
 import { LenisProvider } from "../components/providers/LenisProvider";
 
-const ArcusCommandPalette = dynamic(
-  () => import("../components/ui/arcus-command-palette").then((m) => m.ArcusCommandPalette),
+const BoultCommandPalette = dynamic(
+  () => import("../components/ui/boult-command-palette").then((m) => m.BoultCommandPalette || m.ArcusCommandPalette),
   { ssr: false }
 );
 const SoundSystem = dynamic(
@@ -26,7 +26,7 @@ const APP_ONLY_PREFIXES = [
   "/dashboard",
   "/onboarding",
   "/settings",
-  "/arcus",
+  "/boult",
   "/inbox",
   "/compose",
 ];
@@ -43,7 +43,7 @@ export default function Providers({ children }) {
   const loadAppChrome = isAppRoute(pathname);
 
   // SessionProvider stays everywhere (Navbar / pricing use useSession).
-  // Sound + Arcus palette only on app routes — same UI on marketing, less JS.
+  // Sound + Boult palette only on app routes — same UI on marketing, less JS.
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider
@@ -58,7 +58,7 @@ export default function Providers({ children }) {
               {children}
             </LenisProvider>
             {loadAppChrome && <SoundSystem />}
-            {loadAppChrome && <ArcusCommandPalette />}
+            {loadAppChrome && <BoultCommandPalette />}
             <OfflineToast />
             <Toaster position="top-center" theme="dark" closeButton />
           </DashboardSettingsProvider>

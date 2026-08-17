@@ -14,7 +14,7 @@ import {
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import AutonomyPanel from '@/components/ui/autonomy-panel';
-import { cleanRunSummary } from '@/lib/arcus/report-summary';
+import { cleanRunSummary } from '@/lib/boult/report-summary';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
@@ -57,7 +57,7 @@ function triggerLabel(agent: Pick<Agent, 'trigger_type' | 'conditions' | 'cron_s
   return cronToLabel(agent.cron_schedule);
 }
 
-// One row from arcus_agent_runs — populated by the cron runner on every
+// One row from boult_agent_runs — populated by the cron runner on every
 // scheduled attempt. The RecentRuns subcomponent below lazy-loads up to 7 of
 // these per agent the first time the card is expanded.
 interface ArtifactLink { label: string; url: string }
@@ -210,34 +210,34 @@ function MiniCalendar({ agents, onAgentClick }: { agents: Agent[]; onAgentClick:
       {/* Nav */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1.5">
-          <button onClick={prevMonth} className="w-8 h-8 flex items-center justify-center rounded-lg text-arcus-fg-muted hover:text-arcus-fg hover:bg-arcus-surface border border-arcus-surface hover:border-arcus-raised transition-all duration-150">
+          <button onClick={prevMonth} className="w-8 h-8 flex items-center justify-center rounded-lg text-boult-fg-muted hover:text-boult-fg hover:bg-boult-surface border border-boult-surface hover:border-boult-raised transition-all duration-150">
             <ChevronLeft className="w-4 h-4" />
           </button>
-          <span className="text-[14px] font-extrabold text-arcus-fg min-w-[130px] text-center tracking-tight">
+          <span className="text-[14px] font-extrabold text-boult-fg min-w-[130px] text-center tracking-tight">
             {MONTH_NAMES[viewMonth]} {viewYear}
           </span>
-          <button onClick={nextMonth} className="w-8 h-8 flex items-center justify-center rounded-lg text-arcus-fg-muted hover:text-arcus-fg hover:bg-arcus-surface border border-arcus-surface hover:border-arcus-raised transition-all duration-150">
+          <button onClick={nextMonth} className="w-8 h-8 flex items-center justify-center rounded-lg text-boult-fg-muted hover:text-boult-fg hover:bg-boult-surface border border-boult-surface hover:border-boult-raised transition-all duration-150">
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>
         <button
           onClick={() => { setViewYear(today.getFullYear()); setViewMonth(today.getMonth()); }}
-          className="px-3 py-1.5 rounded-lg text-[12px] font-bold text-arcus-fg-secondary border border-arcus-surface bg-arcus-surface hover:border-arcus-raised hover:text-arcus-fg transition-all duration-150"
+          className="px-3 py-1.5 rounded-lg text-[12px] font-bold text-boult-fg-secondary border border-boult-surface bg-boult-surface hover:border-boult-raised hover:text-boult-fg transition-all duration-150"
         >
           Today
         </button>
       </div>
 
       {/* Day headers */}
-      <div className="grid grid-cols-7 border-b border-arcus-border/60 pb-1.5">
+      <div className="grid grid-cols-7 border-b border-boult-border/60 pb-1.5">
         {DAY_NAMES.map(d => (
-          <div key={d} className="text-center text-[10px] font-bold uppercase tracking-widest text-arcus-fg-muted py-1">{d}</div>
+          <div key={d} className="text-center text-[10px] font-bold uppercase tracking-widest text-boult-fg-muted py-1">{d}</div>
         ))}
       </div>
 
       {/* Grid */}
       <div
-        className="grid grid-cols-7 border border-arcus-border rounded-xl overflow-hidden bg-arcus-elevated"
+        className="grid grid-cols-7 border border-boult-border rounded-xl overflow-hidden bg-boult-elevated"
         style={{ gridTemplateRows: `repeat(${cells.length / 7}, minmax(72px, 1fr))` }}
       >
         {cells.map((cell, idx) => {
@@ -247,12 +247,12 @@ function MiniCalendar({ agents, onAgentClick }: { agents: Agent[]; onAgentClick:
             <div
               key={idx}
               className={cn(
-                'flex flex-col p-1.5 border-r border-b border-arcus-border/60 overflow-hidden transition-colors duration-150 group/cell',
+                'flex flex-col p-1.5 border-r border-b border-boult-border/60 overflow-hidden transition-colors duration-150 group/cell',
                 cell.day === null
-                  ? 'bg-arcus-bg'
+                  ? 'bg-boult-bg'
                   : isToday
-                    ? 'bg-arcus-surface/40'
-                    : 'bg-arcus-elevated/20 hover:bg-arcus-surface/25',
+                    ? 'bg-boult-surface/40'
+                    : 'bg-boult-elevated/20 hover:bg-boult-surface/25',
                 idx % 7 === 6 && 'border-r-0',
               )}
             >
@@ -263,8 +263,8 @@ function MiniCalendar({ agents, onAgentClick }: { agents: Agent[]; onAgentClick:
                     isToday
                       ? 'bg-zinc-100 text-zinc-950 shadow-sm shadow-white/10'
                       : isPast
-                        ? 'text-arcus-fg-muted'
-                        : 'text-arcus-fg-muted group-hover/cell:text-arcus-fg-secondary',
+                        ? 'text-boult-fg-muted'
+                        : 'text-boult-fg-muted group-hover/cell:text-boult-fg-secondary',
                   )}>
                     {cell.day}
                   </div>
@@ -272,9 +272,9 @@ function MiniCalendar({ agents, onAgentClick }: { agents: Agent[]; onAgentClick:
                     <button
                       key={ri}
                       onClick={() => onAgentClick(agent)}
-                      className="w-full text-left rounded px-1.5 py-0.5 border border-arcus-divider/80 bg-arcus-surface/90 hover:bg-arcus-raised hover:border-arcus-divider transition-all duration-150 mb-0.5"
+                      className="w-full text-left rounded px-1.5 py-0.5 border border-boult-divider/80 bg-boult-surface/90 hover:bg-boult-raised hover:border-boult-divider transition-all duration-150 mb-0.5"
                     >
-                      <p className="text-[9px] font-medium text-arcus-fg-secondary truncate leading-normal">{agent.name}</p>
+                      <p className="text-[9px] font-medium text-boult-fg-secondary truncate leading-normal">{agent.name}</p>
                     </button>
                   ))}
                 </>
@@ -343,10 +343,10 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: () => void 
 
 // ── Templates ──────────────────────────────────────────────────────────────────
 
-// Curated agent templates — fetched from /api/arcus/agents/templates so
+// Curated agent templates — fetched from /api/boult/agents/templates so
 // the catalog stays a single source of truth. We keep a thin offline
 // fallback list so the dashboard still renders if the API is unreachable.
-import { AGENT_TEMPLATES as CURATED_AGENT_TEMPLATES, type AgentTemplate as CuratedAgentTemplate } from '@/lib/arcus/agent-templates';
+import { AGENT_TEMPLATES as CURATED_AGENT_TEMPLATES, type AgentTemplate as CuratedAgentTemplate } from '@/lib/boult/agent-templates';
 
 interface UITemplate {
   id?: string;
@@ -377,7 +377,7 @@ function curatedToUITemplate(t: CuratedAgentTemplate): UITemplate {
 const TEMPLATES: UITemplate[] = CURATED_AGENT_TEMPLATES.map(curatedToUITemplate);
 
 function getTemplateIcon(id?: string) {
-  const iconProps = { className: "w-4 h-4 text-arcus-fg-secondary" };
+  const iconProps = { className: "w-4 h-4 text-boult-fg-secondary" };
   switch (id) {
     case 'morning_inbox_sweep':
       return <Sunrise {...iconProps} />;
@@ -791,7 +791,7 @@ function CreateModal({ onClose, onSave, initial }: {
   const todayStr = new Date().toISOString().split('T')[0];
 
   const handleSave = async () => {
-    if (!task.trim()) { toast.error('Describe what you want Arcus to do.'); return; }
+    if (!task.trim()) { toast.error('Describe what you want Boult to do.'); return; }
     if (hasExpiry && !expiresAt) { toast.error('Pick an expiration date or disable expiration.'); return; }
     setSaving(true);
     try {
@@ -864,7 +864,7 @@ function CreateModal({ onClose, onSave, initial }: {
             <div className="lg:col-span-7 space-y-6">
               {/* Task description */}
               <div>
-                <label className="block text-[13px] font-bold text-zinc-600 dark:text-zinc-400 mb-2">What should Arcus do?</label>
+                <label className="block text-[13px] font-bold text-zinc-600 dark:text-zinc-400 mb-2">What should Boult do?</label>
                 <textarea
                   value={task}
                   onChange={e => setTask(e.target.value)}
@@ -1038,7 +1038,7 @@ function CreateModal({ onClose, onSave, initial }: {
 // ── Agent Card ─────────────────────────────────────────────────────────────────
 
 // ── Recent runs (PART 35) ──────────────────────────────────────────────────────
-// Lazy-loads up to 7 rows from /api/arcus/agents/runs?agentId=... on first
+// Lazy-loads up to 7 rows from /api/boult/agents/runs?agentId=... on first
 // expand. Renders status pill, when it ran, duration, tool-call count,
 // delivery icons, and per-bucket artifact link counts. Each artifact group
 // links out to the actual page/event/draft via the URLs the cron runner
@@ -1066,12 +1066,12 @@ function formatDuration(ms: number | null): string | null {
 
 function statusPill(status: AgentRun['status']) {
   const map: Record<AgentRun['status'], { label: string; cls: string; icon: React.ReactNode }> = {
-    success:         { label: 'Success',  cls: 'bg-arcus-raised text-arcus-fg border-arcus-divider',           icon: <Check className="w-3 h-3" /> },
+    success:         { label: 'Success',  cls: 'bg-boult-raised text-boult-fg border-boult-divider',           icon: <Check className="w-3 h-3" /> },
     partial:         { label: 'Partial',  cls: 'bg-amber-500/10 text-amber-600 border-amber-500/20',           icon: <AlertCircle className="w-3 h-3" /> },
     blocked:         { label: 'Blocked',  cls: 'bg-rose-500/10 text-rose-600 border-rose-500/20',              icon: <AlertCircle className="w-3 h-3" /> },
-    error:           { label: 'Error',    cls: 'bg-arcus-raised text-arcus-fg-secondary border-arcus-divider', icon: <AlertCircle className="w-3 h-3" /> },
-    transient_error: { label: 'Retrying', cls: 'bg-arcus-raised text-arcus-fg-secondary border-arcus-divider', icon: <Loader2 className="w-3 h-3 animate-spin" /> },
-    running:         { label: 'Running',  cls: 'bg-arcus-raised text-arcus-fg-secondary border-arcus-divider', icon: <Loader2 className="w-3 h-3 animate-spin" /> },
+    error:           { label: 'Error',    cls: 'bg-boult-raised text-boult-fg-secondary border-boult-divider', icon: <AlertCircle className="w-3 h-3" /> },
+    transient_error: { label: 'Retrying', cls: 'bg-boult-raised text-boult-fg-secondary border-boult-divider', icon: <Loader2 className="w-3 h-3 animate-spin" /> },
+    running:         { label: 'Running',  cls: 'bg-boult-raised text-boult-fg-secondary border-boult-divider', icon: <Loader2 className="w-3 h-3 animate-spin" /> },
   };
   const meta = map[status] ?? map.running;
   return (
@@ -1085,7 +1085,7 @@ function statusPill(status: AgentRun['status']) {
 function autonomyBadge(level: Agent['autonomy_level']) {
   if (!level || level === 'assist') return null; // assist is the default — don't clutter
   const map = {
-    observe: { label: 'Observe', cls: 'bg-arcus-raised text-arcus-fg-muted border-arcus-divider', title: 'Watches and reports — never acts without you' },
+    observe: { label: 'Observe', cls: 'bg-boult-raised text-boult-fg-muted border-boult-divider', title: 'Watches and reports — never acts without you' },
     own:     { label: 'Owns it', cls: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20', title: 'Acts autonomously and tells you after' },
   } as const;
   const meta = map[level as 'observe' | 'own'];
@@ -1106,7 +1106,7 @@ function deliveryIcon(channel: 'email' | 'slack', state: AgentRun['email_deliver
       title={`${channel} delivery: ${state}`}
       className={cn(
         'inline-flex items-center justify-center w-5 h-5 rounded',
-        ok ? 'text-arcus-fg' : 'text-arcus-fg-muted',
+        ok ? 'text-boult-fg' : 'text-boult-fg-muted',
       )}
     >
       <Icon className="w-3 h-3" />
@@ -1123,7 +1123,7 @@ function ArtifactBucket({
     <div className="relative">
       <button
         onClick={() => setOpen(v => !v)}
-        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] text-arcus-fg-secondary bg-arcus-raised/60 hover:bg-arcus-raised border border-arcus-divider/50 hover:border-arcus-divider transition-colors"
+        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] text-boult-fg-secondary bg-boult-raised/60 hover:bg-boult-raised border border-boult-divider/50 hover:border-boult-divider transition-colors"
         title={`${count} ${label}`}
       >
         {icon}
@@ -1135,9 +1135,9 @@ function ArtifactBucket({
             initial={{ opacity: 0, y: -4 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}
-            className="absolute z-30 left-0 top-7 min-w-[260px] max-w-[360px] bg-white dark:bg-neutral-900 border border-arcus-border rounded-xl overflow-hidden shadow-2xl"
+            className="absolute z-30 left-0 top-7 min-w-[260px] max-w-[360px] bg-white dark:bg-neutral-900 border border-boult-border rounded-xl overflow-hidden shadow-2xl"
           >
-            <div className="px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-arcus-fg-muted border-b border-arcus-divider/60">
+            <div className="px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-boult-fg-muted border-b border-boult-divider/60">
               {label} ({count})
             </div>
             <div className="max-h-[220px] overflow-y-auto py-1">
@@ -1147,7 +1147,7 @@ function ArtifactBucket({
                   href={l.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 px-3 py-2 text-[12px] text-arcus-fg-secondary hover:bg-arcus-raised hover:text-arcus-fg transition-colors"
+                  className="flex items-center gap-2 px-3 py-2 text-[12px] text-boult-fg-secondary hover:bg-boult-raised hover:text-boult-fg transition-colors"
                 >
                   <ExternalLink className="w-3 h-3 flex-shrink-0 opacity-60" />
                   <span className="truncate">{l.label}</span>
@@ -1165,13 +1165,13 @@ function RunRow({ run }: { run: AgentRun }) {
   const dur = formatDuration(run.duration_ms);
   const links = run.artifact_links ?? {};
   return (
-    <div className="px-3 py-3 border-b border-arcus-divider/40 last:border-b-0">
+    <div className="px-3 py-3 border-b border-boult-divider/40 last:border-b-0">
       <div className="flex items-center gap-2 flex-wrap">
         {statusPill(run.status)}
-        <span className="text-[12px] text-arcus-fg-muted">{relativeTime(run.started_at)}</span>
-        {dur && <span className="text-[11px] text-arcus-fg-muted">· {dur}</span>}
+        <span className="text-[12px] text-boult-fg-muted">{relativeTime(run.started_at)}</span>
+        {dur && <span className="text-[11px] text-boult-fg-muted">· {dur}</span>}
         {typeof run.tool_calls === 'number' && run.tool_calls > 0 && (
-          <span className="text-[11px] text-arcus-fg-muted">· {run.tool_calls} tool {run.tool_calls === 1 ? 'call' : 'calls'}</span>
+          <span className="text-[11px] text-boult-fg-muted">· {run.tool_calls} tool {run.tool_calls === 1 ? 'call' : 'calls'}</span>
         )}
         <div className="ml-auto flex items-center gap-1">
           {deliveryIcon('email', run.email_delivery)}
@@ -1180,23 +1180,23 @@ function RunRow({ run }: { run: AgentRun }) {
       </div>
 
       {run.outcome_summary ? (
-        <p className="mt-2 text-[12.5px] text-arcus-fg leading-relaxed">{run.outcome_summary}</p>
+        <p className="mt-2 text-[12.5px] text-boult-fg leading-relaxed">{run.outcome_summary}</p>
       ) : null}
 
       {run.plan ? (
         <details className="mt-2 group/plan">
-          <summary className="text-[11px] font-semibold text-arcus-fg-muted/80 cursor-pointer select-none hover:text-arcus-fg-secondary list-none flex items-center gap-1">
+          <summary className="text-[11px] font-semibold text-boult-fg-muted/80 cursor-pointer select-none hover:text-boult-fg-secondary list-none flex items-center gap-1">
             <ChevronDown className="w-3 h-3 transition-transform group-open/plan:rotate-180" />
             Plan
           </summary>
-          <p className="mt-1.5 pl-4 text-[11.5px] text-arcus-fg-muted/90 leading-relaxed whitespace-pre-line border-l border-arcus-divider/50">{run.plan}</p>
+          <p className="mt-1.5 pl-4 text-[11.5px] text-boult-fg-muted/90 leading-relaxed whitespace-pre-line border-l border-boult-divider/50">{run.plan}</p>
         </details>
       ) : null}
 
       {run.status === 'error' && run.error_message ? (
         <p className="mt-2 text-[12px] text-red-400 leading-relaxed line-clamp-2">{run.error_message}</p>
       ) : run.report_summary ? (
-        <p className="mt-2 text-[12px] text-arcus-fg-muted leading-relaxed line-clamp-2">{cleanRunSummary(run.report_summary)}</p>
+        <p className="mt-2 text-[12px] text-boult-fg-muted leading-relaxed line-clamp-2">{cleanRunSummary(run.report_summary)}</p>
       ) : null}
 
       {(links.gmail?.length || links.calendar?.length || links.notion?.length || links.slack?.length) ? (
@@ -1210,20 +1210,20 @@ function RunRow({ run }: { run: AgentRun }) {
 
       {run.report_full ? (
         <details className="mt-2 group/report">
-          <summary className="text-[11px] font-semibold text-arcus-fg-muted/80 cursor-pointer select-none hover:text-arcus-fg-secondary list-none flex items-center gap-1">
+          <summary className="text-[11px] font-semibold text-boult-fg-muted/80 cursor-pointer select-none hover:text-boult-fg-secondary list-none flex items-center gap-1">
             <ChevronDown className="w-3 h-3 transition-transform group-open/report:rotate-180" />
             Full report
           </summary>
-          <div className="mt-1.5 pl-4 border-l border-arcus-divider/50 text-[12px] text-arcus-fg-secondary leading-relaxed arcus-run-report space-y-2">
+          <div className="mt-1.5 pl-4 border-l border-boult-divider/50 text-[12px] text-boult-fg-secondary leading-relaxed boult-run-report space-y-2">
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
               components={{
-                a: ({ node, ...props }) => <a {...props} target="_blank" rel="noopener noreferrer" className="text-arcus-fg underline underline-offset-2 hover:opacity-70" />,
-                h2: ({ node, ...props }) => <p {...props} className="font-bold text-arcus-fg mt-3 first:mt-0" />,
-                h3: ({ node, ...props }) => <p {...props} className="font-semibold text-arcus-fg mt-2" />,
+                a: ({ node, ...props }) => <a {...props} target="_blank" rel="noopener noreferrer" className="text-boult-fg underline underline-offset-2 hover:opacity-70" />,
+                h2: ({ node, ...props }) => <p {...props} className="font-bold text-boult-fg mt-3 first:mt-0" />,
+                h3: ({ node, ...props }) => <p {...props} className="font-semibold text-boult-fg mt-2" />,
                 ul: ({ node, ...props }) => <ul {...props} className="list-disc pl-4 space-y-0.5" />,
                 p: ({ node, ...props }) => <p {...props} className="leading-relaxed" />,
-                code: ({ node, ...props }) => <code {...props} className="px-1 py-0.5 rounded bg-arcus-raised text-[11px]" />,
+                code: ({ node, ...props }) => <code {...props} className="px-1 py-0.5 rounded bg-boult-raised text-[11px]" />,
               }}
             >
               {run.report_full}
@@ -1249,7 +1249,7 @@ function RecentRuns({ agentId, expanded }: { agentId: string; expanded: boolean 
     setErr(null);
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000);
-    fetch(`/api/arcus/agents/runs?agentId=${encodeURIComponent(agentId)}&limit=7`, {
+    fetch(`/api/boult/agents/runs?agentId=${encodeURIComponent(agentId)}&limit=7`, {
       signal: controller.signal,
     })
       .then(async r => {
@@ -1278,13 +1278,13 @@ function RecentRuns({ agentId, expanded }: { agentId: string; expanded: boolean 
   if (!expanded) return null;
 
   return (
-    <div className="mt-2 border border-arcus-divider/50 rounded-xl bg-arcus-elevated/40 overflow-hidden">
-      <div className="px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-arcus-fg-muted border-b border-arcus-divider/40 flex items-center justify-between">
+    <div className="mt-2 border border-boult-divider/50 rounded-xl bg-boult-elevated/40 overflow-hidden">
+      <div className="px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-boult-fg-muted border-b border-boult-divider/40 flex items-center justify-between">
         <span>Recent runs</span>
-        {runs && runs.length > 0 && <span className="font-medium normal-case tracking-normal text-arcus-fg-muted">last {runs.length}</span>}
+        {runs && runs.length > 0 && <span className="font-medium normal-case tracking-normal text-boult-fg-muted">last {runs.length}</span>}
       </div>
       {loading && (
-        <div className="px-3 py-4 flex items-center gap-2 text-[12px] text-arcus-fg-muted">
+        <div className="px-3 py-4 flex items-center gap-2 text-[12px] text-boult-fg-muted">
           <Loader2 className="w-3.5 h-3.5 animate-spin" /> Loading run history…
         </div>
       )}
@@ -1292,7 +1292,7 @@ function RecentRuns({ agentId, expanded }: { agentId: string; expanded: boolean 
         <div className="px-3 py-3 text-[12px] text-red-400">Could not load runs: {err}</div>
       )}
       {!loading && !err && runs && runs.length === 0 && (
-        <div className="px-3 py-4 text-[12px] text-arcus-fg-muted">No runs yet. The first scheduled run will appear here.</div>
+        <div className="px-3 py-4 text-[12px] text-boult-fg-muted">No runs yet. The first scheduled run will appear here.</div>
       )}
       {!loading && runs && runs.map(r => <RunRow key={r.id} run={r} />)}
     </div>
@@ -1312,11 +1312,11 @@ function AgentCard({ agent, onToggle, onEdit, onDelete, onToggleConf, onRunNow }
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -4 }}
-      className="bg-arcus-surface/65 backdrop-blur-xl border border-arcus-border rounded-2xl overflow-hidden hover:border-arcus-divider transition-all shadow-sm"
+      className="bg-boult-surface/65 backdrop-blur-xl border border-boult-border rounded-2xl overflow-hidden hover:border-boult-divider transition-all shadow-sm"
     >
       <div className="p-5 pb-4">
         <div className="flex items-start gap-3.5">
-          <div className="px-2.5 py-1 rounded-lg text-[11px] font-bold border flex-shrink-0 mt-0.5 bg-arcus-raised/60 border-arcus-divider/60 text-arcus-fg-secondary">
+          <div className="px-2.5 py-1 rounded-lg text-[11px] font-bold border flex-shrink-0 mt-0.5 bg-boult-raised/60 border-boult-divider/60 text-boult-fg-secondary">
             {(agent.trigger_type === 'event' || agent.trigger_type === 'condition')
               ? 'Event'
               : agent.trigger_type === 'chained'
@@ -1325,17 +1325,17 @@ function AgentCard({ agent, onToggle, onEdit, onDelete, onToggleConf, onRunNow }
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5">
-              <p className="text-[15px] font-bold text-arcus-fg leading-tight line-clamp-1">{agent.name}</p>
+              <p className="text-[15px] font-bold text-boult-fg leading-tight line-clamp-1">{agent.name}</p>
               {autonomyBadge(agent.autonomy_level)}
             </div>
-            <p className="text-[13px] text-arcus-fg-muted mt-1 leading-relaxed line-clamp-2">{agent.mission?.objective || agent.task_description}</p>
+            <p className="text-[13px] text-boult-fg-muted mt-1 leading-relaxed line-clamp-2">{agent.mission?.objective || agent.task_description}</p>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0 pt-0.5">
             <Toggle checked={agent.status !== 'paused'} onChange={onToggle} />
             <div className="relative">
               <button
                 onClick={() => setMenuOpen(v => !v)}
-                className="w-8 h-8 flex items-center justify-center rounded-lg text-arcus-fg-muted hover:text-arcus-fg hover:bg-arcus-raised transition-all"
+                className="w-8 h-8 flex items-center justify-center rounded-lg text-boult-fg-muted hover:text-boult-fg hover:bg-boult-raised transition-all"
               >
                 <MoreHorizontal className="w-4 h-4" />
               </button>
@@ -1345,17 +1345,17 @@ function AgentCard({ agent, onToggle, onEdit, onDelete, onToggleConf, onRunNow }
                     initial={{ opacity: 0, scale: 0.92, y: -4 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.92, y: -4 }}
-                    className="absolute right-0 top-10 w-36 bg-white dark:bg-neutral-900 border border-arcus-border rounded-xl overflow-hidden shadow-2xl z-20"
+                    className="absolute right-0 top-10 w-36 bg-white dark:bg-neutral-900 border border-boult-border rounded-xl overflow-hidden shadow-2xl z-20"
                   >
                     <button
                       onClick={() => { setMenuOpen(false); onRunNow(); }}
-                      className="w-full flex items-center gap-2 px-3.5 py-2.5 text-[13px] text-arcus-fg-secondary hover:bg-arcus-raised hover:text-arcus-fg transition-all"
+                      className="w-full flex items-center gap-2 px-3.5 py-2.5 text-[13px] text-boult-fg-secondary hover:bg-boult-raised hover:text-boult-fg transition-all"
                     >
                       <Play className="w-3.5 h-3.5" /> Run now
                     </button>
                     <button
                       onClick={() => { setMenuOpen(false); onEdit(); }}
-                      className="w-full flex items-center gap-2 px-3.5 py-2.5 text-[13px] text-arcus-fg-secondary hover:bg-arcus-raised hover:text-arcus-fg transition-all"
+                      className="w-full flex items-center gap-2 px-3.5 py-2.5 text-[13px] text-boult-fg-secondary hover:bg-boult-raised hover:text-boult-fg transition-all"
                     >
                       <Edit2 className="w-3.5 h-3.5" /> Edit
                     </button>
@@ -1373,28 +1373,28 @@ function AgentCard({ agent, onToggle, onEdit, onDelete, onToggleConf, onRunNow }
         </div>
 
         {/* Info rows */}
-        <div className="flex items-center gap-6 mt-4 pt-3.5 border-t border-arcus-divider/50">
+        <div className="flex items-center gap-6 mt-4 pt-3.5 border-t border-boult-divider/50">
           <div>
-            <span className="text-[11px] font-semibold uppercase tracking-widest text-arcus-fg-muted block mb-0.5">
+            <span className="text-[11px] font-semibold uppercase tracking-widest text-boult-fg-muted block mb-0.5">
               {(agent.trigger_type && agent.trigger_type !== 'schedule') ? 'Trigger' : 'Schedule'}
             </span>
-            <span className="text-[13px] text-arcus-fg-secondary font-medium">{triggerLabel(agent)}</span>
+            <span className="text-[13px] text-boult-fg-secondary font-medium">{triggerLabel(agent)}</span>
           </div>
           <div>
-            <span className="text-[11px] font-semibold uppercase tracking-widest text-arcus-fg-muted block mb-0.5">Next run</span>
-            <span className="text-[13px] text-arcus-fg-secondary font-medium">{formatNextRun(nextRun)}</span>
+            <span className="text-[11px] font-semibold uppercase tracking-widest text-boult-fg-muted block mb-0.5">Next run</span>
+            <span className="text-[13px] text-boult-fg-secondary font-medium">{formatNextRun(nextRun)}</span>
           </div>
           <div className="ml-auto flex flex-col items-end gap-1.5">
             <span className={cn(
               'inline-flex px-2.5 py-1 rounded-full text-[11px] font-semibold',
-              agent.status === 'active'  ? 'bg-arcus-raised text-arcus-fg-secondary border border-arcus-divider/60' :
-              agent.status === 'running' ? 'bg-arcus-raised text-arcus-fg border border-arcus-divider' :
-              'bg-transparent text-arcus-fg-muted border border-arcus-divider',
+              agent.status === 'active'  ? 'bg-boult-raised text-boult-fg-secondary border border-boult-divider/60' :
+              agent.status === 'running' ? 'bg-boult-raised text-boult-fg border border-boult-divider' :
+              'bg-transparent text-boult-fg-muted border border-boult-divider',
             )}>
               {agent.status === 'running' ? 'Running…' : agent.status === 'active' ? 'Active' : 'Paused'}
             </span>
             {agent.expires_at && (
-              <span className="text-[11px] text-arcus-fg-muted">
+              <span className="text-[11px] text-boult-fg-muted">
                 Expires {new Date(agent.expires_at + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
               </span>
             )}
@@ -1405,22 +1405,22 @@ function AgentCard({ agent, onToggle, onEdit, onDelete, onToggleConf, onRunNow }
         <div className="mt-3">
           <button
             onClick={() => setExpanded(v => !v)}
-            className="flex items-center gap-1.5 text-[12px] text-arcus-fg-muted hover:text-arcus-fg-secondary transition-colors"
+            className="flex items-center gap-1.5 text-[12px] text-boult-fg-muted hover:text-boult-fg-secondary transition-colors"
           >
             <ChevronDown className={cn('w-3.5 h-3.5 transition-transform', expanded && 'rotate-180')} />
             {agent.last_run_at
-              ? <>Recent runs <span className="text-arcus-fg-muted/70">· last {formatRunDate(agent.last_run_at)}</span></>
-              : <>Recent runs <span className="text-arcus-fg-muted/70">· none yet</span></>}
+              ? <>Recent runs <span className="text-boult-fg-muted/70">· last {formatRunDate(agent.last_run_at)}</span></>
+              : <>Recent runs <span className="text-boult-fg-muted/70">· none yet</span></>}
           </button>
           <RecentRuns agentId={agent.id} expanded={expanded} />
         </div>
       </div>
 
       {/* Skip confirmations */}
-      <div className="mx-5 mb-4 bg-arcus-elevated/60 border border-arcus-divider/50 rounded-xl px-4 py-3 flex items-center justify-between">
+      <div className="mx-5 mb-4 bg-boult-elevated/60 border border-boult-divider/50 rounded-xl px-4 py-3 flex items-center justify-between">
         <div>
-          <p className="text-[13px] font-semibold text-arcus-fg-secondary">Skip confirmations</p>
-          <p className="text-[12px] text-arcus-fg-muted mt-0.5">No approval needed before sending or posting</p>
+          <p className="text-[13px] font-semibold text-boult-fg-secondary">Skip confirmations</p>
+          <p className="text-[12px] text-boult-fg-muted mt-0.5">No approval needed before sending or posting</p>
         </div>
         <Toggle checked={agent.skip_confirmations} onChange={onToggleConf} />
       </div>
@@ -1450,10 +1450,10 @@ export function AgentsPanel({ className, onSendMessage }: AgentsPanelProps) {
   const fetchAgents = async () => {
     setLoadError(false);
     try {
-      const res = await fetch('/api/arcus/agents');
+      const res = await fetch('/api/boult/agents');
       const data = await res.json();
       if (data.error?.includes('not set up')) {
-        console.warn('[AgentsPanel] arcus_agents table not provisioned:', data.error);
+        console.warn('[AgentsPanel] boult_agents table not provisioned:', data.error);
         setTableError(true);
         return;
       }
@@ -1470,7 +1470,7 @@ export function AgentsPanel({ className, onSendMessage }: AgentsPanelProps) {
 
   const saveTimezone = async (tz: string) => {
     if (!tz) return;
-    try { await fetch('/api/arcus/agents/timezone', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ timezone: tz }) }); } catch { /* silent */ }
+    try { await fetch('/api/boult/agents/timezone', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ timezone: tz }) }); } catch { /* silent */ }
   };
 
   const handleCreate = async (data: Partial<Agent> & { _timezone?: string }) => {
@@ -1529,9 +1529,9 @@ export function AgentsPanel({ className, onSendMessage }: AgentsPanelProps) {
           messageCount: 1,
         }),
       );
-      localStorage.setItem('pending_arcus_id', conversationId);
-      localStorage.setItem('pending_arcus_message', prompt);
-      localStorage.setItem('pending_arcus_options', JSON.stringify({}));
+      localStorage.setItem('pending_boult_id', conversationId);
+      localStorage.setItem('pending_boult_message', prompt);
+      localStorage.setItem('pending_boult_options', JSON.stringify({}));
     } catch { /* localStorage unavailable — navigation still works, loader will fetch */ }
 
     toast.success(`Setting up "${agentData.name}"…`);
@@ -1541,7 +1541,7 @@ export function AgentsPanel({ className, onSendMessage }: AgentsPanelProps) {
   const handleEdit = async (data: Partial<Agent> & { _timezone?: string }) => {
     if (!editAgent) return;
     const { _timezone, ...agentData } = data;
-    const res = await fetch('/api/arcus/agents', {
+    const res = await fetch('/api/boult/agents', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: editAgent.id, ...agentData }),
@@ -1560,7 +1560,7 @@ export function AgentsPanel({ className, onSendMessage }: AgentsPanelProps) {
     // toggle never lies about the agent's real state.
     setAgents(prev => prev.map(a => a.id === agent.id ? { ...a, status: newStatus } : a));
     try {
-      const res = await fetch('/api/arcus/agents', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: agent.id, status: newStatus }) });
+      const res = await fetch('/api/boult/agents', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: agent.id, status: newStatus }) });
       if (!res.ok) throw new Error();
       toast.success(newStatus === 'paused' ? `Paused "${agent.name}"` : `Resumed "${agent.name}"`);
     } catch {
@@ -1573,7 +1573,7 @@ export function AgentsPanel({ className, onSendMessage }: AgentsPanelProps) {
     const newVal = !agent.skip_confirmations;
     setAgents(prev => prev.map(a => a.id === agent.id ? { ...a, skip_confirmations: newVal } : a));
     try {
-      const res = await fetch('/api/arcus/agents', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: agent.id, skip_confirmations: newVal }) });
+      const res = await fetch('/api/boult/agents', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: agent.id, skip_confirmations: newVal }) });
       if (!res.ok) throw new Error();
       toast.success(newVal ? 'Auto-approve on — actions run without asking' : 'Auto-approve off — actions wait for your OK');
     } catch {
@@ -1586,7 +1586,7 @@ export function AgentsPanel({ className, onSendMessage }: AgentsPanelProps) {
     const prevAgents = agents;
     setAgents(prev => prev.filter(a => a.id !== agent.id));
     try {
-      const res = await fetch(`/api/arcus/agents?id=${agent.id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/boult/agents?id=${agent.id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error();
       toast.success(`"${agent.name}" deleted`);
     } catch {
@@ -1609,7 +1609,7 @@ export function AgentsPanel({ className, onSendMessage }: AgentsPanelProps) {
     setRunningId(agent.id);
     const toastId = toast.loading(`Starting "${agent.name}"…`);
     try {
-      const res = await fetch('/api/arcus/agents/run', {
+      const res = await fetch('/api/boult/agents/run', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: agent.id }),
@@ -1630,7 +1630,7 @@ export function AgentsPanel({ className, onSendMessage }: AgentsPanelProps) {
         decodeURIComponent(res.headers.get('X-Agent-Task') || '') ||
         agent.task_description;
 
-      // Consume the SSE stream (same event format as /api/arcus/chat).
+      // Consume the SSE stream (same event format as /api/boult/chat).
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let buffer = '';
@@ -1689,13 +1689,13 @@ export function AgentsPanel({ className, onSendMessage }: AgentsPanelProps) {
         },
       ];
 
-      const saveRes = await fetch('/api/arcus/conversation', {
+      const saveRes = await fetch('/api/boult/conversation', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ conversationId, messages, title: agentName }),
       });
       if (!saveRes.ok) {
-        console.error('[Arcus:RunNow] conversation save failed', await saveRes.text());
+        console.error('[Boult:RunNow] conversation save failed', await saveRes.text());
       }
 
       toast.success(`"${agentName}" finished — opening conversation`, { id: toastId });
@@ -1713,12 +1713,12 @@ export function AgentsPanel({ className, onSendMessage }: AgentsPanelProps) {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-[24px] font-bold text-arcus-fg tracking-tight">Scheduled</h2>
-          <p className="text-[14px] text-arcus-fg-muted mt-0.5">Agents working for you around the clock</p>
+          <h2 className="text-[24px] font-bold text-boult-fg tracking-tight">Scheduled</h2>
+          <p className="text-[14px] text-boult-fg-muted mt-0.5">Agents working for you around the clock</p>
         </div>
         <button
           onClick={() => setCreateOpen(true)}
-          className="flex items-center gap-2 px-5 py-2.5 bg-arcus-fg text-arcus-fg-inverse rounded-xl font-bold text-[14px] hover:opacity-90 active:scale-95 transition-all shadow-sm"
+          className="flex items-center gap-2 px-5 py-2.5 bg-boult-fg text-boult-fg-inverse rounded-xl font-bold text-[14px] hover:opacity-90 active:scale-95 transition-all shadow-sm"
         >
           <Plus className="w-4 h-4" />
           New schedule
@@ -1726,7 +1726,7 @@ export function AgentsPanel({ className, onSendMessage }: AgentsPanelProps) {
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center border-b border-arcus-divider/70 mb-5">
+      <div className="flex items-center border-b border-boult-divider/70 mb-5">
         {([
           { key: 'tasks',    label: 'Tasks',    Icon: List },
           { key: 'calendar', label: 'Calendar', Icon: CalendarDays },
@@ -1738,7 +1738,7 @@ export function AgentsPanel({ className, onSendMessage }: AgentsPanelProps) {
             onClick={() => setTab(key)}
             className={cn(
               'flex items-center gap-1.5 px-1 py-3 mr-6 text-[14px] font-semibold transition-all border-b-2 -mb-px',
-              tab === key ? 'text-arcus-fg border-arcus-fg' : 'text-arcus-fg-muted border-transparent hover:text-arcus-fg-secondary',
+              tab === key ? 'text-boult-fg border-boult-fg' : 'text-boult-fg-muted border-transparent hover:text-boult-fg-secondary',
             )}
           >
             <Icon className="w-4 h-4" />
@@ -1750,19 +1750,19 @@ export function AgentsPanel({ className, onSendMessage }: AgentsPanelProps) {
       {tableError && (
         <div className="mb-5 p-4 bg-amber-500/5 border border-amber-500/20 rounded-xl flex items-start gap-3">
           <AlertCircle className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
-          <p className="text-[13px] text-arcus-fg-secondary">Agents aren’t available on your account just yet. Our team has been notified — please check back shortly.</p>
+          <p className="text-[13px] text-boult-fg-secondary">Agents aren’t available on your account just yet. Our team has been notified — please check back shortly.</p>
         </div>
       )}
 
       {loadError && !loading && (
-        <div className="mb-5 p-4 bg-arcus-raised/60 border border-arcus-divider rounded-xl flex items-center justify-between gap-3">
+        <div className="mb-5 p-4 bg-boult-raised/60 border border-boult-divider rounded-xl flex items-center justify-between gap-3">
           <div className="flex items-start gap-3">
-            <AlertCircle className="w-4 h-4 text-arcus-fg-muted flex-shrink-0 mt-0.5" />
-            <p className="text-[13px] text-arcus-fg-secondary">We couldn’t load your agents. Check your connection and try again.</p>
+            <AlertCircle className="w-4 h-4 text-boult-fg-muted flex-shrink-0 mt-0.5" />
+            <p className="text-[13px] text-boult-fg-secondary">We couldn’t load your agents. Check your connection and try again.</p>
           </div>
           <button
             onClick={() => { setLoading(true); fetchAgents(); }}
-            className="px-3 py-1.5 rounded-lg bg-arcus-fg text-arcus-fg-inverse text-[12px] font-bold hover:opacity-90 active:scale-95 transition-all flex-shrink-0"
+            className="px-3 py-1.5 rounded-lg bg-boult-fg text-boult-fg-inverse text-[12px] font-bold hover:opacity-90 active:scale-95 transition-all flex-shrink-0"
           >
             Retry
           </button>
@@ -1771,7 +1771,7 @@ export function AgentsPanel({ className, onSendMessage }: AgentsPanelProps) {
 
       {loading ? (
         <div className="flex items-center justify-center py-24">
-          <Loader2 className="w-6 h-6 text-arcus-fg-muted animate-spin" />
+          <Loader2 className="w-6 h-6 text-boult-fg-muted animate-spin" />
         </div>
       ) : tab === 'calendar' ? (
         <MiniCalendar
@@ -1782,7 +1782,7 @@ export function AgentsPanel({ className, onSendMessage }: AgentsPanelProps) {
         <AutonomyPanel />
       ) : tab === 'marketplace' ? (
         <div>
-          <p className="text-[13px] text-arcus-fg-muted mb-5 leading-relaxed">
+          <p className="text-[13px] text-boult-fg-muted mb-5 leading-relaxed">
             One-click starter agents. Each opens the create modal pre-filled with a tested schedule, task, and output channel — tweak anything before activating.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -1792,25 +1792,25 @@ export function AgentsPanel({ className, onSendMessage }: AgentsPanelProps) {
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.04 }}
-                className="bg-arcus-surface/60 backdrop-blur-xl border border-arcus-border rounded-2xl p-4 flex flex-col hover:border-arcus-divider hover:bg-arcus-surface transition-all group"
+                className="bg-boult-surface/60 backdrop-blur-xl border border-boult-border rounded-2xl p-4 flex flex-col hover:border-boult-divider hover:bg-boult-surface transition-all group"
               >
                 <div className="flex items-center gap-2.5 mb-2.5">
-                  <div className="w-9 h-9 rounded-xl bg-arcus-raised/80 flex items-center justify-center flex-shrink-0">
+                  <div className="w-9 h-9 rounded-xl bg-boult-raised/80 flex items-center justify-center flex-shrink-0">
                     {getTemplateIcon(t.id)}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-[14px] font-bold text-arcus-fg leading-tight truncate">{t.name}</p>
+                    <p className="text-[14px] font-bold text-boult-fg leading-tight truncate">{t.name}</p>
                     {t.tagline && (
-                      <p className="text-[11px] text-arcus-fg-muted truncate">{t.tagline}</p>
+                      <p className="text-[11px] text-boult-fg-muted truncate">{t.tagline}</p>
                     )}
                   </div>
                 </div>
-                <p className="text-[12.5px] text-arcus-fg-muted leading-relaxed flex-1 mb-3 line-clamp-3">{t.description}</p>
+                <p className="text-[12.5px] text-boult-fg-muted leading-relaxed flex-1 mb-3 line-clamp-3">{t.description}</p>
                 <div className="flex items-center justify-between">
-                  <span className="text-[12px] text-arcus-fg-muted font-medium">{cronToLabel(t.cron_schedule)}</span>
+                  <span className="text-[12px] text-boult-fg-muted font-medium">{cronToLabel(t.cron_schedule)}</span>
                   <button
                     onClick={() => setTemplateInit(t as any)}
-                    className="px-3.5 py-1.5 rounded-lg bg-arcus-fg text-arcus-fg-inverse text-[12px] font-bold hover:opacity-90 active:scale-95 transition-all"
+                    className="px-3.5 py-1.5 rounded-lg bg-boult-fg text-boult-fg-inverse text-[12px] font-bold hover:opacity-90 active:scale-95 transition-all"
                   >
                     Add agent
                   </button>
@@ -1821,7 +1821,7 @@ export function AgentsPanel({ className, onSendMessage }: AgentsPanelProps) {
         </div>
       ) : agents.length === 0 ? (
         <div>
-          <p className="text-[14px] text-arcus-fg-muted mb-6 text-center">
+          <p className="text-[14px] text-boult-fg-muted mb-6 text-center">
             Get started with a pre-built agent — activate in one click, customize anytime.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -1831,20 +1831,20 @@ export function AgentsPanel({ className, onSendMessage }: AgentsPanelProps) {
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05 }}
-                className="bg-arcus-surface/60 backdrop-blur-xl border border-arcus-border rounded-2xl p-4 flex flex-col hover:border-arcus-divider hover:bg-arcus-surface transition-all group"
+                className="bg-boult-surface/60 backdrop-blur-xl border border-boult-border rounded-2xl p-4 flex flex-col hover:border-boult-divider hover:bg-boult-surface transition-all group"
               >
                 <div className="flex items-center gap-2.5 mb-2.5">
-                  <div className="w-8 h-8 rounded-xl bg-arcus-raised/80 flex items-center justify-center flex-shrink-0">
+                  <div className="w-8 h-8 rounded-xl bg-boult-raised/80 flex items-center justify-center flex-shrink-0">
                     {getTemplateIcon(t.id)}
                   </div>
-                  <p className="text-[14px] font-bold text-arcus-fg leading-tight">{t.name}</p>
+                  <p className="text-[14px] font-bold text-boult-fg leading-tight">{t.name}</p>
                 </div>
-                <p className="text-[13px] text-arcus-fg-muted leading-relaxed flex-1 mb-3">{t.description}</p>
+                <p className="text-[13px] text-boult-fg-muted leading-relaxed flex-1 mb-3">{t.description}</p>
                 <div className="flex items-center justify-between">
-                  <span className="text-[12px] text-arcus-fg-muted font-medium">{cronToLabel(t.cron_schedule)}</span>
+                  <span className="text-[12px] text-boult-fg-muted font-medium">{cronToLabel(t.cron_schedule)}</span>
                   <button
                     onClick={() => setTemplateInit(t)}
-                    className="px-3.5 py-1.5 rounded-lg bg-arcus-fg text-arcus-fg-inverse text-[12px] font-bold hover:opacity-90 active:scale-95 transition-all"
+                    className="px-3.5 py-1.5 rounded-lg bg-boult-fg text-boult-fg-inverse text-[12px] font-bold hover:opacity-90 active:scale-95 transition-all"
                   >
                     Activate
                   </button>

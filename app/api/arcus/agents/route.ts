@@ -1,13 +1,13 @@
 /**
- * Arcus Background Agents — CRUD
- * GET    /api/arcus/agents       → list user's agents
- * POST   /api/arcus/agents       → create agent
- * PATCH  /api/arcus/agents       → update agent (id in body)
- * DELETE /api/arcus/agents?id=   → delete agent
+ * Boult Background Agents — CRUD
+ * GET    /api/boult/agents       → list user's agents
+ * POST   /api/boult/agents       → create agent
+ * PATCH  /api/boult/agents       → update agent (id in body)
+ * DELETE /api/boult/agents?id=   → delete agent
  *
- * Requires Supabase table: arcus_agents
+ * Requires Supabase table: boult_agents
  * SQL:
- *   create table arcus_agents (
+ *   create table boult_agents (
  *     id uuid default gen_random_uuid() primary key,
  *     user_id text not null,
  *     name text not null,
@@ -22,12 +22,12 @@
  *     last_report_summary text,
  *     created_at timestamptz default now()
  *   );
- *   alter table arcus_agents enable row level security;
- *   create policy "users own their agents" on arcus_agents using (user_id = auth.email());
+ *   alter table boult_agents enable row level security;
+ *   create policy "users own their agents" on boult_agents using (user_id = auth.email());
  *
  *   -- If table already exists, add columns:
- *   alter table arcus_agents add column if not exists skip_confirmations boolean not null default false;
- *   alter table arcus_agents add column if not exists expires_at date;
+ *   alter table boult_agents add column if not exists skip_confirmations boolean not null default false;
+ *   alter table boult_agents add column if not exists expires_at date;
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -46,7 +46,7 @@ export async function GET() {
 
   const supabase = getSupabaseAdmin();
   const { data, error } = await supabase
-    .from('arcus_agents')
+    .from('boult_agents')
     .select('*')
     .eq('user_id', userId)
     .order('created_at', { ascending: false });
@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
 
   const supabase = getSupabaseAdmin();
   const { data, error } = await supabase
-    .from('arcus_agents')
+    .from('boult_agents')
     .insert({
       user_id: userId,
       name: name.trim(),
@@ -123,7 +123,7 @@ export async function PATCH(request: NextRequest) {
 
   const supabase = getSupabaseAdmin();
   const { data, error } = await supabase
-    .from('arcus_agents')
+    .from('boult_agents')
     .update(sanitized)
     .eq('id', id)
     .eq('user_id', userId)
@@ -144,7 +144,7 @@ export async function DELETE(request: NextRequest) {
 
   const supabase = getSupabaseAdmin();
   const { error } = await supabase
-    .from('arcus_agents')
+    .from('boult_agents')
     .delete()
     .eq('id', id)
     .eq('user_id', userId);

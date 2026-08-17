@@ -52,7 +52,7 @@ function evictOldestConversation(): boolean {
     }
     if (oldestKey) {
       localStorage.removeItem(oldestKey);
-      console.warn(`[Arcus:Quota] Evicted oldest conversation: ${oldestKey}`);
+      console.warn(`[Boult:Quota] Evicted oldest conversation: ${oldestKey}`);
       return true;
     }
   } catch { /* fall through */ }
@@ -66,20 +66,20 @@ export function safeSetItem(key: string, value: string): boolean {
     return true;
   } catch (err) {
     if (!isQuotaError(err)) {
-      console.warn('[Arcus:Storage] setItem failed (non-quota):', err);
+      console.warn('[Boult:Storage] setItem failed (non-quota):', err);
       return false;
     }
     // Quota exceeded — try evicting oldest conversation and retry once.
     const evicted = evictOldestConversation();
     if (!evicted) {
-      console.warn('[Arcus:Storage] Quota exceeded, no conversation to evict');
+      console.warn('[Boult:Storage] Quota exceeded, no conversation to evict');
       return false;
     }
     try {
       localStorage.setItem(key, value);
       return true;
     } catch (retryErr) {
-      console.warn('[Arcus:Storage] Retry after eviction also failed:', retryErr);
+      console.warn('[Boult:Storage] Retry after eviction also failed:', retryErr);
       return false;
     }
   }
@@ -90,7 +90,7 @@ export function safeGetItem(key: string): string | null {
   try {
     return localStorage.getItem(key);
   } catch (err) {
-    console.warn('[Arcus:Storage] getItem failed:', err);
+    console.warn('[Boult:Storage] getItem failed:', err);
     return null;
   }
 }

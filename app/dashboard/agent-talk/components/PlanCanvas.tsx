@@ -108,7 +108,7 @@ export function PlanCanvas({ plan, onExecute, onDecline, isProcessing }: PlanCan
       >
         <div className={cn(
           "relative overflow-hidden rounded-2xl border transition-all duration-300",
-          "arcus-glass-card",
+          "boult-glass-card",
           isDraft ? "border-black/[0.08] dark:border-white/[0.08]" :
           isRunning ? "border-blue-500/20" :
           isCompleted ? "border-emerald-500/15" :
@@ -148,7 +148,7 @@ export function PlanCanvas({ plan, onExecute, onDecline, isProcessing }: PlanCan
           </div>
 
           {/* ── Plan Content with Typewriter ── */}
-          <div className="px-5 pb-4 max-h-[280px] overflow-y-auto arcus-scrollbar">
+          <div className="px-5 pb-4 max-h-[280px] overflow-y-auto boult-scrollbar">
             <div className="text-[14px] text-black/60 dark:text-white/60 leading-[1.75]">
               <ReactMarkdown remarkPlugins={[remarkGfm]} components={PlanMarkdown}>
                 {displayed}
@@ -247,7 +247,7 @@ export function PlanCanvas({ plan, onExecute, onDecline, isProcessing }: PlanCan
               </div>
 
               {/* Modal Body (Scrollable) */}
-              <div className="flex-1 overflow-y-auto px-6 py-6 arcus-scrollbar">
+              <div className="flex-1 overflow-y-auto px-6 py-6 boult-scrollbar">
                 <div className="text-[15px] text-black/65 dark:text-white/65 leading-[1.8]">
                   <ReactMarkdown remarkPlugins={[remarkGfm]} components={PlanMarkdown}>
                     {planText}

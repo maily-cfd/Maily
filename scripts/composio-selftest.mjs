@@ -66,9 +66,9 @@ try {
   // 2. LIVE END-TO-END: pass a real connected-account id as the 1st CLI arg
   //    (node scripts/composio-selftest.mjs <accountId>) after connecting one
   //    Google account through the app. This resolves the token EXACTLY as the
-  //    Arcus tool layer does, then hits Google's tokeninfo to PROVE the token
+  //    Boult tool layer does, then hits Google's tokeninfo to PROVE the token
   //    is a real, unmasked, Gmail-scoped bearer Google accepts. This is the
-  //    definitive "does Arcus reach the user's Gmail via Composio" check.
+  //    definitive "does Boult reach the user's Gmail via Composio" check.
   const testAccountId = process.argv[2];
   if (testAccountId) {
     try {
@@ -85,7 +85,7 @@ try {
           const scopes = String(j.scope || '');
           const hasGmail = /mail\.google\.com|gmail\./.test(scopes);
           console.log(ok(`Google ACCEPTS the token. Scopes: ${scopes}`));
-          console.log(hasGmail ? ok('Gmail scope present — Arcus tools will work against this account.')
+          console.log(hasGmail ? ok('Gmail scope present — Boult tools will work against this account.')
                                : warn('No Gmail scope on this token — check the auth config scopes.'));
         }
       }

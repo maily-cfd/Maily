@@ -1,9 +1,9 @@
 'use client';
 
 /**
- * DraftGalleryCard — multi-draft review for Arcus (live chat + bg agent).
+ * DraftGalleryCard — multi-draft review for Boult (live chat + bg agent).
  *
- * When Arcus drafts several replies in one message (the canvases stream in one
+ * When Boult drafts several replies in one message (the canvases stream in one
  * by one), they collect here as a stack of EXPAND/COLLAPSE draft boxes in a
  * grey palette. Each box is independently editable and can be sent directly —
  * no bulk select/confirm. Unsent drafts remain in Gmail Drafts (the draft tools
@@ -88,7 +88,7 @@ export function DraftGalleryCard({ drafts, onSendOne, onDismiss }: DraftGalleryC
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.22 }}
-      className="mt-3 mb-1 rounded-2xl overflow-hidden arcus-glass-card"
+      className="mt-3 mb-1 rounded-2xl overflow-hidden boult-glass-card"
     >
       {/* Header */}
       <div className="px-5 py-3.5 border-b border-black/[0.06] dark:border-white/[0.06] bg-black/[0.02] dark:bg-white/[0.02] flex items-center justify-between gap-3">

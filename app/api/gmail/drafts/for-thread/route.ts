@@ -2,13 +2,13 @@
  * GET /api/gmail/drafts/for-thread?threadId=...
  *
  * "Does this thread already have a draft?" — used by the home-feed's Needs a
- * Reply CTA so it never sends a person straight to Arcus when a reply has
- * already been drafted (by the user, or a prior Arcus pass). If one exists,
+ * Reply CTA so it never sends a person straight to Boult when a reply has
+ * already been drafted (by the user, or a prior Boult pass). If one exists,
  * the client opens the Inbox tab's existing draft-reply box with this content
- * instead of prefilling a new Arcus prompt.
+ * instead of prefilling a new Boult prompt.
  *
  * Fail-soft by design: any error, missing session, or no match returns
- * { exists: false } with a 200 — the caller's fallback (send to Arcus) is
+ * { exists: false } with a 200 — the caller's fallback (send to Boult) is
  * always safe, so this endpoint must never be the reason a click does nothing.
  */
 import { NextResponse } from 'next/server';

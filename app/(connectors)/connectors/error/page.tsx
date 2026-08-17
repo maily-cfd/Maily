@@ -92,7 +92,7 @@ function ConnectorErrorContent() {
         {/* Help Text */}
         <p className="text-gray-500 text-sm mt-8">
           Need help?{' '}
-          <a href="mailto:support@arcus.com" className="text-blue-400 hover:underline">
+          <a href="mailto:support@boult.com" className="text-blue-400 hover:underline">
             Contact Support
           </a>
         </p>

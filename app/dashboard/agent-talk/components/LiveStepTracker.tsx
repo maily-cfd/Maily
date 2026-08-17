@@ -13,7 +13,7 @@ import { GmailIcon, NotionIcon, GoogleCalendarIcon, SlackIcon } from './BrandIco
 // ─── Tool icon + label map ────────────────────────────────────────────────────
 //
 // For tools that hit a real third-party app, show the BRAND mark — that's
-// what the user recognizes ("Arcus is touching my Notion"). For utility
+// what the user recognizes ("Boult is touching my Notion"). For utility
 // tools (canvas, web fetch, etc.) we fall back to Lucide icons.
 
 const TOOL_META: Record<string, { icon: React.ReactNode; verb: string }> = {
@@ -106,7 +106,7 @@ function domainOf(params: any): string | null {
 
 // ─── Atomic rows: reasoning, tool, loader ─────────────────────────────────────
 
-// The narration Arcus weaves between steps — clean prose (Manus-style), no
+// The narration Boult weaves between steps — clean prose (Manus-style), no
 // icon, reads as the agent thinking out loud before/after a batch of actions.
 function ReasoningRow({ text, delay = 0 }: { text: string; delay?: number }) {
   return (

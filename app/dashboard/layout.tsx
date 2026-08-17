@@ -1,8 +1,8 @@
 import "./dashboard.css";
 
 export const metadata = {
-  title: 'Arcus | Mailient',
-  description: 'Chat with your AI email agent for email agentic performance.',
+  title: 'Boult | Maily',
+  description: 'Chat with Boult, your AI email agent for email agentic performance.',
 };
 
 import { requirePaidSubscription } from '@/lib/access-gate';

@@ -95,7 +95,7 @@ export function RewardsCard({ onClose, usageData }: RewardsCardProps) {
                     {/* Visual Element (Premium Glassy Cube) */}
                     <div className="absolute top-0 right-0 w-80 h-full pointer-events-none opacity-80 transition-transform duration-700 group-hover:scale-105">
                         <img 
-                            src="/mailient_cube.png" 
+                            src="/maily_cube.png" 
                             className="w-full h-full object-cover scale-[1.7] translate-x-12 translate-y-2 rotate-[-12deg] brightness-110 dark:brightness-100"
                             style={{ 
                                 maskImage: 'radial-gradient(circle at 65% 50%, black 10%, transparent 80%), linear-gradient(to right, transparent, black 40%)',

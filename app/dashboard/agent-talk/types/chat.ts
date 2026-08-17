@@ -31,7 +31,7 @@ export interface ChatInputProps {
   onEmailRemove?: (id: string) => void;
   /**
    * PART 46 — fired when the user submits a slash command whose `kind` is
-   * 'client'. The handler name comes from the registry in lib/arcus/skills.ts
+   * 'client'. The handler name comes from the registry in lib/boult/skills.ts
    * (e.g. 'openAgents', 'showHelp'). ChatInterface wires it to the real
    * client-side action — opening a modal, clearing state, etc. Server-kind
    * commands ('/brief', '/inbox', etc.) bypass this callback and go through

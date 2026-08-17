@@ -85,7 +85,7 @@ export function CanvasEditor({ value, onChange, onAddSelectionToChat }: CanvasEd
   }, [value, editor]);
 
   if (!editor) {
-    return <div className="h-[300px] animate-pulse rounded-xl bg-arcus-surface" />;
+    return <div className="h-[300px] animate-pulse rounded-xl bg-boult-surface" />;
   }
 
   return (
@@ -132,7 +132,7 @@ export function CanvasEditor({ value, onChange, onAddSelectionToChat }: CanvasEd
               if (!selected) return;
               onAddSelectionToChat(selected);
             }}
-            className="flex items-center gap-1.5 px-2.5 h-8 rounded-lg border border-arcus-border bg-arcus-elevated text-arcus-fg text-[12.5px] font-medium shadow-lg hover:bg-arcus-surface transition-colors whitespace-nowrap"
+            className="flex items-center gap-1.5 px-2.5 h-8 rounded-lg border border-boult-border bg-boult-elevated text-boult-fg text-[12.5px] font-medium shadow-lg hover:bg-boult-surface transition-colors whitespace-nowrap"
           >
             <MessageSquarePlus className="w-3.5 h-3.5" />
             Add to chat
@@ -150,7 +150,7 @@ function Toolbar({ editor }: { editor: Editor }) {
     // Breaks out of the content's px-7/py-6 so it sits flush under the header,
     // edge to edge, and sticks there while the document scrolls. Wraps to a
     // second row on a narrow panel rather than clipping buttons off the end.
-    <div className="sticky -top-6 z-10 -mx-7 -mt-6 mb-7 flex flex-wrap items-center gap-0.5 px-5 py-2.5 bg-arcus-bg/95 backdrop-blur border-b border-arcus-border">
+    <div className="sticky -top-6 z-10 -mx-7 -mt-6 mb-7 flex flex-wrap items-center gap-0.5 px-5 py-2.5 bg-boult-bg/95 backdrop-blur border-b border-boult-border">
       <Btn onClick={() => editor.chain().focus().undo().run()} disabled={!editor.can().undo()} label="Undo"><Undo2 className="w-4 h-4" /></Btn>
       <Btn onClick={() => editor.chain().focus().redo().run()} disabled={!editor.can().redo()} label="Redo"><Redo2 className="w-4 h-4" /></Btn>
 
@@ -185,7 +185,7 @@ function Toolbar({ editor }: { editor: Editor }) {
 }
 
 function Sep() {
-  return <div className="w-px h-5 bg-arcus-border mx-1.5 shrink-0" />;
+  return <div className="w-px h-5 bg-boult-border mx-1.5 shrink-0" />;
 }
 
 function Btn({
@@ -207,9 +207,9 @@ function Btn({
       className={cn(
         'w-8 h-8 flex items-center justify-center rounded-lg transition-colors shrink-0',
         active
-          ? 'bg-arcus-fg text-arcus-fg-inverse'
-          : 'text-arcus-fg-tertiary hover:text-arcus-fg hover:bg-arcus-surface',
-        disabled && 'opacity-30 cursor-not-allowed hover:bg-transparent hover:text-arcus-fg-tertiary'
+          ? 'bg-boult-fg text-boult-fg-inverse'
+          : 'text-boult-fg-tertiary hover:text-boult-fg hover:bg-boult-surface',
+        disabled && 'opacity-30 cursor-not-allowed hover:bg-transparent hover:text-boult-fg-tertiary'
       )}
     >
       {children}

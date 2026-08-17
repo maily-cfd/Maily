@@ -1,3 +1,4 @@
+import { Mail } from "lucide-react";
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { logEvent } from "@/lib/logsso";
@@ -18,8 +19,8 @@ export async function POST(req: Request) {
 
         const typeLabel = type === 'creator' ? 'Apply for Creator' : 'Apply for Affiliate';
         const description = type === 'creator'
-            ? 'Design and publish autonomous email workflow agents to Arcus Marketplace for a 70% revenue share.'
-            : 'Promote Mailient and earn a massive 30% recurring lifetime commission on referrals.';
+            ? 'Design and publish autonomous email workflow agents to Boult Marketplace for a 70% revenue share.'
+            : 'Promote Maily and earn a massive 30% recurring lifetime commission on referrals.';
 
         console.log(`[Partner Application] New ${type} application:`, { email, type, date: new Date().toISOString() });
 
@@ -37,7 +38,7 @@ export async function POST(req: Request) {
         const emailContent = `
             <div style="font-family: 'Satoshi', sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; color: #111; background: #fff; border-radius: 24px; border: 1px solid #f0f0f0;">
                 <div style="text-align: center; margin-bottom: 30px;">
-                    <img src="https://mailient.xyz/mailient-logo-premium.png" alt="Mailient Logo" style="width: 48px; height: 48px; border-radius: 12px; border: 1px solid #f0f0f0;" />
+                    <Mail className="w-full h-full p-1 text-inherit" />
                 </div>
                 
                 <h2 style="font-size: 22px; font-weight: 800; border-bottom: 2px solid #000; padding-bottom: 15px; margin-bottom: 30px; letter-spacing: -0.03em; text-align: center; color: #000;">
@@ -70,7 +71,7 @@ export async function POST(req: Request) {
                 </div>
 
                 <div style="text-align: center; margin-top: 35px;">
-                    <a href="mailto:${email}?subject=Mailient Partner Application - Next Steps" 
+                    <a href="mailto:${email}?subject=Maily Partner Application - Next Steps" 
                        style="background: #000; color: #fff; text-decoration: none; padding: 12px 25px; border-radius: 12px; font-weight: 700; font-size: 13px; display: inline-block;">
                         Onboard Applicant
                     </a>
@@ -83,8 +84,8 @@ export async function POST(req: Request) {
         `;
 
         const { data, error } = await resend.emails.send({
-            from: 'Mailient Onboarding <support@mailient.xyz>',
-            to: ['mailient.xyz@gmail.com'],
+            from: 'Maily Onboarding <support@maily.dev>',
+            to: ['support.maily@gmail.com'],
             replyTo: email,
             subject: `[Partner Loop] New ${type === 'creator' ? 'Creator' : 'Affiliate'} Application from ${email}`,
             html: emailContent,

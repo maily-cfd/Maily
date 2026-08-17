@@ -1,10 +1,10 @@
 /**
- * Arcus V3 — Notion OAuth Flow
+ * Boult V3 — Notion OAuth Flow
  * 
  * Initiates the Notion OAuth 2.0 flow.
  * Flow:
- *   1. GET /api/arcus/v3/oauth/notion → Redirects to Notion consent screen
- *   2. Notion redirects back to /api/arcus/v3/oauth/notion/callback
+ *   1. GET /api/boult/v3/oauth/notion → Redirects to Notion consent screen
+ *   2. Notion redirects back to /api/boult/v3/oauth/notion/callback
  *   3. We exchange code for access token, encrypt, and store.
  */
 
@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
 
     // Determine callback URL based on environment
     const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
-    const redirectUri = `${baseUrl}/api/arcus/v3/oauth/notion/callback`;
+    const redirectUri = `${baseUrl}/api/boult/v3/oauth/notion/callback`;
 
     // Build Notion OAuth URL
     const params = new URLSearchParams({
@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
 
     // Store state in a cookie for validation on callback
     const response = NextResponse.redirect(notionAuthUrl);
-    response.cookies.set('arcus_notion_state', state, {
+    response.cookies.set('boult_notion_state', state, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
     return response;
   } catch (error) {
     logEvent({ channel: "failures", event: "❌ API Error", description: String(error) });
-    console.error('[Arcus V3] Notion OAuth init error:', (error as Error).message);
+    console.error('[Boult V3] Notion OAuth init error:', (error as Error).message);
     return NextResponse.redirect(new URL('/dashboard/agent-talk?error=oauth_init', request.url));
   }
 }

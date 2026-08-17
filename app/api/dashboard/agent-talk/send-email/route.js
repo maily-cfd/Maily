@@ -4,7 +4,7 @@ import { DatabaseService, getSupabaseAdmin } from '@/lib/supabase.js';
 import { decrypt } from '@/lib/crypto.js';
 import { logEvent } from "@/lib/logsso";
 
-// Send email on behalf of the authenticated user for Arcus tasks
+// Send email on behalf of the authenticated user for Boult tasks
 export async function POST(request) {
   try {
     const session = await auth();
@@ -30,7 +30,7 @@ export async function POST(request) {
     // Must be checked BEFORE user_tokens — a Composio user's user_tokens holds
     // the identity-only login token (no Gmail scope), which would fail here.
     try {
-      const { composioAccountFor, googleFetch } = await import('@/lib/arcus/tools/http-tokens');
+      const { composioAccountFor, googleFetch } = await import('@/lib/boult/tools/http-tokens');
       const composioAcct = await composioAccountFor(userEmail, 'gmail');
       if (composioAcct) {
         const lines = [`To: ${to}`, `Subject: ${subject}`, `Content-Type: text/${isHtml ? 'html' : 'plain'}; charset=UTF-8`, '', emailBody];
@@ -65,11 +65,11 @@ export async function POST(request) {
       refreshToken = tokens.encrypted_refresh_token ? decrypt(tokens.encrypted_refresh_token) : '';
     }
 
-    // Fallback: check arcus_integrations (Gmail connected via integrations page)
+    // Fallback: check boult_integrations (Gmail connected via integrations page)
     if (!accessToken) {
       const supabase = getSupabaseAdmin();
       const { data: integData } = await supabase
-        .from('arcus_integrations')
+        .from('boult_integrations')
         .select('access_token')
         .eq('user_id', userEmail)
         .eq('provider', 'gmail')
@@ -100,7 +100,7 @@ export async function POST(request) {
     // Clean up the Gmail draft now that the email has been sent
     if (gmailDraftId) {
       try {
-        const { googleFetch } = await import('@/lib/arcus/tools/http-tokens');
+        const { googleFetch } = await import('@/lib/boult/tools/http-tokens');
         await googleFetch(userEmail, 'gmail', `https://gmail.googleapis.com/gmail/v1/users/me/drafts/${gmailDraftId}`, {
           method: 'DELETE',
           headers: { Authorization: `Bearer ${accessToken}` },

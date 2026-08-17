@@ -112,7 +112,7 @@ export function ChatSelectionToolbar({ rootRef, onAdd }: Props) {
           window.getSelection()?.removeAllRanges();
           onAdd(text);
         }}
-        className="flex items-center gap-1.5 px-2.5 h-8 rounded-lg border border-arcus-border bg-arcus-elevated text-arcus-fg text-[12.5px] font-medium shadow-lg hover:bg-arcus-surface transition-colors whitespace-nowrap"
+        className="flex items-center gap-1.5 px-2.5 h-8 rounded-lg border border-boult-border bg-boult-elevated text-boult-fg text-[12.5px] font-medium shadow-lg hover:bg-boult-surface transition-colors whitespace-nowrap"
       >
         <MessageSquarePlus className="w-3.5 h-3.5" />
         Add to chat

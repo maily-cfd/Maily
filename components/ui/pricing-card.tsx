@@ -11,7 +11,7 @@ import { Button } from "./button";
 import { PLANS } from "@/lib/subscription-service";
 import { useSession } from "next-auth/react";
 
-const mailientPlans = [
+const mailyPlans = [
   {
     id: "monthly",
     name: "Monthly",
@@ -20,7 +20,7 @@ const mailientPlans = [
     priceLabel: "/month",
     features: [
       "Unlimited AI Draft Replies",
-      "Unlimited Arcus AI",
+      "Unlimited Boult AI",
       "Unlimited Summaries",
       "Full Sift email triage",
       "Gold Founding Badge",
@@ -91,7 +91,7 @@ export function PricingCard({ onClose }: PricingCardProps) {
         }
         
         // CRITICAL: Set redirect URL so users come back to our payment success page
-        const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://mailient.xyz';
+        const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://maily.dev';
         params.set('redirect_url', `${baseUrl}/payment-success`);
 
         // Redirect in the same window so they come back to the app easily
@@ -120,7 +120,7 @@ export function PricingCard({ onClose }: PricingCardProps) {
       </div>
 
       <div className="flex flex-col gap-3">
-        {mailientPlans.map((plan) => {
+        {mailyPlans.map((plan) => {
           const isSelected = selectedPlan === plan.id;
           const price = plan.price;
 
@@ -229,7 +229,7 @@ export function PricingCard({ onClose }: PricingCardProps) {
                             disabled={isActivating}
                             className="w-full h-10 rounded-xl font-bold transition-all bg-white text-black hover:bg-neutral-200"
                           >
-                            {plan.id === 'lifetime' ? 'Own Mailient Forever' : 'Subscribe Now'}
+                            {plan.id === 'lifetime' ? 'Own Maily Forever' : 'Subscribe Now'}
                             {isActivating && <span className="ml-2 animate-spin">◌</span>}
                           </Button>
                         </div>

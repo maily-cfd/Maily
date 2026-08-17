@@ -79,7 +79,7 @@ export function ActionResultCard({ data, onUndo }: ActionResultCardProps) {
         initial={{ opacity: 0, y: 6 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-        className="mt-1.5 flex items-center justify-between gap-3 px-4 py-3 rounded-2xl arcus-glass"
+        className="mt-1.5 flex items-center justify-between gap-3 px-4 py-3 rounded-2xl boult-glass"
       >
         <div className="flex items-center gap-2.5 min-w-0">
           <CheckCircle2 className="w-4 h-4 text-emerald-500 dark:text-emerald-400 flex-shrink-0" />
@@ -120,7 +120,7 @@ export function ActionResultCard({ data, onUndo }: ActionResultCardProps) {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-      className="mt-3 mb-1 flex items-stretch gap-3 p-4 rounded-2xl overflow-hidden arcus-glass-card"
+      className="mt-3 mb-1 flex items-stretch gap-3 p-4 rounded-2xl overflow-hidden boult-glass-card"
     >
       {/* Left: info + actions */}
       <div className="flex-1 flex flex-col justify-between min-w-0 gap-3">

@@ -12,7 +12,7 @@
 
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { ArcusIntegrationManager } from '@/lib/arcus-integration-manager';
+import { BoultIntegrationManager } from '@/lib/boult-integration-manager';
 import { supabase } from '@/lib/supabase';
 import { logEvent } from "@/lib/logsso";
 
@@ -92,7 +92,7 @@ const db = {
 };
 
 // Initialize integration manager
-const integrationManager = new ArcusIntegrationManager(db);
+const integrationManager = new BoultIntegrationManager(db);
 
 /**
  * GET /api/integrations/status
@@ -213,10 +213,10 @@ export async function POST(request) {
  * DELETE /api/integrations - Disconnect integration
  */
 // F6.1 — DEPRECATED. This handler used to only delete from
-// integration_credentials, leaving arcus_integrations and user_tokens
+// integration_credentials, leaving boult_integrations and user_tokens
 // rows orphaned — the chat layer kept seeing connectors as connected
 // after the user disconnected. PART 24 introduced a unified endpoint at
-// /api/arcus/connectors/disconnect that deletes from all three stores
+// /api/boult/connectors/disconnect that deletes from all three stores
 // with the conditional safeguard for shared Google tokens.
 //
 // This handler now proxies to that endpoint so any old call site keeps
@@ -224,7 +224,7 @@ export async function POST(request) {
 // warning so we can find and migrate callers, then delete this handler
 // in a follow-up.
 export async function DELETE(request) {
-  console.warn('[DEPRECATED] DELETE /api/integrations — use POST /api/arcus/connectors/disconnect instead.');
+  console.warn('[DEPRECATED] DELETE /api/integrations — use POST /api/boult/connectors/disconnect instead.');
   try {
     const session = await auth();
     if (!session?.user?.email) {
@@ -238,7 +238,7 @@ export async function DELETE(request) {
 
     // Proxy to the unified endpoint with the same cookie/session.
     const origin = new URL(request.url).origin;
-    const proxied = await fetch(`${origin}/api/arcus/connectors/disconnect`, {
+    const proxied = await fetch(`${origin}/api/boult/connectors/disconnect`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

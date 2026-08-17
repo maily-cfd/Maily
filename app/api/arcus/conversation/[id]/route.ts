@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
 
 type Context = { params: Promise<{ id: string }> };
 
-/** GET /api/arcus/conversation/[id] — load a single conversation */
+/** GET /api/boult/conversation/[id] — load a single conversation */
 export async function GET(_request: Request, context: Context) {
   try {
     const { id } = await context.params;
@@ -18,7 +18,7 @@ export async function GET(_request: Request, context: Context) {
     }
 
     const db = new DatabaseService();
-    const data = await db.loadArcusChatSession(session.user.email, id);
+    const data = await db.loadBoultChatSession(session.user.email, id);
     if (!data) {
       return NextResponse.json({ error: 'Not found' }, { status: 404 });
     }
@@ -26,12 +26,12 @@ export async function GET(_request: Request, context: Context) {
     return NextResponse.json(data);
   } catch (err: any) {
     logEvent({ channel: "failures", event: "❌ API Error", description: String(err) });
-    console.error('[GET /api/arcus/conversation/[id]]', err.message);
+    console.error('[GET /api/boult/conversation/[id]]', err.message);
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }
 
-/** DELETE /api/arcus/conversation/[id] — delete a conversation */
+/** DELETE /api/boult/conversation/[id] — delete a conversation */
 export async function DELETE(_request: Request, context: Context) {
   try {
     const { id } = await context.params;
@@ -45,7 +45,7 @@ export async function DELETE(_request: Request, context: Context) {
     const supabase = getSupabaseAdmin();
 
     const { error } = await supabase
-      .from('arcus_chat_sessions')
+      .from('boult_chat_sessions')
       .delete()
       .eq('id', id)
       .eq('user_id', session.user.email.toLowerCase());
@@ -57,12 +57,12 @@ export async function DELETE(_request: Request, context: Context) {
     return NextResponse.json({ success: true });
   } catch (err: any) {
     logEvent({ channel: "failures", event: "❌ API Error", description: String(err) });
-    console.error('[DELETE /api/arcus/conversation/[id]]', err.message);
+    console.error('[DELETE /api/boult/conversation/[id]]', err.message);
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }
 
-/** PATCH /api/arcus/conversation/[id] — rename a conversation title */
+/** PATCH /api/boult/conversation/[id] — rename a conversation title */
 export async function PATCH(request: Request, context: Context) {
   try {
     const { id } = await context.params;
@@ -81,7 +81,7 @@ export async function PATCH(request: Request, context: Context) {
     const supabase = getSupabaseAdmin();
 
     const { error } = await supabase
-      .from('arcus_chat_sessions')
+      .from('boult_chat_sessions')
       .update({ title: title.trim(), updated_at: new Date().toISOString() })
       .eq('id', id)
       .eq('user_id', session.user.email.toLowerCase());
@@ -93,7 +93,7 @@ export async function PATCH(request: Request, context: Context) {
     return NextResponse.json({ success: true });
   } catch (err: any) {
     logEvent({ channel: "failures", event: "❌ API Error", description: String(err) });
-    console.error('[PATCH /api/arcus/conversation/[id]]', err.message);
+    console.error('[PATCH /api/boult/conversation/[id]]', err.message);
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }

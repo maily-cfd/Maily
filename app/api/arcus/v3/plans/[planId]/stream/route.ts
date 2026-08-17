@@ -1,13 +1,13 @@
 /**
- * Arcus V3 — SSE Stream for Plan Execution
- * GET /api/arcus/v3/plans/[planId]/stream
+ * Boult V3 — SSE Stream for Plan Execution
+ * GET /api/boult/v3/plans/[planId]/stream
  * 
  * Returns a Server-Sent Events stream for real-time step updates.
  */
 
 import { NextRequest } from 'next/server';
 import { auth } from '../../../../../../../lib/auth.js';
-import { registerSSEClient } from '../../../../../../../lib/arcus-v3/sse';
+import { registerSSEClient } from '../../../../../../../lib/boult-v3/sse';
 import { logEvent } from "@/lib/logsso";
 
 export const dynamic = 'force-dynamic';

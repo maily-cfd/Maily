@@ -82,7 +82,7 @@ export function CancellationFlow({
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 20 }}
-        className="w-full max-w-[500px] bg-white dark:bg-arcus-surface-hover border border-neutral-200 dark:border-arcus-border rounded-[32px] overflow-hidden shadow-2xl"
+        className="w-full max-w-[500px] bg-white dark:bg-boult-surface-hover border border-neutral-200 dark:border-boult-border rounded-[32px] overflow-hidden shadow-2xl"
       >
         {/* Header */}
         <div className="px-8 pt-8 pb-4 flex items-center justify-between">

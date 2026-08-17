@@ -4,37 +4,37 @@ import { BlogLayout } from "@/components/BlogLayout";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Zero-Knowledge Encryption Explained // Mailient Blog",
-  description: "Most AI email tools need to read your data to work. Mailient doesn't. A deep dive into the architecture that keeps your inbox private.",
+  title: "Zero-Knowledge Encryption Explained // Maily Blog",
+  description: "Most AI email tools need to read your data to work. Maily doesn't. A deep dive into the architecture that keeps your inbox private.",
   openGraph: {
-    title: "Zero-Knowledge Encryption Explained // Mailient Blog",
-    description: "Most AI email tools need to read your data to work. Mailient doesn't. A deep dive into the architecture that keeps your inbox private.",
-    url: "https://mailient.xyz/blogs/zero-knowledge-encryption-email-privacy",
+    title: "Zero-Knowledge Encryption Explained // Maily Blog",
+    description: "Most AI email tools need to read your data to work. Maily doesn't. A deep dive into the architecture that keeps your inbox private.",
+    url: "https://maily.dev/blogs/zero-knowledge-encryption-email-privacy",
     type: "article",
     publishedTime: "2026-05-23T00:00:00.000Z",
-    authors: ["Maulik"],
+    authors: ["Maily"],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Zero-Knowledge Encryption Explained // Mailient Blog",
-    description: "Most AI email tools need to read your data to work. Mailient doesn't. A deep dive into the architecture that keeps your inbox private.",
+    title: "Zero-Knowledge Encryption Explained // Maily Blog",
+    description: "Most AI email tools need to read your data to work. Maily doesn't. A deep dive into the architecture that keeps your inbox private.",
   },
 };
 
 const meta = {
-  title: "Zero-Knowledge Encryption Explained: How Mailient Protects Your Email Without Reading It",
-  description: "Most AI email tools need to read your data to work. Mailient doesn't. A deep dive into the architecture that keeps your inbox private.",
+  title: "Zero-Knowledge Encryption Explained: How Maily Protects Your Email Without Reading It",
+  description: "Most AI email tools need to read your data to work. Maily doesn't. A deep dive into the architecture that keeps your inbox private.",
   date: "May 23, 2026",
   readTime: "8 min read",
   category: "Security",
   slug: "zero-knowledge-encryption-email-privacy",
-  author: "Maulik",
+  author: "Maily",
 };
 
 const tableOfContents = [
   { id: "trust-problem", label: "The Trust Problem" },
   { id: "what-zero-knowledge-means", label: "What Zero-Knowledge Means" },
-  { id: "mailient-architecture", label: "Mailient's Architecture" },
+  { id: "maily-architecture", label: "Maily's Architecture" },
   { id: "what-server-never-sees", label: "What the Server Never Sees" },
   { id: "competitor-comparison", label: "How This Compares" },
   { id: "privacy-as-architecture", label: "Privacy as Architecture" },
@@ -42,7 +42,7 @@ const tableOfContents = [
 
 const relatedPosts = [
   {
-    title: "How AI Learns to Write Exactly Like You: Inside Mailient's Neural Voice Profile",
+    title: "How AI Learns to Write Exactly Like You: Inside Maily's Neural Voice Profile",
     slug: "ai-learns-your-writing-style",
     category: "Engineering",
     readTime: "7 min read",
@@ -62,7 +62,7 @@ export default function ZeroKnowledgeEncryptionPage() {
         When you connect an AI tool to your email, you're handing it access to the most sensitive corpus of data in your professional life — contracts, financial discussions, legal negotiations, medical information, personal conversations. Every AI email tool asks for this access. Very few explain what they do with it once they have it.
       </p>
       <p>
-        Mailient is built on a different premise: <strong>the server should never be able to read your emails</strong>. Not as a policy choice. As an architectural constraint. Here's how it works and why it matters.
+        Maily is built on a different premise: <strong>the server should never be able to read your emails</strong>. Not as a policy choice. As an architectural constraint. Here's how it works and why it matters.
       </p>
 
       <hr />
@@ -100,36 +100,36 @@ export default function ZeroKnowledgeEncryptionPage() {
 
       <hr />
 
-      <h2 id="mailient-architecture">Mailient's Client-Side Encryption Architecture</h2>
+      <h2 id="maily-architecture">Maily's Client-Side Encryption Architecture</h2>
       <p>
-        Mailient implements zero-knowledge protection using <strong>AES-256-GCM encryption performed entirely in your browser</strong>. Here's the technical flow:
+        Maily implements zero-knowledge protection using <strong>AES-256-GCM encryption performed entirely in your browser</strong>. Here's the technical flow:
       </p>
 
       <h3>1. Email Processing Happens Locally</h3>
       <p>
-        When you connect your Gmail account, Mailient's processing engine runs inside your browser. Your emails are fetched via Google's OAuth API and processed client-side. The AI features — triage, draft generation, voice profiling — all operate on plaintext data that exists only in your browser's memory.
+        When you connect your Gmail account, Maily's processing engine runs inside your browser. Your emails are fetched via Google's OAuth API and processed client-side. The AI features — triage, draft generation, voice profiling — all operate on plaintext data that exists only in your browser's memory.
       </p>
 
       <h3>2. PII Sanitization Before AI Processing</h3>
       <p>
-        Before any data is sent to AI models for processing, Mailient strips personally identifiable information (PII) from the content. Names, email addresses, phone numbers, and other sensitive identifiers are replaced with anonymized tokens. The AI model processes the semantics of your email — the intent, tone, and context — without ever seeing the personal details.
+        Before any data is sent to AI models for processing, Maily strips personally identifiable information (PII) from the content. Names, email addresses, phone numbers, and other sensitive identifiers are replaced with anonymized tokens. The AI model processes the semantics of your email — the intent, tone, and context — without ever seeing the personal details.
       </p>
 
       <h3>3. AES-256-GCM Encryption for Local Cache</h3>
       <p>
-        Any data that Mailient stores locally (for performance and offline access) is encrypted using AES-256-GCM — the same encryption standard used by governments and financial institutions. GCM (Galois/Counter Mode) provides both confidentiality and integrity verification, meaning the data cannot be read <em>or</em> tampered with without the correct key.
+        Any data that Maily stores locally (for performance and offline access) is encrypted using AES-256-GCM — the same encryption standard used by governments and financial institutions. GCM (Galois/Counter Mode) provides both confidentiality and integrity verification, meaning the data cannot be read <em>or</em> tampered with without the correct key.
       </p>
 
       <h3>4. Keys Stay With You</h3>
       <p>
-        The encryption keys are derived from your session and never transmitted to Mailient's servers. When your session ends, the keys are destroyed. There is no master key, no recovery key, no backdoor. If Mailient's servers were compromised tomorrow, your email data would remain encrypted and unreadable.
+        The encryption keys are derived from your session and never transmitted to Maily's servers. When your session ends, the keys are destroyed. There is no master key, no recovery key, no backdoor. If Maily's servers were compromised tomorrow, your email data would remain encrypted and unreadable.
       </p>
 
       <hr />
 
       <h2 id="what-server-never-sees">What the Server Never Sees</h2>
       <p>
-        To be concrete about what Mailient's server infrastructure does and does not have access to:
+        To be concrete about what Maily's server infrastructure does and does not have access to:
       </p>
 
       <div className="callout-box">
@@ -176,7 +176,7 @@ export default function ZeroKnowledgeEncryptionPage() {
 
       <h3>Category 3: Client-Side AI with Zero-Knowledge Storage</h3>
       <p>
-        This is where Mailient operates. By running AI processing in the browser and encrypting any stored data client-side, Mailient provides AI-powered email management without requiring the server to ever access your data. It's a harder engineering challenge — client-side processing is more constrained than server-side — but it eliminates the trust dependency entirely.
+        This is where Maily operates. By running AI processing in the browser and encrypting any stored data client-side, Maily provides AI-powered email management without requiring the server to ever access your data. It's a harder engineering challenge — client-side processing is more constrained than server-side — but it eliminates the trust dependency entirely.
       </p>
 
       <hr />
@@ -192,12 +192,12 @@ export default function ZeroKnowledgeEncryptionPage() {
         For professionals handling sensitive communications — founders discussing term sheets, lawyers exchanging privileged correspondence, consultants managing confidential client data — the difference between a promise and a proof is the difference between acceptable risk and unnecessary risk.
       </p>
       <p>
-        Mailient's <Link href="/security">security architecture</Link> is designed so that your trust in the product is based on verifiable technical constraints, not on believing a company's marketing copy. You can read more about the full security standard on our <Link href="/security">dedicated security page</Link>.
+        Maily's <Link href="/security">security architecture</Link> is designed so that your trust in the product is based on verifiable technical constraints, not on believing a company's marketing copy. You can read more about the full security standard on our <Link href="/security">dedicated security page</Link>.
       </p>
 
       <div className="callout-box">
         <p>
-          <strong>Your emails are your business.</strong> Mailient is built to keep it that way.{" "}
+          <strong>Your emails are your business.</strong> Maily is built to keep it that way.{" "}
           <a href="/auth/signup">Start free trial →</a>
         </p>
       </div>

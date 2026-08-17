@@ -258,7 +258,7 @@ export function ThinkingLayer({ blocks, isVisible, currentThought, isGenerating,
 
 
 /**
- * ResultCard — Simple and clear card for Arcus execution results
+ * ResultCard — Simple and clear card for Boult execution results
  */
 interface ResultCardProps {
     type: string;
@@ -322,7 +322,7 @@ export function ResultCard({ type, title, onView, rawContent }: ResultCardProps)
         <motion.div
             whileTap={{ scale: 0.99 }}
             onClick={onView}
-            className="group relative flex items-center gap-4 p-4 mt-3 mb-3 w-full max-w-[620px] rounded-2xl cursor-pointer arcus-glass-card arcus-glass-hover"
+            className="group relative flex items-center gap-4 p-4 mt-3 mb-3 w-full max-w-[620px] rounded-2xl cursor-pointer boult-glass-card boult-glass-hover"
         >
             {/* Graphic card container — soft neutral tile, straightens on hover */}
             <div className="relative w-11 h-12 rounded-xl bg-black/[0.04] dark:bg-white/[0.06] border border-black/[0.06] dark:border-white/[0.08] flex items-center justify-center shrink-0 transform -rotate-3 overflow-hidden transition-transform duration-300 group-hover:rotate-0">

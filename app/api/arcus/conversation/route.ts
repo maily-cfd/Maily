@@ -6,7 +6,7 @@ import { logEvent } from "@/lib/logsso";
 
 export const dynamic = 'force-dynamic';
 
-/** POST /api/arcus/conversation — upsert a full conversation snapshot */
+/** POST /api/boult/conversation — upsert a full conversation snapshot */
 export async function POST(request: Request) {
   try {
     const session = await auth();
@@ -22,7 +22,7 @@ export async function POST(request: Request) {
     }
 
     const db = new DatabaseService();
-    const result = await db.saveArcusChatSession(
+    const result = await db.saveBoultChatSession(
       session.user.email,
       conversationId,
       messages,
@@ -32,12 +32,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: true, saved: !!result });
   } catch (err: any) {
     logEvent({ channel: "failures", event: "❌ API Error", description: String(err) });
-    console.error('[POST /api/arcus/conversation]', err.message);
+    console.error('[POST /api/boult/conversation]', err.message);
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }
 
-/** GET /api/arcus/conversation — list conversations for the current user */
+/** GET /api/boult/conversation — list conversations for the current user */
 export async function GET() {
   try {
     const session = await auth();
@@ -46,11 +46,11 @@ export async function GET() {
     }
 
     const db = new DatabaseService();
-    const sessions = await db.listArcusChatSessions(session.user.email);
+    const sessions = await db.listBoultChatSessions(session.user.email);
     return NextResponse.json({ sessions });
   } catch (err: any) {
     logEvent({ channel: "failures", event: "❌ API Error", description: String(err) });
-    console.error('[GET /api/arcus/conversation]', err.message);
+    console.error('[GET /api/boult/conversation]', err.message);
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }

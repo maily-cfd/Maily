@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Changelog | Mailient",
-  description: "What shipped in Mailient — new capabilities, fixes, and improvements to your inbox employee.",
-  alternates: { canonical: "https://mailient.xyz/changelog" },
+  title: "Changelog | Maily",
+  description: "What shipped in Maily — new capabilities, fixes, and improvements to your inbox employee.",
+  alternates: { canonical: "https://maily.dev/changelog" },
   openGraph: {
-    title: "Changelog | Mailient",
-    description: "What shipped in Mailient — new capabilities, fixes, and improvements.",
-    url: "https://mailient.xyz/changelog",
-    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Mailient changelog" }],
+    title: "Changelog | Maily",
+    description: "What shipped in Maily — new capabilities, fixes, and improvements.",
+    url: "https://maily.dev/changelog",
+    images: [{ url: "/logo-maily.png", width: 1200, height: 630, alt: "Maily changelog" }],
   },
 };
 

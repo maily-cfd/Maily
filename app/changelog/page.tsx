@@ -18,7 +18,7 @@ const TAG_STYLES: Record<ChangelogTag, string> = {
 
 export default function ChangelogPage() {
   useEffect(() => {
-    document.title = "Changelog / Mailient";
+    document.title = "Changelog / Maily";
   }, []);
 
   return (

@@ -29,7 +29,7 @@ export default function DraftsProductPage() {
   };
 
   useEffect(() => {
-    document.title = "Drafts — replies that sound like you | Mailient";
+    document.title = "Drafts — replies that sound like you | Maily";
   }, []);
 
   return (
@@ -143,7 +143,7 @@ export default function DraftsProductPage() {
             </h2>
 
             <p className="text-xs text-neutral-400 leading-relaxed font-light font-sans max-w-xl">
-              You never have to log into another app to send emails. Mailient drafts replies directly inside Gmail, ready for your approval. You retain full control: no automated message ever exits your account without manual confirmation.
+              You never have to log into another app to send emails. Maily drafts replies directly inside Gmail, ready for your approval. You retain full control: no automated message ever exits your account without manual confirmation.
             </p>
 
             <ul className="space-y-4 pt-2">
@@ -167,7 +167,7 @@ export default function DraftsProductPage() {
             <DemoVideo
               src="/demos/voice-demo.mp4"
               poster="/demos/voice-demo.jpg"
-              label="Arcus drafting a reply in your voice on a real inbox"
+              label="Boult drafting a reply in your voice on a real inbox"
               className="absolute inset-0 w-full h-full"
             />
           </div>

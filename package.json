@@ -1,5 +1,5 @@
 {
-  "name": "mailient",
+  "name": "maily",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -49,6 +49,7 @@
     "dotenv": "^17.2.3",
     "elevenlabs": "^1.59.0",
     "embla-carousel-react": "^8.6.0",
+    "firebase": "^12.17.1",
     "framer-motion": "^12.38.0",
     "google-auth-library": "^10.6.2",
     "googleapis": "^164.1.0",

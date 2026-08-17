@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { SLASH_COMMANDS, filterSlashCommands, type SlashCommand } from '@/lib/arcus/skills';
+import { SLASH_COMMANDS, filterSlashCommands, type SlashCommand } from '@/lib/boult/skills';
 
 interface SlashCommandMenuProps {
   isOpen: boolean;

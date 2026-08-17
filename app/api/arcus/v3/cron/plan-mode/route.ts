@@ -1,6 +1,6 @@
 /**
- * Arcus V3 — Plan Mode Cron
- * GET /api/arcus/v3/cron/plan-mode
+ * Boult V3 — Plan Mode Cron
+ * GET /api/boult/v3/cron/plan-mode
  *
  * Called by Vercel Cron or an external scheduler.
  * Iterates all users with planModeEnabled=true and enqueues
@@ -11,7 +11,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '../../../../../../lib/supabase.js';
-import { enqueueEvent } from '../../../../../../lib/arcus-v3/queue';
+import { enqueueEvent } from '../../../../../../lib/boult-v3/queue';
 import { logEvent } from "@/lib/logsso";
 
 export const dynamic = 'force-dynamic';
@@ -29,10 +29,10 @@ export async function GET(request: NextRequest) {
     const supabase = getSupabaseAdmin();
     const now = new Date();
 
-    // Fetch all users who have at least one active Arcus integration
-    // (having an integration implies they want Arcus to watch their apps)
+    // Fetch all users who have at least one active Boult integration
+    // (having an integration implies they want Boult to watch their apps)
     const { data: integrations } = await supabase
-      .from('arcus_integrations')
+      .from('boult_integrations')
       .select('user_id')
       .not('access_token', 'is', null);
 
@@ -68,7 +68,7 @@ export async function GET(request: NextRequest) {
       todayStart.setHours(0, 0, 0, 0);
 
       const { data: existingBrief } = await supabase
-        .from('arcus_plans')
+        .from('boult_plans')
         .select('id')
         .eq('user_id', userId)
         .eq('mode', 'plan_mode')
@@ -94,7 +94,7 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     logEvent({ channel: "failures", event: "❌ API Error", description: String(error) });
-    console.error('[Arcus V3] Plan Mode cron error:', (error as Error).message);
+    console.error('[Boult V3] Plan Mode cron error:', (error as Error).message);
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }

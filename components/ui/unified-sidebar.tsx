@@ -29,7 +29,7 @@ import {
   LogOut,
   Rocket,
   CreditCard
-} from "lucide-react";
+, Mail} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -124,7 +124,7 @@ export function UnifiedSidebar({
   // Universal navigation items
   const universalNavItems: SidebarItem[] = [
     { id: 'home-feed', name: 'Feed', icon: Mail, isRoute: true, route: '/home-feed' },
-    { id: 'agent-talk', name: 'Arcus', icon: Sparkles, isRoute: true, route: '/dashboard/agent-talk' },
+    { id: 'agent-talk', name: 'Boult', icon: Sparkles, isRoute: true, route: '/dashboard/agent-talk' },
   ];
 
   const handleLogout = async () => {
@@ -250,7 +250,7 @@ export function UnifiedSidebar({
             className="w-10 h-10 bg-white rounded-xl flex items-center justify-center cursor-pointer hover:scale-110 transition-transform duration-500 overflow-hidden shadow-xl"
             onClick={() => router.push('/home-feed')}
           >
-            <img src="/mailient-logo-v3.png" alt="Mailient" className="w-full h-full object-cover" />
+            <Mail className="w-full h-full p-1 text-inherit" />
           </div>
         </div>
         <div className="flex flex-col items-center gap-6 w-full">
@@ -397,10 +397,10 @@ export function UnifiedSidebar({
           <div className={styles.header}>
             <div className="flex items-center gap-3 mb-6">
               <div className="w-8 h-8 bg-black rounded-lg border border-white/10 flex items-center justify-center overflow-hidden">
-                <img src="/mailient-logo-v3.png" alt="Mailient" className="w-full h-full object-cover scale-110" />
+                <Mail className="w-full h-full p-1 text-inherit" />
               </div>
               <h1 className={styles.title}>
-                MAILIENT
+                MAILY
               </h1>
             </div>
             {variant === 'home-feed' && (

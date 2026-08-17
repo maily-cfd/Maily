@@ -127,7 +127,7 @@ export default function PricingSection3({
         "Full Sift email ingestion & triage",
         "Unlimited custom voice-cloned drafts",
         "Active Sync integrations (Notion, Cal.com)",
-        "Standard Arcus AI query access"
+        "Standard Boult AI query access"
       ],
       tag: "Cancel anytime"
     },
@@ -143,7 +143,7 @@ export default function PricingSection3({
         "Full Sift email ingestion & triage",
         "Unlimited custom voice-cloned drafts",
         "Active Sync integrations (Notion, Cal.com)",
-        "Standard Arcus AI query access",
+        "Standard Boult AI query access",
         "Gold Founding Badge status",
         "Gold Slack channel entry"
       ],
@@ -155,11 +155,11 @@ export default function PricingSection3({
       description: "Secure absolute access forever. One-time payment, zero recurring subscription fees. Complete diamond status.",
       price: 499,
       yearlyPrice: 499, // ALWAYS STAYS $499 - clicking annual only converts subscription!
-      buttonText: "Own Mailient Forever",
+      buttonText: "Own Maily Forever",
       popular: true, // Prioritize and highlight Lifetime tier!
       features: [
         "One-time purchase, zero API overhead fees",
-        "Lifetime access to Sift, Drafts & Arcus",
+        "Lifetime access to Sift, Drafts & Boult",
         "500 AI queries/month (refilled automatically)",
         "Exclusive Diamond Founding Badge status",
         "VIP Diamond feedback Slack channel",

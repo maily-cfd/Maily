@@ -13,7 +13,7 @@ import { Plus } from 'lucide-react';
 import { 
   CONNECTOR_REGISTRY,
   getConnectedConnectors 
-} from '@/lib/arcus-connector-registry';
+} from '@/lib/boult-connector-registry';
 
 interface ConnectedAccount {
   id: string;

@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
 
   const systemPrompt = `You are a professional prompt engineer specializing in AI personality and behavior instructions.
 
-The user has written a rough draft describing how they want their AI assistant (called Arcus) to behave.
+The user has written a rough draft describing how they want their AI assistant (called Boult) to behave.
 
 Your task: Expand and enhance this draft into a comprehensive, professional personality instruction set.
 
@@ -62,7 +62,7 @@ Rules:
         headers: {
           Authorization: `Bearer ${apiKey}`,
           'Content-Type': 'application/json',
-          'HTTP-Referer': 'https://mailient.xyz',
+          'HTTP-Referer': 'https://maily.dev',
         },
         body: JSON.stringify({
           model: 'nvidia/nemotron-3-ultra-550b-a55b:free',

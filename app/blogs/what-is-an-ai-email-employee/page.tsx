@@ -4,21 +4,21 @@ import { BlogLayout } from "@/components/BlogLayout";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "What Is an AI Email Employee? // Mailient Blog",
+  title: "What Is an AI Email Employee? // Maily Blog",
   description:
     "An AI email employee reads, triages, drafts, books, and follows up on your email autonomously — you approve, it works. How it differs from AI assistants, copilots, and email clients.",
   openGraph: {
-    title: "What Is an AI Email Employee? // Mailient Blog",
+    title: "What Is an AI Email Employee? // Maily Blog",
     description:
       "An AI email employee reads, triages, drafts, books, and follows up autonomously — you approve, it works. How it differs from assistants, copilots, and email clients.",
-    url: "https://mailient.xyz/blogs/what-is-an-ai-email-employee",
+    url: "https://maily.dev/blogs/what-is-an-ai-email-employee",
     type: "article",
     publishedTime: "2026-07-02T00:00:00.000Z",
-    authors: ["Maulik"],
+    authors: ["Maily"],
   },
   twitter: {
     card: "summary_large_image",
-    title: "What Is an AI Email Employee? // Mailient Blog",
+    title: "What Is an AI Email Employee? // Maily Blog",
     description:
       "An AI email employee reads, triages, drafts, books, and follows up autonomously — you approve, it works.",
   },
@@ -32,7 +32,7 @@ const meta = {
   readTime: "8 min read",
   category: "Industry",
   slug: "what-is-an-ai-email-employee",
-  author: "Maulik",
+  author: "Maily",
 };
 
 const tableOfContents = [
@@ -136,7 +136,7 @@ export default function WhatIsAnAiEmailEmployeePage() {
 
       <h2 id="what-it-does">What an Email Employee Actually Does</h2>
       <p>
-        Concretely — using <Link href="/product/arcus">Mailient</Link> as the example, since that's what we build — a
+        Concretely — using <Link href="/product/boult">Maily</Link> as the example, since that's what we build — a
         day in the life looks like this:
       </p>
       <ul>
@@ -189,7 +189,7 @@ export default function WhatIsAnAiEmailEmployeePage() {
           No black box.
         </li>
         <li>
-          <strong>Real privacy architecture, not policy.</strong> In Mailient's case: email is encrypted in your
+          <strong>Real privacy architecture, not policy.</strong> In Maily's case: email is encrypted in your
           browser before it reaches our servers, personal data is stripped before any AI processes content, and
           nothing is ever used to train models —{" "}
           <Link href="/blogs/zero-knowledge-encryption-email-privacy">here's the deep dive</Link>.
@@ -205,7 +205,7 @@ export default function WhatIsAnAiEmailEmployeePage() {
         justify neither, so they <em>become</em> the assistant, spending 10–15 hours a week inside Gmail.
       </p>
       <p>
-        An AI email employee costs about as much as a couple of coffees a week (Mailient is $29/month, flat,
+        An AI email employee costs about as much as a couple of coffees a week (Maily is $29/month, flat,
         everything included). It doesn't sleep, doesn't miss a message, and doesn't forget a follow-up. It will not
         replace human judgment — that's why approval exists — but it eliminates the job of being your own inbox
         secretary.
@@ -213,7 +213,7 @@ export default function WhatIsAnAiEmailEmployeePage() {
 
       <div className="callout-box">
         <p>
-          <strong>The one-sentence version:</strong> Mailient removes email from your to-do list entirely. You go
+          <strong>The one-sentence version:</strong> Maily removes email from your to-do list entirely. You go
           build — it handles the inbox. <a href="/auth/signup">Start the 3-day free trial →</a>
         </p>
       </div>
@@ -234,12 +234,12 @@ export default function WhatIsAnAiEmailEmployeePage() {
       </p>
       <h3>Who is this category for?</h3>
       <p>
-        Anyone whose business runs through one overloaded inbox. Mailient specifically builds for solo founders —
+        Anyone whose business runs through one overloaded inbox. Maily specifically builds for solo founders —
         one founder, one Gmail, no EA.
       </p>
       <h3>Does it replace an email client?</h3>
       <p>
-        Not necessarily. Mailient works on top of Gmail via OAuth — your email stays in Gmail; the employee works on
+        Not necessarily. Maily works on top of Gmail via OAuth — your email stays in Gmail; the employee works on
         it there.
       </p>
     </BlogLayout>

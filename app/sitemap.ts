@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next';
 
-const BASE = 'https://mailient.xyz';
+const BASE = 'https://maily.dev';
 
 // Blog posts with their real publish dates (kept in sync with each post's
 // openGraph.publishedTime).
@@ -11,8 +11,8 @@ const BLOG_POSTS: Array<{ slug: string; published: string }> = [
   { slug: 'founders-lose-deals-inbox', published: '2026-05-24' },
   { slug: 'zero-knowledge-encryption-email-privacy', published: '2026-05-23' },
   { slug: 'what-is-an-ai-email-employee', published: '2026-07-02' },
-  { slug: 'mailient-vs-superhuman', published: '2026-07-02' },
-  { slug: 'mailient-vs-fyxer', published: '2026-07-02' },
+  { slug: 'maily-vs-superhuman', published: '2026-07-02' },
+  { slug: 'maily-vs-fyxer', published: '2026-07-02' },
   { slug: 'best-ai-email-assistant-solo-founders', published: '2026-07-02' },
 ];
 
@@ -22,7 +22,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const pages: MetadataRoute.Sitemap = [
     { url: `${BASE}/`, lastModified: now, changeFrequency: 'weekly', priority: 1 },
     { url: `${BASE}/pricing`, lastModified: now, changeFrequency: 'monthly', priority: 0.9 },
-    { url: `${BASE}/product/arcus`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${BASE}/product/boult`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${BASE}/product/sift`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${BASE}/product/drafts`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${BASE}/blogs`, lastModified: now, changeFrequency: 'weekly', priority: 0.7 },

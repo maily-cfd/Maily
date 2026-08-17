@@ -1,24 +1,24 @@
 /**
  * Run a background agent immediately ("Run now" from the agent card).
- * POST /api/arcus/agents/run  { id }
+ * POST /api/boult/agents/run  { id }
  *
  * Streams the agentic loop as Server-Sent Events (identical event format to
- * /api/arcus/chat) so the browser sees live progress and the HTTP response
+ * /api/boult/chat) so the browser sees live progress and the HTTP response
  * is flushed immediately. The previous implementation drained the entire
  * loop server-side before responding, which exceeded Vercel's 60s function
  * cap and returned a 504 — the route never reached the conversation-save
  * code, so "Run now" appeared to do nothing.
  *
  * The client consumes the stream and persists the conversation via
- * /api/arcus/conversation once the report is produced.
+ * /api/boult/conversation once the report is produced.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 // @ts-ignore
 const { auth } = require('../../../../../lib/auth.js');
 import { getSupabaseAdmin } from '../../../../../lib/supabase.js';
-import { buildAgentLoopArgs } from '../../../../../lib/arcus/run-agent';
-import { runAgentLoop } from '../../../../../lib/arcus/loop';
+import { buildAgentLoopArgs } from '../../../../../lib/boult/run-agent';
+import { runAgentLoop } from '../../../../../lib/boult/loop';
 import { logEvent } from "@/lib/logsso";
 
 export const dynamic = 'force-dynamic';
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
 
   const supabase = getSupabaseAdmin();
   const { data: agent, error } = await supabase
-    .from('arcus_agents')
+    .from('boult_agents')
     .select('*')
     .eq('id', id)
     .eq('user_id', userId)
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
   // stream). last_run_at is intentionally left untouched so a manual run
   // doesn't suppress the next scheduled run via the cron anti-double-run guard.
   supabase
-    .from('arcus_agents')
+    .from('boult_agents')
     .update({ last_report_summary: `Manual run started ${new Date().toISOString()}` })
     .eq('id', agent.id)
     .then(() => {}, () => {});

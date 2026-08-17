@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { auth as getSession } from '@/lib/auth';
-import { ArcusIntegrationManager } from '@/lib/arcus-integration-manager';
+import { BoultIntegrationManager } from '@/lib/boult-integration-manager';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { logEvent } from "@/lib/logsso";
 
@@ -30,7 +30,7 @@ const db = {
   }
 };
 
-const integrationManager = new ArcusIntegrationManager(db);
+const integrationManager = new BoultIntegrationManager(db);
 
 export async function GET(request) {
   const baseUrl = new URL(request.url).origin;

@@ -1,9 +1,9 @@
 /**
- * Arcus V3 — Agentic Chat Endpoint
- * POST /api/arcus/v3/chat
+ * Boult V3 — Agentic Chat Endpoint
+ * POST /api/boult/v3/chat
  *
  * Real agentic loop using Claude tool_use via OpenRouter.
- * Streams SSE events matching useArcusAgentStream's expected format.
+ * Streams SSE events matching useBoultAgentStream's expected format.
  *
  * Event types:
  *   run_start            → { runId, message }
@@ -21,9 +21,9 @@ import { NextRequest } from 'next/server';
 import { auth } from '../../../../../lib/auth.js';
 import { getSupabaseAdmin } from '../../../../../lib/supabase.js';
 import { decrypt } from '../../../../../lib/crypto.js';
-import { ARCUS_TOOLS } from '../../../../../lib/arcus-v3/tools/definitions';
-import { executeTool } from '../../../../../lib/arcus-v3/tools/executor';
-import { storeMessage, getConversationHistory } from '../../../../../lib/arcus-v3/memory';
+import { BOULT_TOOLS } from '../../../../../lib/boult-v3/tools/definitions';
+import { executeTool } from '../../../../../lib/boult-v3/tools/executor';
+import { storeMessage, getConversationHistory } from '../../../../../lib/boult-v3/memory';
 import crypto from 'crypto';
 import { logEvent } from "@/lib/logsso";
 
@@ -55,8 +55,8 @@ async function callLLM(
         method: 'POST',
         headers: {
           Authorization: `Bearer ${key}`,
-          'HTTP-Referer': 'https://mailient.xyz',
-          'X-Title': 'Arcus AI',
+          'HTTP-Referer': 'https://maily.dev',
+          'X-Title': 'Boult AI',
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -71,7 +71,7 @@ async function callLLM(
 
       if (!res.ok) {
         const body = await res.text().catch(() => '');
-        console.error(`[Arcus] OpenRouter ${res.status}:`, body.slice(0, 200));
+        console.error(`[Boult] OpenRouter ${res.status}:`, body.slice(0, 200));
         continue;
       }
 
@@ -79,7 +79,7 @@ async function callLLM(
       return data.choices?.[0]?.message || null;
     } catch (err) {
       logEvent({ channel: "failures", event: "❌ API Error", description: String(err) });
-      console.error('[Arcus] LLM call error:', (err as Error).message);
+      console.error('[Boult] LLM call error:', (err as Error).message);
       continue;
     }
   }
@@ -94,7 +94,7 @@ async function callLLM(
  * chat path so v3 drafts sound like the user from the first turn. Empty string
  * if there's no saved profile yet — v3 doesn't bootstrap from sent mail here,
  * to keep the streaming budget tight; the bootstrap happens in the legacy
- * /api/arcus/chat path the user already hits in normal flow.
+ * /api/boult/chat path the user already hits in normal flow.
  */
 async function getVoiceProfileBlock(userId: string): Promise<string> {
   try {
@@ -114,7 +114,7 @@ async function getUserIntegrations(userId: string): Promise<string> {
   try {
     const supabase = getSupabaseAdmin();
     const { data } = await supabase
-      .from('arcus_integrations')
+      .from('boult_integrations')
       .select('provider')
       .eq('user_id', userId);
     const connected = (data || []).map((r: any) => r.provider);
@@ -131,7 +131,7 @@ async function getRecentEmailSummary(userId: string): Promise<string> {
   try {
     const supabase = getSupabaseAdmin();
     const { data } = await supabase
-      .from('arcus_integrations')
+      .from('boult_integrations')
       .select('access_token')
       .eq('user_id', userId)
       .eq('provider', 'gmail')
@@ -141,7 +141,7 @@ async function getRecentEmailSummary(userId: string): Promise<string> {
 
     // googleFetch proxies through Composio for managed users (access_token is a
     // composio: marker, not a bearer) or does the direct authed call for legacy.
-    const { googleFetch } = await import('@/lib/arcus/tools/http-tokens');
+    const { googleFetch } = await import('@/lib/boult/tools/http-tokens');
     const res = await googleFetch(userId, 'gmail',
       'https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=10&labelIds=INBOX&q=is:unread',
       { headers: { Authorization: `Bearer ${token}` } }
@@ -166,8 +166,8 @@ async function getPersonalityInstructions(userId: string): Promise<string> {
       .maybeSingle();
 
     const prefs = (data?.preferences as Record<string, any>) || {};
-    if (prefs.arcus_instructions_enabled === false) return '';
-    return typeof prefs.arcus_personality === 'string' ? prefs.arcus_personality.trim() : '';
+    if (prefs.boult_instructions_enabled === false) return '';
+    return typeof prefs.boult_personality === 'string' ? prefs.boult_personality.trim() : '';
   } catch {
     logEvent({ channel: "failures", event: "❌ API Error", description: "Unknown error" });
     return '';
@@ -213,7 +213,7 @@ function buildSystemPrompt(
   const instructionsSection = customInstructions
     ? `\n\n────────────────────────────────────────────────────────────────────────\nUSER CUSTOM INSTRUCTIONS\n────────────────────────────────────────────────────────────────────────\nThe user has provided the following custom instructions for your behavior, tone, and formatting. You MUST follow these instructions precisely in every interaction:\n\n${customInstructions}\n`
     : '';
-  return `You are Arcus, an AI executive agent built for founders. You live inside the user's Mailient workspace with real access to Gmail, Google Calendar, Notion, Notion Calendar (Notion databases with a date property), and Slack. You execute — you don't just advise.
+  return `You are Boult, an AI executive agent built for founders. You live inside the user's Maily workspace with real access to Gmail, Google Calendar, Notion, Notion Calendar (Notion databases with a date property), and Slack. You execute — you don't just advise.
 
 Today is ${today}. The user's name is ${userName || 'there'}.
 
@@ -222,28 +222,28 @@ ${emailSummary}
 ${voiceSection}
 ${instructionsSection}
 ────────────────────────────────────────────────────────────────────────
-MAILIENT PLATFORM KNOWLEDGE
+MAILY PLATFORM KNOWLEDGE
 ────────────────────────────────────────────────────────────────────────
-You are Arcus, the AI executive agent built directly into the Mailient platform. If the user asks about Mailient, its features, or its pricing, use the following information:
-- Mailient is an AI-powered email intelligence platform that connects to Gmail, Google Calendar, Notion, and Slack to automate workflows.
+You are Boult, the AI executive agent built directly into the Maily platform. If the user asks about Maily, its features, or its pricing, use the following information:
+- Maily is an AI-powered email intelligence platform that connects to Gmail, Google Calendar, Notion, and Slack to automate workflows.
 - Core Features:
   1. Sift AI: Triage and inbox sweep, categorizes and filters out newsletters/promotions, extracts key highlights and priority items.
-  2. Arcus AI: Autonomous executive agent (you) capable of analyzing threads, executing workflows, managing calendars, and managing Notion/Slack integrations.
+  2. Boult AI: Autonomous executive agent (you) capable of analyzing threads, executing workflows, managing calendars, and managing Notion/Slack integrations.
   3. Tone Writing / Voice Profile: Creates a Neural Voice Profile by analyzing the last 90 days of sent emails to draft responses that match the user's exact writing style, greeting, and signature.
   4. Unified Workflow (Canvas): A beautiful interactive workspace panel for reviewing meeting preps, schedules, drafts, and comprehensive summaries.
   5. Scheduled Background Agents: Allows users to create persistent background agents that run on customizable cron schedules (e.g., sweep inbox every morning and draft replies to client emails).
   6. Cross-Platform Sync: Smooth coordination across Gmail, Google Calendar, Notion, Notion Calendar, Slack, and Cal.com.
   7. Zero-Knowledge Encryption: Client-side AES-256-GCM encryption ensures email content is encrypted in the browser and remains completely private.
 - Pricing Tiers (no free forever plan; monthly includes a 3-day free trial via Polar — card required, cancel before day 3):
-  1. Monthly Plan: $29/month after a 3-day free trial. Includes unlimited AI Drafts, Sift Analysis, Arcus queries, background agents, scheduling, and a Gold Founder Badge.
+  1. Monthly Plan: $29/month after a 3-day free trial. Includes unlimited AI Drafts, Sift Analysis, Boult queries, background agents, scheduling, and a Gold Founder Badge.
   2. Annual Plan: $16.58/month (billed $199 annually). Saves 40% (2 months free). Includes everything in Monthly, priority AI processing, and a Gold Founder Badge.
   3. Lifetime Founder Plan: $499 one-time payment. Pay once, own forever. Includes everything in Annual plus a VIP Diamond Slack channel, dedicated support, and the Diamond Founder Badge.
 - Founder & Team:
-  - Built by Maulik (a 14-year-old high-agency founder). Contact: mailient.xyz@gmail.com or @maulik_5 on X. Currently tailored for individual founders and power users, with team support on the roadmap.
+  - Maily is a free, open source project. Follow at @Mailycfd on X or github.com/maily-cfd/Maily. Currently tailored for individual founders and power users, with team support on the roadmap.
 - Salesperson Role & Objection Handling (CRITICAL):
   - When users ask about pricing, evaluate upgrading, or express objections (e.g. "too expensive", "I'll stay on free", "cuz it's too expensive"), DO NOT just give up or immediately agree to stay on the free plan.
   - ACT LIKE A TALENTED, PERSUASIVE, AND EMPOWERING SALESPERSON.
-  - Highlight the massive ROI: a single deal closed or just a few hours saved per week easily pays for the $29/month plan. Emphasize that Mailient has NO free tier—only a highly restricted Starter plan with strict daily limits (e.g., 10 Arcus AI queries per day), whereas Pro is completely unlimited and allows you to run autonomous background agents working for you 24/7.
+  - Highlight the massive ROI: a single deal closed or just a few hours saved per week easily pays for the $29/month plan. Emphasize that Maily has NO free tier—only a highly restricted Starter plan with strict daily limits (e.g., 10 Boult AI queries per day), whereas Pro is completely unlimited and allows you to run autonomous background agents working for you 24/7.
   - Handle objections with warmth, intelligence, and confidence. Keep your response crisp, focused on value, and close with a persuasive invitation to upgrade.
 
 
@@ -390,7 +390,7 @@ Chat: short confirmations, status updates, single-line answers, the approval que
 ────────────────────────────────────────────────────────────────────────
 NOTION WRITES
 ────────────────────────────────────────────────────────────────────────
-create_notion_page takes a databaseHint ("meetings", "tasks", "contacts", "CRM", "projects"). Arcus searches the workspace and matches by name. You don't need to know property names — pass title, date, notes, status, url, actionItems and the executor maps them to the real schema. If no matching database is found, the tool tells you — relay that to the user and ask which database name to use.
+create_notion_page takes a databaseHint ("meetings", "tasks", "contacts", "CRM", "projects"). Boult searches the workspace and matches by name. You don't need to know property names — pass title, date, notes, status, url, actionItems and the executor maps them to the real schema. If no matching database is found, the tool tells you — relay that to the user and ask which database name to use.
 
 ────────────────────────────────────────────────────────────────────────
 FINAL MESSAGE RULES (mandatory)
@@ -484,7 +484,7 @@ export async function POST(request: NextRequest) {
         ];
 
         while (iteration < MAX_ITERATIONS) {
-          const assistantMsg = await callLLM(messagesWithSystem, ARCUS_TOOLS);
+          const assistantMsg = await callLLM(messagesWithSystem, BOULT_TOOLS);
           if (!assistantMsg) throw new Error('LLM returned empty response.');
 
           // Add assistant's response to message history for next iteration
@@ -611,7 +611,7 @@ export async function POST(request: NextRequest) {
         });
       } catch (err) {
           logEvent({ channel: "failures", event: "❌ API Error", description: String(err) });
-        console.error('[Arcus V3 Chat] Error:', (err as Error).message);
+        console.error('[Boult V3 Chat] Error:', (err as Error).message);
         emit('error', { message: (err as Error).message });
       } finally {
         controller.close();

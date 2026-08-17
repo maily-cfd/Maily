@@ -1,5 +1,5 @@
 /**
- * Mailient public changelog — the ship log rendered at /changelog.
+ * Maily public changelog — the ship log rendered at /changelog.
  *
  * HOW TO ADD AN ENTRY: prepend to the group for today's date (create the
  * group if it doesn't exist — newest group first). Write for FOUNDERS, not
@@ -53,7 +53,7 @@ export const CHANGELOG: ChangelogGroup[] = [
         tag: 'Improved',
         title: '“Handle it” now does it — in one click',
         points: [
-          'Clicking “Handle it” on any card no longer bounces you to a new page with a prompt you still have to send. It opens Arcus right where you are and sends the request instantly — one click, and it’s already working.',
+          'Clicking “Handle it” on any card no longer bounces you to a new page with a prompt you still have to send. It opens Boult right where you are and sends the request instantly — one click, and it’s already working.',
         ],
       },
       {
@@ -78,9 +78,9 @@ export const CHANGELOG: ChangelogGroup[] = [
         tag: 'New',
         title: 'A home that shows YOUR world — across every app, not just email',
         points: [
-          'The home feed no longer opens with what Mailient did for you. It opens with where your world stands: who’s waiting on you, what’s coming up, and what you owe — the state of your day, not a scoreboard of the software.',
+          'The home feed no longer opens with what Maily did for you. It opens with where your world stands: who’s waiting on you, what’s coming up, and what you owe — the state of your day, not a scoreboard of the software.',
           'New “What’s slipping” — the things genuinely at risk right now, ranked by what it costs to miss: a deal gone quiet, a VIP you haven’t answered, a bounced email — pulled from across your apps, so you see a loss before it happens.',
-          'New “Your world right now” — each important relationship shown as a living thing across every connected app at once: an email thread’s status fused with that same person’s calendar, Cal.com booking, Notion page, and Slack DM. One glance tells you everything, one click hands it to Arcus.',
+          'New “Your world right now” — each important relationship shown as a living thing across every connected app at once: an email thread’s status fused with that same person’s calendar, Cal.com booking, Notion page, and Slack DM. One glance tells you everything, one click hands it to Boult.',
           'It only ever joins signals it’s certain about (an exact email or exact name match), and a disconnected app simply never appears — nothing invented.',
           'New “On your plate” — the commitments you made in meetings, with their due dates, so a promise never quietly slips. And “Your meetings” now reads your day back to you: how much of it is booked and whether it’s stacked back-to-back.',
           'The weekly agent-activity view didn’t go away — it’s now a single quiet “Handled quietly” line at the very bottom you can expand any time.',
@@ -95,7 +95,7 @@ export const CHANGELOG: ChangelogGroup[] = [
         tag: 'Improved',
         title: 'A cleaner, more useful “Your week”',
         points: [
-          'Redesigned the “Your week” panel with frosted glass cards and textured stat pills — a calmer, more premium read of what Arcus did for you.',
+          'Redesigned the “Your week” panel with frosted glass cards and textured stat pills — a calmer, more premium read of what Boult did for you.',
           'It tells you more at a glance: four headline numbers (actions, runs, daily average, and your busiest day), the daily trend with your busiest day highlighted, and a new “This week, in short” — your busiest day, how many of the 7 days had activity, and your average actions per run.',
           'Dropped a duplicate chart that just re-plotted the same daily numbers, so the panel is less cluttered and every tile now earns its place. Every number is still real — nothing illustrative.',
         ],
@@ -143,8 +143,8 @@ export const CHANGELOG: ChangelogGroup[] = [
         tag: 'New',
         title: 'A redesigned home feed that shows where your world stands',
         points: [
-          'The home feed used to be a log of what already happened. It now opens with a real command center: a one-line read on your day, four live numbers (need a reply, meetings, awaiting reply, handled for you), and a chart of what Arcus actually did across the last 7 days.',
-          'New "Key conversations" section — your important threads and exactly where each one stands right now: awaiting your reply, waiting on them, or a meeting is booked. One click hands any of them to Arcus to handle.',
+          'The home feed used to be a log of what already happened. It now opens with a real command center: a one-line read on your day, four live numbers (need a reply, meetings, awaiting reply, handled for you), and a chart of what Boult actually did across the last 7 days.',
+          'New "Key conversations" section — your important threads and exactly where each one stands right now: awaiting your reply, waiting on them, or a meeting is booked. One click hands any of them to Boult to handle.',
           'The things that need you are separated from the things that are handled: reply-now emails, your upcoming meetings with one-tap prep and scheduling, cross-app suggestions from Gmail, Calendar, Notion and Slack, and a recap of what your agents did while you were away.',
           'Every number on the page is real — the week chart shows an honest empty state when there is no activity yet, never a fake trend.',
         ],
@@ -159,7 +159,7 @@ export const CHANGELOG: ChangelogGroup[] = [
         title: 'The security page, rebuilt — and far more thorough',
         points: [
           'The security page now matches the rest of the site — the same cards, headings and motion — instead of looking like a page from a different product.',
-          'It now spells out the exact three Google permissions Mailient asks for, and why each one is there — the same list the Google consent screen shows you.',
+          'It now spells out the exact three Google permissions Maily asks for, and why each one is there — the same list the Google consent screen shows you.',
           'Added a plain-English security FAQ: what the AI can read, what it can access, whether data is ever sold, what happens when you delete your account, who else touches your data, and the fact that nothing sends without your approval.',
           'Added links to the deeper reading — the zero-knowledge encryption write-up, the Privacy Policy, the Terms, and the one-click page to revoke Google access.',
           'Fixed a set of text colours across the site that were silently not applying, including a few labels and ticks that were meant to stand out and were rendering as plain grey.',
@@ -167,16 +167,16 @@ export const CHANGELOG: ChangelogGroup[] = [
       },
       {
         tag: 'Fixed',
-        title: 'Arcus now edits documents instead of rewriting them from a guess',
+        title: 'Boult now edits documents instead of rewriting them from a guess',
         points: [
-          'Asking Arcus to change something in an open document — shorten it, add a section, fix a line — used to produce a much shorter, generic replacement, because Arcus was working from a vague memory of the topic rather than the actual text on your screen.',
-          'Arcus now sees the exact live document before editing it, so changes land on the real content and everything you did not ask to change stays intact.',
+          'Asking Boult to change something in an open document — shorten it, add a section, fix a line — used to produce a much shorter, generic replacement, because Boult was working from a vague memory of the topic rather than the actual text on your screen.',
+          'Boult now sees the exact live document before editing it, so changes land on the real content and everything you did not ask to change stays intact.',
           'New documents are also held to a higher bar: real sections and real depth for anything you call a report, doc, or plan — not a two-line stub.',
         ],
       },
       {
         tag: 'New',
-        title: 'A weekly plan, for trying Mailient properly',
+        title: 'A weekly plan, for trying Maily properly',
         points: [
           '$8.99 a week gets you the complete product — every feature, nothing held back. It renews weekly and you can cancel anytime from your billing portal.',
           'It sits alongside Monthly, Annual and Lifetime on the pricing page and in setup.',
@@ -215,16 +215,16 @@ export const CHANGELOG: ChangelogGroup[] = [
       },
       {
         tag: 'Improved',
-        title: 'Arcus shows less clutter while it works',
+        title: 'Boult shows less clutter while it works',
         points: [
-          'When Arcus reads seven emails in a row it now says so once, as a single line with a count, instead of seven identical rows you had to scroll past to reach the answer.',
+          'When Boult reads seven emails in a row it now says so once, as a single line with a count, instead of seven identical rows you had to scroll past to reach the answer.',
         ],
       },
       {
         tag: 'New',
-        title: 'Watch Arcus actually work',
+        title: 'Watch Boult actually work',
         points: [
-          'The Meet Arcus section now shows a real recording of Arcus running — triaging, drafting and booking — in place of the example readout that used to sit there.',
+          'The Meet Boult section now shows a real recording of Boult running — triaging, drafting and booking — in place of the example readout that used to sit there.',
         ],
       },
       {
@@ -249,7 +249,7 @@ export const CHANGELOG: ChangelogGroup[] = [
         points: [
           'The top navigation is now three separate floating pieces — the logo, the links, and the two buttons — instead of one long bar stretched across the screen.',
           'Text and cards fade in as they come into view, in both scroll directions, so the page feels alive rather than static.',
-          'The "Why Mailient" and "Meet Arcus" sections were paragraphs of solid prose. They are now a few short lines you can take in at a glance — the argument is the same, the reading is not.',
+          'The "Why Maily" and "Meet Boult" sections were paragraphs of solid prose. They are now a few short lines you can take in at a glance — the argument is the same, the reading is not.',
           'The morning payoff figures are now proper cards with icons instead of loose text.',
           'The quick-access bar is back at the bottom of the homepage.',
         ],
@@ -263,7 +263,7 @@ export const CHANGELOG: ChangelogGroup[] = [
         tag: 'New',
         title: 'Give a friend a free month — and get one back',
         points: [
-          'Anyone you invite now gets a full free month of Mailient instead of the 3-day trial. When they stay on as a customer, a free month is added to your account automatically — nothing to claim.',
+          'Anyone you invite now gets a full free month of Maily instead of the 3-day trial. When they stay on as a customer, a free month is added to your account automatically — nothing to claim.',
           'Open Rewards in the sidebar for your link, then "Open share screen" for the full version: a pre-written message and one tap to WhatsApp, email, X or LinkedIn. On a phone it opens your normal share sheet.',
           'You can see how many friends have joined and how many months you have earned.',
           'Previously invites paid out in credits, which nothing in the product could spend — so the reward was worth nothing. It is real subscription time now.',
@@ -301,8 +301,8 @@ export const CHANGELOG: ChangelogGroup[] = [
         tag: 'Improved',
         title: 'A faster, clearer homepage',
         points: [
-          'What Mailient actually does now comes before the price instead of after it, and the opening argument is a quarter of its old length.',
-          'Buttons that went nowhere now work: "Put work on autopilot" reaches pricing, and "Watch Mailient handle a real inbox" reaches the demos.',
+          'What Maily actually does now comes before the price instead of after it, and the opening argument is a quarter of its old length.',
+          'Buttons that went nowhere now work: "Put work on autopilot" reaches pricing, and "Watch Maily handle a real inbox" reaches the demos.',
           'Headings follow one consistent size scale, so the page no longer shouts louder at the bottom than at the top.',
           'The floating bottom toolbar is gone from the homepage, giving the page back the screen space it was covering.',
           'The FAQ and the demo switcher can now be operated by keyboard and read by screen readers.',
@@ -310,7 +310,7 @@ export const CHANGELOG: ChangelogGroup[] = [
       },
       {
         tag: 'Improved',
-        title: 'Mailient is open — no more access requests',
+        title: 'Maily is open — no more access requests',
         points: [
           'You no longer have to request access and wait for approval. Every "Get started" button takes you straight to signup, and you are in.',
           'The old access-request form and its approval queue are gone entirely.',
@@ -336,7 +336,7 @@ export const CHANGELOG: ChangelogGroup[] = [
           'Signing in now asks only for your name and email; Gmail access is a separate, clearly-scoped step — so the permission screen is smaller and easier to trust.',
           'Getting started from the homepage now drops you straight onto the Gmail-connect step right after sign-in, so setup feels like one continuous action instead of extra clicks.',
           'Connection problems finally speak up: if a Google connect is cancelled or doesn\'t finish, you get a clear message instead of a silent bounce-back.',
-          'If a Google connection ever expires, the app now knows the moment it happens and shows you a clear "reconnect" prompt — instead of quietly failing the next time Arcus tries to act.',
+          'If a Google connection ever expires, the app now knows the moment it happens and shows you a clear "reconnect" prompt — instead of quietly failing the next time Boult tries to act.',
           'Behind the scenes, the Google connection can now run through a verified provider, which removes the old signup ceiling — the app is ready to onboard far more people without hitting a wall.',
         ],
       },
@@ -344,7 +344,7 @@ export const CHANGELOG: ChangelogGroup[] = [
         tag: 'New',
         title: 'Big tasks never get cut off anymore',
         points: [
-          'Arcus now gets a 5-minute working window per pass (up from ~1 minute) — and when a task genuinely needs more, it automatically continues in a fresh pass, carrying over everything it already did. No more "the response got cut off before the summary came back."',
+          'Boult now gets a 5-minute working window per pass (up from ~1 minute) — and when a task genuinely needs more, it automatically continues in a fresh pass, carrying over everything it already did. No more "the response got cut off before the summary came back."',
           'You see it happen naturally in the chat: the first pass shows its steps and says it\'s continuing, the next pass picks up exactly where it stopped and delivers the complete answer. Small tasks are exactly as fast as before.',
           'Scheduled agents get the same 5-minute window, so deep inbox sweeps can actually finish and deliver their reports.',
         ],
@@ -361,7 +361,7 @@ export const CHANGELOG: ChangelogGroup[] = [
         tag: 'Improved',
         title: 'Plan documents look like real strategy docs now',
         points: [
-          'Asking Arcus to plan something big used to produce a thin page whose Steps section could show raw code instead of steps. Fixed at every layer: steps now render as numbered rows with descriptions, timelines and success metrics lay out as proper tables, and even a malformed plan gets repaired into readable steps instead of showing JSON.',
+          'Asking Boult to plan something big used to produce a thin page whose Steps section could show raw code instead of steps. Fixed at every layer: steps now render as numbered rows with descriptions, timelines and success metrics lay out as proper tables, and even a malformed plan gets repaired into readable steps instead of showing JSON.',
           'Plans are also held to a much higher bar: objective, where things stand, 6–12 concrete steps, timeline, measurable success metrics, risks with mitigations, and the expected output — grounded in what you actually said, never invented numbers.',
         ],
       },
@@ -408,7 +408,7 @@ export const CHANGELOG: ChangelogGroup[] = [
         tag: 'New',
         title: 'Edit and re-send your messages — and flip between answers',
         points: [
-          'Every message you send now has an Edit button. Change the wording and send — Arcus answers the new version, and you can slide between the old and new answers with the ‹ › arrows, just like the big AI chats.',
+          'Every message you send now has an Edit button. Change the wording and send — Boult answers the new version, and you can slide between the old and new answers with the ‹ › arrows, just like the big AI chats.',
           'A Copy button sits right under each message.',
           'Long messages collapse to a few lines with a "Show more" toggle, so a big paste doesn\'t take over the screen — tap to expand, tap again for "Show less".',
         ],
@@ -434,8 +434,8 @@ export const CHANGELOG: ChangelogGroup[] = [
         tag: 'New',
         title: 'Meet the outreach capability — right from the chat',
         points: [
-          'A "New" pill on the Arcus home screen introduces cold outreach. Tap it for a short animated walkthrough of the whole flow — intake, research, drafting, your approval, and the paced send — then one tap on "Start outreach".',
-          'Starting now drops you straight into the flow: Arcus immediately asks for your list and your pitch, in a fast, friendly reply. (The earlier version could stall here; that\'s fixed — it answers in a second and never times out.)',
+          'A "New" pill on the Boult home screen introduces cold outreach. Tap it for a short animated walkthrough of the whole flow — intake, research, drafting, your approval, and the paced send — then one tap on "Start outreach".',
+          'Starting now drops you straight into the flow: Boult immediately asks for your list and your pitch, in a fast, friendly reply. (The earlier version could stall here; that\'s fixed — it answers in a second and never times out.)',
           'There\'s no new tab or setup to hunt for. Outreach lives inside the same chat and agents you already use. Seen it already? Dismiss the pill and it won\'t come back.',
         ],
       },
@@ -443,7 +443,7 @@ export const CHANGELOG: ChangelogGroup[] = [
         tag: 'Fixed',
         title: 'Drafting replies to several emails no longer times out',
         points: [
-          'Asking Arcus to "draft replies to the 5 emails waiting on me" used to grind past the time limit and come back with an apology and nothing to show. Now it reads all the threads together, writes every reply in one pass, and shows them instantly.',
+          'Asking Boult to "draft replies to the 5 emails waiting on me" used to grind past the time limit and come back with an apology and nothing to show. Now it reads all the threads together, writes every reply in one pass, and shows them instantly.',
           'Each reply lands as its own card in the chat: recipient, subject, and a voice-match score. Click one to open it, tweak the wording, and send. Five emails means five cards you can work through in seconds.',
           'Send goes straight to the recipient in the right thread, not just to your Drafts folder. Anything you don\'t send stays saved as a draft.',
         ],
@@ -452,10 +452,10 @@ export const CHANGELOG: ChangelogGroup[] = [
         tag: 'Improved',
         title: 'Outreach that finds your leads, sounds human, and shows its work',
         points: [
-          'Point Arcus at your contacts wherever they live: attach a CSV, paste a list, or just say "email everyone in my Leads database in Notion" and it reads the real rows itself. If it can\'t find valid addresses, it tells you exactly where it looked instead of guessing.',
+          'Point Boult at your contacts wherever they live: attach a CSV, paste a list, or just say "email everyone in my Leads database in Notion" and it reads the real rows itself. If it can\'t find valid addresses, it tells you exactly where it looked instead of guessing.',
           'Every email now reads like a real person typed it: no em-dashes, no "I hope this email finds you well", no AI throat-clearing. Plain, direct, in your voice.',
-          'Before it asks for your approval, Arcus opens a live tracker you can watch: every lead with its research hook, status, and send time, updating as the batch moves from drafted to queued to sent.',
-          'One request does the whole job. Arcus plans and executes in the same turn: pulls the leads, researches each person, drafts, opens the tracker, asks once, and schedules the send. Ask for a watcher and it deploys a background agent that keeps working at a safe ~40 emails a day.',
+          'Before it asks for your approval, Boult opens a live tracker you can watch: every lead with its research hook, status, and send time, updating as the batch moves from drafted to queued to sent.',
+          'One request does the whole job. Boult plans and executes in the same turn: pulls the leads, researches each person, drafts, opens the tracker, asks once, and schedules the send. Ask for a watcher and it deploys a background agent that keeps working at a safe ~40 emails a day.',
         ],
       },
       {
@@ -472,14 +472,14 @@ export const CHANGELOG: ChangelogGroup[] = [
     entries: [
       {
         tag: 'Improved',
-        title: 'A cleaner live view while Arcus works',
+        title: 'A cleaner live view while Boult works',
         points: [
           'One thinking indicator, one place — the live "thinking" shimmer no longer shows up twice, and execution steps live only inside the collapsible steps box on the reply.',
           'The steps box now starts closed and quietly shows what\'s running in its header; it opens itself only when a real multi-step task is underway, in a fixed-width, pure black-and-white design.',
           'Thoughts now sit under the executor box as a quiet trace instead of reading like the reply itself, and the blinking bar that could get stuck under a reply is gone.',
           'Stray model artifacts (a lone "False" line) no longer leak into the chat.',
-          'When Arcus asks a clarifying question, it now suggests the most likely answers as tappable choices — its best guess comes preselected, so one tap answers it. Your reply lands in the chat as a clean answer, not a form transcript.',
-          'A question from Arcus now reads like a normal message in the conversation — no more empty reply above the question card.',
+          'When Boult asks a clarifying question, it now suggests the most likely answers as tappable choices — its best guess comes preselected, so one tap answers it. Your reply lands in the chat as a clean answer, not a form transcript.',
+          'A question from Boult now reads like a normal message in the conversation — no more empty reply above the question card.',
         ],
       },
       {
@@ -488,22 +488,22 @@ export const CHANGELOG: ChangelogGroup[] = [
         points: [
           'Sending a follow-up message no longer risks bouncing you back to the start screen mid-reply (the bug that forced a refresh and burned a second run).',
           'The thinking indicator is truly singular now — the placeholder "Thinking..." line that doubled it is gone; only real reasoning shows under the header.',
-          'While drafting or triaging, Arcus references an email in a line or two instead of pasting the whole thing — full bodies only when you ask to see them.',
+          'While drafting or triaging, Boult references an email in a line or two instead of pasting the whole thing — full bodies only when you ask to see them.',
         ],
       },
       {
         tag: 'Fixed',
         title: 'Replies are fast again',
         points: [
-          'A model-provider quirk was silently eating the response budget on "thinking", which made normal replies crawl to ~50 seconds and sometimes come back blank. Arcus now tells that model family to answer directly — replies land in seconds again.',
-          'When a model is having a bad day, Arcus now steps around it once instead of re-trying the same failure on every backup key.',
+          'A model-provider quirk was silently eating the response budget on "thinking", which made normal replies crawl to ~50 seconds and sometimes come back blank. Boult now tells that model family to answer directly — replies land in seconds again.',
+          'When a model is having a bad day, Boult now steps around it once instead of re-trying the same failure on every backup key.',
         ],
       },
       {
         tag: 'New',
-        title: 'Arcus can decide to plan before it acts',
+        title: 'Boult can decide to plan before it acts',
         points: [
-          'When a request mid-conversation turns out to be big, multi-phase, or risky, Arcus now switches itself into plan mode and shows you a reviewable plan before touching anything.',
+          'When a request mid-conversation turns out to be big, multi-phase, or risky, Boult now switches itself into plan mode and shows you a reviewable plan before touching anything.',
           'Simple asks still just get done — the switch is reserved for work that deserves your sign-off first.',
         ],
       },
@@ -514,20 +514,20 @@ export const CHANGELOG: ChangelogGroup[] = [
     entries: [
       {
         tag: 'New',
-        title: 'Arcus runs your outreach — hand it a list, approve once',
+        title: 'Boult runs your outreach — hand it a list, approve once',
         points: [
-          'Paste a list or attach a CSV and say "email these 40 people about…" — Arcus researches each person, writes every email individually in your voice, and shows you samples.',
+          'Paste a list or attach a CSV and say "email these 40 people about…" — Boult researches each person, writes every email individually in your voice, and shows you samples.',
           'One approval covers the whole batch. After your yes, emails go out paced like a human sends them — spread over days, business hours, minutes apart — so your Gmail reputation stays clean.',
-          'Before a first bulk send from a custom domain, Arcus checks your SPF/DMARC and tells you exactly what to fix if something\'s missing.',
-          'Ask for a watcher and Arcus sets up a scheduled agent that reads the replies, drafts responses in your voice with real openings from your calendar, nudges the silent ones once with a fresh angle, and never contacts anyone who opts out.',
+          'Before a first bulk send from a custom domain, Boult checks your SPF/DMARC and tells you exactly what to fix if something\'s missing.',
+          'Ask for a watcher and Boult sets up a scheduled agent that reads the replies, drafts responses in your voice with real openings from your calendar, nudges the silent ones once with a fresh angle, and never contacts anyone who opts out.',
           'Nothing new to learn — it\'s the same chat, the same agents, now trusted with bigger jobs.',
         ],
       },
       {
         tag: 'Fixed',
-        title: 'Attachments actually reach Arcus now',
+        title: 'Attachments actually reach Boult now',
         points: [
-          'CSV and text files uploaded in chat were silently invisible to the AI. Fixed — attach a contact list or notes and Arcus reads the real contents.',
+          'CSV and text files uploaded in chat were silently invisible to the AI. Fixed — attach a contact list or notes and Boult reads the real contents.',
         ],
       },
     ],
@@ -539,7 +539,7 @@ export const CHANGELOG: ChangelogGroup[] = [
         tag: 'Improved',
         title: 'Answers that read like a briefing, not a wall of text',
         points: [
-          'Arcus now structures substantive answers — clear sections, dividers, and a boxed "Bottom line" takeaway you can read at a glance.',
+          'Boult now structures substantive answers — clear sections, dividers, and a boxed "Bottom line" takeaway you can read at a glance.',
           'The quick-ask palette (Ctrl+K) renders it all beautifully: section labels, tidy lists, callout boxes.',
           'One-line questions still get one-line answers — no ceremony where none is needed.',
         ],
@@ -548,7 +548,7 @@ export const CHANGELOG: ChangelogGroup[] = [
         tag: 'Improved',
         title: 'A calmer, smarter chat',
         points: [
-          'Simple messages get a simple reply — the processing trace now only appears when Arcus is doing real work.',
+          'Simple messages get a simple reply — the processing trace now only appears when Boult is doing real work.',
           'While it works, you see what it\'s actually thinking — a live reasoning line, updating in real time.',
           'Plan cards are fully legible in both themes, and their proposals are grounded in your real emails and events — one obvious right move stands alone instead of padded fake alternatives.',
           'Acting on a briefing recommendation now hands the request visibly into the chat composer — you review it and hit send.',
@@ -560,7 +560,7 @@ export const CHANGELOG: ChangelogGroup[] = [
         points: [
           'The plan screen leads with what matters: "Start 3-day free trial", the real price you\'ll pay, and secure-checkout reassurance.',
           'A plan + price recap sits right before checkout, with a one-click way to change your mind.',
-          'The live Arcus demo can be skipped — it finishes in the background either way.',
+          'The live Boult demo can be skipped — it finishes in the background either way.',
           'Fixed two dead ends: returning from an abandoned checkout, and a scan that timed out, both now continue cleanly.',
         ],
       },
@@ -579,7 +579,7 @@ export const CHANGELOG: ChangelogGroup[] = [
     entries: [
       {
         tag: 'New',
-        title: 'Watch Arcus work — a live, narrated trace',
+        title: 'Watch Boult work — a live, narrated trace',
         points: [
           'Every step shows the actual thing being done ("Scanning your inbox for unanswered investor threads"), not a bare tool name.',
           'Web steps show their real sources. Multi-step tasks show a live phase plan that checks off as work completes.',
@@ -610,7 +610,7 @@ export const CHANGELOG: ChangelogGroup[] = [
         tag: 'New',
         title: 'Transparent reasoning',
         points: [
-          'Arcus shows how it decided, not just what it decided — the tradeoff it weighed, what it ranked above what, and why.',
+          'Boult shows how it decided, not just what it decided — the tradeoff it weighed, what it ranked above what, and why.',
           'Your Today feed gained "Why this order?" — one tap reveals how the day was prioritized.',
         ],
       },
@@ -620,7 +620,7 @@ export const CHANGELOG: ChangelogGroup[] = [
         points: [
           'Confidence receipts: every pick comes with the evidence it saw ("read 47, 3 need you").',
           'Approval mode: anything that leaves the building waits for your one-glance sign-off.',
-          'Founder memory: Arcus learns your VIPs, style, and priorities from how you work — and shows its recall.',
+          'Founder memory: Boult learns your VIPs, style, and priorities from how you work — and shows its recall.',
           'Continuous inbox: you review progress, not a backlog — "while you were away" leads with what was handled.',
           'Opportunity detection: quiet risks surface first, tagged "Before it slips".',
         ],
@@ -629,7 +629,7 @@ export const CHANGELOG: ChangelogGroup[] = [
         tag: 'Improved',
         title: 'Instant, warm replies',
         points: [
-          'Casual messages skip the machinery entirely — Arcus answers in about a second, like a colleague texting back.',
+          'Casual messages skip the machinery entirely — Boult answers in about a second, like a colleague texting back.',
         ],
       },
     ],

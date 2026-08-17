@@ -29,7 +29,7 @@ To ensure account information remains accurate and up-to-date, set up a cron job
 Add the following to your crontab (e.g., `crontab -e`):
 
 ```
-0 */6 * * * cd /path/to/mailient && node scripts/sync-profiles.js
+0 */6 * * * cd /path/to/maily && node scripts/sync-profiles.js
 ```
 
 This runs the sync every 6 hours.

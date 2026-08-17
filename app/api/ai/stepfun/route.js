@@ -62,8 +62,8 @@ export async function POST(request) {
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${apiKey}`,
-                        'HTTP-Referer': process.env.HOST || 'https://mailient.xyz',
-                        'X-Title': 'Mailient',
+                        'HTTP-Referer': process.env.HOST || 'https://maily.dev',
+                        'X-Title': 'Maily',
                         ...(privacyMode ? { 'X-OpenRouter-Data-Collection': 'opt-out' } : {})
                     },
                     body: JSON.stringify({

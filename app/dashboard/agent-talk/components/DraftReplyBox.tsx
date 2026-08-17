@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Copy, X, Edit2, Mail, Send, Check, Sparkles, ArrowUp, CornerDownLeft, Paperclip, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import WordBlurStream from '../../../../src/WordBlurStream';
-import { ArcusLogo } from '@/components/ui/arcus-logo';
+import { BoultLogo } from '@/components/ui/boult-logo';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
@@ -240,7 +240,7 @@ export function DraftReplyBox({
     };
 
     return (
-        <div className="arcus-glass-card rounded-[24px] overflow-hidden animate-in fade-in slide-in-from-bottom-6 duration-700 max-w-2xl mx-auto my-6 relative select-text">
+        <div className="boult-glass-card rounded-[24px] overflow-hidden animate-in fade-in slide-in-from-bottom-6 duration-700 max-w-2xl mx-auto my-6 relative select-text">
             {/* Technical subtle noise overlay */}
             <div className="absolute inset-0 pointer-events-none opacity-[0.015] z-[0] bg-[url('/noise.svg')] brightness-100 contrast-150" />
 
@@ -250,9 +250,9 @@ export function DraftReplyBox({
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-5 border-b border-black/[0.05] dark:border-white/[0.04] bg-black/[0.02] dark:bg-[#333333]/30 relative z-10">
                 <div className="flex items-center gap-4">
-                    <ArcusLogo size={36} className="shrink-0" />
+                    <BoultLogo size={36} className="shrink-0" />
                     <div>
-                        <h3 className="text-black dark:text-white font-bold text-xs tracking-wider uppercase">Arcus AI Draft</h3>
+                        <h3 className="text-black dark:text-white font-bold text-xs tracking-wider uppercase">Boult AI Draft</h3>
                         <p className="text-[10px] text-zinc-500 uppercase tracking-tight font-bold">Gmail Triage Agent</p>
                     </div>
                 </div>
@@ -365,7 +365,7 @@ export function DraftReplyBox({
                             editedContent || (
                                 <div className="flex flex-col items-center justify-center py-8 text-zinc-500 text-sm gap-3">
                                     <div className="w-6.5 h-6.5 border-[2.5px] border-black/15 border-t-black dark:border-white/20 dark:border-t-white rounded-full animate-spin" />
-                                    <span className="font-mono text-[10.5px] uppercase tracking-[0.15em] text-zinc-500 dark:text-zinc-400">Arcus is writing...</span>
+                                    <span className="font-mono text-[10.5px] uppercase tracking-[0.15em] text-zinc-500 dark:text-zinc-400">Boult is writing...</span>
                                 </div>
                             )
                         )}

@@ -32,7 +32,7 @@ export function usePlanModeBrief(): UsePlanModeBriefReturn {
   // Fetch the latest brief
   const fetchLatestBrief = useCallback(async () => {
     try {
-      const res = await fetch('/api/arcus/v3/plans?mode=plan_mode&limit=1');
+      const res = await fetch('/api/boult/v3/plans?mode=plan_mode&limit=1');
       if (!res.ok) {
         if (res.status === 401) return; // Not logged in
         throw new Error(`Failed: ${res.status}`);
@@ -59,7 +59,7 @@ export function usePlanModeBrief(): UsePlanModeBriefReturn {
         briefData = latestPlan.brief as BriefData;
       } else {
         // Fetch full plan detail to get brief data
-        const detailRes = await fetch(`/api/arcus/v3/plans/${latestPlan.id}`);
+        const detailRes = await fetch(`/api/boult/v3/plans/${latestPlan.id}`);
         if (detailRes.ok) {
           const detail = await detailRes.json();
           briefData = detail.brief as BriefData || null;
@@ -94,7 +94,7 @@ export function usePlanModeBrief(): UsePlanModeBriefReturn {
       setIsLoading(true);
       setError(null);
 
-      const res = await fetch('/api/arcus/v3/trigger', {
+      const res = await fetch('/api/boult/v3/trigger', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ mode: 'plan_mode' }),

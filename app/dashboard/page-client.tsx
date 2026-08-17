@@ -66,7 +66,7 @@ export default function DashboardClient() {
 
   // Set page title
   useEffect(() => {
-    document.title = 'Dashboard / Mailient';
+    document.title = 'Dashboard / Maily';
   }, []);
 
   // Dashboard is accessible only to authenticated users
@@ -74,7 +74,7 @@ export default function DashboardClient() {
     <div className="min-h-screen bg-gray-900 text-white flex" style={{ fontFamily: 'Satoshi, sans-serif' }}>
       <div className="flex-1 flex flex-col items-center justify-center">
         <h1 className="text-4xl font-bold mb-4">Dashboard</h1>
-        <p className="text-gray-400 mb-8">Welcome to your Mailient dashboard!</p>
+        <p className="text-gray-400 mb-8">Welcome to your Maily dashboard!</p>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl">
           <div className="bg-gray-800 rounded-lg p-6">
             <h3 className="text-lg font-semibold mb-2">Email Management</h3>

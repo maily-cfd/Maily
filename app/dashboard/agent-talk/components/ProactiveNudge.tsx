@@ -46,7 +46,7 @@ export function ProactiveNudge({ onPrompt, enabled = true }: Props) {
 
     setLoading(true);
     try {
-      const res = await fetch('/api/arcus/triage', {
+      const res = await fetch('/api/boult/triage', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ since: '6h' }),
@@ -114,7 +114,7 @@ export function ProactiveNudge({ onPrompt, enabled = true }: Props) {
                 <Bell className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
               </div>
               <span className="text-[12px] font-semibold text-amber-700 dark:text-amber-300/90 tracking-tight">
-                Arcus spotted {totalItems} item{totalItems !== 1 ? 's' : ''} for you
+                Boult spotted {totalItems} item{totalItems !== 1 ? 's' : ''} for you
               </span>
             </div>
             <button

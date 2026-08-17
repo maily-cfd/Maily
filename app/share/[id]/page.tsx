@@ -23,7 +23,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { cn } from '@/lib/utils';
 import { AgentExecutionTimeline } from '@/app/dashboard/agent-talk/components/AgentExecutionTimeline';
-import { ArcusLogo } from "@/components/ui/arcus-logo";
+import { BoultLogo } from "@/components/ui/boult-logo";
 
 // ─── Custom Message Content with premium Markdown rendering ──────────────────
 const MessageContent = ({ content, isUser }: { content: any, isUser: boolean }) => {
@@ -313,7 +313,7 @@ export default function SharePage() {
       <nav className="fixed top-0 left-0 right-0 z-50 h-16 border-b border-white/[0.04] bg-black/60 backdrop-blur-2xl flex items-center justify-between px-6 lg:px-12">
         <div className="flex items-center gap-3 min-w-0">
           <div className="w-8 h-8 rounded-lg border border-white/10 flex items-center justify-center shrink-0">
-            <ArcusLogo size={32} />
+            <BoultLogo size={32} />
           </div>
           <h1 className="text-[14px] font-bold tracking-tight text-white truncate max-w-[180px] sm:max-w-[280px]">
             {title}

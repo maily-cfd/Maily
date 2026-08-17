@@ -22,8 +22,8 @@ export default function PrivacyPolicy() {
       title: "1. Who we are",
       content: (
         <div className="space-y-4">
-          <p>Mailient is an AI-powered email intelligence platform founded and operated by Maulik. Our service connects to your Gmail or Google Workspace account (with your explicit permission) to help you triage, summarize, draft, and manage email communications more efficiently.</p>
-          <p>Contact: For all privacy-related inquiries, please reach out to us at <a href="mailto:mailient.xyz@gmail.com" className="text-black dark:text-white font-medium underline underline-offset-4 decoration-neutral-300 dark:decoration-neutral-700 hover:decoration-black dark:hover:decoration-white transition-all">mailient.xyz@gmail.com</a>.</p>
+          <p>Maily is a free, open source AI email intelligence platform. Our service connects to your Gmail or Google Workspace account (with your explicit permission) to help you triage, summarize, draft, and manage email communications more efficiently.</p>
+          <p>Contact: For all privacy-related inquiries, please reach out to us at <a href="mailto:support.maily@gmail.com" className="text-black dark:text-white font-medium underline underline-offset-4 decoration-neutral-300 dark:decoration-neutral-700 hover:decoration-black dark:hover:decoration-white transition-all">support.maily@gmail.com</a>.</p>
         </div>
       )
     },
@@ -34,10 +34,10 @@ export default function PrivacyPolicy() {
         <div className="space-y-4">
           <p>This policy applies to:</p>
           <ul className="list-disc pl-5 space-y-2">
-            <li>All users of the Mailient website and web application at mailient.xyz</li>
-            <li>Users who connect their Google or Google Workspace accounts to Mailient</li>
-            <li>Users on Monthly, Annual, and Lifetime Founder subscription tiers</li>
-            <li>Visitors who browse mailient.xyz without creating an account</li>
+            <li>All users of the Maily website and web application at maily.dev</li>
+            <li>Users who connect their Google or Google Workspace accounts to Maily</li>
+            <li>Users of both the hosted and self-hosted versions of Maily</li>
+            <li>Visitors who browse maily.dev without creating an account</li>
           </ul>
           <p>This policy does not apply to third-party websites, services, or applications that may be linked from our platform.</p>
         </div>
@@ -54,7 +54,7 @@ export default function PrivacyPolicy() {
           </div>
           <div>
             <h4 className="font-bold text-black dark:text-white mb-2">3.2 Email data</h4>
-            <p>To provide AI-powered inbox analysis, Mailient accesses your Gmail data through the official Gmail API, using the scopes you explicitly grant during OAuth. This may include: email subject lines, sender and recipient addresses, timestamps, email body content (for analysis and drafting), and thread metadata. This data is processed in real time or near-real time to deliver features such as Mailient Sift analysis, Arcus AI queries, smart drafts, and email summaries.</p>
+            <p>To provide AI-powered inbox analysis, Maily accesses your Gmail data through the official Gmail API, using the scopes you explicitly grant during OAuth. This may include: email subject lines, sender and recipient addresses, timestamps, email body content (for analysis and drafting), and thread metadata. This data is processed in real time or near-real time to deliver features such as Maily Sift analysis, Boult AI queries, smart drafts, and email summaries.</p>
           </div>
           <div>
             <h4 className="font-bold text-black dark:text-white mb-2">3.3 Usage and analytics data</h4>
@@ -65,8 +65,8 @@ export default function PrivacyPolicy() {
             <p>If you use the Notes feature, the content of notes you create is stored to enable access across sessions. Notes may be shared in text or image format as you initiate.</p>
           </div>
           <div>
-            <h4 className="font-bold text-black dark:text-white mb-2">3.5 Subscription and payment information</h4>
-            <p>If you upgrade to a paid plan (Monthly at $29/month, Annual at $199/year, or Lifetime Founder at $499 one-time), payment is processed by a third-party payment processor. We do not store your full credit card number, CVV, or raw financial information. We may retain your subscription tier, billing status, and anonymized transaction records.</p>
+            <h4 className="font-bold text-black dark:text-white mb-2">3.5 Usage data</h4>
+            <p>We may retain anonymized usage information to improve the product. No email content is included.</p>
           </div>
         </div>
       )
@@ -80,7 +80,7 @@ export default function PrivacyPolicy() {
           <div className="space-y-4">
             <div>
               <p className="font-bold text-black dark:text-white">Service delivery</p>
-              <p>Powering AI inbox analysis, drafting, summaries, and smart triage via Sift and Arcus.</p>
+              <p>Powering AI inbox analysis, drafting, summaries, and smart triage via Sift and Boult.</p>
             </div>
             <div>
               <p className="font-bold text-black dark:text-white">Personalization</p>
@@ -129,7 +129,7 @@ export default function PrivacyPolicy() {
           </div>
           <div className="flex gap-4 items-start pl-6">
             <div className="text-red-500 font-bold">✕</div>
-            <p>We do not serve advertisements — Mailient is a subscription product and is not supported by advertising. We do not allow advertisers to target you based on your email content.</p>
+            <p>We do not serve advertisements — Maily is a subscription product and is not supported by advertising. We do not allow advertisers to target you based on your email content.</p>
           </div>
         </div>
       )
@@ -156,14 +156,14 @@ export default function PrivacyPolicy() {
       title: "7. Google API services disclosure",
       content: (
         <div className="space-y-4">
-          <p>Mailient's use of information received from Google APIs adheres to the Google API Services User Data Policy, including the Limited Use requirements. This means:</p>
+          <p>Maily's use of information received from Google APIs adheres to the Google API Services User Data Policy, including the Limited Use requirements. This means:</p>
           <ul className="list-disc pl-5 space-y-3">
             <li>We only request the minimum permissions necessary to provide the features you use.</li>
-            <li>Gmail data is used solely to deliver and improve Mailient's core email features.</li>
+            <li>Gmail data is used solely to deliver and improve Maily's core email features.</li>
             <li>We do not transfer Gmail data to third parties except as necessary to provide the service, or as required by law.</li>
-            <li>We do not use Gmail data for serving advertisements or for any purpose other than providing and improving the Mailient service.</li>
-            <li>Humans at Mailient do not read your Gmail messages unless you explicitly share them for support purposes or as required by law.</li>
-            <li>You can revoke Mailient's access to your Google account at any time by visiting <a href="https://myaccount.google.com/permissions" className="text-black dark:text-white font-medium underline underline-offset-4 decoration-neutral-300 dark:decoration-neutral-700 hover:decoration-black dark:hover:decoration-white transition-all">myaccount.google.com/permissions</a>.</li>
+            <li>We do not use Gmail data for serving advertisements or for any purpose other than providing and improving the Maily service.</li>
+            <li>Humans at Maily do not read your Gmail messages unless you explicitly share them for support purposes or as required by law.</li>
+            <li>You can revoke Maily's access to your Google account at any time by visiting <a href="https://myaccount.google.com/permissions" className="text-black dark:text-white font-medium underline underline-offset-4 decoration-neutral-300 dark:decoration-neutral-700 hover:decoration-black dark:hover:decoration-white transition-all">myaccount.google.com/permissions</a>.</li>
           </ul>
         </div>
       )
@@ -193,7 +193,7 @@ export default function PrivacyPolicy() {
           <p>We do not sell your personal data. We may share limited information only in the following circumstances:</p>
           <ul className="list-disc pl-5 space-y-4">
             <li><strong>Service providers:</strong> We may engage trusted third-party vendors (e.g., cloud hosting, payment processors, analytics tools) who process data on our behalf under contractual data processing agreements and are not permitted to use the data for their own purposes.</li>
-            <li><strong>Legal compliance:</strong> We may disclose information if required to do so by applicable law, court order, or regulatory authority, or to protect the rights, property, or safety of Mailient, our users, or the public.</li>
+            <li><strong>Legal compliance:</strong> We may disclose information if required to do so by applicable law, court order, or regulatory authority, or to protect the rights, property, or safety of Maily, our users, or the public.</li>
             <li><strong>Business transfers:</strong> In the event of a merger, acquisition, or sale of assets, your data may be transferred. We will notify you before your data is transferred and becomes subject to a different privacy policy.</li>
           </ul>
           <p>We never share your Gmail data or email content with third parties for advertising, profiling, or any commercial purpose beyond service delivery.</p>
@@ -229,10 +229,10 @@ export default function PrivacyPolicy() {
             </div>
             <div>
               <p className="font-bold text-black dark:text-white tracking-tight">Revocation of consent</p>
-              <p>Withdraw access permissions granted to Mailient at any time.</p>
+              <p>Withdraw access permissions granted to Maily at any time.</p>
             </div>
           </div>
-          <p>To exercise any of these rights, contact us at <a href="mailto:mailient.xyz@gmail.com" className="text-black dark:text-white font-medium underline underline-offset-4 decoration-neutral-300 dark:decoration-neutral-700 hover:decoration-black dark:hover:decoration-white transition-all">mailient.xyz@gmail.com</a>. We will respond within 30 days. You may also revoke Google access permissions at any time via your Google account settings at <a href="https://myaccount.google.com/permissions" className="text-black dark:text-white font-medium underline underline-offset-4 decoration-neutral-300 dark:decoration-neutral-700 hover:decoration-black dark:hover:decoration-white transition-all">myaccount.google.com/permissions</a>.</p>
+          <p>To exercise any of these rights, contact us at <a href="mailto:support.maily@gmail.com" className="text-black dark:text-white font-medium underline underline-offset-4 decoration-neutral-300 dark:decoration-neutral-700 hover:decoration-black dark:hover:decoration-white transition-all">support.maily@gmail.com</a>. We will respond within 30 days. You may also revoke Google access permissions at any time via your Google account settings at <a href="https://myaccount.google.com/permissions" className="text-black dark:text-white font-medium underline underline-offset-4 decoration-neutral-300 dark:decoration-neutral-700 hover:decoration-black dark:hover:decoration-white transition-all">myaccount.google.com/permissions</a>.</p>
         </div>
       )
     },
@@ -241,10 +241,10 @@ export default function PrivacyPolicy() {
       title: "11. Cookies and tracking technologies",
       content: (
         <div className="space-y-4">
-          <p>Mailient uses minimal cookies and similar technologies to operate the service:</p>
+          <p>Maily uses minimal cookies and similar technologies to operate the service:</p>
           <ul className="list-disc pl-5 space-y-3">
             <li><strong>Essential cookies:</strong> Required to maintain your login session and ensure the application functions correctly. These cannot be disabled without breaking the service.</li>
-            <li><strong>Cookieless analytics:</strong> We use anonymized, aggregated analytics (e.g., page views, feature usage) to understand how Mailient is used — configured to run without setting tracking cookies or storing tracking identifiers in your browser. No email content is included in these analytics.</li>
+            <li><strong>Cookieless analytics:</strong> We use anonymized, aggregated analytics (e.g., page views, feature usage) to understand how Maily is used — configured to run without setting tracking cookies or storing tracking identifiers in your browser. No email content is included in these analytics.</li>
           </ul>
           <p>We do not set advertising cookies, cross-site tracking cookies, or analytics tracking cookies, and we do not use third-party behavioral tracking technologies.</p>
           <p>You can manage or delete cookies via your browser settings. Disabling essential cookies will prevent you from using the application.</p>
@@ -256,7 +256,7 @@ export default function PrivacyPolicy() {
       title: "12. International data transfers",
       content: (
         <div className="space-y-4">
-          <p>Mailient is operated globally and your data may be processed in countries other than your country of residence. We ensure that any international transfer of personal data is subject to appropriate safeguards in accordance with applicable data protection laws, including standard contractual clauses or equivalent measures where required. By using Mailient, you acknowledge that your data may be transferred to and processed in countries with different data protection standards than your own.</p>
+          <p>Maily is operated globally and your data may be processed in countries other than your country of residence. We ensure that any international transfer of personal data is subject to appropriate safeguards in accordance with applicable data protection laws, including standard contractual clauses or equivalent measures where required. By using Maily, you acknowledge that your data may be transferred to and processed in countries with different data protection standards than your own.</p>
         </div>
       )
     },
@@ -265,7 +265,7 @@ export default function PrivacyPolicy() {
       title: "13. Third-party services and integrations",
       content: (
         <div className="space-y-4">
-          <p>Mailient integrates with or relies on the following categories of third-party services:</p>
+          <p>Maily integrates with or relies on the following categories of third-party services:</p>
           <ul className="list-disc pl-5 space-y-4">
             <li><strong>Google (Gmail API & OAuth):</strong> Core to our service. Google's privacy policy governs their data handling at <a href="https://policies.google.com/privacy" className="hover:text-black dark:hover:text-white transition-colors">policies.google.com/privacy</a>.</li>
             <li><strong>Payment processors:</strong> Used to handle subscription payments. They do not receive your email content.</li>
@@ -287,7 +287,7 @@ export default function PrivacyPolicy() {
             <li>Notify you by email or in-app notification for significant changes</li>
             <li>Where required by law, seek your renewed consent before the changes take effect</li>
           </ul>
-          <p>We encourage you to review this policy periodically. Continued use of Mailient after changes are posted constitutes your acceptance of the updated policy.</p>
+          <p>We encourage you to review this policy periodically. Continued use of Maily after changes are posted constitutes your acceptance of the updated policy.</p>
         </div>
       )
     },
@@ -296,10 +296,11 @@ export default function PrivacyPolicy() {
       title: "15. Contact us",
       content: (
         <div className="space-y-2">
-          <p className="font-bold text-black dark:text-white">Mailient Intelligence</p>
-          <p>Email: <a href="mailto:mailient.xyz@gmail.com" className="text-black dark:text-white font-medium underline underline-offset-4 decoration-neutral-300 dark:decoration-neutral-700 hover:decoration-black dark:hover:decoration-white transition-all">mailient.xyz@gmail.com</a></p>
-          <p>Website: <a href="https://mailient.xyz" className="hover:text-black dark:hover:text-white transition-colors">mailient.xyz</a></p>
-          <p>Founder: <a href="https://x.com/maulik_5" className="text-black dark:text-white font-medium underline underline-offset-4 decoration-neutral-300 dark:decoration-neutral-700 hover:decoration-black dark:hover:decoration-white transition-all">@maulik_5 on X</a></p>
+          <p className="font-bold text-black dark:text-white">Maily Intelligence</p>
+          <p>Email: <a href="mailto:support.maily@gmail.com" className="text-black dark:text-white font-medium underline underline-offset-4 decoration-neutral-300 dark:decoration-neutral-700 hover:decoration-black dark:hover:decoration-white transition-all">support.maily@gmail.com</a></p>
+          <p>Website: <a href="https://maily.dev" className="hover:text-black dark:hover:text-white transition-colors">maily.dev</a></p>
+          <p>X / Twitter: <a href="https://x.com/Mailycfd" className="text-black dark:text-white font-medium underline underline-offset-4 decoration-neutral-300 dark:decoration-neutral-700 hover:decoration-black dark:hover:decoration-white transition-all">@Mailycfd on X</a></p>
+          <p>GitHub: <a href="https://github.com/maily-cfd/Maily" className="text-black dark:text-white font-medium underline underline-offset-4 decoration-neutral-300 dark:decoration-neutral-700 hover:decoration-black dark:hover:decoration-white transition-all">github.com/maily-cfd/Maily</a></p>
         </div>
       )
     }
@@ -329,7 +330,7 @@ export default function PrivacyPolicy() {
             </p>
             <div className="h-px w-full bg-neutral-100 dark:bg-neutral-900 my-10" />
             <p className="text-[17px] leading-[1.7] text-neutral-600 dark:text-neutral-400">
-                This Privacy Policy describes how Mailient Intelligence ("Mailient," "we," "us," or "our") collects, uses, stores, and protects your personal information when you use our email intelligence platform at mailient.xyz. By using Mailient, you agree to the practices described in this policy.
+                This Privacy Policy describes how Maily Intelligence ("Maily," "we," "us," or "our") collects, uses, stores, and protects your personal information when you use our email intelligence platform at maily.dev. By using Maily, you agree to the practices described in this policy.
             </p>
           </motion.div>
         </header>

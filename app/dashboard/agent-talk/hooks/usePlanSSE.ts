@@ -1,7 +1,7 @@
 /**
  * usePlanSSE — Real-time plan execution updates via Server-Sent Events
  *
- * Connects to /api/arcus/v3/plans/:planId/stream and dispatches
+ * Connects to /api/boult/v3/plans/:planId/stream and dispatches
  * step-level state transitions to the UI.
  *
  * Events:
@@ -39,7 +39,7 @@ export function usePlanSSE({ planId, enabled, onEvent, onError }: UsePlanSSEOpti
   useEffect(() => {
     if (!enabled || !planId) return;
 
-    const url = `/api/arcus/v3/plans/${planId}/stream`;
+    const url = `/api/boult/v3/plans/${planId}/stream`;
     const eventSource = new EventSource(url, { withCredentials: true });
 
     eventSource.onmessage = (e) => {

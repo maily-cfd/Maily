@@ -65,7 +65,7 @@ export async function GET(request: Request) {
     let agents: any[] = [];
     try {
       const { data: dbAgents, error: agentsError } = await db.supabase
-        .from('arcus_recurring_agents')
+        .from('boult_recurring_agents')
         .select('*')
         .eq('user_id', session.user.id);
         

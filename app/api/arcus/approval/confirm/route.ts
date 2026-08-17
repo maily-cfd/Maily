@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 // @ts-ignore — JS module
 import { auth as nextAuth } from '../../../../../lib/auth.js';
-import { approvePending, declinePending } from '../../../../../lib/arcus/session-state';
+import { approvePending, declinePending } from '../../../../../lib/boult/session-state';
 import { logEvent } from "@/lib/logsso";
 
 const auth: any = nextAuth;
@@ -9,11 +9,11 @@ const auth: any = nextAuth;
 export const dynamic = 'force-dynamic';
 
 /**
- * POST /api/arcus/approval/confirm
+ * POST /api/boult/approval/confirm
  *
  * Called by ConfirmationCard.onAction the moment the user clicks Confirm /
  * Cancel on a request_confirmation card. Flips the pending row in
- * arcus_session_approvals so that the next executeTool('send_email' | ...)
+ * boult_session_approvals so that the next executeTool('send_email' | ...)
  * call from the same conversation can match against it and proceed.
  *
  * Body: { approvalId: string, decision: 'confirm' | 'cancel' }

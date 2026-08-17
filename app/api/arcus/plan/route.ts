@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { ArcusPlanner } from '@/lib/arcus-planner';
+import { BoultPlanner } from '@/lib/boult-planner';
 import { assertPaidAccess } from '@/lib/subscription-protection';
 import { logEvent } from "@/lib/logsso";
 
@@ -10,7 +10,7 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // STRICT paywall — Arcus planning is paid-only.
+    // STRICT paywall — Boult planning is paid-only.
     const gate = await assertPaidAccess(session.user.email);
     if (!gate.ok) {
         return NextResponse.json(
@@ -22,13 +22,13 @@ export async function POST(req: Request) {
     try {
         const { intent, context } = await req.json();
         
-        const planner = new ArcusPlanner();
+        const planner = new BoultPlanner();
         const plan = await planner.plan(intent, context);
 
         return NextResponse.json(plan);
     } catch (error: any) {
     logEvent({ channel: "failures", event: "❌ API Error", description: String(error) });
-        console.error('[Arcus Plan API] Error:', error);
+        console.error('[Boult Plan API] Error:', error);
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }

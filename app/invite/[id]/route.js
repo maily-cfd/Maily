@@ -25,7 +25,7 @@ export async function GET(request, { params }) {
     const { id } = await params;
     // New codes are 6 chars from a fixed alphabet, but LEGACY links are
     // /invite/<username-or-email-prefix> and can contain dots, plus and
-    // hyphens ("mailient.xyz"). A strict [A-Z0-9] test silently dropped every
+    // hyphens ("maily.dev"). A strict [A-Z0-9] test silently dropped every
     // one of those before the cookie was even set. Case is preserved here —
     // resolveCode uppercases for the code table and lowercases for the legacy
     // lookup, so normalising either way at this layer would break the other.
@@ -34,7 +34,7 @@ export async function GET(request, { params }) {
 
     if (code) {
       const cookieStore = await cookies();
-      cookieStore.set('mailient_referral', code, {
+      cookieStore.set('maily_referral', code, {
         maxAge: 30 * 24 * 60 * 60, // 30 days — a friend rarely signs up the same hour
         path: '/',
         secure: process.env.NODE_ENV === 'production',

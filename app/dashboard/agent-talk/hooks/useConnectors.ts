@@ -11,7 +11,7 @@ import {
   CONNECTOR_STATUS,
   hasConnectedAccounts,
   getConnectedConnectors 
-} from '@/lib/arcus-connector-registry';
+} from '@/lib/boult-connector-registry';
 
 interface ConnectedAccount {
   id: string;
@@ -181,12 +181,12 @@ export function useConnectors(options: UseConnectorsOptions) {
   }, [userId, loadAccounts, options]);
 
   // Disconnect an account (now: by connectorId, not accountId — so we can
-  // hit the unified Arcus disconnect endpoint which clears every store).
+  // hit the unified Boult disconnect endpoint which clears every store).
   // The legacy /api/connectors/{accountId} DELETE only touched one table,
   // so disconnecting Gmail from the UI left the row in integration_credentials
   // and user_tokens orphaned — the next chat turn would still think Gmail
   // was connected. Now we POST a provider to the new endpoint and it deletes
-  // from arcus_integrations + integration_credentials + (conditionally)
+  // from boult_integrations + integration_credentials + (conditionally)
   // user_tokens, plus invalidates the scope-probe cache.
   const disconnect = useCallback(async (accountIdOrConnectorId: string) => {
     if (!userId) return;
@@ -201,14 +201,14 @@ export function useConnectors(options: UseConnectorsOptions) {
       setError(null);
 
       // Resolve to a connectorId — the new endpoint takes provider, not
-      // arcus account id. The local state stores both, so we accept either.
+      // boult account id. The local state stores both, so we accept either.
       const account = connectedAccounts.find(
         a => a.id === accountIdOrConnectorId || a.connectorId === accountIdOrConnectorId,
       );
       const provider = account?.connectorId || accountIdOrConnectorId;
       const displayName = account?.name || provider;
 
-      const response = await fetch('/api/arcus/connectors/disconnect', {
+      const response = await fetch('/api/boult/connectors/disconnect', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ provider }),

@@ -347,7 +347,7 @@ export default function ProfileSettingsPage() {
                 <button
                   onClick={() => {
                     window.location.href = '/home-feed';
-                    document.title = 'Home | Mailient';
+                    document.title = 'Home | Maily';
                   }}
                   className="p-2 hover:bg-[#1a1a1a] rounded-full transition-all duration-300 hover:scale-105"
                   aria-label="Feed"
@@ -366,7 +366,7 @@ export default function ProfileSettingsPage() {
                 <button
                   onClick={() => {
                     window.location.href = '/notifications';
-                    document.title = 'Notifications | Mailient';
+                    document.title = 'Notifications | Maily';
                   }}
                   className="p-2 hover:bg-[#1a1a1a] rounded-full transition-all duration-300 hover:scale-105"
                   aria-label="Notifications"
@@ -381,7 +381,7 @@ export default function ProfileSettingsPage() {
             
 
             
-            {/* Arcus Symbol */}
+            {/* Boult Symbol */}
             <Tooltip delayDuration={100}>
               <TooltipTrigger asChild>
                 <button
@@ -393,7 +393,7 @@ export default function ProfileSettingsPage() {
                 </button>
               </TooltipTrigger>
               <TooltipContent side="right">
-                <p>Arcus</p>
+                <p>Boult</p>
               </TooltipContent>
             </Tooltip>
             
@@ -790,7 +790,7 @@ export default function ProfileSettingsPage() {
                           <div className="space-y-1">
                             <div className="flex items-center gap-2">
                               <h2 className="text-2xl font-black text-white tracking-tight leading-none">
-                                {profile?.name || 'Mailient User'}
+                                {profile?.name || 'Maily User'}
                               </h2>
                               
                               {/* Founder Badge logic */}
@@ -888,7 +888,7 @@ export default function ProfileSettingsPage() {
                       <div>
                         {!isEditingProfile ? (
                           <p className="text-sm font-light text-neutral-300 leading-relaxed max-w-xl">
-                            {profile?.bio || "No biography added yet. Click 'Edit Profile' to write a bio and personalize your Mailient workspace."}
+                            {profile?.bio || "No biography added yet. Click 'Edit Profile' to write a bio and personalize your Maily workspace."}
                           </p>
                         ) : (
                           <div>
@@ -1014,7 +1014,7 @@ export default function ProfileSettingsPage() {
                             <span className="text-[9px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/10">70% RevShare</span>
                           </div>
                           <p className="text-[12px] font-light leading-relaxed text-neutral-400 mb-6 font-sans">
-                            Join as an early AI engineer. Design and publish autonomous email workflow agents to our upcoming Arcus Marketplace. Earn a lucrative 70% revenue share on every execution or subscription you power.
+                            Join as an early AI engineer. Design and publish autonomous email workflow agents to our upcoming Boult Marketplace. Earn a lucrative 70% revenue share on every execution or subscription you power.
                           </p>
                         </div>
                         <button
@@ -1034,7 +1034,7 @@ export default function ProfileSettingsPage() {
                             <span className="text-[9px] font-mono text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/10">30% commission</span>
                           </div>
                           <p className="text-[12px] font-light leading-relaxed text-neutral-400 mb-6 font-sans">
-                            Become a Mailient partner. Promote our autonomous inbox loop and earn a massive 30% recurring lifetime commission on all subscriptions you refer. No upfront payment required.
+                            Become a Maily partner. Promote our autonomous inbox loop and earn a massive 30% recurring lifetime commission on all subscriptions you refer. No upfront payment required.
                           </p>
                         </div>
                         <button
@@ -1363,8 +1363,8 @@ export default function ProfileSettingsPage() {
               <form onSubmit={handlePartnerSubmit} className="space-y-4">
                 <p className="text-[13px] leading-relaxed text-neutral-400 font-light font-sans">
                   {partnerModalType === "creator" 
-                    ? "Join as an early AI engineer. Design and publish autonomous email workflow agents to our upcoming Arcus Marketplace. Earn a lucrative 70% revenue share on every execution or subscription you power."
-                    : "Become a Mailient partner. Promote our autonomous inbox loop and earn a massive 30% recurring lifetime commission on all subscriptions you refer. No upfront payment required."}
+                    ? "Join as an early AI engineer. Design and publish autonomous email workflow agents to our upcoming Boult Marketplace. Earn a lucrative 70% revenue share on every execution or subscription you power."
+                    : "Become a Maily partner. Promote our autonomous inbox loop and earn a massive 30% recurring lifetime commission on all subscriptions you refer. No upfront payment required."}
                 </p>
                 <div className="space-y-3">
                   <label className="text-[10px] font-bold tracking-wider uppercase text-neutral-500 block">Your Email</label>

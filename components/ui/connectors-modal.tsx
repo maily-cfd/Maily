@@ -162,8 +162,8 @@ export const SUPPORTED_APPS = [
     website: 'https://mail.google.com',
     documentation: 'https://developers.google.com/gmail/api',
     privacyPolicy: 'https://policies.google.com/privacy',
-    description: 'Gmail is the core integration. Without it Arcus cannot search your inbox, draft replies, send mail, label, or archive — every other workflow that touches email depends on this.',
-    details: 'Connect Gmail to let Arcus read your threads, draft replies in your voice, manage labels, archive cleanly, and send approved emails. Requires the four Gmail scopes (read / compose / send / modify) the agent depends on — completing the sign-in grants all four in one consent screen.',
+    description: 'Gmail is the core integration. Without it Boult cannot search your inbox, draft replies, send mail, label, or archive — every other workflow that touches email depends on this.',
+    details: 'Connect Gmail to let Boult read your threads, draft replies in your voice, manage labels, archive cleanly, and send approved emails. Requires the four Gmail scopes (read / compose / send / modify) the agent depends on — completing the sign-in grants all four in one consent screen.',
     smartPrompt: "Search my inbox for any urgent emails from the last 24 hours and summarize them.",
   },
   {
@@ -177,8 +177,8 @@ export const SUPPORTED_APPS = [
     website: 'https://calendar.google.com',
     documentation: 'https://developers.google.com/calendar',
     privacyPolicy: 'https://policies.google.com/privacy',
-    description: 'Google Calendar MCP lets you connect tools to your Google Calendar workspace, so you can create, edit, search, and organize events straight from Arcus.',
-    details: 'Sync your Google Calendar to let Arcus schedule meetings, find availability, and manage your daily agenda autonomously.',
+    description: 'Google Calendar MCP lets you connect tools to your Google Calendar workspace, so you can create, edit, search, and organize events straight from Boult.',
+    details: 'Sync your Google Calendar to let Boult schedule meetings, find availability, and manage your daily agenda autonomously.',
     smartPrompt: "Check my calendar for tomorrow morning and summarize what my schedule looks like."
   },
   { 
@@ -192,8 +192,8 @@ export const SUPPORTED_APPS = [
     website: 'https://meet.google.com',
     documentation: 'https://developers.google.com/meet',
     privacyPolicy: 'https://policies.google.com/privacy',
-    description: 'Google Meet gives Arcus what happens after a call — transcripts, recordings, and who actually attended — plus instant meeting links on request.',
-    details: 'Connect Google Meet to let Arcus summarize a call from its transcript, pull the recording, check attendance, and spin up an instant meeting link. Scheduled meetings already get a Meet link from Google Calendar — this is the separate Meet connection that reaches everything a call leaves behind.',
+    description: 'Google Meet gives Boult what happens after a call — transcripts, recordings, and who actually attended — plus instant meeting links on request.',
+    details: 'Connect Google Meet to let Boult summarize a call from its transcript, pull the recording, check attendance, and spin up an instant meeting link. Scheduled meetings already get a Meet link from Google Calendar — this is the separate Meet connection that reaches everything a call leaves behind.',
     smartPrompt: "Summarize my last Google Meet call and list the action items."
   },
   { 
@@ -207,8 +207,8 @@ export const SUPPORTED_APPS = [
     website: 'https://notion.so',
     documentation: 'https://developers.notion.com',
     privacyPolicy: 'https://notion.so/privacy',
-    description: 'Notion MCP lets you connect tools to your Notion workspace, so you can create, edit, search, and organize content straight from Arcus.',
-    details: 'Link your Notion workspace to enable Arcus to create meeting notes, update project trackers, and append data to your pages.',
+    description: 'Notion MCP lets you connect tools to your Notion workspace, so you can create, edit, search, and organize content straight from Boult.',
+    details: 'Link your Notion workspace to enable Boult to create meeting notes, update project trackers, and append data to your pages.',
     smartPrompt: "Search my Notion workspace for any pages related to 'Product Roadmap' and give me a summary."
   },
   { 
@@ -222,7 +222,7 @@ export const SUPPORTED_APPS = [
     website: 'https://calendar.notion.so',
     documentation: 'https://developers.notion.com',
     privacyPolicy: 'https://notion.so/privacy',
-    description: 'Notion Calendar MCP provides unified time management across Notion pages and external timelines straight from Arcus.',
+    description: 'Notion Calendar MCP provides unified time management across Notion pages and external timelines straight from Boult.',
     details: 'Integrate Notion Calendar to bridge your project timelines with your personal schedule for comprehensive mission planning.',
     smartPrompt: "Combine my Notion project timelines with my calendar and let me know if I have any overlapping deadlines next week."
   },
@@ -237,8 +237,8 @@ export const SUPPORTED_APPS = [
     website: 'https://slack.com',
     documentation: 'https://api.slack.com',
     privacyPolicy: 'https://slack.com/trust/privacy/privacy-policy',
-    description: 'Slack MCP lets you read and write Slack conversations in Arcus to centralize communication and team coordination.',
-    details: 'Connect Slack to allow Arcus to monitor channels, draft messages, and coordinate across your teams.',
+    description: 'Slack MCP lets you read and write Slack conversations in Boult to centralize communication and team coordination.',
+    details: 'Connect Slack to allow Boult to monitor channels, draft messages, and coordinate across your teams.',
     smartPrompt: "Summarize the latest 5 messages from my most active Slack channel."
   },
   { 
@@ -252,8 +252,8 @@ export const SUPPORTED_APPS = [
     website: 'https://cal.com',
     documentation: 'https://developer.cal.com',
     privacyPolicy: 'https://cal.com/privacy',
-    description: 'Cal.com MCP enables professional scheduling with automated link generation and booking straight from Arcus.',
-    details: 'Integrate Cal.com to let Arcus share your booking links and automatically handle appointment scheduling with external partners.',
+    description: 'Cal.com MCP enables professional scheduling with automated link generation and booking straight from Boult.',
+    details: 'Integrate Cal.com to let Boult share your booking links and automatically handle appointment scheduling with external partners.',
     smartPrompt: "Share my Cal.com booking link and check if there's any availability for a 30-min call this Friday afternoon.",
     comingSoon: false
   }
@@ -261,15 +261,15 @@ export const SUPPORTED_APPS = [
 
 // V3 providers redirect directly; legacy providers return { url } from /auth
 export const V3_DIRECT_ROUTES: Record<string, string> = {
-  gmail:            '/api/arcus/v3/oauth/gmail',
-  google_calendar:  '/api/arcus/v3/oauth/gcal',
+  gmail:            '/api/boult/v3/oauth/gmail',
+  google_calendar:  '/api/boult/v3/oauth/gcal',
   // Meet is its OWN connection, not derived from Calendar. Calendar still puts
   // Meet links on scheduled events; this grants the Meet API v2 (transcripts,
   // recordings, attendance, standalone spaces).
-  google_meet:      '/api/arcus/v3/oauth/gmeet',
-  slack:            '/api/arcus/v3/oauth/slack',
-  notion:           '/api/arcus/v3/oauth/notion',
-  notion_calendar:  '/api/arcus/v3/oauth/notion', // shares Notion OAuth
+  google_meet:      '/api/boult/v3/oauth/gmeet',
+  slack:            '/api/boult/v3/oauth/slack',
+  notion:           '/api/boult/v3/oauth/notion',
+  notion_calendar:  '/api/boult/v3/oauth/notion', // shares Notion OAuth
 };
 
 interface ConnectorsModalProps {
@@ -440,9 +440,9 @@ export function ConnectorsModal({
   const handleDisconnect = async (appId: string) => {
     try {
       // PART 25: unified disconnect — clears all three token stores
-      // (arcus_integrations, integration_credentials, user_tokens) so the
+      // (boult_integrations, integration_credentials, user_tokens) so the
       // chat layer correctly sees the connector as disconnected on next turn.
-      const res = await fetch('/api/arcus/connectors/disconnect', {
+      const res = await fetch('/api/boult/connectors/disconnect', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ provider: appId }),
@@ -543,7 +543,7 @@ export function ConnectorsModal({
               isDark ? "from-[#0A0A0A] to-transparent" : "from-[#EBEBEB] to-transparent"
             )} />
             
-            <div className="h-full overflow-y-auto p-10 py-12 arcus-scrollbar pb-12">
+            <div className="h-full overflow-y-auto p-10 py-12 boult-scrollbar pb-12">
             <div className="grid grid-cols-1 gap-4">
             {SUPPORTED_APPS.map((app) => {
                 const isConnected = isAppConnected(app.id);
@@ -771,7 +771,7 @@ export function ConnectorsModal({
                   <div className="w-full flex flex-col gap-3">
                     {/* Step 1 — one click straight to the right page */}
                     <a
-                      href="https://app.cal.com/settings/developer/api-keys?createKey=Mailient"
+                      href="https://app.cal.com/settings/developer/api-keys?createKey=Maily"
                       target="_blank"
                       rel="noopener noreferrer"
                       className={cn(
@@ -786,7 +786,7 @@ export function ConnectorsModal({
 
                     {/* The 3 steps, spelled out so there's nothing to figure out */}
                     <ol className={cn("text-[12.5px] leading-relaxed list-decimal pl-5 space-y-1", isDark ? "text-white/55" : "text-neutral-600")}>
-                      <li>On the page that opens, click <span className="font-semibold">+ Add</span> → name it <span className="font-semibold">Mailient</span> → <span className="font-semibold">Save</span>.</li>
+                      <li>On the page that opens, click <span className="font-semibold">+ Add</span> → name it <span className="font-semibold">Maily</span> → <span className="font-semibold">Save</span>.</li>
                       <li>Copy the key it shows (starts with <span className="font-mono">cal_</span>).</li>
                       <li>Paste it below and hit Connect.</li>
                     </ol>

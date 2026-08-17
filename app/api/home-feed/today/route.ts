@@ -9,7 +9,7 @@
  * SELECTION IS THE AI'S JOB. The fetchers below gather only a WIDE, mostly-
  * unfiltered candidate net — regex is used to ORDER the fallback, NOT to gate
  * what the AI sees. The real select/rank/reason + briefing is done by the
- * tool-driven triage agent (lib/arcus/today-agent.ts), which investigates the
+ * tool-driven triage agent (lib/boult/today-agent.ts), which investigates the
  * candidates with read-only tools before deciding. Heuristics run only when the
  * AI is unavailable, so Today never loads worse than the regex baseline.
  */
@@ -19,7 +19,7 @@ import { auth } from '@/lib/auth.js';
 // @ts-ignore
 import { getSupabaseAdmin } from '@/lib/supabase.js';
 import { GmailService } from '@/lib/gmail';
-import { cleanRunSummary } from '@/lib/arcus/report-summary';
+import { cleanRunSummary } from '@/lib/boult/report-summary';
 import { logEvent } from "@/lib/logsso";
 
 export const dynamic = 'force-dynamic';
@@ -32,7 +32,7 @@ export const maxDuration = 60;
 // judgment — it can't tell a $12k invoice from a newsletter — so it stays
 // deliberately conservative rather than dumping a wide unranked pool on the user.
 // The AI triage path does NOT use this: it decides how many items actually matter
-// (0, 2, or 7) and is bounded only by BUCKET_CEILING in lib/arcus/today-agent.ts.
+// (0, 2, or 7) and is bounded only by BUCKET_CEILING in lib/boult/today-agent.ts.
 const HEURISTIC_MAX_PER_BUCKET = 5;
 // Separate buckets that were previously (and accidentally) sharing the top-3 cap.
 // They aren't AI-triaged — they're straight DB reads — so they keep an explicit
@@ -95,7 +95,7 @@ interface ActionItem {
 
 // "While you were away" — what the user's scheduled agents did recently. This
 // is what makes HomeFeed a command center: every agent's work flows through it,
-// not just inbox-derived items. Sourced from arcus_agent_runs.
+// not just inbox-derived items. Sourced from boult_agent_runs.
 interface AgentRunItem {
   id: string;
   agentName: string;
@@ -132,8 +132,8 @@ interface TodayResponse {
   // surfaced. "Read 47, 3 need you" is the strongest it's-not-guessing signal.
   triage?: { scanned: number; surfaced: number };
   // Approval Mode: write actions background agents queued for the user's OK
-  // (arcus_agent_pending_actions, status='pending'). Surfaced so the founder
-  // learns work is waiting on their signature without opening Arcus.
+  // (boult_agent_pending_actions, status='pending'). Surfaced so the founder
+  // learns work is waiting on their signature without opening Boult.
   pendingApprovals?: number;
 }
 
@@ -376,7 +376,7 @@ async function fetchShowUp(userEmail: string, limit = HEURISTIC_MAX_PER_BUCKET):
     // Calendar surface read as "expired" even with an ACTIVE Composio connection
     // (proxy verified live: 200). googleFetch routes Composio users via Proxy
     // Execute and legacy users via a direct fetch with the bearer we pass here.
-    const { getGcalToken, googleFetch } = await import('@/lib/arcus/tools/http-tokens');
+    const { getGcalToken, googleFetch } = await import('@/lib/boult/tools/http-tokens');
     const token = await getGcalToken(userEmail).catch(() => null);
     const qs = new URLSearchParams({
       timeMin: now.toISOString(),
@@ -490,7 +490,7 @@ async function fetchActionItems(userEmail: string): Promise<ActionItem[]> {
   try {
     const supabase = getSupabaseAdmin();
     const { data, error } = await supabase
-      .from('arcus_meeting_events')
+      .from('boult_meeting_events')
       .select('id, title, attendees, event_start, action_items')
       .ilike('user_id', userEmail)
       .not('action_items', 'is', null)
@@ -556,7 +556,7 @@ async function fetchAgentRuns(userEmail: string): Promise<AgentRunItem[]> {
     const sinceIso = new Date(Date.now() - 14 * 60 * 60 * 1000).toISOString();
 
     const { data: runs, error } = await supabase
-      .from('arcus_agent_runs')
+      .from('boult_agent_runs')
       .select('id, agent_id, status, report_summary, tool_calls, completed_at, started_at, artifact_links')
       .eq('user_id', userEmail)
       .gte('started_at', sinceIso)
@@ -571,7 +571,7 @@ async function fetchAgentRuns(userEmail: string): Promise<AgentRunItem[]> {
     const nameById = new Map<string, string>();
     if (agentIds.length) {
       const { data: agents } = await supabase
-        .from('arcus_agents')
+        .from('boult_agents')
         .select('id, name')
         .in('id', agentIds);
       for (const a of (agents || []) as any[]) nameById.set(a.id, a.name);
@@ -607,7 +607,7 @@ async function fetchPendingApprovalsCount(userEmail: string): Promise<number> {
   try {
     const supabase = getSupabaseAdmin();
     const { count, error } = await supabase
-      .from('arcus_agent_pending_actions')
+      .from('boult_agent_pending_actions')
       .select('id', { count: 'exact', head: true })
       .ilike('user_id', userEmail)
       .eq('status', 'pending');
@@ -633,7 +633,7 @@ export async function computeTodaySnapshot(userEmail: string): Promise<TodayResp
   const snapshotStart = Date.now();
   let accessToken: string | null = null;
   try {
-    const { getGmailToken, getGcalToken } = await import('@/lib/arcus/tools/http-tokens');
+    const { getGmailToken, getGcalToken } = await import('@/lib/boult/tools/http-tokens');
     accessToken = (await getGmailToken(userEmail).catch(() => null))
                || (await getGcalToken(userEmail).catch(() => null));
   } catch (e) {
@@ -666,7 +666,7 @@ export async function computeTodaySnapshot(userEmail: string): Promise<TodayResp
       logEvent({ channel: "failures", event: "❌ API Error", description: String(e) });
       if (isTokenExpiredErr(e)) {
         try {
-          const { markIntegrationNeedsReauth } = await import('@/lib/arcus/tools/http-tokens');
+          const { markIntegrationNeedsReauth } = await import('@/lib/boult/tools/http-tokens');
           await markIntegrationNeedsReauth(userEmail.toLowerCase(), tag === 'gmail' ? 'gmail' : 'gcal');
         } catch {
           logEvent({ channel: "failures", event: "❌ API Error", description: "Unknown error" });}
@@ -719,7 +719,7 @@ export async function computeTodaySnapshot(userEmail: string): Promise<TodayResp
   let agentOk = false;
   if (decidePool.length || showUpPool.length || chasePool.length) {
     try {
-      const { buildTodayViaAgent } = await import('@/lib/arcus/today-agent');
+      const { buildTodayViaAgent } = await import('@/lib/boult/today-agent');
       // BUDGET-AWARE DEADLINE — the agent must NEVER consume the whole 60s
       // function budget (maxDuration). LIVE-MEASURED 2026-07-23 on a real inbox:
       // at a flat deadlineMs 45s the agent burned the full 45s, STILL failed to
@@ -825,7 +825,7 @@ export async function storeTodaySnapshot(userEmail: string, payload: TodayRespon
   try {
     const supabase = getSupabaseAdmin();
     await supabase
-      .from('arcus_today_cache')
+      .from('boult_today_cache')
       .upsert({ user_id: userEmail.toLowerCase(), payload, generated_at: new Date().toISOString() }, { onConflict: 'user_id' });
   } catch (e: any) {
     logEvent({ channel: "failures", event: "❌ API Error", description: String(e) });
@@ -836,7 +836,7 @@ export async function storeTodaySnapshot(userEmail: string, payload: TodayRespon
 async function readTodaySnapshot(supabase: any, userEmail: string): Promise<{ payload: TodayResponse; generatedAt: string } | null> {
   try {
     const { data } = await supabase
-      .from('arcus_today_cache')
+      .from('boult_today_cache')
       .select('payload, generated_at')
       .eq('user_id', userEmail.toLowerCase())
       .maybeSingle();
@@ -851,7 +851,7 @@ async function readTodaySnapshot(supabase: any, userEmail: string): Promise<{ pa
 async function getDismissedIds(supabase: any, userEmail: string): Promise<Set<string>> {
   try {
     const { data } = await supabase
-      .from('arcus_today_dismissals')
+      .from('boult_today_dismissals')
       .select('item_id')
       .eq('user_id', userEmail.toLowerCase());
     return new Set((data || []).map((r: any) => r.item_id));
@@ -896,7 +896,7 @@ export async function GET(req: Request) {
     // Make the "handled before you open it" promise real: a paid, Gmail-connected
     // user gets their first overnight agent automatically (idempotent, one-time).
     try {
-      const { ensureMorningSweepAgent } = await import('@/lib/arcus/ensure-default-agent');
+      const { ensureMorningSweepAgent } = await import('@/lib/boult/ensure-default-agent');
       await ensureMorningSweepAgent(userEmail);
     } catch {
       logEvent({ channel: "failures", event: "❌ API Error", description: "Unknown error" }); /* never block the feed */ }

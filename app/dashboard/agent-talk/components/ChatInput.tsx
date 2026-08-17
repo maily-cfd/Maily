@@ -4,7 +4,7 @@ import { useState, useRef, useEffect, KeyboardEvent } from 'react';
 import { toast } from 'sonner';
 import { ChatInputProps, Email } from '../types/chat';
 import { SlashCommandMenu } from './SlashCommandMenu';
-import { findSlashCommand, filterSlashCommands } from '@/lib/arcus/skills';
+import { findSlashCommand, filterSlashCommands } from '@/lib/boult/skills';
 import { IntegrationsModal } from '@/components/ui/integrations-modal';
 import { EmailSelectionModal } from '@/components/ui/email-selection-modal';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
@@ -234,7 +234,7 @@ export function ChatInput({ onSendMessage, disabled, placeholder, onModalStateCh
       // first token matches a registered command and that command's kind is
       // 'client', short-circuit to the local handler the parent provided.
       // Server-kind commands fall through to onSendMessage and the chat
-      // route expands them server-side (see lib/arcus/skills.ts).
+      // route expands them server-side (see lib/boult/skills.ts).
       if (trimmed.startsWith('/')) {
         const firstWhitespace = trimmed.search(/\s/);
         const cmdToken = firstWhitespace === -1 ? trimmed : trimmed.slice(0, firstWhitespace);

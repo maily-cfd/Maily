@@ -12,7 +12,7 @@ export async function GET() {
 
     const db = new DatabaseService();
     const { data, error } = await db.supabase
-      .from('arcus_recurring_agents')
+      .from('boult_recurring_agents')
       .select('*')
       .eq('user_id', session.user.id)
       .order('created_at', { ascending: false });
@@ -67,7 +67,7 @@ export async function POST(request: Request) {
     const readableSchedule = `${freqStr} at ${timeStr} UTC${expiration_date ? ` (Expires ${expiration_date})` : ''}`;
 
     const { data, error } = await db.supabase
-      .from('arcus_recurring_agents')
+      .from('boult_recurring_agents')
       .insert({
         user_id: session.user.id,
         name: name || 'Scheduled Agent',
@@ -89,7 +89,7 @@ export async function POST(request: Request) {
       // Table might not have the new columns yet — fallback to basic insert
       if (error.code === '42703' || error.message?.includes('column')) {
         const { data: fallbackData, error: fallbackError } = await db.supabase
-          .from('arcus_recurring_agents')
+          .from('boult_recurring_agents')
           .insert({
             user_id: session.user.id,
             name: name || 'Scheduled Agent',
@@ -157,7 +157,7 @@ export async function PATCH(request: Request) {
     const { id, is_active } = body;
 
     const { data, error } = await db.supabase
-      .from('arcus_recurring_agents')
+      .from('boult_recurring_agents')
       .update({ is_active })
       .eq('id', id)
       .eq('user_id', session.user.id)
@@ -187,7 +187,7 @@ export async function DELETE(request: Request) {
 
     const db = new DatabaseService();
     const { error } = await db.supabase
-      .from('arcus_recurring_agents')
+      .from('boult_recurring_agents')
       .delete()
       .eq('id', id)
       .eq('user_id', session.user.id);

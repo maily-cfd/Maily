@@ -40,9 +40,9 @@ function PaymentSuccessContent() {
         // 3s delay so a late localStorage clear can't wipe it.
         let dest = '/home-feed';
         try {
-            const ret = localStorage.getItem('mailient_checkout_return');
+            const ret = localStorage.getItem('maily_checkout_return');
             if (ret) dest = ret;
-            localStorage.removeItem('mailient_checkout_return');
+            localStorage.removeItem('maily_checkout_return');
             localStorage.setItem('onboarding_completed', 'true');
         } catch { /* */ }
         setTimeout(() => {
@@ -82,7 +82,7 @@ function PaymentSuccessContent() {
                 if (isPaidPlan) {
                     // Mark this tab as durably allowed so the home feed reveals
                     // instantly without re-running its own verification race.
-                    try { localStorage.setItem('mailient_access_ok', String(Date.now())); sessionStorage.removeItem('mailient_access_denied'); } catch { /* */ }
+                    try { localStorage.setItem('maily_access_ok', String(Date.now())); sessionStorage.removeItem('maily_access_denied'); } catch { /* */ }
                     celebrateSuccess(planType!);
                 } else {
                     // Subscription not yet active - webhook may be delayed
@@ -146,7 +146,7 @@ function PaymentSuccessContent() {
             if (response.ok && data.success && vPaid) {
                 // Success! Polar confirmed a real paid/trial subscription.
                 console.log('✅ Polar verification successful!');
-                try { localStorage.setItem('mailient_access_ok', String(Date.now())); sessionStorage.removeItem('mailient_access_denied'); } catch { /* */ }
+                try { localStorage.setItem('maily_access_ok', String(Date.now())); sessionStorage.removeItem('maily_access_denied'); } catch { /* */ }
                 celebrateSuccess(vPlan!);
             } else if (response.ok && data.success && !vPaid) {
                 // Reconciled, but no paid plan — do not grant access.
@@ -285,8 +285,8 @@ function PaymentSuccessContent() {
 
                                 <p className="text-white/40 text-xs pt-2">
                                     Need help? Contact us at{' '}
-                                    <a href="mailto:mailient.xyz@gmail.com" className="text-purple-400 hover:underline">
-                                        mailient.xyz@gmail.com
+                                    <a href="mailto:support.maily@gmail.com" className="text-purple-400 hover:underline">
+                                        support.maily@gmail.com
                                     </a>
                                 </p>
                             </div>

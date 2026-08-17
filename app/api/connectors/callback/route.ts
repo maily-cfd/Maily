@@ -6,7 +6,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { ConnectorService } from '@/lib/arcus-connector-service';
+import { ConnectorService } from '@/lib/boult-connector-service';
 import { logEvent } from "@/lib/logsso";
 
 // Lazy initialization - only create client when needed

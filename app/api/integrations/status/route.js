@@ -36,10 +36,10 @@ export async function GET(request) {
     const userEmail = session.user.email.toLowerCase();
 
     const db = new DatabaseService();
-    // Check both tables: legacy integration_credentials and V3 arcus_integrations
+    // Check both tables: legacy integration_credentials and V3 boult_integrations
     const [{ data: legacyRows }, { data: v3Rows }] = await Promise.all([
       db.supabase.from('integration_credentials').select('provider').eq('user_email', userEmail),
-      db.supabase.from('arcus_integrations').select('provider').eq('user_id', userEmail),
+      db.supabase.from('boult_integrations').select('provider').eq('user_id', userEmail),
     ]);
 
     const connected = new Set([

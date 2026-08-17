@@ -3,39 +3,39 @@
 // JSON-LD on the homepage (server), so copy edits update both.
 export const landingFaqs: Array<{ q: string; a: string }> = [
   {
-    q: "Is there a free trial?",
-    a: "Yes. The monthly plan starts with a 3-day free trial via Polar. A card is required to start checkout, but you are not charged during the trial. Cancel anytime before day 3 and you pay $0. After the trial it’s $29/month. Annual ($199/year) and Lifetime Founder ($499 once) skip the trial and bill immediately. Every plan includes the full product — no feature gating.",
+    q: "Is Maily free?",
+    a: "Yes — Maily is completely free and open source. You can self-host it for free forever, or use the hosted version at no cost. The full product is available to everyone with no feature gating, no paid tiers, and no trial required.",
   },
   {
-    q: "How is Mailient different from Claude or ChatGPT connectors?",
-    a: "Claude and ChatGPT connectors help when you open a chat and ask. Mailient is an always-on inbox employee: it reads overnight, drafts in your voice, books meetings, and brings you one morning briefing — without you prompting it. Connectors are tools inside a conversation. Mailient is the hire that runs while you sleep.",
+    q: "How is Maily different from Claude or ChatGPT connectors?",
+    a: "Claude and ChatGPT connectors help when you open a chat and ask. Maily is an always-on inbox employee: it reads overnight, drafts in your voice, books meetings, and brings you one morning briefing — without you prompting it. Connectors are tools inside a conversation. Maily is the hire that runs while you sleep.",
   },
   {
-    q: "Does Mailient replace Gmail?",
-    a: "No. Mailient works on top of your existing Gmail account through a secure OAuth connection. Your emails still live in Gmail. Mailient makes them intelligent. You can use both side by side or live entirely inside Mailient — your choice."
+    q: "Does Maily replace Gmail?",
+    a: "No. Maily works on top of your existing Gmail account through a secure OAuth connection. Your emails still live in Gmail. Maily makes them intelligent. You can use both side by side or live entirely inside Maily — your choice."
   },
   {
-    q: "How does Mailient learn my writing style?",
-    a: "When you connect Gmail, Mailient reads your last 90 days of sent emails and learns how you write — your tone, your greeting style, your typical sign-off, how formal you are with different types of people. Every draft it writes sounds like you. It improves the more you use it."
+    q: "How does Maily learn my writing style?",
+    a: "When you connect Gmail, Maily reads your last 90 days of sent emails and learns how you write — your tone, your greeting style, your typical sign-off, how formal you are with different types of people. Every draft it writes sounds like you. It improves the more you use it."
   },
   {
     q: "Is my email data private?",
-    a: "Yes — and not just as a policy. Your emails are encrypted inside your own browser using AES-256-GCM before they ever reach Mailient's servers. Personal data is stripped before the AI processes anything. We cannot read your emails. That is an architecture decision, not a promise."
+    a: "Yes — and not just as a policy. Your emails are encrypted inside your own browser using AES-256-GCM before they ever reach Maily's servers. Personal data is stripped before the AI processes anything. We cannot read your emails. That is an architecture decision, not a promise."
   },
   {
-    q: "Can I cancel anytime?",
-    a: "Yes. Cancel during the 3-day trial and you won’t be charged. Monthly plan cancels at the end of your billing period. Annual plan can be cancelled anytime — you keep full access for the year you paid for. No retention calls. No dark patterns. One click in settings."
+    q: "Can I self-host Maily?",
+    a: "Absolutely. Maily is fully open source (github.com/maily-cfd/Maily) and designed to be self-hostable. Clone the repo, add your own API keys, and deploy to any server or platform that runs Next.js. Full setup instructions are in the README."
   },
   {
     q: "How long does setup take?",
-    a: "About two minutes. Sign in with Google, connect Gmail, see a live scan of your inbox, then start the 3-day trial. Calendar, Slack, and Notion can be connected later from the app whenever you’re ready — they’re not required to begin."
+    a: "About two minutes. Sign in with Google, connect Gmail, and you're in. Calendar, Slack, and Notion can be connected later from the app whenever you're ready — they're not required to begin."
   },
   {
-    q: "Does Mailient work for teams?",
-    a: "Mailient is built for solo founders — one founder, one Gmail, no team seats. Multi-seat support is on the roadmap. If you need it sooner, email Maulik directly at mailient.xyz@gmail.com."
+    q: "Does Maily work for teams?",
+    a: "Maily currently works best for individual founders and power users — one account, one Gmail. Multi-seat support is on the roadmap. If you need it sooner, reach out to us on X at @Mailycfd or open a GitHub discussion."
   },
   {
-    q: "Who built Mailient?",
-    a: "Maulik — a 14-year-old founder who built Mailient because he watched smart people lose deals, miss opportunities, and burn hours on email every single day. The product exists because the problem is real. You can talk to him directly at @maulik_5 on X or mailient.xyz@gmail.com."
+    q: "Who built Maily?",
+    a: "Maily is a community-driven open source project. You can follow updates at @Mailycfd on X, star the repo at github.com/maily-cfd/Maily, or open an issue to contribute. The product exists because email overload is a real problem — and we're solving it together."
   }
 ];

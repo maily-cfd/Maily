@@ -18,7 +18,7 @@ import { cn } from "@/lib/utils";
  *
  * Fill is now owned by an explicit `variant` instead of by className patches:
  *
- *   primary   — solid white, black label. Mailient's palette has no hue, so
+ *   primary   — solid white, black label. Maily's palette has no hue, so
  *               LUMINANCE is the accent: pure white is reserved for the thing
  *               we want clicked and is deliberately the brightest element on
  *               any given screen.

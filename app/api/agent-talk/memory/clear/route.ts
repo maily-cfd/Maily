@@ -14,7 +14,7 @@ function getSupermemoryKey(): string | null {
  * POST /api/agent-talk/memory/clear
  *
  * Wipes ALL memories for the authenticated user from:
- *   1. arcus_memories (Supabase) — the source of truth
+ *   1. boult_memories (Supabase) — the source of truth
  *   2. Supermemory (if configured) — best-effort mirror cleanup
  */
 export async function POST() {
@@ -29,7 +29,7 @@ export async function POST() {
     const { getSupabaseAdmin } = await import('../../../../../lib/supabase.js');
     const supabase = getSupabaseAdmin();
     const { count } = await supabase
-      .from('arcus_memories')
+      .from('boult_memories')
       .delete({ count: 'exact' })
       .eq('user_id', userId);
     supabaseCount = count || 0;

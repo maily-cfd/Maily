@@ -4,19 +4,19 @@ import { BlogLayout } from "@/components/BlogLayout";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "The 3-Hour Email Rule // Mailient Blog",
+  title: "The 3-Hour Email Rule // Maily Blog",
   description: "Professionals spend 3+ hours per day on email. AI triage doesn't just organize — it gives you back the time you didn't know you were losing.",
   openGraph: {
-    title: "The 3-Hour Email Rule // Mailient Blog",
+    title: "The 3-Hour Email Rule // Maily Blog",
     description: "Professionals spend 3+ hours per day on email. AI triage doesn't just organize — it gives you back the time you didn't know you were losing.",
-    url: "https://mailient.xyz/blogs/ai-inbox-triage-reclaim-calendar",
+    url: "https://maily.dev/blogs/ai-inbox-triage-reclaim-calendar",
     type: "article",
     publishedTime: "2026-05-20T00:00:00.000Z",
-    authors: ["Maulik"],
+    authors: ["Maily"],
   },
   twitter: {
     card: "summary_large_image",
-    title: "The 3-Hour Email Rule // Mailient Blog",
+    title: "The 3-Hour Email Rule // Maily Blog",
     description: "Professionals spend 3+ hours per day on email. AI triage doesn't just organize — it gives you back the time you didn't know you were losing.",
   },
 };
@@ -28,7 +28,7 @@ const meta = {
   readTime: "7 min read",
   category: "Productivity",
   slug: "ai-inbox-triage-reclaim-calendar",
-  author: "Maulik",
+  author: "Maily",
 };
 
 const tableOfContents = [
@@ -47,7 +47,7 @@ const relatedPosts = [
     readTime: "7 min read",
   },
   {
-    title: "How AI Learns to Write Exactly Like You: Inside Mailient's Neural Voice Profile",
+    title: "How AI Learns to Write Exactly Like You: Inside Maily's Neural Voice Profile",
     slug: "ai-learns-your-writing-style",
     category: "Engineering",
     readTime: "7 min read",
@@ -183,7 +183,7 @@ export default function AIInboxTriagePage() {
 
       <h2 id="implementing-sift">Implementing the 3-Hour Rule with Sift AI</h2>
       <p>
-        <Link href="/product/sift">Mailient's Sift AI</Link> is the implementation layer for the 3-Hour Rule. It performs semantic triage on every incoming message, categorizing them into actionable groups before you open your inbox.
+        <Link href="/product/sift">Maily's Sift AI</Link> is the implementation layer for the 3-Hour Rule. It performs semantic triage on every incoming message, categorizing them into actionable groups before you open your inbox.
       </p>
 
       <h3>Priority Surfacing</h3>
@@ -201,9 +201,9 @@ export default function AIInboxTriagePage() {
         Emails that are informational but not urgent — status updates, system notifications, team announcements — are categorized separately. You can review them in batch during a dedicated window instead of processing them in real-time.
       </p>
 
-      <h3>Combined with Arcus</h3>
+      <h3>Combined with Boult</h3>
       <p>
-        Sift handles triage. <Link href="/product/arcus">Arcus</Link> handles action. Once Sift identifies that an email requires a response, Arcus reads the thread, drafts a reply in your <Link href="/blogs/ai-learns-your-writing-style">voice</Link>, checks your calendar if scheduling is involved, and queues the response for your review. By the time you sit down for your 15-minute processing window, the work is already done.
+        Sift handles triage. <Link href="/product/boult">Boult</Link> handles action. Once Sift identifies that an email requires a response, Boult reads the thread, drafts a reply in your <Link href="/blogs/ai-learns-your-writing-style">voice</Link>, checks your calendar if scheduling is involved, and queues the response for your review. By the time you sit down for your 15-minute processing window, the work is already done.
       </p>
 
       <p>
@@ -212,7 +212,7 @@ export default function AIInboxTriagePage() {
 
       <div className="callout-box">
         <p>
-          <strong>Stop spending 3 hours a day on email.</strong> Mailient's Sift AI handles triage. Arcus handles responses. You handle approvals.{" "}
+          <strong>Stop spending 3 hours a day on email.</strong> Maily's Sift AI handles triage. Boult handles responses. You handle approvals.{" "}
           <a href="/auth/signup">Start free trial →</a>
         </p>
       </div>

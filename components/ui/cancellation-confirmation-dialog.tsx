@@ -184,7 +184,7 @@ function CancellationReasonDialog({
 
         <div className="space-y-4">
           <p className="text-[var(--settings-text-secondary)] leading-relaxed">
-            We're sorry to see you go! Your feedback helps us improve Mailient for everyone.
+            We're sorry to see you go! Your feedback helps us improve Maily for everyone.
           </p>
 
           <div>

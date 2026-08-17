@@ -1,8 +1,8 @@
 /**
- * Arcus V3 — Integrations API
- * GET    /api/arcus/v3/integrations              — List connected
- * POST   /api/arcus/v3/integrations              — Connect
- * DELETE /api/arcus/v3/integrations?provider=xxx  — Disconnect
+ * Boult V3 — Integrations API
+ * GET    /api/boult/v3/integrations              — List connected
+ * POST   /api/boult/v3/integrations              — Connect
+ * DELETE /api/boult/v3/integrations?provider=xxx  — Disconnect
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '../../../../../lib/auth.js';
@@ -21,7 +21,7 @@ export async function GET() {
     const supabase = getSupabaseAdmin();
 
     const { data } = await supabase
-      .from('arcus_integrations')
+      .from('boult_integrations')
       .select('id, provider, scopes, created_at, channel_expiry, workspace_info')
       .eq('user_id', userId);
 
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
 
     const supabase = getSupabaseAdmin();
     const { error } = await supabase
-      .from('arcus_integrations')
+      .from('boult_integrations')
       .upsert({
         user_id: userId,
         provider,
@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    await auditLogger.log(userId, 'arcus.integration_connected', { provider });
+    await auditLogger.log(userId, 'boult.integration_connected', { provider });
     return NextResponse.json({ status: 'connected', provider });
   } catch (error) {
     logEvent({ channel: "failures", event: "❌ API Error", description: String(error) });
@@ -88,12 +88,12 @@ export async function DELETE(request: NextRequest) {
 
     const supabase = getSupabaseAdmin();
     await supabase
-      .from('arcus_integrations')
+      .from('boult_integrations')
       .delete()
       .eq('user_id', userId)
       .eq('provider', provider);
 
-    await auditLogger.log(userId, 'arcus.integration_disconnected', { provider });
+    await auditLogger.log(userId, 'boult.integration_disconnected', { provider });
     return NextResponse.json({ status: 'disconnected', provider });
   } catch (error) {
     logEvent({ channel: "failures", event: "❌ API Error", description: String(error) });

@@ -7,7 +7,7 @@ import { Clock, X, Repeat, CalendarClock, ShieldCheck, History, Pause, Play, Arr
 import { useTheme } from 'next-themes';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { cleanRunSummary } from '@/lib/arcus/report-summary';
+import { cleanRunSummary } from '@/lib/boult/report-summary';
 
 // ── Channel icons ──────────────────────────────────────────────────────────────
 
@@ -165,7 +165,7 @@ function ScheduledAgentSidebar({
     const timeoutId = setTimeout(() => controller.abort(), 10000);
     (async () => {
       try {
-        const res = await fetch('/api/arcus/agents', { signal: controller.signal });
+        const res = await fetch('/api/boult/agents', { signal: controller.signal });
         if (cancelled) return;
         const json = await res.json();
         const agent = (json.agents || []).find((a: any) => a.id === data.id);
@@ -192,7 +192,7 @@ function ScheduledAgentSidebar({
     setSkip(next);
     setSavingSkip(true);
     try {
-      await fetch('/api/arcus/agents', {
+      await fetch('/api/boult/agents', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: data.id, skip_confirmations: next }),
@@ -384,7 +384,7 @@ export function ScheduledAgentCard({ data: initialData }: { data: ScheduledAgent
     setIsPausing(true);
     const nextStatus = isActive ? 'paused' : 'active';
     try {
-      const res = await fetch('/api/arcus/agents', {
+      const res = await fetch('/api/boult/agents', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: data.id, status: nextStatus }),

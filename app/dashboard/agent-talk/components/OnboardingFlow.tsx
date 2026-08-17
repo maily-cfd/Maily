@@ -76,7 +76,7 @@ const ALL_PROMPTS: SuggestedPrompt[] = [
   {
     icon: <Sparkles className="w-4 h-4" />,
     label: 'Set up a delegation rule',
-    prompt: 'Help me create an Arcus rule: whenever I get a meeting request email, automatically draft 3 proposed times.',
+    prompt: 'Help me create a Boult rule: whenever I get a meeting request email, automatically draft 3 proposed times.',
     category: 'general',
   },
 ];
@@ -117,8 +117,8 @@ export function OnboardingFlow({ visible, connectedIntegrations, onPrompt, userN
             </h2>
             <p className="text-[13px] text-white/40">
               {connectedIntegrations.length > 0
-                ? `Arcus is connected to ${connectedIntegrations.map(humanizeIntegration).join(', ')}. What can I help you with?`
-                : 'Connect your tools to get started. Try asking Arcus anything.'}
+                ? `Boult is connected to ${connectedIntegrations.map(humanizeIntegration).join(', ')}. What can I help you with?`
+                : 'Connect your tools to get started. Try asking Boult anything.'}
             </p>
           </div>
 

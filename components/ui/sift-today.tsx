@@ -490,7 +490,7 @@ function AgentRunCard({ run }: { run: AgentRunItem }) {
 
               {detail && !loadingDetail && (
                 <>
-                  {/* Plan — what Arcus decided to do */}
+                  {/* Plan — what Boult decided to do */}
                   {detail.plan && (
                     <div>
                       <p className="text-[10.5px] font-semibold uppercase tracking-[0.1em] text-black/35 dark:text-white/35 mb-1.5">The plan</p>
@@ -595,7 +595,7 @@ function AgentRunsSection({ runs, pendingApprovals }: { runs: AgentRunItem[]; pe
 // is small (a few buckets), so localStorage is the pragmatic store; IndexedDB would
 // be the move if this ever held large per-message bodies.
 let TODAY_CACHE: TodayPayload | null = null;
-const TODAY_PERSIST_KEY = 'mailient_today_snapshot';
+const TODAY_PERSIST_KEY = 'maily_today_snapshot';
 const TODAY_PERSIST_TTL = 24 * 60 * 60 * 1000;
 
 function loadPersistedToday(): TodayPayload | null {
@@ -871,7 +871,7 @@ interface AiRecDTO {
   category: 'connect' | 'productivity';
   title: string;
   summary: string;
-  arcusPrompt: string;
+  boultPrompt: string;
   ctaLabel: string;
   stat: { value: number; label: string };
   // Opportunity Detection: a hidden loss caught before it slips.
@@ -891,14 +891,14 @@ function aiToRec(dto: AiRecDTO): Recommendation {
     title: dto.title,
     summary: dto.summary,
     stat: dto.stat,
-    cta: { label: dto.ctaLabel, prompt: dto.arcusPrompt },
+    cta: { label: dto.ctaLabel, prompt: dto.boultPrompt },
     groundedIn: Array.isArray(dto.refIds) ? dto.refIds.length : undefined,
     atRisk: dto.atRisk === true,
   };
 }
 
-const REC_CACHE_PREFIX = 'mailient_airecs_';
-const REC_APPS_PREFIX = 'mailient_airec_apps_';
+const REC_CACHE_PREFIX = 'maily_airecs_';
+const REC_APPS_PREFIX = 'maily_airec_apps_';
 
 // Read AI recs from sessionStorage synchronously so frame 1 already knows whether
 // to show the cached picks or the loading skeletons (no deterministic flash).
@@ -1165,7 +1165,7 @@ export default function SiftToday() {
   const [customizeOpen, setCustomizeOpen] = useState(false);
   // Transparent Reasoning (P6): the day's prioritization logic stays collapsed by
   // default (protection, not overwhelm) and expands when the founder wants to
-  // understand — or challenge — how Mailient ranked their day.
+  // understand — or challenge — how Maily ranked their day.
   const [showReasoning, setShowReasoning] = useState(false);
   // Dismissals are persisted server-side (durable + cross-device); the Today API
   // already excludes them on load, so this in-memory set only handles instant
@@ -1431,9 +1431,9 @@ export default function SiftToday() {
     load({ background: !!TODAY_CACHE });
   }, [load]);
 
-  const openArcus = (prompt: string) => {
+  const openBoult = (prompt: string) => {
     try {
-      sessionStorage.setItem('arcus_prefill', prompt);
+      sessionStorage.setItem('boult_prefill', prompt);
     } catch {
       // sessionStorage can throw in incognito or with disk full — push anyway
     }
@@ -1469,7 +1469,7 @@ export default function SiftToday() {
 
   // CONTINUOUS INBOX — the opening line reframes the visit from "catching up"
   // (a backlog to process) to "reviewing progress" (work already done). Built
-  // ONLY from real numbers already in the payload: what Mailient did while away
+  // ONLY from real numbers already in the payload: what Maily did while away
   // (emails read + artifacts its agents produced), then the small remainder.
   // Null when nothing actually moved in the gap → the normal subline shows.
   const progress = useMemo(() => {
@@ -1489,7 +1489,7 @@ export default function SiftToday() {
     const leftClause = left === 0
       ? "nothing needs you — you're clear."
       : `${left} ${left === 1 ? 'thing needs' : 'things need'} you. The rest is handled.`;
-    return `While you were away, Mailient ${didClause}. ${leftClause}`;
+    return `While you were away, Maily ${didClause}. ${leftClause}`;
   }, [data, decideItems, chaseItems, showUpItems, actionItemsVisible]);
 
   return (
@@ -1507,7 +1507,7 @@ export default function SiftToday() {
             <p className="text-[15px] mt-1.5 text-black/55 dark:text-white/55 tracking-tight">
               {progress || data?.briefing?.trim() || "here's what deserves you today."}
             </p>
-            {/* Transparent Reasoning (P6) — "Why this order?" reveals HOW Mailient
+            {/* Transparent Reasoning (P6) — "Why this order?" reveals HOW Maily
                 ranked the day. Collapsed by default so the norm stays calm; one tap
                 exposes the tradeoff logic so the founder understands (and can
                 challenge) the triage instead of taking it on faith. Only shown when
@@ -1535,7 +1535,7 @@ export default function SiftToday() {
                       className="overflow-hidden"
                     >
                       <div className="mt-2.5 max-w-xl rounded-xl border border-black/[0.07] dark:border-white/[0.08] border-l-2 border-l-black/25 dark:border-l-white/25 bg-black/[0.02] dark:bg-white/[0.03] pl-3.5 pr-4 py-3">
-                        <p className="text-[10.5px] uppercase tracking-[0.14em] text-black/35 dark:text-white/35 mb-1.5 font-semibold">How Mailient ranked today</p>
+                        <p className="text-[10.5px] uppercase tracking-[0.14em] text-black/35 dark:text-white/35 mb-1.5 font-semibold">How Maily ranked today</p>
                         <p className="text-[13.5px] leading-relaxed text-black/70 dark:text-white/70">{data.reasoning.trim()}</p>
                       </div>
                     </motion.div>
@@ -1675,7 +1675,7 @@ export default function SiftToday() {
               generatedAt={data.generatedAt}
               servingCached={servingCached}
               triage={data.triage}
-              onAct={openArcus}
+              onAct={openBoult}
               onRefresh={() => load({ force: true })}
               onCustomize={() => setCustomizeOpen(true)}
             />
@@ -1706,7 +1706,7 @@ export default function SiftToday() {
                             const ctx = item.attendees.length > 0
                               ? ` (linked to ${item.attendees.join(', ')})`
                               : '';
-                            openArcus(`Help me with this action item from "${item.meetingTitle || 'my notes'}"${ctx}: ${item.text}`);
+                            openBoult(`Help me with this action item from "${item.meetingTitle || 'my notes'}"${ctx}: ${item.text}`);
                           },
                         }}
                       />
@@ -1773,7 +1773,7 @@ export default function SiftToday() {
                         primaryAction={{
                           label: 'Prep me',
                           onClick: () =>
-                            openArcus(`/prep ${item.title} at ${formatStartTime(item.start)} today`),
+                            openBoult(`/prep ${item.title} at ${formatStartTime(item.start)} today`),
                         }}
                         secondaryAction={
                           item.meetLink ? { label: 'Join', href: item.meetLink } : undefined

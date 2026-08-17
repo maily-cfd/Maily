@@ -34,15 +34,15 @@ export async function POST(req: Request) {
                 </div>
 
                 <div style="border-top: 1px solid #eee; padding-top: 25px; margin-top: 40px; font-size: 11px; color: #bbb; text-align: center; letter-spacing: 0.05em;">
-                    Inquiry routed via Mailient Support Gateway.<br/>
+                    Inquiry routed via Maily Support Gateway.<br/>
                     ID: ${Math.random().toString(36).substring(7).toUpperCase()} | ${new Date().toISOString()}
                 </div>
             </div>
         `;
 
         const { data, error } = await resend.emails.send({
-            from: 'Support <support@mailient.xyz>',
-            to: ['mailient.xyz@gmail.com'],
+            from: 'Support <support@maily.dev>',
+            to: ['support.maily@gmail.com'],
             replyTo: email,
             subject: `[Support] ${subject} from ${name}`,
             html: emailContent,

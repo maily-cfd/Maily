@@ -207,7 +207,7 @@ export function Features8() {
                       <div className="ring-black size-8 ring-4 rounded-full overflow-hidden">
                         <img className="size-full object-cover" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&q=80" alt="Avatar" />
                       </div>
-                      <span className="block h-fit rounded border border-white/10 bg-neutral-900 px-2 py-1 text-[10px] text-white font-mono shadow-sm">Arcus Core</span>
+                      <span className="block h-fit rounded border border-white/10 bg-neutral-900 px-2 py-1 text-[10px] text-white font-mono shadow-sm">Boult Core</span>
                     </div>
                     <div className="relative flex w-[calc(50%+0.875rem)] items-center justify-end gap-2 transition-transform duration-500 group-hover:translate-x-1">
                       <span className="block h-fit rounded border border-white/10 bg-neutral-900 px-2 py-1 text-[10px] text-white font-mono shadow-sm">Drafts Engine</span>

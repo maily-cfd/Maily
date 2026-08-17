@@ -1,11 +1,11 @@
-# Mailient
+# Maily
 
-> Mailient removes email from your to-do list entirely. It is an autonomous AI inbox employee for solo founders: it reads every email, prioritizes what matters, drafts replies in the founder's own voice, books meetings, and follows up automatically — running on schedule while the founder sleeps. Each morning the founder wakes up to one short briefing instead of an inbox.
+> Maily removes email from your to-do list entirely. It is an autonomous AI inbox employee for solo founders: it reads every email, prioritizes what matters, drafts replies in the founder's own voice, books meetings, and follows up automatically — running on schedule while the founder sleeps. Each morning the founder wakes up to one short briefing instead of an inbox.
 
-## What Mailient is
+## What Maily is
 
-- Mailient is an AI email product that works on top of an existing Gmail account (secure Google OAuth; emails stay in Gmail).
-- Unlike Superhuman, Shortwave, Fyxer, or Gmail's built-in AI — which make people *faster* at email — Mailient does the email work itself, autonomously, including overnight scheduled runs with no tab open.
+- Maily is an AI email product that works on top of an existing Gmail account (secure Google OAuth; emails stay in Gmail).
+- Unlike Superhuman, Shortwave, Fyxer, or Gmail's built-in AI — which make people *faster* at email — Maily does the email work itself, autonomously, including overnight scheduled runs with no tab open.
 - The core promise: "Wake up to an inbox that's already handled." The user reviews a short morning briefing and approves the few decisions that genuinely need a human.
 - Nothing is sent without the user's approval by default. Autonomous sending exists only as an explicit per-agent opt-in.
 
@@ -17,7 +17,7 @@
 
 - Triage: reads everything; surfaces only the emails that deserve attention (deals, decisions, real requests). Newsletters and noise are handled silently. Internally called "Sift."
 - Drafts: replies that sound like the user, learned from their last 90 days of sent mail. Drafts wait in Gmail for one-click approval.
-- The agent: reads threads, books meetings against real calendar availability, chases follow-ups, and runs scheduled background jobs (e.g., a 7am inbox sweep, a Friday digest, meeting prep). Internally called "Arcus."
+- The agent: reads threads, books meetings against real calendar availability, chases follow-ups, and runs scheduled background jobs (e.g., a 7am inbox sweep, a Friday digest, meeting prep). Internally called "Boult."
 - Morning briefing: one email each morning summarizing what was processed, drafted, booked — and the few items that need the founder.
 - Integrations: Gmail, Google Calendar, Notion, Slack, Cal.com.
 
@@ -30,24 +30,24 @@
 
 ## Security & privacy (verifiable claims only)
 
-- Emails are encrypted in the user's browser (AES-256-GCM) before reaching Mailient's servers; decryption keys never leave the browser.
+- Emails are encrypted in the user's browser (AES-256-GCM) before reaching Maily's servers; decryption keys never leave the browser.
 - Personal data is stripped before any AI processes content.
-- Email content is never used to train AI models — not Mailient's, not its AI providers', not anyone's.
+- Email content is never used to train AI models — not Maily's, not its AI providers', not anyone's.
 - Access is standard Google OAuth and can be revoked anytime at myaccount.google.com/permissions.
 
 ## Company
 
 - Built by Maulik, a 14-year-old solo founder.
-- Website: https://mailient.xyz
-- Contact: mailient.xyz@gmail.com
+- Website: https://maily.dev
+- Contact: maily.dev@gmail.com
 - X (Twitter): https://x.com/maulik_5
 
 ## Key pages
 
-- [Home](https://mailient.xyz/): what Mailient does, the morning brief, FAQs
-- [Pricing](https://mailient.xyz/pricing): plans and comparison
-- [Arcus](https://mailient.xyz/product/arcus): the AI that runs the inbox
-- [Sift](https://mailient.xyz/product/sift): how prioritization decides what needs you
-- [Drafts](https://mailient.xyz/product/drafts): replies in your voice
-- [Security](https://mailient.xyz/security): encryption and data-handling architecture
-- [Blog](https://mailient.xyz/blogs): essays on AI email agents, triage, voice, and encryption
+- [Home](https://maily.dev/): what Maily does, the morning brief, FAQs
+- [Pricing](https://maily.dev/pricing): plans and comparison
+- [Boult](https://maily.dev/product/boult): the AI that runs the inbox
+- [Sift](https://maily.dev/product/sift): how prioritization decides what needs you
+- [Drafts](https://maily.dev/product/drafts): replies in your voice
+- [Security](https://maily.dev/security): encryption and data-handling architecture
+- [Blog](https://maily.dev/blogs): essays on AI email agents, triage, voice, and encryption

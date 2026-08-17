@@ -41,16 +41,15 @@ import { useTheme } from "next-themes";
 import { ProgressiveBlur } from "@/components/ui/progressive-blur";
 import { Footer } from "@/components/Footer";
 import { SpecialText } from "@/components/ui/special-text";
-import { BlurFade } from "@/components/ui/blur-fade";
 import { CircleExpandButton } from "@/components/CircleExpandButton";
 import { FloatingNavbar } from "@/components/FloatingNavbar";
 import { SectionHeader } from "@/components/ui/section-header";
-import { WordSoftReveal } from "@/components/ui/word-blur-reveal";
 import { DemoVideo } from "@/components/ui/demo-video";
 import { landingFaqs } from "@/lib/landing-faqs";
+import HeroASCII from "@/components/ui/hero-ascii";
 
 /** Below-fold / heavy modules — same UI, loaded after first paint. */
-const PricingSection3 = dynamic(() => import("@/components/ui/pricing-section-3"), { ssr: false });
+
 const Features8 = dynamic(() => import("@/components/ui/features-8").then((m) => m.Features8), { ssr: false });
 const CTASection = dynamic(() => import("@/components/ui/hero-dithering-card").then((m) => m.CTASection), { ssr: false });
 const TestimonialsSection = dynamic(() => import("@/components/ui/testimonials-section").then((m) => m.TestimonialsSection), { ssr: false });
@@ -394,64 +393,11 @@ export function LinearLanding() {
       <Navbar theme={navTheme} />
 
       {/* 1. HERO SECTION */}
-      <section className="relative w-full pt-40 pb-0 md:pt-48 flex flex-col items-center text-center z-10 bg-gradient-to-b from-[#000000] via-[#09090b] to-[#16161a] overflow-hidden">
-        {/* White-grey glow from the bottom of the hero section spreading up */}
-        <div className="absolute inset-x-0 bottom-0 h-[250px] bg-[radial-gradient(ellipse_at_bottom,rgba(255,255,255,0.08),transparent_70%)] pointer-events-none z-10" />
+      <section className="relative w-full z-10">
+        <HeroASCII />
+      </section>
 
-        {/* Etheral Shadow Background Layer */}
-        <div className={`absolute inset-0 z-0 pointer-events-none select-none ${isDark ? "opacity-40 mix-blend-screen" : "opacity-30 mix-blend-multiply"}`}>
-          <EtheralShadow
-            color={isDark ? "rgba(128, 128, 128, 1)" : "rgba(120, 120, 130, 0.55)"}
-            animation={{ scale: 100, speed: 90 }}
-            noise={{ opacity: isDark ? 1 : 0.45, scale: 1.2 }}
-            sizing="fill"
-          />
-        </div>
-
-        <div className="w-full flex flex-col items-center max-w-5xl z-10 mx-auto px-6">
-          
-          {/* Headline & Subtitle */}
-          <BlurFade delay={0.1} duration={0.8} inView>
-            <h1 className="text-4xl md:text-[60px] font-medium tracking-[-0.035em] leading-[1.08] max-w-3xl bg-gradient-to-b from-neutral-900 via-neutral-700 to-neutral-400 dark:from-white dark:via-neutral-100 dark:to-neutral-400 bg-clip-text text-transparent pb-2">
-              You run your company,
-              <br />
-              We run your inbox.
-            </h1>
-          </BlurFade>
-
-          <BlurFade delay={0.2} duration={0.8} inView>
-            <p className="text-lg md:text-[22px] text-neutral-500 dark:text-[#8a8f98] leading-relaxed max-w-4xl mt-8 font-light min-h-[4rem] flex items-center justify-center">
-              <RotatingTagline />
-            </p>
-          </BlurFade>
-
-          {/* Premium CTAs */}
-          <BlurFade delay={0.3} duration={0.8} inView>
-            <div className="flex flex-col items-center gap-3 mt-12">
-              <div className="flex flex-wrap items-center justify-center gap-4">
-                <CircleExpandButton href="/auth/signup">
-                  Start 3-day free trial
-                </CircleExpandButton>
-
-                {/* Points at #demos (the real product-demo videos). */}
-                <CircleExpandButton href="#demos" variant="secondary">
-                  Watch Mailient handle a real inbox
-                </CircleExpandButton>
-              </div>
-              <p className="text-[13px] text-neutral-500 dark:text-[#8a8f98] tracking-wide">
-                Card required · not charged for 3 days · cancel anytime · then $29/mo
-              </p>
-            </div>
-          </BlurFade>
-
-          {/* 16:9 Floating Obsidian Demo Video Window */}
-          <BlurFade delay={0.4} duration={1.0} inView>
-            <HeroVideoPlayer />
-          </BlurFade>
-
-      </div>
-
-      {/* Clear Separation Line at the bottom of the Metallic Hero */}
+{/* Clear Separation Line at the bottom of the Metallic Hero */}
       <div className="w-full h-px bg-gradient-to-r from-transparent via-neutral-300 dark:via-white/[0.12] to-transparent relative z-25 mt-16 md:mt-24" />
 
       {/* NOTE: a PerspectiveMarquee sat here as a "trusted by" wall. It was
@@ -462,18 +408,17 @@ export function LinearLanding() {
           already told properly by the #connectors orbit section below, and
           pre-launch we have no customer logos to show. Nothing beats fake
           social proof except no social proof. */}
-    </section>
 
       {/* 1.5 THE PROBLEM — WHY MAILIENT MANIFESTO (moved up: problem right after hero, per positioning spec) */}
       <section className="py-16 md:py-32 px-6 w-full max-w-4xl mx-auto border-t border-neutral-200 dark:border-white/[0.06] z-10 relative flex flex-col items-center text-left">
-        <BlurFade delay={0.1} duration={0.8} inView>
+        <div>
           <div className="w-full space-y-12">
           
           <SectionHeader
             pill="Why Mailient"
             icon={AlertCircle}
             heading="Email was supposed to be a tool. For most founders, it became the job."
-            subtitle="Every founder has lost money to an email they saw too late. You have too — you just can't name which one."
+            subtitle="Every founder has lost opportunities to an email they saw too late. You have too — you just can't name which one."
           />
 
           <div className="space-y-8 text-neutral-500 dark:text-neutral-600 dark:text-neutral-400 font-sans font-light leading-relaxed text-base md:text-lg">
@@ -514,20 +459,14 @@ export function LinearLanding() {
               <span className="text-neutral-500 dark:text-neutral-500"> A part-time job you never hired for.</span>
             </p>
 
-            <WordSoftReveal
-              text="Gmail sorts what you read. Superhuman speeds it up. Claude connectors help when you ask. None of them run your inbox overnight — so the email you never opened still costs you the deal."
-              className="text-center text-base md:text-lg"
-            />
+            <p className="text-center text-base md:text-lg">Gmail sorts what you read. Superhuman speeds it up. Claude connectors help when you ask. None of them run your inbox overnight — so the email you never opened still costs you the deal.</p>
 
-            <WordSoftReveal
-              text="So Mailient isn't a faster inbox or another chat connector. It's a hire — at $29 a month, with a 3-day free trial."
-              className="text-neutral-900 dark:text-white font-normal text-xl md:text-2xl tracking-tight leading-snug text-center pt-2"
-            />
+            <p className="text-neutral-900 dark:text-white font-normal text-xl md:text-2xl tracking-tight leading-snug text-center pt-2">So Mailient isn't a faster inbox or another chat connector. It's a hire — completely open-source, and 100% free.</p>
 
           </div>
 
         </div>
-        </BlurFade>
+        </div>
       </section>
 
       {/* 2. THREE THINGS IT DOES INTERACTIVE SECTION */}
@@ -535,21 +474,21 @@ export function LinearLanding() {
         {/* This section previously had NO heading at all — it opened straight
             into the tab list, so a scroller hit three product demos with no
             statement of what they were demonstrating. */}
-        <BlurFade delay={0.1} duration={0.8} inView>
+        <div>
           <SectionHeader
             pill="What it does"
             icon={Sparkles}
             heading="Three things, running without you."
             subtitle="Watch each one on a real inbox — no mockups."
           />
-        </BlurFade>
+        </div>
 
         {/* 4/8 split, was 5/7 — the demo panel is the argument here, so it gets
             the space. The selector column only has to hold three short labels. */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
 
           {/* Left panel: Vertical connected capability selectors */}
-          <BlurFade delay={0.1} duration={0.8} inView className="lg:col-span-4 w-full">
+          <div className="col-span-12 lg:col-span-4">
             <div className="space-y-12" role="tablist" aria-label="Product demos">
               {/* Step 1 */}
               {/* Tab semantics: these three selectors drive the demo panel on
@@ -685,7 +624,7 @@ export function LinearLanding() {
                     Describe the job, pick when it runs. Set it once.
                   </p>
                   <CircleExpandButton
-                    href="#pricing"
+                    href="/auth/signup"
                     variant="secondary"
                     className="text-xs md:text-sm"
                   >
@@ -695,11 +634,11 @@ export function LinearLanding() {
               )}
             </div>
           </div>
-        </BlurFade>
+        </div>
 
           {/* Right panel: dynamic high-contrast visual display */}
-          <BlurFade delay={0.25} duration={0.8} inView className="lg:col-span-8 w-full h-[440px] md:h-[580px]">
-            <div id="demo-panel" role="tabpanel" className="bg-[#050505] border border-neutral-200 dark:border-white/[0.08] rounded-[28px] p-5 md:p-10 shadow-2xl h-full flex flex-col justify-between relative overflow-hidden">
+          <div className="col-span-12 lg:col-span-8">
+            <div id="demo-panel" role="tabpanel" className="bg-[#050505] border border-neutral-200 dark:border-white/[0.08] rounded-[28px] shadow-2xl w-full aspect-[4/3] lg:aspect-video relative overflow-hidden">
             {/* Custom Dither Dot Grid Overlay */}
             <div className="absolute inset-y-0 left-0 w-[45%] pointer-events-none opacity-[0.08] mix-blend-screen select-none"
                  style={{
@@ -787,14 +726,14 @@ export function LinearLanding() {
             </AnimatePresence>
 
           </div>
-        </BlurFade>
+        </div>
 
       </div>
     </section>
 
       {/* 3.5 HOW MAILIENT WORKS — three steps, no jargon */}
       <section className="py-16 md:py-24 px-6 w-full max-w-5xl mx-auto border-t border-neutral-200 dark:border-white/[0.06] z-10 relative">
-        <BlurFade delay={0.1} duration={0.8} inView>
+        <div>
           <SectionHeader
             pill="How it works"
             icon={Layers}
@@ -812,10 +751,7 @@ export function LinearLanding() {
               </span>
               <span className="font-mono text-[10px] tracking-[0.2em] text-neutral-500 dark:text-neutral-600 font-bold block relative z-10">STEP 1</span>
               <h3 className="text-lg font-semibold text-neutral-900 dark:text-white relative z-10">Connect Gmail.</h3>
-              <WordSoftReveal
-                text="Two minutes, secure Google sign-in. Your email stays in Gmail — nothing moves, nothing to configure."
-                className="text-sm text-neutral-500 dark:text-neutral-600 dark:text-neutral-400 font-light leading-relaxed font-sans relative z-10"
-              />
+              <p className="text-sm text-neutral-500 dark:text-neutral-600 dark:text-neutral-400 font-light leading-relaxed font-sans relative z-10">Two minutes, secure Google sign-in. Your email stays in Gmail — nothing moves, nothing to configure.</p>
             </div>
             <div className="linear-grid-card linear-grid-card-lift p-8 space-y-4">
               <span className="gradient-tile w-12 h-12 relative z-10">
@@ -823,10 +759,7 @@ export function LinearLanding() {
               </span>
               <span className="font-mono text-[10px] tracking-[0.2em] text-neutral-500 dark:text-neutral-600 font-bold block relative z-10">STEP 2</span>
               <h3 className="text-lg font-semibold text-neutral-900 dark:text-white relative z-10">It learns how you write.</h3>
-              <WordSoftReveal
-                text="From your last 90 days of sent mail: your greetings, your rhythm, your sign-offs. Drafts start sounding like you, not like AI."
-                className="text-sm text-neutral-500 dark:text-neutral-600 dark:text-neutral-400 font-light leading-relaxed font-sans relative z-10"
-              />
+              <p className="text-sm text-neutral-500 dark:text-neutral-600 dark:text-neutral-400 font-light leading-relaxed font-sans relative z-10">From your last 90 days of sent mail: your greetings, your rhythm, your sign-offs. Drafts start sounding like you, not like AI.</p>
             </div>
             <div className="linear-grid-card linear-grid-card-lift p-8 space-y-4">
               <span className="gradient-tile w-12 h-12 relative z-10">
@@ -834,13 +767,10 @@ export function LinearLanding() {
               </span>
               <span className="font-mono text-[10px] tracking-[0.2em] text-neutral-500 dark:text-neutral-600 font-bold block relative z-10">STEP 3</span>
               <h3 className="text-lg font-semibold text-neutral-900 dark:text-white relative z-10">Mornings arrive organized.</h3>
-              <WordSoftReveal
-                text="Overnight it reads everything, drafts the replies, books the meetings, chases the silence — and leaves you one briefing. Nothing sends without your approval."
-                className="text-sm text-neutral-500 dark:text-neutral-600 dark:text-neutral-400 font-light leading-relaxed font-sans relative z-10"
-              />
+              <p className="text-sm text-neutral-500 dark:text-neutral-600 dark:text-neutral-400 font-light leading-relaxed font-sans relative z-10">Overnight it reads everything, drafts the replies, books the meetings, chases the silence — and leaves you one briefing. Nothing sends without your approval.</p>
             </div>
           </div>
-        </BlurFade>
+        </div>
       </section>
 
       {/* CONNECT GMAIL — the setup objection, answered with footage.
@@ -850,16 +780,16 @@ export function LinearLanding() {
           clip. Here the recording is the whole point of the section.
           Copy is one line — the video is the argument. */}
       <section id="connect-gmail" className="py-16 md:py-32 px-6 w-full max-w-6xl mx-auto border-t border-neutral-200 dark:border-white/[0.06] z-10 relative">
-        <BlurFade delay={0.1} duration={0.8} inView>
+        <div>
           <SectionHeader
             pill="Connect Gmail"
             icon={Mail}
             heading="Two minutes. One sign-in. Done."
             subtitle="Your mail never leaves Gmail — nothing to migrate, nothing to configure."
           />
-        </BlurFade>
+        </div>
 
-        <BlurFade delay={0.2} duration={0.9} inView>
+        <div>
           <div className="linear-grid-card p-2 md:p-3 relative">
             <div className="rounded-[20px] overflow-hidden aspect-[1280/708] relative z-10">
               <DemoVideo
@@ -869,20 +799,20 @@ export function LinearLanding() {
               />
             </div>
           </div>
-        </BlurFade>
+        </div>
       </section>
 
       {/* 4. FLAGSHIP MEET ARCUS SECTION */}
       <section className="py-20 md:py-36 px-6 w-full max-w-7xl mx-auto border-t border-neutral-200 dark:border-white/[0.06] z-10 relative">
-        <BlurFade delay={0.1} duration={0.9} inView>
+        <div>
           <SectionHeader
             pill="Meet Arcus"
             icon={Bot}
             heading="Meet your new employee."
             subtitle="We named it Arcus. You'll just say: handled."
           />
-        </BlurFade>
-        <BlurFade delay={0.2} duration={0.9} inView>
+        </div>
+        <div>
           <div
             className="w-full linear-grid-card p-6 md:p-16 flex flex-col lg:flex-row gap-10 lg:gap-16 items-center relative group"
             onMouseEnter={handleMouseEnterCard}
@@ -955,7 +885,7 @@ export function LinearLanding() {
             </div>
 
           </div>
-        </BlurFade>
+        </div>
       </section>
 
       {/* 3. RADAR CIRCULAR APP ORBITS INTEGRATIONS */}
@@ -1109,12 +1039,12 @@ export function LinearLanding() {
               {/* Soft background glow */}
               <div className="absolute w-24 h-24 rounded-[26px] bg-white/[0.01] blur-md pointer-events-none group-hover:bg-white/[0.02] transition-colors" />
               <img 
-                src="/mailient-logo-premium.png" 
-                alt="Mailient Hub" 
-                className="w-12 h-12 object-cover relative z-10 transition-transform duration-500 group-hover:scale-105"
+                src="/logo-maily.png" 
+                alt="Maily Hub" 
+                className="w-12 h-12 object-cover relative z-10 transition-transform duration-500 group-hover:scale-105 rounded-xl border border-white/10"
               />
               <div className="absolute bottom-full mb-4 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-xl bg-neutral-950 border border-neutral-200 dark:border-white/10 text-neutral-900 dark:text-white font-mono text-[10px] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none shadow-2xl">
-                Mailient Core Hub
+                Maily Core Hub
               </div>
             </div>
 
@@ -1231,7 +1161,7 @@ export function LinearLanding() {
 
       {/* 5. PRODUCT CLAIMS + SECURITY STRIP */}
       <section className="py-16 md:py-32 px-6 w-full max-w-7xl mx-auto border-t border-neutral-200 dark:border-white/[0.06] z-10 relative">
-        <BlurFade delay={0.1} duration={0.8} inView>
+        <div>
           <div className="max-w-5xl mx-auto">
           
           {/* Product statement cards. These were previously styled as pull-quotes
@@ -1275,7 +1205,7 @@ export function LinearLanding() {
           </div>
 
         </div>
-        </BlurFade>
+        </div>
       </section>
 
 
@@ -1288,24 +1218,15 @@ export function LinearLanding() {
           after the pricing section, so the last substantive argument for the
           product sat below the ask, where nobody still deciding would reach it.
           Order is now: capabilities → price → objections (FAQ) → CTA. */}
-      <BlurFade delay={0.1} duration={0.8} inView>
+      <div>
         <Features8 />
-      </BlurFade>
+      </div>
 
-      {/* MODULAR PRICING SECTION — id is load-bearing: in-page CTAs target #pricing */}
-      <section id="pricing" className="w-full border-t border-neutral-200 dark:border-white/[0.06] z-10 relative">
-        <BlurFade delay={0.1} duration={0.8} inView>
-          <PricingSection3
-            handleSelectPlan={(planId) => {
-              router.push("/pricing");
-            }}
-          />
-        </BlurFade>
-      </section>
+      
 
       {/* FAQ ACCORDION SECTION — objection handling, directly after the price */}
       <section className="py-16 md:py-32 px-6 w-full max-w-7xl mx-auto border-t border-neutral-200 dark:border-white/[0.06] z-10 relative">
-        <BlurFade delay={0.1} duration={0.8} inView>
+        <div>
           {/* Was a 4/8 split with the header stranded in the left column. Now
               the shared centered header over a single measured column, which
               is also easier to read — accordion rows no longer run 8 columns
@@ -1355,13 +1276,13 @@ export function LinearLanding() {
               </div>
             ))}
           </div>
-        </BlurFade>
+        </div>
       </section>
 
       {/* Premium Dithered CTA Section */}
-      <BlurFade delay={0.1} duration={0.8} inView>
+      <div>
         <CTASection />
-      </BlurFade>
+      </div>
 
       <Footer />
 

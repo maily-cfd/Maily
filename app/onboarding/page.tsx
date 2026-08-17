@@ -98,32 +98,9 @@ export default function OnboardingPage() {
                 if (data.completed) {
                   serverCompleted = true;
                   localStorage.setItem('onboarding_completed', 'true');
-                  // Onboarding is done — but ONLY a paid/active user lands in the app.
-                  // An unpaid user who completed the flow but abandoned checkout must
-                  // NOT be bounced to /home-feed (which would ping-pong them to
-                  // /pricing). Keep them inside onboarding, parked on the paywall
-                  // (step 13), until they actually pay & activate.
-                  try {
-                    const subRes = await fetch(`/api/subscription/status?t=${Date.now()}`);
-                    const subData = subRes.ok ? await subRes.json() : null;
-                    const planType = subData?.subscription?.planType;
-                    const isExpired = !!subData?.subscription?.isExpired;
-                    const isPaid = !!planType && planType !== 'free' && planType !== 'none' && !isExpired;
-                    if (isPaid) {
-                      console.log('📋 [Onboarding] Completed + paid — entering app.');
-                      router.replace('/home-feed');
-                    } else {
-                      console.log('🔒 [Onboarding] Completed but UNPAID — parking on paywall (step 13).');
-                      localStorage.removeItem('onboarding_completed');
-                      const stepParam = new URLSearchParams(window.location.search).get('step');
-                      if (stepParam !== '13') router.replace('/onboarding?step=13');
-                    }
-                  } catch {
-                    // On a status error, do NOT optimistically grant the app —
-                    // keep them on the paywall (fail closed for access).
-                    const stepParam = new URLSearchParams(window.location.search).get('step');
-                    if (stepParam !== '13') router.replace('/onboarding?step=13');
-                  }
+                  // Onboarding done — go straight to the app, no paywall.
+                  console.log('📋 [Onboarding] Completed — entering app.');
+                  router.replace('/home-feed');
                   return;
                 } else if (data.lastStep && data.lastStep >= 1) {
                   if (localDone) localStorage.removeItem('onboarding_completed');

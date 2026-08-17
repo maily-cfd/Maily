@@ -5,7 +5,7 @@
  * Composio's verified client (?toolkit=gmail|gcal). The pending
  * connected-account id rides in the short-lived cookie the initiate route
  * set. We verify the account reached ACTIVE on Composio's side, persist the
- * marker row (`composio:<accountId>` in arcus_integrations.access_token —
+ * marker row (`composio:<accountId>` in boult_integrations.access_token —
  * the token getters resolve the live Google token from Composio on demand),
  * and bounce back to the chat with the same success/error params the
  * connectors modal already understands.
@@ -21,7 +21,7 @@ import { auth } from '../../../../../lib/auth.js';
 import { getSupabaseAdmin } from '../../../../../lib/supabase.js';
 // @ts-ignore — JS module
 import { encrypt } from '../../../../../lib/crypto.js';
-import { getComposioAccountStatus, COMPOSIO_TOKEN_PREFIX } from '../../../../../lib/arcus/composio';
+import { getComposioAccountStatus, COMPOSIO_TOKEN_PREFIX } from '../../../../../lib/boult/composio';
 
 export const dynamic = 'force-dynamic';
 
@@ -67,9 +67,9 @@ export async function GET(request: NextRequest) {
     if (status !== 'ACTIVE') return fail('composio_pending');
 
     const supabase = getSupabaseAdmin();
-    // arcus_integrations has NO `status` column — writing it fails the upsert
+    // boult_integrations has NO `status` column — writing it fails the upsert
     // (PGRST204). A row existing = connected.
-    const { error: dbError } = await supabase.from('arcus_integrations').upsert({
+    const { error: dbError } = await supabase.from('boult_integrations').upsert({
       user_id: userId,
       provider: toolkit,
       access_token: encrypt(`${COMPOSIO_TOKEN_PREFIX}${accountId}`),
@@ -86,7 +86,7 @@ export async function GET(request: NextRequest) {
     // A fresh Gmail grant invalidates any cached "missing scopes" verdict.
     if (toolkit === 'gmail') {
       try {
-        const { invalidateGmailScope } = await import('../../../../../lib/arcus/gmail-scope');
+        const { invalidateGmailScope } = await import('../../../../../lib/boult/gmail-scope');
         await invalidateGmailScope(userId);
       } catch { /* cache module optional — non-fatal */ }
     }
@@ -97,7 +97,7 @@ export async function GET(request: NextRequest) {
     // proxy resolves by user+toolkit, and multiple ACTIVE connections for one
     // toolkit make it ambiguous. Best-effort — never blocks the reconnect.
     try {
-      const { pruneOtherComposioConnections } = await import('../../../../../lib/arcus/composio');
+      const { pruneOtherComposioConnections } = await import('../../../../../lib/boult/composio');
       const removed = await pruneOtherComposioConnections(userId, toolkit, accountId);
       if (removed) console.log(`[Composio] pruned ${removed} superseded ${toolkit} connection(s) for ${userId}`);
     } catch { /* best-effort */ }
@@ -106,11 +106,11 @@ export async function GET(request: NextRequest) {
     // reconnect. The upsert above only touches access_token/tokens, so a prior
     // status='needs_reauth' would otherwise persist and keep showing the
     // integration as "reconnect required." Best-effort + separate from the
-    // upsert: if arcus_integrations has no `status` column this throws and is
+    // upsert: if boult_integrations has no `status` column this throws and is
     // swallowed rather than failing the whole reconnect.
     const legacyProvider = toolkit === 'gcal' ? 'google_calendar' : toolkit === 'gmeet' ? 'google_meet' : 'google';
     try {
-      await supabase.from('arcus_integrations').update({ status: 'connected', updated_at: new Date().toISOString() }).eq('user_id', userId).eq('provider', toolkit);
+      await supabase.from('boult_integrations').update({ status: 'connected', updated_at: new Date().toISOString() }).eq('user_id', userId).eq('provider', toolkit);
     } catch { /* no status column — fine */ }
     try {
       await supabase.from('integration_credentials').update({ status: 'connected', updated_at: new Date().toISOString() }).eq('user_id', userId).eq('provider', legacyProvider);
@@ -123,7 +123,7 @@ export async function GET(request: NextRequest) {
     // still shows" happened: the reconnect worked, but the stale cached snapshot
     // kept rendering the banner.
     try {
-      await supabase.from('arcus_today_cache').delete().in('user_id', [userId, `${userId}::convos`]);
+      await supabase.from('boult_today_cache').delete().in('user_id', [userId, `${userId}::convos`]);
     } catch { /* cache table optional — non-fatal */ }
 
     // Return the user to where they started the reconnect (e.g. /home-feed) when

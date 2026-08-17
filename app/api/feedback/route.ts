@@ -18,7 +18,7 @@ function getCompanyFromEmail(email: string): string {
     const genericDomains = [
         'gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'live.com', 
         'icloud.com', 'mail.com', 'aol.com', 'zoho.com', 'protonmail.com', 
-        'proton.me', 'gmx.com', 'yandex.com', 'mailient.xyz'
+        'proton.me', 'gmx.com', 'yandex.com', 'maily.dev'
     ];
     if (genericDomains.includes(domain)) {
         return 'Personal';
@@ -226,8 +226,8 @@ export async function POST(req: Request) {
         `;
 
         const { data, error } = await resend.emails.send({
-            from: 'Feedback <feedback@mailient.xyz>',
-            to: ['mailient.xyz@gmail.com'],
+            from: 'Feedback <feedback@maily.dev>',
+            to: ['support.maily@gmail.com'],
             subject: `Feedback: ${displaySource}`,
             html: emailContent,
         });

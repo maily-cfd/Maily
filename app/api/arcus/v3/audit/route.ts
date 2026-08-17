@@ -1,6 +1,6 @@
 /**
- * Arcus V3 — Audit Log API
- * GET /api/arcus/v3/audit
+ * Boult V3 — Audit Log API
+ * GET /api/boult/v3/audit
  *
  * Fetches the audit log for the authenticated user.
  * Supports cursor-based pagination.
@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     logEvent({ channel: "failures", event: "❌ API Error", description: String(error) });
-    console.error('[Arcus V3] Audit log API error:', (error as Error).message);
+    console.error('[Boult V3] Audit log API error:', (error as Error).message);
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }

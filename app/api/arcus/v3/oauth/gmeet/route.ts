@@ -1,5 +1,5 @@
 /**
- * Arcus V3 — Google Meet connect.
+ * Boult V3 — Google Meet connect.
  *
  * Composio-ONLY by design. Unlike the Gmail and Calendar routes, there is no
  * own-client fallback: the Meet API v2 scopes are restricted, our own OAuth
@@ -8,7 +8,7 @@
  * configured we say so plainly rather than bouncing the user into a consent
  * screen that cannot grant what Meet needs.
  *
- * This is a SEPARATE connection from Calendar on purpose — see lib/arcus/tools/
+ * This is a SEPARATE connection from Calendar on purpose — see lib/boult/tools/
  * meet.ts. Meet links on scheduled events still come from Calendar.
  *
  * Flow:  GET here → Composio consent → /api/integrations/composio/callback?toolkit=gmeet
@@ -17,7 +17,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '../../../../../../lib/auth.js';
 import { logEvent } from '@/lib/logsso';
-import { composioEnabled, initiateComposioConnection } from '../../../../../../lib/arcus/composio';
+import { composioEnabled, initiateComposioConnection } from '../../../../../../lib/boult/composio';
 
 export const dynamic = 'force-dynamic';
 

@@ -1,13 +1,13 @@
 /**
  * GET/POST /api/home-feed/briefing-prefs
  * Read + persist how the user wants their daily briefing shaped. Thin wrapper —
- * all shape/validation/storage lives in lib/arcus/briefing-prefs.ts so the
+ * all shape/validation/storage lives in lib/boult/briefing-prefs.ts so the
  * recommendations endpoint reads the exact same source of truth.
  */
 import { NextRequest, NextResponse } from 'next/server';
 // @ts-ignore — JS module
 import { auth } from '@/lib/auth.js';
-import { coerceBriefingPrefs, getBriefingPrefs, saveBriefingPrefs, DEFAULT_BRIEFING_PREFS } from '@/lib/arcus/briefing-prefs';
+import { coerceBriefingPrefs, getBriefingPrefs, saveBriefingPrefs, DEFAULT_BRIEFING_PREFS } from '@/lib/boult/briefing-prefs';
 import { logEvent } from "@/lib/logsso";
 
 export const dynamic = 'force-dynamic';

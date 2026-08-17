@@ -24,7 +24,7 @@ export function ogImage(title: string, subtitle: string) {
         }}
       >
         <div style={{ display: "flex", fontSize: 26, letterSpacing: 8, color: "#8a8f98" }}>
-          MAILIENT
+          MAILY
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
           <div style={{ display: "flex", fontSize: 62, fontWeight: 600, lineHeight: 1.12, letterSpacing: -1.5, maxWidth: 1020 }}>
@@ -34,7 +34,7 @@ export function ogImage(title: string, subtitle: string) {
             {subtitle}
           </div>
         </div>
-        <div style={{ display: "flex", fontSize: 22, color: "#555555" }}>mailient.xyz</div>
+        <div style={{ display: "flex", fontSize: 22, color: "#555555" }}>maily.dev</div>
       </div>
     ),
     OG_SIZE,

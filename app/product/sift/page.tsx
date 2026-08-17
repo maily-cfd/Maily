@@ -31,7 +31,7 @@ export default function SiftProductPage() {
   };
 
   useEffect(() => {
-    document.title = "Sift — only what needs you | Mailient";
+    document.title = "Sift — only what needs you | Maily";
   }, []);
 
   return (
@@ -98,7 +98,7 @@ export default function SiftProductPage() {
 
           <BlurFade delay={0.28} duration={0.8} yOffset={12} inView>
             <p className="text-base md:text-[18px] text-[#8a8f98] leading-relaxed max-w-2xl mt-6 font-light font-sans">
-              Mailient separates the deals, decisions, and real requests from the newsletters and noise — automatically. You see a handful of emails a day. It handles the rest.
+              Maily separates the deals, decisions, and real requests from the newsletters and noise — automatically. You see a handful of emails a day. It handles the rest.
             </p>
           </BlurFade>
 

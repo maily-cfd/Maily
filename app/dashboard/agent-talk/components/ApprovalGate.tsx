@@ -99,7 +99,7 @@ export function ApprovalGate({ plan, onApprove, onReject, onModify, isProcessing
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="w-full bg-arcus-surface-hover border border-neutral-200 dark:border-arcus-border rounded-2xl overflow-hidden"
+      className="w-full bg-boult-surface-hover border border-neutral-200 dark:border-boult-border rounded-2xl overflow-hidden"
     >
       {/* Header */}
       <div className="px-5 py-4 border-b border-neutral-200 dark:border-white/5">
@@ -293,7 +293,7 @@ export function ApprovalGate({ plan, onApprove, onReject, onModify, isProcessing
                   </button>
                 </div>
                 <p className="text-[11px] text-black/30 dark:text-white/30 mt-3 text-center">
-                  Once approved, Arcus will execute all {plan.todos.length} steps automatically
+                  Once approved, Boult will execute all {plan.todos.length} steps automatically
                 </p>
               </div>
             )}
@@ -429,7 +429,7 @@ export function ApprovalGateCompact({ plan, onApprove, isProcessing }: {
     <motion.div
       initial={{ opacity: 0, scale: 0.98 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="bg-arcus-surface-hover border border-amber-500/20 rounded-xl p-4 my-3"
+      className="bg-boult-surface-hover border border-amber-500/20 rounded-xl p-4 my-3"
     >
       <div className="flex items-start gap-3">
         <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0">

@@ -5,11 +5,11 @@ import { HomeFeedSidebar } from "@/components/ui/home-feed-sidebar";
 import { motion } from "framer-motion";
 
 const SHIMMER =
-    "linear-gradient(110deg, transparent 18%, color-mix(in srgb, var(--arcus-fg) 14%, transparent) 50%, transparent 82%)";
+    "linear-gradient(110deg, transparent 18%, color-mix(in srgb, var(--boult-fg) 14%, transparent) 50%, transparent 82%)";
 
 function ShimmerBar({ className = "", delay = 0 }: { className?: string; delay?: number }) {
     return (
-        <div className={`relative overflow-hidden bg-arcus-fg/[0.06] ${className}`}>
+        <div className={`relative overflow-hidden bg-boult-fg/[0.06] ${className}`}>
             <motion.div
                 className="absolute inset-0 w-[220%]"
                 style={{ background: SHIMMER }}
@@ -24,7 +24,7 @@ export function AgentLoading() {
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
     return (
-        <div className="flex h-screen w-full bg-arcus-bg text-arcus-fg overflow-hidden relative">
+        <div className="flex h-screen w-full bg-boult-bg text-boult-fg overflow-hidden relative">
             <HomeFeedSidebar onCollapse={setIsSidebarCollapsed} />
 
             <div className={`flex-1 flex flex-col transition-[margin] duration-300 px-3 sm:px-6 py-4 relative ${
@@ -54,7 +54,7 @@ export function AgentLoading() {
                     <ShimmerBar className="h-3.5 w-[45%] rounded-full" delay={0.38} />
 
                     {/* Card placeholder */}
-                    <div className="mt-6 rounded-2xl border border-arcus-border bg-arcus-fg/[0.03] p-5 flex flex-col gap-3">
+                    <div className="mt-6 rounded-2xl border border-boult-border bg-boult-fg/[0.03] p-5 flex flex-col gap-3">
                         <ShimmerBar className="h-3 w-[34%] rounded-full" delay={0.24} />
                         <ShimmerBar className="h-3 w-[72%] rounded-full" delay={0.32} />
                         <ShimmerBar className="h-3 w-[56%] rounded-full" delay={0.4} />
@@ -63,7 +63,7 @@ export function AgentLoading() {
 
                 {/* Bottom prompt box */}
                 <div className="absolute bottom-10 left-6 right-6 md:left-12 md:right-12">
-                    <div className="h-20 w-full max-w-3xl mx-auto rounded-[28px] border border-arcus-border bg-arcus-fg/[0.03] relative overflow-hidden flex items-center justify-between px-7">
+                    <div className="h-20 w-full max-w-3xl mx-auto rounded-[28px] border border-boult-border bg-boult-fg/[0.03] relative overflow-hidden flex items-center justify-between px-7">
                         <div className="flex items-center gap-3">
                             <ShimmerBar className="w-8 h-8 rounded-full" />
                             <ShimmerBar className="w-8 h-8 rounded-full" delay={0.12} />
@@ -71,7 +71,7 @@ export function AgentLoading() {
                         <ShimmerBar className="h-2.5 w-44 rounded-full" delay={0.22} />
                         <div className="flex items-center gap-3">
                             <ShimmerBar className="w-8 h-8 rounded-full" delay={0.3} />
-                            <div className="w-9 h-9 rounded-full bg-arcus-fg/[0.12]" />
+                            <div className="w-9 h-9 rounded-full bg-boult-fg/[0.12]" />
                         </div>
                     </div>
                 </div>

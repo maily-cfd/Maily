@@ -17,7 +17,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
-const CRON_SECRET = process.env.CRON_SECRET || 'arcus-cron-secret';
+const CRON_SECRET = process.env.CRON_SECRET || 'boult-cron-secret';
 const STALE_MS = 4 * 60 * 1000; // refresh caches older than this
 const MAX_USERS = 40;            // bound work per tick
 
@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
   const authHeader = request.headers.get('authorization') || '';
   const ok =
     authHeader === `Bearer ${CRON_SECRET}` ||
-    request.headers.get('x-arcus-cron-secret') === CRON_SECRET ||
+    request.headers.get('x-boult-cron-secret') === CRON_SECRET ||
     request.headers.get('x-vercel-cron') === '1';
   if (!ok) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
   // Active users = those with at least one active/running agent (a good proxy for
   // "will open the dashboard soon"). Bounded per tick.
   const { data: agents } = await supabase
-    .from('arcus_agents')
+    .from('boult_agents')
     .select('user_id')
     .in('status', ['active', 'running']);
   const users = Array.from(new Set((agents || []).map((a: any) => String(a.user_id).toLowerCase()))).slice(0, MAX_USERS);
@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
 
   // Skip users whose cache is already fresh.
   const { data: caches } = await supabase
-    .from('arcus_today_cache')
+    .from('boult_today_cache')
     .select('user_id, generated_at')
     .in('user_id', users);
   const freshCutoff = Date.now() - STALE_MS;

@@ -133,7 +133,7 @@ export function IntegrationRequiredCard({ data, onAgentCreated }: IntegrationReq
   const refresh = useCallback(async () => {
     setIsRefreshing(true);
     try {
-      const res = await fetch('/api/arcus/v3/integrations');
+      const res = await fetch('/api/boult/v3/integrations');
       if (!res.ok) return;
       const json = await res.json();
       const providers: string[] = (json.integrations || []).map((i: any) => i.provider as string);
@@ -237,7 +237,7 @@ export function IntegrationRequiredCard({ data, onAgentCreated }: IntegrationReq
     setIsCreating(true);
     setError(null);
     try {
-      const res = await fetch('/api/arcus/agents/create', {
+      const res = await fetch('/api/boult/agents/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data.agentParams),
@@ -257,7 +257,7 @@ export function IntegrationRequiredCard({ data, onAgentCreated }: IntegrationReq
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: 8, scale: 0.97 }}
       transition={{ type: 'spring', damping: 28, stiffness: 320 }}
-      className="w-full max-w-[640px] mx-auto mb-4 rounded-3xl arcus-glass-card overflow-hidden"
+      className="w-full max-w-[640px] mx-auto mb-4 rounded-3xl boult-glass-card overflow-hidden"
     >
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-black/[0.06] dark:border-zinc-200/10">

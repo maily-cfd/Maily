@@ -99,7 +99,7 @@ export function DraftApprovalModal({
     const originalBody = draftData.content || '';
     const finalBody = action === 'cancelled' ? undefined : (contentRef.current?.innerText || '').trim();
     try {
-      fetch('/api/arcus/learn/draft-feedback', {
+      fetch('/api/boult/learn/draft-feedback', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -1,11 +1,11 @@
 /**
- * Arcus Background Agent — Run History
- * GET /api/arcus/agents/runs?agentId=<uuid>&limit=<n>
+ * Boult Background Agent — Run History
+ * GET /api/boult/agents/runs?agentId=<uuid>&limit=<n>
  *
  * Returns the most recent run rows for the signed-in user, optionally scoped
  * to a single agent. Backs the "Recent runs" section in the AgentsPanel UI.
  *
- * Reads from arcus_agent_runs (see supabase/migrations/arcus_agent_runs.sql);
+ * Reads from boult_agent_runs (see supabase/migrations/boult_agent_runs.sql);
  * the cron runner inserts one row per attempt and updates it with status +
  * delivery + tool_calls + artifact_links as the run progresses.
  *
@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
 
   const runQuery = (cols: string) => {
     let q = supabase
-      .from('arcus_agent_runs')
+      .from('boult_agent_runs')
       .select(cols)
       .eq('user_id', userId)
       .order('started_at', { ascending: false })
@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
   };
 
   // Try with the super-agent columns (honest outcome + full report); fall back if
-  // the migration (arcus_super_agent_v1.sql) hasn't been applied yet, so the
+  // the migration (boult_super_agent_v1.sql) hasn't been applied yet, so the
   // route never 500s on a partially-migrated DB.
   let { data, error } = await runQuery(`${BASE_COLS}, outcome_summary, report_full`);
   if (error && /(outcome_summary|report_full)/.test(error.message || '')) {

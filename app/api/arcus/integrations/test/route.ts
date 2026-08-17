@@ -1,5 +1,5 @@
 /**
- * GET /api/arcus/integrations/test?provider=<provider>
+ * GET /api/boult/integrations/test?provider=<provider>
  *
  * F6.4 — Verifies a connector actually works by making a single trivial
  * API call. Returns { ok: true, latency, scope?: string[] } on success or
@@ -31,10 +31,10 @@ async function testGmail(userId: string): Promise<TestResult> {
   const t0 = Date.now();
   // @ts-ignore — JS module path
   const { getSupabaseAdmin } = await import('../../../../../lib/supabase.js');
-  const { normalizeUserId } = await import('../../../../../lib/arcus/user-id');
+  const { normalizeUserId } = await import('../../../../../lib/boult/user-id');
   const supabase = getSupabaseAdmin();
   const { data } = await supabase
-    .from('arcus_integrations')
+    .from('boult_integrations')
     .select('access_token')
     .eq('user_id', normalizeUserId(userId))
     .eq('provider', 'gmail')
@@ -43,7 +43,7 @@ async function testGmail(userId: string): Promise<TestResult> {
 
   // @ts-ignore
   const { decrypt } = await import('../../../../../lib/crypto.js');
-  const { googleFetch } = await import('../../../../../lib/arcus/tools/http-tokens');
+  const { googleFetch } = await import('../../../../../lib/boult/tools/http-tokens');
   const token = decrypt(data.access_token);
   try {
     // googleFetch proxies through Composio for managed users (the stored token
@@ -67,10 +67,10 @@ async function testGcal(userId: string): Promise<TestResult> {
   const t0 = Date.now();
   // @ts-ignore
   const { getSupabaseAdmin } = await import('../../../../../lib/supabase.js');
-  const { normalizeUserId } = await import('../../../../../lib/arcus/user-id');
+  const { normalizeUserId } = await import('../../../../../lib/boult/user-id');
   const supabase = getSupabaseAdmin();
   const { data } = await supabase
-    .from('arcus_integrations')
+    .from('boult_integrations')
     .select('access_token')
     .eq('user_id', normalizeUserId(userId))
     .eq('provider', 'gcal')
@@ -79,7 +79,7 @@ async function testGcal(userId: string): Promise<TestResult> {
 
   // @ts-ignore
   const { decrypt } = await import('../../../../../lib/crypto.js');
-  const { googleFetch } = await import('../../../../../lib/arcus/tools/http-tokens');
+  const { googleFetch } = await import('../../../../../lib/boult/tools/http-tokens');
   const token = decrypt(data.access_token);
   try {
     // googleFetch proxies through Composio for managed users (the stored token
@@ -103,10 +103,10 @@ async function testNotion(userId: string): Promise<TestResult> {
   const t0 = Date.now();
   // @ts-ignore
   const { getSupabaseAdmin } = await import('../../../../../lib/supabase.js');
-  const { normalizeUserId } = await import('../../../../../lib/arcus/user-id');
+  const { normalizeUserId } = await import('../../../../../lib/boult/user-id');
   const supabase = getSupabaseAdmin();
   const { data } = await supabase
-    .from('arcus_integrations')
+    .from('boult_integrations')
     .select('access_token')
     .eq('user_id', normalizeUserId(userId))
     .eq('provider', 'notion')
@@ -135,10 +135,10 @@ async function testSlack(userId: string): Promise<TestResult> {
   const t0 = Date.now();
   // @ts-ignore
   const { getSupabaseAdmin } = await import('../../../../../lib/supabase.js');
-  const { normalizeUserId } = await import('../../../../../lib/arcus/user-id');
+  const { normalizeUserId } = await import('../../../../../lib/boult/user-id');
   const supabase = getSupabaseAdmin();
   const { data } = await supabase
-    .from('arcus_integrations')
+    .from('boult_integrations')
     .select('access_token')
     .eq('user_id', normalizeUserId(userId))
     .eq('provider', 'slack')

@@ -3,7 +3,7 @@ import { auth } from '@/lib/auth.js';
 import { DatabaseService } from '@/lib/supabase.js';
 import { decrypt } from '@/lib/crypto.js';
 import { GmailService } from '@/lib/gmail.ts';
-import { ArcusAIService } from '@/lib/arcus-ai.js';
+import { BoultAIService } from '@/lib/boult-ai.js';
 import { subscriptionService } from '@/lib/subscription-service.js';
 import { logEvent } from "@/lib/logsso";
 
@@ -25,7 +25,7 @@ export async function GET(request) {
     const refreshToken = userTokens.encrypted_refresh_token ? decrypt(userTokens.encrypted_refresh_token) : '';
     
     const gmailService = new GmailService(accessToken, refreshToken);
-    const arcusAI = new ArcusAIService();
+    const boultAI = new BoultAIService();
 
     // 1. Search for unreplied incoming emails older than 1 day but within 30 days
     // We search for emails in inbox that aren't from 'me' and haven't been replied to.
@@ -54,12 +54,12 @@ export async function GET(request) {
 
     const parsedEmails = emailDetails.map(details => gmailService.parseEmailData(details));
     
-    // 3. AI Usage Check (Arcus Engine)
-    // Smart Nudges consume "arcus_ai" credits
-    const canUse = await subscriptionService.canUseFeature(session.user.email, 'arcus_ai');
+    // 3. AI Usage Check (Boult Engine)
+    // Smart Nudges consume "boult_ai" credits
+    const canUse = await subscriptionService.canUseFeature(session.user.email, 'boult_ai');
     
     if (!canUse) {
-      console.log('⚠️ [Nudges API] User has exhausted Arcus AI credits');
+      console.log('⚠️ [Nudges API] User has exhausted Boult AI credits');
       return NextResponse.json({ 
         nudges: [], 
         status: 'limit_reached',
@@ -67,15 +67,15 @@ export async function GET(request) {
       }, { status: 403 });
     }
 
-    console.log('🤖 [Nudges API] Analyzing emails with Arcus AI...');
+    console.log('🤖 [Nudges API] Analyzing emails with Boult AI...');
 
     // 4. Use AI to detect which ones actually need a nudge
-    const nudges = await arcusAI.analyzeNeedsNudge(parsedEmails);
+    const nudges = await boultAI.analyzeNeedsNudge(parsedEmails);
     console.log('✅ [Nudges API] AI returned ' + (nudges?.length || 0) + ' nudges');
 
     // 5. Track successful usage
     if (nudges && nudges.length > 0) {
-      await subscriptionService.incrementFeatureUsage(session.user.email, 'arcus_ai');
+      await subscriptionService.incrementFeatureUsage(session.user.email, 'boult_ai');
     }
 
     // 6. Return nudges with some metadata

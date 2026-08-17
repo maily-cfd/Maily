@@ -26,26 +26,26 @@ export async function GET() {
 
     const prefs = (data?.preferences as Record<string, unknown>) || {};
     return NextResponse.json({
-      personality: (prefs.arcus_personality as string) || '',
-      instructionsEnabled: prefs.arcus_instructions_enabled !== false,
-      memoryEnabled: prefs.arcus_memory_enabled !== false,
+      personality: (prefs.boult_personality as string) || '',
+      instructionsEnabled: prefs.boult_instructions_enabled !== false,
+      memoryEnabled: prefs.boult_memory_enabled !== false,
       // PART 45 — user-tunable voice + length controls. Defaults are 'warm'
       // and 'normal' to match the PART 43 voice rewrite; users who want the
       // old terse style switch to 'direct' + 'brief'.
-      communicationStyle: (prefs.arcus_communication_style as string) || 'warm',
-      verbosity: (prefs.arcus_verbosity as string) || 'normal',
+      communicationStyle: (prefs.boult_communication_style as string) || 'warm',
+      verbosity: (prefs.boult_verbosity as string) || 'normal',
       // PART 47 — write-action confirmation mode. Default 'ask' (current
       // behavior: inline previews + confirm before send/schedule/post/create).
-      // Users who trust Arcus pick 'auto' — writes execute immediately, no
+      // Users who trust Boult pick 'auto' — writes execute immediately, no
       // preview, no confirmation. Persists so the choice survives reload.
-      actionMode: (prefs.arcus_action_mode as string) || 'ask',
+      actionMode: (prefs.boult_action_mode as string) || 'ask',
       // PART 61 — pre-meeting prep. Default on with a 25-minute lead time.
-      meetingPrepEnabled: prefs.arcus_meeting_prep_enabled !== false,
-      meetingPrepLeadMinutes: typeof prefs.arcus_meeting_prep_lead_minutes === 'number'
-        ? prefs.arcus_meeting_prep_lead_minutes
+      meetingPrepEnabled: prefs.boult_meeting_prep_enabled !== false,
+      meetingPrepLeadMinutes: typeof prefs.boult_meeting_prep_lead_minutes === 'number'
+        ? prefs.boult_meeting_prep_lead_minutes
         : 25,
       // PART 62 — post-meeting follow-up draft. Default on.
-      meetingFollowupEnabled: prefs.arcus_meeting_followup_enabled !== false,
+      meetingFollowupEnabled: prefs.boult_meeting_followup_enabled !== false,
     });
   } catch {
     logEvent({ channel: "failures", event: "❌ API Error", description: "Unknown error" });
@@ -118,27 +118,27 @@ export async function POST(request: NextRequest) {
       .maybeSingle();
 
     const existingPrefs = (existing?.preferences as Record<string, unknown>) || {};
-    const updatedPrefs: Record<string, unknown> = { ...existingPrefs, arcus_personality: personality };
+    const updatedPrefs: Record<string, unknown> = { ...existingPrefs, boult_personality: personality };
     if (instructionsEnabled !== undefined) {
-      updatedPrefs.arcus_instructions_enabled = instructionsEnabled;
+      updatedPrefs.boult_instructions_enabled = instructionsEnabled;
     }
     if (communicationStyle !== undefined) {
-      updatedPrefs.arcus_communication_style = communicationStyle;
+      updatedPrefs.boult_communication_style = communicationStyle;
     }
     if (verbosity !== undefined) {
-      updatedPrefs.arcus_verbosity = verbosity;
+      updatedPrefs.boult_verbosity = verbosity;
     }
     if (actionMode !== undefined) {
-      updatedPrefs.arcus_action_mode = actionMode;
+      updatedPrefs.boult_action_mode = actionMode;
     }
     if (meetingPrepEnabled !== undefined) {
-      updatedPrefs.arcus_meeting_prep_enabled = meetingPrepEnabled;
+      updatedPrefs.boult_meeting_prep_enabled = meetingPrepEnabled;
     }
     if (meetingPrepLeadMinutes !== undefined) {
-      updatedPrefs.arcus_meeting_prep_lead_minutes = meetingPrepLeadMinutes;
+      updatedPrefs.boult_meeting_prep_lead_minutes = meetingPrepLeadMinutes;
     }
     if (meetingFollowupEnabled !== undefined) {
-      updatedPrefs.arcus_meeting_followup_enabled = meetingFollowupEnabled;
+      updatedPrefs.boult_meeting_followup_enabled = meetingFollowupEnabled;
     }
 
     if (existing) {

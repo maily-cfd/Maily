@@ -15,7 +15,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
-import { composioLoginEnabled, initiateComposioConnection } from '../../../../../lib/arcus/composio';
+import { composioLoginEnabled, initiateComposioConnection } from '../../../../../lib/boult/composio';
 
 export const dynamic = 'force-dynamic';
 

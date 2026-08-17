@@ -17,7 +17,7 @@ export function NotificationIcon({ className = "", iconClassName = "", onClick }
     const loadUnreadCount = () => {
       if (typeof window !== 'undefined') {
         try {
-          const stored = localStorage.getItem('mailient_notifications');
+          const stored = localStorage.getItem('maily_notifications');
           if (stored) {
             const notifications = JSON.parse(stored);
             const unread = notifications.filter((n: any) => !n.read).length;

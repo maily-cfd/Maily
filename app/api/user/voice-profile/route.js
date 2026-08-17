@@ -201,7 +201,7 @@ async function interpretVoiceInstruction(instruction) {
     try {
         const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
             method: 'POST',
-            headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json', 'HTTP-Referer': 'https://mailient.xyz' },
+            headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json', 'HTTP-Referer': 'https://maily.dev' },
             body: JSON.stringify({
                 // nemotron-3-super-120b:free REMOVED 2026-07-19 (user report: not working —
                 // was returning empty 200s even before that). gemma-4-26b confirmed to support

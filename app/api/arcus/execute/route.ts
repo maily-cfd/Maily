@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { ArcusExecutorEngine } from '@/lib/arcus-executor-engine';
+import { BoultExecutorEngine } from '@/lib/boult-executor-engine';
 import { DatabaseService } from '@/lib/supabase';
 import { assertPaidAccess } from '@/lib/subscription-protection';
 import { logEvent } from "@/lib/logsso";
@@ -11,7 +11,7 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // STRICT paywall — Arcus execution is paid-only.
+    // STRICT paywall — Boult execution is paid-only.
     const gate = await assertPaidAccess(session.user.email);
     if (!gate.ok) {
         return NextResponse.json(
@@ -31,13 +31,13 @@ export async function POST(req: Request) {
             supabase: new DatabaseService().supabase
         };
 
-        const executor = new ArcusExecutorEngine({ supabase: executionContext.supabase });
+        const executor = new BoultExecutorEngine({ supabase: executionContext.supabase });
         const result = await executor.executePlan(plan, executionContext);
 
         return NextResponse.json(result);
     } catch (error: any) {
     logEvent({ channel: "failures", event: "❌ API Error", description: String(error) });
-        console.error('[Arcus Execute API] Error:', error);
+        console.error('[Boult Execute API] Error:', error);
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }

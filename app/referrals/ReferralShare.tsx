@@ -22,7 +22,7 @@ interface Stats {
  * sender isn't asking for a favour.
  */
 function shareMessage(link: string) {
-  return `I've been using Mailient — it runs my inbox and leaves me one briefing every morning instead of 200 emails. Here's a free month if you want to try it: ${link}`;
+  return `I've been using Maily — it runs my inbox and leaves me one briefing every morning instead of 200 emails. Here's a free month if you want to try it: ${link}`;
 }
 
 export default function ReferralShare({ stats, firstName }: { stats: Stats; firstName: string | null }) {
@@ -49,7 +49,7 @@ export default function ReferralShare({ stats, firstName }: { stats: Stats; firs
   const nativeShare = useCallback(async () => {
     if (typeof navigator !== 'undefined' && (navigator as any).share) {
       try {
-        await (navigator as any).share({ title: 'Mailient', text: message, url: link });
+        await (navigator as any).share({ title: 'Maily', text: message, url: link });
         return;
       } catch { /* user dismissed — not an error */ }
     }
@@ -58,7 +58,7 @@ export default function ReferralShare({ stats, firstName }: { stats: Stats; firs
 
   const channels = [
     { label: 'WhatsApp', href: `https://wa.me/?text=${encodeURIComponent(message)}` },
-    { label: 'Email', href: `mailto:?subject=${encodeURIComponent('A free month of Mailient')}&body=${encodeURIComponent(message)}` },
+    { label: 'Email', href: `mailto:?subject=${encodeURIComponent('A free month of Maily')}&body=${encodeURIComponent(message)}` },
     { label: 'X', href: `https://twitter.com/intent/tweet?text=${encodeURIComponent(message)}` },
     { label: 'LinkedIn', href: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(link)}` },
   ];
@@ -84,7 +84,7 @@ export default function ReferralShare({ stats, firstName }: { stats: Stats; firs
           Give a friend<br />a free month.
         </h1>
         <p className="mt-4 text-[15px] sm:text-base leading-relaxed text-neutral-600 dark:text-neutral-400 max-w-lg">
-          {firstName ? `${firstName}, anyone ` : 'Anyone '}you invite gets a full month of Mailient free — not a 3-day trial.
+          {firstName ? `${firstName}, anyone ` : 'Anyone '}you invite gets a full month of Maily free — not a 3-day trial.
           When they stay on, you get a free month too.
         </p>
 
@@ -96,7 +96,7 @@ export default function ReferralShare({ stats, firstName }: { stats: Stats; firs
             <p className="text-[14px] text-neutral-900 dark:text-neutral-200 font-medium">Your invite link isn&apos;t ready yet.</p>
             <p className="mt-1.5 text-[13px] leading-relaxed text-neutral-600 dark:text-neutral-400">
               We couldn&apos;t generate your code just now. Refresh in a moment — if it keeps happening, reply to any
-              Mailient email and we&apos;ll sort it out.
+              Maily email and we&apos;ll sort it out.
             </p>
           </div>
         )}

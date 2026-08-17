@@ -66,7 +66,7 @@ export function ArtifactsGalleryPanel({
   useEffect(() => {
     if (isOpen) {
       setIsLoadingAll(true);
-      fetch('/api/arcus/conversation')
+      fetch('/api/boult/conversation')
         .then(res => res.json())
         .then(data => {
           if (data && Array.isArray(data.sessions)) setAllSessions(data.sessions);
@@ -154,7 +154,7 @@ export function ArtifactsGalleryPanel({
     setDownloadingId(art.id);
     const safeName = art.title.replace(/\s+/g, '_').toLowerCase();
     try {
-      const { markdownToDocxBlob, triggerDocxDownload } = await import('@/lib/arcus/docx-export');
+      const { markdownToDocxBlob, triggerDocxDownload } = await import('@/lib/boult/docx-export');
       const blob = await markdownToDocxBlob(art.raw, art.title);
       triggerDocxDownload(blob, safeName);
       toast.success(`Downloaded "${art.title}"`);
@@ -329,7 +329,7 @@ export function ArtifactsGalleryPanel({
             {/* Content */}
             <div className={cn(
               "flex-1 overflow-y-auto px-6 py-5 relative z-10 select-none",
-              isDark ? "arcus-scrollbar" : "scrollbar-thin scrollbar-thumb-black/20 scrollbar-track-transparent"
+              isDark ? "boult-scrollbar" : "scrollbar-thin scrollbar-thumb-black/20 scrollbar-track-transparent"
             )}>
               {dynamicArtifacts.length > 0 ? (
                 <div className="space-y-5">
@@ -433,7 +433,7 @@ export function ArtifactsGalleryPanel({
                     Your library is empty
                   </h4>
                   <p className={cn("text-[12px] leading-relaxed max-w-[260px]", isDark ? "text-[#737373]" : "text-black/40")}>
-                    Documents, plans, and drafts created by Arcus across all your conversations will appear here — searchable and downloadable as .docx.
+                    Documents, plans, and drafts created by Boult across all your conversations will appear here — searchable and downloadable as .docx.
                   </p>
                 </div>
               )}

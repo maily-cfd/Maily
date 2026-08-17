@@ -182,7 +182,7 @@ const GlassTabContainer = React.forwardRef<HTMLDivElement, GlassTabContainerProp
           }
 
           .tab-container-liquid-lens {
-            background-color: ${glassColor || "oklch(from var(--arcus-surface) l c h / 40%)"};
+            background-color: ${glassColor || "oklch(from var(--boult-surface) l c h / 40%)"};
             backdrop-filter: blur(12px) url(#liquid-glass-${filterId}) saturate(150%);
             -webkit-backdrop-filter: blur(12px) saturate(150%);
             
@@ -203,7 +203,7 @@ const GlassTabContainer = React.forwardRef<HTMLDivElement, GlassTabContainerProp
         `}</style>
         
         <div
-          className={cn("tab-container-liquid flex items-center gap-1 p-1 rounded-full border border-arcus-border shadow-lg", className)}
+          className={cn("tab-container-liquid flex items-center gap-1 p-1 rounded-full border border-boult-border shadow-lg", className)}
           ref={ref}
           {...props}
         >

@@ -35,10 +35,10 @@ const VERBOSITY_OPTIONS: Array<{ value: Verbosity; label: string; hint: string }
 ];
 
 const placeholderVariations = [
-  'Give Arcus some context...',
-  'Describe how Arcus should behave...',
-  "Set Arcus's communication style...",
-  "Customize Arcus's personality...",
+  'Give Boult some context...',
+  'Describe how Boult should behave...',
+  "Set Boult's communication style...",
+  "Customize Boult's personality...",
 ];
 
 export function PersonalitySettingsModal({
@@ -160,10 +160,10 @@ export function PersonalitySettingsModal({
         <div className="flex items-center justify-between mb-6">
           <div className="space-y-1">
             <h2 className="text-2xl font-bold tracking-tight text-black dark:text-white">
-              Arcus Personality
+              Boult Personality
             </h2>
             <p className="text-sm text-neutral-500 dark:text-neutral-400">
-              Tell Arcus how to behave, communicate, and respond
+              Tell Boult how to behave, communicate, and respond
             </p>
           </div>
           <button
@@ -300,7 +300,7 @@ export function PersonalitySettingsModal({
         <p className="text-[12px] text-neutral-400 dark:text-white/25 mb-6 leading-relaxed">
           Tip: Write a rough description and hit{' '}
           <span className="font-semibold text-neutral-500 dark:text-white/40">Enhance</span>{' '}
-          — Arcus will expand it into a detailed professional instruction set.
+          — Boult will expand it into a detailed professional instruction set.
         </p>
 
         {/* Action buttons */}

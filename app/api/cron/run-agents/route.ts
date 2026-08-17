@@ -1,21 +1,21 @@
 /**
- * Arcus Background Agent Runner — Vercel Cron
+ * Boult Background Agent Runner — Vercel Cron
  * GET /api/cron/run-agents
  *
  * Runs every 15 minutes (configure in vercel.json).
  *
  * For each active agent whose next run time has passed:
- * 1. Runs the agent task via the Arcus agentic loop
+ * 1. Runs the agent task via the Boult agentic loop
  * 2. Delivers the report via Resend (email) and/or Slack
  * 3. Updates lastRunAt and lastReportSummary
  *
  * Required env vars:
  *   RESEND_API_KEY          — Resend API key (send email reports)
- *   RESEND_FROM_EMAIL       — Verified Resend sender, e.g. "Arcus <arcus@mailient.xyz>"
- *                             Defaults to "Arcus AI <arcus@mailient.xyz>"
+ *   RESEND_FROM_EMAIL       — Verified Resend sender, e.g. "Boult <boult@maily.dev>"
+ *                             Defaults to "Boult AI <boult@maily.dev>"
  *
  * Optional env vars:
- *   ARCUS_SLACK_BOT_TOKEN   — Slack bot token for the Mailient workspace.
+ *   BOULT_SLACK_BOT_TOKEN   — Slack bot token for the Maily workspace.
  *                             If set, used for all Slack delivery instead of
  *                             the user's personal Slack OAuth token.
  *   CRON_SECRET             — REQUIRED. cron-job.org sends this as
@@ -29,20 +29,20 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '../../../../lib/supabase.js';
 // @ts-ignore - JS module
 import { subscriptionService } from '../../../../lib/subscription-service.js';
-import { runAgentTask, generateRunPlan } from '../../../../lib/arcus/run-agent';
-import { hasPendingActions } from '../../../../lib/arcus/agent-approvals';
-import { scoreReportSignal, decideDelivery } from '../../../../lib/arcus/signal-density';
-import { checkEventAgents, mergeProcessedIds } from '../../../../lib/arcus/triggers/reactive-poll';
-import { enqueueChainHandoff, drainChainQueue } from '../../../../lib/arcus/triggers/chain';
+import { runAgentTask, generateRunPlan } from '../../../../lib/boult/run-agent';
+import { hasPendingActions } from '../../../../lib/boult/agent-approvals';
+import { scoreReportSignal, decideDelivery } from '../../../../lib/boult/signal-density';
+import { checkEventAgents, mergeProcessedIds } from '../../../../lib/boult/triggers/reactive-poll';
+import { enqueueChainHandoff, drainChainQueue } from '../../../../lib/boult/triggers/chain';
 // @ts-ignore — JS module, no .d.ts
 import { EmailUI } from '../../../../lib/email-design.js';
-import { drainScheduledEmails } from '../../../../lib/arcus/scheduled-send';
-import { drainAutonomyActions } from '../../../../lib/arcus/autonomy-drain';
-import { reconcileLedger } from '../../../../lib/arcus/super/ledger';
+import { drainScheduledEmails } from '../../../../lib/boult/scheduled-send';
+import { drainAutonomyActions } from '../../../../lib/boult/autonomy-drain';
+import { reconcileLedger } from '../../../../lib/boult/super/ledger';
 import { logEvent } from "@/lib/logsso";
 
-const CRON_SECRET = process.env.CRON_SECRET || 'arcus-cron-secret';
-const RESEND_FROM = process.env.RESEND_FROM_EMAIL || 'Arcus AI <arcus@mailient.xyz>';
+const CRON_SECRET = process.env.CRON_SECRET || 'boult-cron-secret';
+const RESEND_FROM = process.env.RESEND_FROM_EMAIL || 'Boult AI <boult@maily.dev>';
 
 // A 'running' row older than this is treated as a crashed/timed-out run
 // (stuck lock) and is allowed to run again, instead of being excluded forever.
@@ -67,7 +67,7 @@ export async function GET(request: NextRequest) {
   const authHeader = request.headers.get('authorization') || '';
   const isCronJobOrg =
     authHeader === `Bearer ${CRON_SECRET}` ||
-    request.headers.get('x-arcus-cron-secret') === CRON_SECRET;
+    request.headers.get('x-boult-cron-secret') === CRON_SECRET;
   const isVercelCron = request.headers.get('x-vercel-cron') === '1';
   if (!isCronJobOrg && !isVercelCron) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -91,7 +91,7 @@ export async function GET(request: NextRequest) {
   const reapCutoffIso = new Date(Date.now() - (maxDuration + 120) * 1000).toISOString();
   try {
     await supabase
-      .from('arcus_agent_runs')
+      .from('boult_agent_runs')
       .update({
         status: 'error',
         error_message: 'Run was cut short by the serverless time limit before it finished. It will retry on the next scheduled run.',
@@ -100,7 +100,7 @@ export async function GET(request: NextRequest) {
       .eq('status', 'running')
       .lt('started_at', reapCutoffIso);
     await supabase
-      .from('arcus_agents')
+      .from('boult_agents')
       .update({ status: 'active' })
       .eq('status', 'running')
       .lt('last_run_at', reapCutoffIso);
@@ -113,7 +113,7 @@ export async function GET(request: NextRequest) {
   // risk a double-send. (No-op if the autonomy table isn't migrated.)
   try {
     await supabase
-      .from('arcus_autonomy_actions')
+      .from('boult_autonomy_actions')
       .update({ status: 'failed', error: 'Interrupted by the serverless time limit; not retried to avoid a double-send.', executed_at: new Date().toISOString() })
       .eq('status', 'executing')
       .lt('execute_at', reapCutoffIso);
@@ -121,12 +121,12 @@ export async function GET(request: NextRequest) {
     logEvent({ channel: "failures", event: "❌ API Error", description: "Unknown error" }); /* table optional */ }
 
   const { data: agents, error } = await supabase
-    .from('arcus_agents')
+    .from('boult_agents')
     .select('*')
     .in('status', ['active', 'running']);
 
   if (error?.code === '42P01') {
-    return NextResponse.json({ message: 'arcus_agents table not found — skipping.' });
+    return NextResponse.json({ message: 'boult_agents table not found — skipping.' });
   }
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   if (!agents?.length) {
@@ -219,7 +219,7 @@ export async function GET(request: NextRequest) {
       const expiryEnd = new Date(`${agent.expires_at}T23:59:59Z`).getTime();
       if (now.getTime() > expiryEnd) {
         if (agent.status !== 'paused') {
-          await supabase.from('arcus_agents').update({ status: 'paused' }).eq('id', agent.id);
+          await supabase.from('boult_agents').update({ status: 'paused' }).eq('id', agent.id);
           results.push(`Expired (paused): ${agent.name}`);
         }
         continue;
@@ -282,7 +282,7 @@ export async function GET(request: NextRequest) {
   if (polledNotFired.length) {
     const polledAt = now.toISOString();
     await Promise.all(polledNotFired.map(a =>
-      supabase.from('arcus_agents')
+      supabase.from('boult_agents')
         // Clear force_poll too — the real-time nudge has now been serviced.
         .update({ agent_state: { ...(a.agent_state || {}), last_polled_at: polledAt, force_poll: false } })
         .eq('id', a.id),
@@ -295,7 +295,7 @@ export async function GET(request: NextRequest) {
   try {
     const drained = await drainChainQueue(supabase);
     for (const d of drained) {
-      const { data: child } = await supabase.from('arcus_agents').select('*').eq('id', d.agentId).maybeSingle();
+      const { data: child } = await supabase.from('boult_agents').select('*').eq('id', d.agentId).maybeSingle();
       if (!child || child.status === 'paused') continue;
       if (child.expires_at && now.getTime() > new Date(`${child.expires_at}T23:59:59Z`).getTime()) continue;
       if (!(child.user_id in paidMap)) {
@@ -383,7 +383,7 @@ export async function GET(request: NextRequest) {
   const nowIso = now.toISOString();
   await Promise.all(
     readyToRun.map(a =>
-      supabase.from('arcus_agents')
+      supabase.from('boult_agents')
         .update({ status: 'running', last_run_at: nowIso })
         .eq('id', a.id),
     ),
@@ -393,12 +393,12 @@ export async function GET(request: NextRequest) {
     readyToRun.map(async (agent) => {
       results.push(`Running: ${agent.name} (${agent.user_id})`);
       // FX.2 — Insert a run record so we have history beyond just the
-      // most-recent on arcus_agents. Updated in-flight as the run progresses.
+      // most-recent on boult_agents. Updated in-flight as the run progresses.
       const runStartedAt = new Date();
       let runRecordId: string | null = null;
       try {
         const { data: runRecord } = await supabase
-          .from('arcus_agent_runs')
+          .from('boult_agent_runs')
           .insert({
             agent_id: agent.id,
             user_id: agent.user_id,
@@ -435,7 +435,7 @@ export async function GET(request: NextRequest) {
           // generateRunPlan enforces this via deadlineAt — it's what actually caps the call.
           const plan = await generateRunPlan(agent, { deadlineMs: planBudgetMs });
           if (plan) {
-            await supabase.from('arcus_agent_runs').update({ plan }).eq('id', runRecordId);
+            await supabase.from('boult_agent_runs').update({ plan }).eq('id', runRecordId);
           }
         } catch (e: any) {
           logEvent({ channel: "failures", event: "❌ API Error", description: String(e) });
@@ -472,7 +472,7 @@ export async function GET(request: NextRequest) {
           results.push(`Skipped (AI unavailable): ${agent.name}`);
           if (runRecordId) {
             try {
-              await supabase.from('arcus_agent_runs').update({
+              await supabase.from('boult_agent_runs').update({
                 completed_at: new Date().toISOString(),
                 duration_ms: Date.now() - runStartedAt.getTime(),
                 // 'failed' is a known-valid status; the summary explains it was a
@@ -545,7 +545,7 @@ export async function GET(request: NextRequest) {
           };
         }
         await supabase
-          .from('arcus_agents')
+          .from('boult_agents')
           .update(agentUpdate)
           .eq('id', agent.id);
 
@@ -602,7 +602,7 @@ export async function GET(request: NextRequest) {
           };
           try {
             const { error: coreErr } = await supabase
-              .from('arcus_agent_runs')
+              .from('boult_agent_runs')
               .update(coreUpdate)
               .eq('id', runRecordId);
             if (coreErr) {
@@ -615,7 +615,7 @@ export async function GET(request: NextRequest) {
           try {
             const errBlob = !emailOk ? ` · email_err: ${emailErr}` : '';
             await supabase
-              .from('arcus_agent_runs')
+              .from('boult_agent_runs')
               .update({
                 signal_score: signal.score,
                 delivery_decision: `${decision.reason}${errBlob} · ${signal.reasons.slice(0, 3).join(' | ')}`.slice(0, 500),
@@ -630,7 +630,7 @@ export async function GET(request: NextRequest) {
             const superUpdate: Record<string, any> = {};
             if (outcomeSummary) superUpdate.outcome_summary = outcomeSummary;
             superUpdate.report_full = report.slice(0, 20000);
-            await supabase.from('arcus_agent_runs').update(superUpdate).eq('id', runRecordId);
+            await supabase.from('boult_agent_runs').update(superUpdate).eq('id', runRecordId);
           } catch {
             logEvent({ channel: "failures", event: "❌ API Error", description: "Unknown error" }); /* non-fatal */ }
         }
@@ -675,7 +675,7 @@ export async function GET(request: NextRequest) {
           : `Error: ${err.message}`;
 
         await supabase
-          .from('arcus_agents')
+          .from('boult_agents')
           .update({ status: 'active', last_run_at: retryStamp, last_report_summary: summary })
           .eq('id', agent.id);
 
@@ -683,7 +683,7 @@ export async function GET(request: NextRequest) {
         if (runRecordId) {
           try {
             await supabase
-              .from('arcus_agent_runs')
+              .from('boult_agent_runs')
               .update({
                 completed_at: new Date().toISOString(),
                 duration_ms: Date.now() - runStartedAt.getTime(),
@@ -863,7 +863,7 @@ async function sendEmailReport(toEmail: string, agentName: string, report: strin
   const date = new Date().toLocaleDateString('en-US', {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
   });
-  const subject = `${agentName} — Your Arcus Report for ${date}`;
+  const subject = `${agentName} — Your Boult Report for ${date}`;
   const html = buildReportHtml(agentName, date, report, hasPending);
 
   // Fix 8 — retry once on transient failures (5xx / network). 4xx (bad email,
@@ -874,7 +874,7 @@ async function sendEmailReport(toEmail: string, agentName: string, report: strin
     try {
       const { error } = await resend.emails.send({
         from: RESEND_FROM,
-        replyTo: 'mailient.xyz@gmail.com',
+        replyTo: 'support.maily@gmail.com',
         to: toEmail,
         subject,
         html,
@@ -1080,8 +1080,8 @@ function buildReportHtml(agentName: string, date: string, report: string, hasPen
     : '';
 
   const cta = hasPending
-    ? UI.button('Review queued actions', 'https://mailient.xyz/dashboard?tab=agents&approve=pending')
-    : UI.button('Open dashboard', 'https://mailient.xyz/dashboard');
+    ? UI.button('Review queued actions', 'https://maily.dev/dashboard?tab=agents&approve=pending')
+    : UI.button('Open dashboard', 'https://maily.dev/dashboard');
 
   const content = `
     ${pendingBanner}
@@ -1095,13 +1095,13 @@ function buildReportHtml(agentName: string, date: string, report: string, hasPen
 
   return UI.shell({
     // The agent's name is the headline — this is a report FROM a named
-    // employee, not from a system. The old "ARCUS AUTONOMOUS REPORT // ID //
+    // employee, not from a system. The old "BOULT AUTONOMOUS REPORT // ID //
     // SECURE" monospace footer was theatre; it made a briefing look like a
     // machine log, so it is gone.
     title: agentName,
     eyebrow: date,
     content,
-    footerNote: hasPending ? 'Actions are waiting for your approval.' : 'Your briefing from Arcus.',
+    footerNote: hasPending ? 'Actions are waiting for your approval.' : 'Your briefing from Boult.',
   });
 }
 
@@ -1116,14 +1116,14 @@ async function sendSlackReport(userId: string, channel: string | null, agentName
   // making every failure invisible.
 
   // Platform-level bot token takes priority — no user token needed if configured.
-  // Fall back to the user's own Slack OAuth token from arcus_integrations.
-  let token: string | null = process.env.ARCUS_SLACK_BOT_TOKEN || null;
+  // Fall back to the user's own Slack OAuth token from boult_integrations.
+  let token: string | null = process.env.BOULT_SLACK_BOT_TOKEN || null;
 
   if (!token) {
     const { decrypt } = await import('../../../../lib/crypto.js');
     const supabase = getSupabaseAdmin();
     const { data } = await supabase
-      .from('arcus_integrations')
+      .from('boult_integrations')
       .select('access_token')
       .eq('user_id', userId)
       .eq('provider', 'slack')
@@ -1131,7 +1131,7 @@ async function sendSlackReport(userId: string, channel: string | null, agentName
     if (!data?.access_token) {
       // No token available — this is a config issue, not a transient failure.
       // Throw so the caller records slack_delivery: 'failed'.
-      throw new Error(`No Slack token for user ${userId} and ARCUS_SLACK_BOT_TOKEN not set.`);
+      throw new Error(`No Slack token for user ${userId} and BOULT_SLACK_BOT_TOKEN not set.`);
     }
     token = decrypt(data.access_token);
   }
@@ -1147,7 +1147,7 @@ async function sendSlackReport(userId: string, channel: string | null, agentName
     const lookupJson = await lookupRes.json() as any;
     if (!lookupJson.ok || !lookupJson.user?.id) {
       // Fix 2 — throw instead of returning silently. Common cause: user's
-      // Mailient email doesn't match their Slack workspace email.
+      // Maily email doesn't match their Slack workspace email.
       throw new Error(`Slack users.lookupByEmail failed for ${userId}: ${lookupJson.error ?? 'users_not_found'} — user's login email may differ from their Slack email.`);
     }
     const slackUserId = lookupJson.user.id;
@@ -1178,7 +1178,7 @@ async function sendSlackReport(userId: string, channel: string | null, agentName
     body: JSON.stringify({
       channel: targetChannel,
       blocks,
-      text: `${agentName} — Arcus Report for ${date}`,
+      text: `${agentName} — Boult Report for ${date}`,
     }),
     signal: AbortSignal.timeout(10000),
   });
@@ -1233,7 +1233,7 @@ function buildSlackBlocks(agentName: string, date: string, report: string, hasPe
       accessory: {
         type: 'button',
         text: { type: 'plain_text', text: 'Review', emoji: false },
-        url: 'https://mailient.xyz/dashboard?tab=agents&approve=pending',
+        url: 'https://maily.dev/dashboard?tab=agents&approve=pending',
         style: 'primary',
       },
     },
@@ -1252,7 +1252,7 @@ function buildSlackBlocks(agentName: string, date: string, report: string, hasPe
     },
     {
       type: 'context',
-      elements: [{ type: 'mrkdwn', text: `Arcus · ${date}` }],
+      elements: [{ type: 'mrkdwn', text: `Boult · ${date}` }],
     },
     { type: 'divider' },
     ...pendingBlock,
@@ -1263,7 +1263,7 @@ function buildSlackBlocks(agentName: string, date: string, report: string, hasPe
     {
       type: 'context',
       elements: [
-        { type: 'mrkdwn', text: `<https://mailient.xyz/dashboard|Open dashboard> · ${new Date().toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true })}` },
+        { type: 'mrkdwn', text: `<https://maily.dev/dashboard|Open dashboard> · ${new Date().toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true })}` },
       ],
     },
   ];
@@ -1279,7 +1279,7 @@ function buildSlackBlocks(agentName: string, date: string, report: string, hasPe
     const truncated = bodyBlocks.slice(0, maxBodyBlocks - 1);
     truncated.push({
       type: 'section',
-      text: { type: 'mrkdwn', text: '_Report truncated — <https://mailient.xyz/dashboard?tab=agents|view full report on dashboard>_' },
+      text: { type: 'mrkdwn', text: '_Report truncated — <https://maily.dev/dashboard?tab=agents|view full report on dashboard>_' },
     });
     // Rebuild blocks array with truncated body
     const insertIdx = blocks.indexOf(bodyBlocks[0]);
@@ -1298,7 +1298,7 @@ async function sendErrorNotification(agent: any, errorMessage: string): Promise<
     weekday: 'short', month: 'short', day: 'numeric',
     hour: 'numeric', minute: '2-digit', hour12: true,
   });
-  const report = `# ⚠️ Agent Run Failed — ${agent.name}\n\nYour agent **${agent.name}** encountered an issue during its scheduled run at ${ts}.\n\n**Error:** ${errorMessage}\n\nThe agent has been kept active and will attempt to run again at its next scheduled time. If this error repeats, check your connected integrations or update the agent's task description.\n\n_If you need help, reply to this message or visit [mailient.xyz](https://mailient.xyz)._`;
+  const report = `# ⚠️ Agent Run Failed — ${agent.name}\n\nYour agent **${agent.name}** encountered an issue during its scheduled run at ${ts}.\n\n**Error:** ${errorMessage}\n\nThe agent has been kept active and will attempt to run again at its next scheduled time. If this error repeats, check your connected integrations or update the agent's task description.\n\n_If you need help, reply to this message or visit [maily.dev](https://maily.dev)._`;
 
   // Fix 7 — use Promise.allSettled so both channels are always attempted.
   // Previously sequential await meant email failure blocked Slack notification.

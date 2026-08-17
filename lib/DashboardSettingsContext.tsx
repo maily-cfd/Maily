@@ -24,8 +24,8 @@ interface DashboardSettings {
 interface DashboardSettingsContextType {
     settings: DashboardSettings;
     updateSetting: (key: keyof DashboardSettings, value: any) => void;
-    isArcusOpen: boolean;
-    setIsArcusOpen: (open: boolean) => void;
+    isBoultOpen: boolean;
+    setIsBoultOpen: (open: boolean) => void;
     resetCache: () => void;
     relaunchApp: () => void;
     showNotification: (title: string, options?: NotificationOptions) => void;
@@ -55,13 +55,13 @@ const DashboardSettingsContext = createContext<DashboardSettingsContextType | un
 
 export function DashboardSettingsProvider({ children }: { children: React.ReactNode }) {
     const [settings, setSettings] = useState<DashboardSettings>(defaultSettings);
-    const [isArcusOpen, setIsArcusOpen] = useState(false);
+    const [isBoultOpen, setIsBoultOpen] = useState(false);
     const [subscriptionData, setSubscriptionData] = useState<any>(null);
     const { data: session } = useSession();
 
     // Load settings from localStorage
     useEffect(() => {
-        const saved = localStorage.getItem('mailient_dashboard_settings');
+        const saved = localStorage.getItem('maily_dashboard_settings');
         if (saved) {
             try {
                 setSettings({ ...defaultSettings, ...JSON.parse(saved) });
@@ -75,12 +75,12 @@ export function DashboardSettingsProvider({ children }: { children: React.ReactN
     const updateSetting = useCallback((key: keyof DashboardSettings, value: any) => {
         setSettings(prev => {
             const next = { ...prev, [key]: value };
-            localStorage.setItem('mailient_dashboard_settings', JSON.stringify(next));
+            localStorage.setItem('maily_dashboard_settings', JSON.stringify(next));
             return next;
         });
     }, []);
 
-    // Keyboard shortcut listener for Arcus (Ctrl+K / Cmd+K)
+    // Keyboard shortcut listener for Boult (Ctrl+K / Cmd+K)
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
@@ -88,7 +88,7 @@ export function DashboardSettingsProvider({ children }: { children: React.ReactN
             
             if (modifier && e.key.toLowerCase() === 'k') {
                 e.preventDefault();
-                setIsArcusOpen(prev => !prev);
+                setIsBoultOpen(prev => !prev);
                 if (settings.soundEffects) {
                     playSystemSound('toggle');
                 }
@@ -160,8 +160,8 @@ export function DashboardSettingsProvider({ children }: { children: React.ReactN
         <DashboardSettingsContext.Provider value={{ 
             settings, 
             updateSetting, 
-            isArcusOpen, 
-            setIsArcusOpen,
+            isBoultOpen, 
+            setIsBoultOpen,
             resetCache,
             relaunchApp,
             showNotification,

@@ -1,6 +1,6 @@
 'use client';
 /**
- * Arcus V3 — SSE Hook
+ * Boult V3 — SSE Hook
  * Connects to the plan execution SSE stream.
  */
 import { useEffect, useCallback, useRef } from 'react';
@@ -23,7 +23,7 @@ export function usePlanSSE(planId: string | null, onEvent: (e: SSEEvent) => void
   useEffect(() => {
     if (!planId) return;
 
-    const es = new EventSource(`/api/arcus/v3/plans/${planId}/stream`, {
+    const es = new EventSource(`/api/boult/v3/plans/${planId}/stream`, {
       withCredentials: true,
     });
 
@@ -45,15 +45,15 @@ export function usePlanSSE(planId: string | null, onEvent: (e: SSEEvent) => void
 }
 
 /**
- * Hook for listening to global Arcus feed events (new plans).
+ * Hook for listening to global Boult feed events (new plans).
  */
-export function useArcusFeedSSE(onEvent: (e: SSEEvent) => void) {
+export function useBoultFeedSSE(onEvent: (e: SSEEvent) => void) {
   const onEventRef = useRef(onEvent);
   onEventRef.current = onEvent;
 
   useEffect(() => {
     // For feed-level notifications, we use a global stream
-    const es = new EventSource(`/api/arcus/v3/plans/feed/stream`, {
+    const es = new EventSource(`/api/boult/v3/plans/feed/stream`, {
       withCredentials: true,
     });
 

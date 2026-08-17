@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
 
     const supabase = getSupabaseAdmin();
     const { data, error } = await supabase
-      .from('arcus_audit_log')
+      .from('boult_audit_log')
       .select('*')
       .eq('user_id', userEmail)
       .order('created_at', { ascending: false })

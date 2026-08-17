@@ -1,14 +1,14 @@
-Contact: mailto:security@mailient.xyz
+Contact: mailto:security@maily.dev
 Expires: 2027-12-31T23:59:59.000Z
 Preferred-Languages: en
-Canonical: https://mailient.xyz/.well-known/security.txt
-Policy: https://mailient.xyz/privacy-policy
+Canonical: https://maily.dev/.well-known/security.txt
+Policy: https://maily.dev/privacy-policy
 
-# Mailient Security Disclosure Policy
+# Maily Security Disclosure Policy
 #
-# If you discover a security vulnerability in Mailient, we ask that you:
+# If you discover a security vulnerability in Maily, we ask that you:
 #
-# 1. Email security@mailient.xyz with details of the vulnerability
+# 1. Email security@maily.dev with details of the vulnerability
 # 2. Do not publicly disclose the issue until we've had time to address it
 # 3. Do not access or modify user data without explicit permission
 # 4. Provide sufficient information to reproduce the issue
@@ -20,8 +20,8 @@ Policy: https://mailient.xyz/privacy-policy
 # - Crediting you (if desired) in our security acknowledgments
 #
 # Scope:
-# - mailient.xyz and all subdomains
-# - Mailient API endpoints
+# - maily.dev and all subdomains
+# - Maily API endpoints
 # - Authentication and session management
 # - Data encryption and storage
 #

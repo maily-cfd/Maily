@@ -1,9 +1,9 @@
 /**
- * F5 — Arcus migration health check.
+ * F5 — Boult migration health check.
  *
- * GET /api/arcus/health/migrations
+ * GET /api/boult/health/migrations
  *
- * Probes Supabase for the existence of the tables Arcus depends on. Returns
+ * Probes Supabase for the existence of the tables Boult depends on. Returns
  * a structured JSON the settings card can read to show a red "memory not
  * configured" banner when a migration was never applied to the live project.
  *
@@ -20,18 +20,18 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const REQUIRED_TABLES = [
-  'arcus_memories',
-  'arcus_agent_runs',
-  'arcus_agent_scratchpad',
-  'arcus_agents',
-  'arcus_delegation_rules',
+  'boult_memories',
+  'boult_agent_runs',
+  'boult_agent_scratchpad',
+  'boult_agents',
+  'boult_delegation_rules',
 ] as const;
 
 // Columns that must exist or a feature silently no-ops. The triggers migration
-// (arcus_agents_triggers_v1.sql) adds these — without it, every agent defaults
+// (boult_agents_triggers_v1.sql) adds these — without it, every agent defaults
 // to 'schedule' and event/condition/pipeline agents never fire, with no error.
 const REQUIRED_COLUMNS: { table: string; column: string; feature: string }[] = [
-  { table: 'arcus_agents', column: 'trigger_type', feature: 'reactive/event/pipeline triggers' },
+  { table: 'boult_agents', column: 'trigger_type', feature: 'reactive/event/pipeline triggers' },
 ];
 
 type TableStatus = 'ok' | 'missing' | 'error';

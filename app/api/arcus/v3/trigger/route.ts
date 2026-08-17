@@ -1,10 +1,10 @@
 /**
- * Arcus V3 — Manual Trigger & Plan Mode
- * POST /api/arcus/v3/trigger
+ * Boult V3 — Manual Trigger & Plan Mode
+ * POST /api/boult/v3/trigger
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '../../../../../lib/auth.js';
-import { enqueueEvent } from '../../../../../lib/arcus-v3/queue';
+import { enqueueEvent } from '../../../../../lib/boult-v3/queue';
 import { logEvent } from "@/lib/logsso";
 
 export async function POST(request: NextRequest) {
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ status: 'queued', enqueued });
   } catch (error) {
     logEvent({ channel: "failures", event: "❌ API Error", description: String(error) });
-    console.error('[Arcus V3] Manual trigger error:', (error as Error).message);
+    console.error('[Boult V3] Manual trigger error:', (error as Error).message);
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }

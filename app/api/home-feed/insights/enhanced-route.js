@@ -325,7 +325,7 @@ function transformIntelligenceToHomeFeedCards(intelligence) {
       const action = highlights.recommended_action;
       insights.push({
         id: 'recommended-action',
-        type: 'arcus-suggestion',
+        type: 'boult-suggestion',
         title: 'Recommended Action',
         subtitle: `Priority: ${action.priority?.toUpperCase()}`,
         content: `${action.action}. Rationale: ${action.rationale}. Expected impact: ${action.expected_impact}. Time required: ${action.time_required}`,
@@ -527,7 +527,7 @@ function generateFounderFallbackInsights() {
     ai_highlights: [
       {
         id: 'fallback-ai-connect',
-        type: 'arcus-suggestion',
+        type: 'boult-suggestion',
         title: 'Recommended Action',
         subtitle: 'AI-powered guidance',
         content: 'Connect your Gmail to receive personalized AI recommendations for growing your startup.',

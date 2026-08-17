@@ -3,7 +3,7 @@
 /**
  * ConnectorBar Component - Phase 4
  * 
- * Displays connector icons in the prompt box with "Connect your tools to Arcus" CTA
+ * Displays connector icons in the prompt box with "Connect your tools to Boult" CTA
  * Matches Manus AI style with black/white premium aesthetic
  */
 
@@ -111,7 +111,7 @@ export function ConnectorBar({ connectors, onOpenConnectors, className }: Connec
         <Link2 className="w-3.5 h-3.5 text-black/40 dark:text-white/40" />
         <span className="text-[12px] text-black/60 dark:text-white/50 group-hover/link:text-black dark:group-hover/link:text-white transition-colors">
           {connectedCount === 0 
-            ? "Connect your tools to Arcus" 
+            ? "Connect your tools to Boult" 
             : `${connectedCount}/${totalCount} connected`
           }
         </span>

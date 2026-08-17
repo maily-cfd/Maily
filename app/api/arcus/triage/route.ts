@@ -1,6 +1,6 @@
 /**
- * Arcus Proactive Triage — Feature 5
- * POST /api/arcus/triage
+ * Boult Proactive Triage — Feature 5
+ * POST /api/boult/triage
  *
  * Runs a focused inbox scan and surfaces what matters:
  *  - Urgent emails requiring immediate action
@@ -19,7 +19,7 @@ import { assertPaidAccess } from '../../../../lib/subscription-protection.js';
 const auth: any = nextAuth;
 import { getSupabaseAdmin } from '../../../../lib/supabase.js';
 import { decrypt } from '../../../../lib/crypto.js';
-import { googleFetch } from '../../../../lib/arcus/tools/http-tokens';
+import { googleFetch } from '../../../../lib/boult/tools/http-tokens';
 import { logEvent } from "@/lib/logsso";
 
 export const maxDuration = 55;
@@ -38,7 +38,7 @@ async function getGmailToken(userId: string): Promise<string | null> {
   if (tokens?.encrypted_access_token) return decrypt(tokens.encrypted_access_token);
 
   const { data: integ } = await supabase
-    .from('arcus_integrations')
+    .from('boult_integrations')
     .select('access_token')
     .eq('user_id', uid)
     .eq('provider', 'gmail')
@@ -69,7 +69,7 @@ async function matchDelegationRules(
   try {
     const supabase = getSupabaseAdmin();
     const { data: rules } = await supabase
-      .from('arcus_delegation_rules')
+      .from('boult_delegation_rules')
       .select('*')
       .eq('user_id', userId)
       .eq('is_active', true);
@@ -98,7 +98,7 @@ export async function POST(req: NextRequest) {
     const userEmail = session?.user?.email?.toLowerCase();
     if (!userEmail) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    // STRICT paywall — Arcus triage is paid-only.
+    // STRICT paywall — Boult triage is paid-only.
     const gate = await assertPaidAccess(userEmail);
     if (!gate.ok) {
       return NextResponse.json(

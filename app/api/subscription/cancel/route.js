@@ -4,7 +4,7 @@ import { subscriptionService } from '@/lib/subscription-service';
 import { Resend } from 'resend';
 import { logEvent } from "@/lib/logsso";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 /**
  * POST - Cancel user's subscription
@@ -80,10 +80,11 @@ export async function POST(request) {
         }
 
         // Send feedback email via Resend
-        try {
-            await resend.emails.send({
-                from: 'Mailient <onboarding@resend.dev>',
-                to: 'mailient.xyz@gmail.com',
+        if (resend) {
+            try {
+                await resend.emails.send({
+                from: 'Maily <onboarding@resend.dev>',
+                to: 'support.maily@gmail.com',
                 subject: `📉 Subscription Cancelled: ${userName}`,
                 html: `
                     <div style="font-family: sans-serif; padding: 20px; color: #333;">
@@ -104,10 +105,11 @@ export async function POST(request) {
                     </div>
                 `
             });
-            console.log('📧 Feedback email sent to mailient.xyz@gmail.com');
+            console.log('📧 Feedback email sent to support.maily@gmail.com');
         } catch (emailError) {
         logEvent({ channel: "failures", event: "❌ API Error", description: String(emailError) });
             console.error('❌ Failed to send feedback email:', emailError);
+        }
         }
 
         return NextResponse.json({

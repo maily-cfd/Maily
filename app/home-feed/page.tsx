@@ -79,16 +79,17 @@ function HomeFeedContent() {
   }, [searchParams]);
 
   // Command Center's "Draft reply" hands off here when a thread ALREADY has a
-  // Gmail draft — instead of sending a redundant prompt to Arcus, stash the
+  // Gmail draft — instead of sending a redundant prompt to Boult, stash the
   // existing draft's content for the Inbox tab's own draft-reply box to pick
-  // up (mirrors the established 'arcus_prefill' sessionStorage handoff), then
+  // up (mirrors the established 'boult_prefill' sessionStorage handoff), then
   // switch tabs so the user lands right on it, ready to review and send.
   const openExistingDraft = useCallback((draft: { threadId: string; to: string; subject: string; body: string; isHtml: boolean }) => {
     try { sessionStorage.setItem('hf_open_draft', JSON.stringify(draft)); } catch { /* incognito */ }
     switchTab('inbox');
   }, [switchTab]);
 
-  // Check authentication, subscription status, and onboarding status
+
+  // Check authentication only — all authenticated users have full access.
   useEffect(() => {
     if (status === "loading") return;
 
@@ -98,183 +99,18 @@ function HomeFeedContent() {
     }
 
     if (status === "authenticated" && session?.user?.email) {
-      // Run the access check exactly once per mount. NextAuth can hand us a new
-      // `session` object reference on re-render; without this guard the effect
-      // re-fires and spins up overlapping polling loops — the "stuck in a loop"
-      // the user saw in the console.
-      if (verifyRanRef.current) return;
-      verifyRanRef.current = true;
-
-      const checkAccessAndSubscription = async () => {
-        try {
-          // Detect if user might have just returned from payment or activation
-          const mightHaveJustPaid = () => {
-            // Check if we already verified in this tab session to prevent infinite reload loops
-            const alreadyVerified = sessionStorage.getItem('activation_verified_this_session');
-            if (alreadyVerified === 'true') return false;
-
-            const referrer = document.referrer || '';
-            const pendingPlan = localStorage.getItem('pending_plan');
-            const pendingTimestamp = localStorage.getItem('pending_plan_timestamp');
-
-            const isFromPayment = referrer.includes('polar.sh') ||
-              referrer.includes('whop.com') ||
-              referrer.includes('/payment-success');
-
-            const hasPendingPlan = pendingPlan && pendingTimestamp &&
-              (Date.now() - parseInt(pendingTimestamp)) < 10 * 60 * 1000; // 10 min window
-
-            return isFromPayment || !!hasPendingPlan;
-          };
-
-          const justPaid = mightHaveJustPaid();
-          if (justPaid) {
-            setIsVerifyingPayment(true);
-          }
-
-          const maxRetries = justPaid ? 20 : 1; // 20 retries x 3s = 60 seconds
-          const retryDelay = 3000;
-          let triedVerify = false; // one-shot Polar reconcile before denying
-
-          console.log('📡 [HomeFeed] Checking subscription status...', { justPaid, maxRetries });
-
-          for (let attempt = 0; attempt < maxRetries; attempt++) {
-            if (attempt > 0) {
-              console.log(`⏳ [HomeFeed] Polling attempt ${attempt}/${maxRetries - 1}...`);
-              await new Promise(resolve => setTimeout(resolve, retryDelay));
-            }
-
-            try {
-              // Cache busting
-              const subResponse = await fetch(`/api/subscription/status?t=${Date.now()}`);
-              if (!subResponse.ok) throw new Error(`Status API error: ${subResponse.status}`);
-              
-              const subData = await subResponse.json();
-              const isExpired = subData.subscription?.isExpired;
-              const planType = subData.subscription?.planType;
-              // STRICT: `hasActiveSubscription` is polluted (it returns true for
-              // free users), so it CANNOT gate access. The real signal is a paid
-              // or trial plan type — 'pro'/'starter'/'annual'/'lifetime' (a trial
-              // reports as 'pro'). 'free'/'none' never grants access.
-              const isPaidPlan = !!planType && planType !== 'free' && planType !== 'none';
-
-              // CASE 1: SUCCESSFUL ACTIVATION (just checked out + real plan + not expired)
-              const isSuccess = justPaid && !isExpired && isPaidPlan;
-              
-              if (isSuccess) {
-                console.log('🎉 [HomeFeed] Activation confirmed!', planType);
-                localStorage.setItem('onboarding_completed', 'true');
-                sessionStorage.setItem('activation_verified_this_session', 'true');
-                try { localStorage.setItem('mailient_access_ok', String(Date.now())); sessionStorage.removeItem('mailient_access_denied'); } catch {}
-                localStorage.removeItem('pending_plan');
-                localStorage.removeItem('pending_plan_timestamp');
-                setPaymentVerified(true);
-
-                // Specific plan name for UI
-                const planName = planType === 'starter' ? 'Starter' : planType === 'pro' ? 'Pro' : 'Free';
-                setActivatedPlan(planName);
-
-                // Grant access directly — NO page reload. The reload was the source
-                // of the stuck "Activating…" loop: a reload re-ran this effect and,
-                // on slow webhook propagation, could re-enter verification. Showing
-                // the success state then revealing the app in-place is loop-proof.
-                setAccessGranted(true);
-                setTimeout(() => {
-                  setIsVerifyingPayment(false);
-                  setPaymentVerified(false);
-                }, 2500);
-                return; // Stop polling
-              }
-
-              // CASE 2: STILL PENDING (Either expired or not yet active but we just paid)
-              if (justPaid && attempt < maxRetries - 1) {
-                console.log('⏳ [HomeFeed] Waiting for state update...');
-                continue; // Next attempt
-              }
-
-              // CASE 3 — STRICT ACCESS: paid-only. Access requires a real paid or
-              // trial plan from a completed Polar checkout. No free tier.
-              if (isPaidPlan && !isExpired) {
-                localStorage.setItem('onboarding_completed', 'true');
-                try { localStorage.setItem('mailient_access_ok', String(Date.now())); sessionStorage.removeItem('mailient_access_denied'); sessionStorage.removeItem('hf_sent_onboarding'); } catch {}
-                setIsVerifyingPayment(false);
-                setShowPricing(false);
-                setAccessGranted(true);
-                return; // Access allowed, stop polling
-              }
-
-              // CASE 4 — not subscribed (free) OR expired → must subscribe. Finish
-              // onboarding first if it isn't done, otherwise send to the paywall.
-              if (attempt === maxRetries - 1) {
-                // SELF-HEAL: the user may have a real Polar subscription that the
-                // webhook failed to sync to our DB (exactly the "trial active in
-                // Polar but dashboard says no subscription" case). Reconcile
-                // directly with Polar ONCE before denying. /api/subscription/verify
-                // queries Polar by email and writes the row if it finds an
-                // active/trialing sub.
-                if (!triedVerify) {
-                  triedVerify = true;
-                  console.log('🩺 [HomeFeed] No sub in DB — reconciling with Polar…');
-                  try {
-                    const vr = await fetch('/api/subscription/verify', { method: 'POST' });
-                    const vd = await vr.json().catch(() => ({}));
-                    const vPlan = vd?.subscription?.planType;
-                    if (vr.ok && vd?.success && vPlan && vPlan !== 'free' && vPlan !== 'none') {
-                      console.log('✅ [HomeFeed] Reconciled from Polar:', vPlan);
-                      localStorage.setItem('onboarding_completed', 'true');
-                      try { localStorage.setItem('mailient_access_ok', String(Date.now())); sessionStorage.removeItem('mailient_access_denied'); sessionStorage.removeItem('hf_sent_onboarding'); } catch {}
-                      setIsVerifyingPayment(false);
-                      setShowPricing(false);
-                      setAccessGranted(true);
-                      return; // healed — access granted
-                    }
-                    console.log('🔎 [HomeFeed] Polar reconcile found nothing active.');
-                  } catch (e) {
-                    console.warn('[HomeFeed] Polar reconcile failed:', e);
-                  }
-                }
-
-                setIsVerifyingPayment(false);
-                // Remember this tab is unsubscribed AND revoke the durable access
-                // marker so the next visit starts blocked (fail closed), not optimistic.
-                try { sessionStorage.setItem('mailient_access_denied', '1'); localStorage.removeItem('mailient_access_ok'); } catch {}
-                setAccessGranted(false);
-                console.log('🔒 [HomeFeed] No active subscription — sending to paywall (onboarding step 13).');
-                // Unpaid users always land on the single paywall surface: onboarding
-                // step 13. Onboarding parks them there (it won't bounce back here
-                // unpaid), so there's no ping-pong to guard against.
-                router.replace('/onboarding?step=13');
-                return;
-              }
-
-            } catch (err) {
-              console.error('⚠️ Polling error:', err);
-              if (attempt === maxRetries - 1) {
-                // Fail closed: can't verify → deny. A transient error should
-                // not grant access to an unconfirmed user.
-                setIsVerifyingPayment(false);
-                try { sessionStorage.setItem('mailient_access_denied', '1'); localStorage.removeItem('mailient_access_ok'); } catch {}
-                setAccessGranted(false);
-                console.log('🔒 [HomeFeed] API error on final attempt — failing closed.');
-                router.replace('/onboarding?step=13');
-                return;
-              }
-            }
-          }
-        } catch (error) {
-          console.error("Error in home-feed init:", error);
-          setIsVerifyingPayment(false);
-        }
-      };
-      
-      checkAccessAndSubscription();
+      // Grant access immediately — no subscription check needed.
+      try { localStorage.setItem('maily_access_ok', String(Date.now())); sessionStorage.removeItem('maily_access_denied'); } catch {}
+      setAccessGranted(true);
+      setIsVerifyingPayment(false);
     }
   }, [status, session, router]);
 
   // Set page title
   useEffect(() => {
-    document.title = 'Mailient - AI Inbox';
+    document.title = 'Maily - AI Inbox';
   }, []);
+
 
   // Check for welcome query param and trigger confetti (reuses searchParams
   // already declared above for the tab state).
@@ -351,11 +187,11 @@ function HomeFeedContent() {
         </div>
       );
     }
-    return <div className="min-h-screen bg-arcus-bg" />;
+    return <div className="min-h-screen bg-boult-bg" />;
   }
 
   return (
-    <div className="satoshi-home-feed w-full min-h-screen bg-arcus-bg relative flex">
+    <div className="satoshi-home-feed w-full min-h-screen bg-boult-bg relative flex">
       <HomeFeedSidebar 
         onCollapse={setIsSidebarCollapsed} 
         onOpenSettings={() => setShowSettings(true)}
@@ -487,7 +323,7 @@ function HomeFeedContent() {
               usageData={usageData || {
                 planType: 'free',
                 features: {
-                  arcus_ai: { usage: 0, limit: 10, remaining: 10, isUnlimited: false, period: 'daily' },
+                  boult_ai: { usage: 0, limit: 10, remaining: 10, isUnlimited: false, period: 'daily' },
                   sift_ai: { usage: 0, limit: 5, remaining: 5, isUnlimited: false, period: 'daily' }
                 }
               }}
@@ -502,11 +338,11 @@ function HomeFeedContent() {
 export default function HomeFeed() {
   return (
     <Suspense fallback={
-      // Themed fallback — bg-arcus-bg adapts to light/dark and matches the app
+      // Themed fallback — bg-boult-bg adapts to light/dark and matches the app
       // ground, so the loading moment never flashes a hardcoded black screen
       // before the feed paints. (Was bg-black: jarring on the light theme and
       // even on dark it flashed pure #000 over the app's #0D0D0D + white cards.)
-      <div className="w-full bg-arcus-bg flex items-center justify-center" style={{ height: '100dvh' }}>
+      <div className="w-full bg-boult-bg flex items-center justify-center" style={{ height: '100dvh' }}>
         <div className="h-7 w-7 rounded-full border-2 border-neutral-500/25 border-t-neutral-500 animate-spin" />
       </div>
     }>

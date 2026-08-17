@@ -22,7 +22,7 @@ export default function TermsOfService() {
       title: "1. Binding Agreement",
       content: (
         <div className="space-y-4">
-          <p>These Terms of Use ("Terms") constitute a legally binding agreement between you ("User," "you") and Mailient ("Mailient," "we," "us," "our"). By accessing, registering for, or using our Services, you agree to be bound by these Terms.</p>
+          <p>These Terms of Use ("Terms") constitute a legally binding agreement between you ("User," "you") and Maily ("Maily," "we," "us," "our"). By accessing, registering for, or using our Services, you agree to be bound by these Terms.</p>
           <p>If you do not agree, you must immediately discontinue use.</p>
           <p>We reserve the right to refuse service to anyone at our sole discretion.</p>
         </div>
@@ -64,7 +64,7 @@ export default function TermsOfService() {
       title: "4. Nature of Services",
       content: (
         <div className="space-y-4">
-          <p>Mailient provides AI-assisted email productivity tools, including but not limited to:</p>
+          <p>Maily provides AI-assisted email productivity tools, including but not limited to:</p>
           <ul className="list-disc pl-5 space-y-2">
             <li>Email prioritization;</li>
             <li>Draft generation;</li>
@@ -101,7 +101,7 @@ export default function TermsOfService() {
       title: "6. Data Access and Permissions",
       content: (
         <div className="space-y-4">
-          <p>By connecting your email or third-party accounts, you grant Mailient limited permission to access and process data strictly for:</p>
+          <p>By connecting your email or third-party accounts, you grant Maily limited permission to access and process data strictly for:</p>
           <ul className="list-disc pl-5 space-y-2">
             <li>Providing core functionality;</li>
             <li>Improving Services (never to train AI models on your content);</li>
@@ -123,7 +123,7 @@ export default function TermsOfService() {
       content: (
         <div className="space-y-4">
           <p>You retain ownership of all content you provide ("User Content").</p>
-          <p>You grant Mailient a worldwide, non-exclusive, royalty-free license to:</p>
+          <p>You grant Maily a worldwide, non-exclusive, royalty-free license to:</p>
           <ul className="list-disc pl-5 space-y-2">
             <li>Process, store, and display content;</li>
             <li>Modify content for functionality (for example, drafting replies in your voice);</li>
@@ -138,7 +138,7 @@ export default function TermsOfService() {
       title: "8. AI Disclaimer (Critical Clause)",
       content: (
         <div className="space-y-4">
-          <p>Mailient uses artificial intelligence systems which may produce:</p>
+          <p>Maily uses artificial intelligence systems which may produce:</p>
           <ul className="list-disc pl-5 space-y-2">
             <li>Inaccurate or incomplete outputs;</li>
             <li>Misleading or unintended suggestions.</li>
@@ -149,7 +149,7 @@ export default function TermsOfService() {
             <li>Outputs are NOT professional, legal, financial, or medical advice;</li>
             <li>You MUST independently verify all outputs before relying on them.</li>
           </ul>
-          <p>Mailient bears NO responsibility for decisions made using AI outputs.</p>
+          <p>Maily bears NO responsibility for decisions made using AI outputs.</p>
         </div>
       )
     },
@@ -195,7 +195,7 @@ export default function TermsOfService() {
       title: "11. Intellectual Property",
       content: (
         <div className="space-y-4">
-          <p>All platform components (excluding User Content) are owned by Mailient, including:</p>
+          <p>All platform components (excluding User Content) are owned by Maily, including:</p>
           <ul className="list-disc pl-5 space-y-2">
             <li>Software and algorithms;</li>
             <li>Design and branding;</li>
@@ -210,7 +210,7 @@ export default function TermsOfService() {
       title: "12. Third-Party Integrations",
       content: (
         <div className="space-y-4">
-          <p>Mailient integrates with third-party providers.</p>
+          <p>Maily integrates with third-party providers.</p>
           <p>We are NOT responsible for:</p>
           <ul className="list-disc pl-5 space-y-2">
             <li>Their availability;</li>
@@ -236,7 +236,7 @@ export default function TermsOfService() {
           <ul className="list-disc pl-5 space-y-2">
             <li>Access is revoked immediately;</li>
             <li>Data may be deleted without recovery;</li>
-            <li>No liability is incurred by Mailient.</li>
+            <li>No liability is incurred by Maily.</li>
           </ul>
         </div>
       )
@@ -269,7 +269,7 @@ export default function TermsOfService() {
       content: (
         <div className="space-y-4">
           <p>TO THE MAXIMUM EXTENT PERMITTED BY LAW:</p>
-          <p>Mailient shall NOT be liable for:</p>
+          <p>Maily shall NOT be liable for:</p>
           <ul className="list-disc pl-5 space-y-2">
             <li>Indirect, incidental, or consequential damages;</li>
             <li>Loss of profits, data, or business opportunities;</li>
@@ -285,7 +285,7 @@ export default function TermsOfService() {
       title: "16. Indemnification",
       content: (
         <div className="space-y-4">
-          <p>You agree to indemnify and hold harmless Mailient from any claims arising from:</p>
+          <p>You agree to indemnify and hold harmless Maily from any claims arising from:</p>
           <ul className="list-disc pl-5 space-y-2">
             <li>Your use of the Services;</li>
             <li>Violation of these Terms;</li>
@@ -341,7 +341,7 @@ export default function TermsOfService() {
       content: (
         <div className="space-y-4">
           <p>These Terms shall be governed by applicable laws.</p>
-          <p>All disputes shall be subject to the exclusive jurisdiction of courts determined by Mailient.</p>
+          <p>All disputes shall be subject to the exclusive jurisdiction of courts determined by Maily.</p>
         </div>
       )
     },
@@ -458,7 +458,7 @@ export default function TermsOfService() {
               26. Contact
             </h2>
             <div className="text-[17px] leading-[1.7] text-neutral-600 dark:text-neutral-300 font-normal">
-              <p>Email: <a href="mailto:mailient.xyz@gmail.com" className="text-black dark:text-white font-medium underline underline-offset-4 decoration-neutral-300 dark:decoration-neutral-700 hover:decoration-black dark:hover:decoration-white transition-all">mailient.xyz@gmail.com</a></p>
+              <p>Email: <a href="mailto:support.maily@gmail.com" className="text-black dark:text-white font-medium underline underline-offset-4 decoration-neutral-300 dark:decoration-neutral-700 hover:decoration-black dark:hover:decoration-white transition-all">support.maily@gmail.com</a></p>
             </div>
           </motion.section>
 
@@ -473,7 +473,7 @@ export default function TermsOfService() {
               FINAL ACKNOWLEDGMENT
             </h2>
             <div className="text-[17px] leading-[1.7] text-neutral-600 dark:text-neutral-300 font-normal space-y-4">
-              <p>By using Mailient, you confirm that:</p>
+              <p>By using Maily, you confirm that:</p>
               <ul className="list-disc pl-5 space-y-2">
                 <li>You understand these Terms;</li>
                 <li>You accept all risks associated with AI systems;</li>

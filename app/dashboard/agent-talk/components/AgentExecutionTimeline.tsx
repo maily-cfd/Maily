@@ -88,10 +88,10 @@ function StepPill({ step }: { step: AgentStep }) {
       className={cn(
         'flex items-center gap-2.5 px-3 py-1.5 rounded-xl border w-fit max-w-full transition-all',
         isActive
-          ? 'bg-arcus-elevated border-arcus-divider shadow-[0_0_12px_rgba(255,255,255,0.04)]'
+          ? 'bg-boult-elevated border-boult-divider shadow-[0_0_12px_rgba(255,255,255,0.04)]'
           : isError
           ? 'bg-red-500/[0.04] border-red-500/[0.12]'
-          : 'bg-arcus-elevated border-arcus-border',
+          : 'bg-boult-elevated border-boult-border',
       )}
     >
       {/* Icon box */}
@@ -99,10 +99,10 @@ function StepPill({ step }: { step: AgentStep }) {
         className={cn(
           'flex-shrink-0 w-[22px] h-[22px] rounded-lg flex items-center justify-center border transition-all',
           isActive
-            ? 'bg-arcus-surface border-arcus-divider text-arcus-fg-secondary'
+            ? 'bg-boult-surface border-boult-divider text-boult-fg-secondary'
             : isError
             ? 'bg-red-500/10 border-red-500/20 text-red-400/70'
-            : 'bg-arcus-elevated border-arcus-border text-arcus-fg-muted',
+            : 'bg-boult-elevated border-boult-border text-boult-fg-muted',
         )}
       >
         {isActive ? (
@@ -123,7 +123,7 @@ function StepPill({ step }: { step: AgentStep }) {
       <div className="flex-1 min-w-0">
         {isActive ? (
           <motion.span
-            className="text-[13px] font-medium text-arcus-fg-secondary tracking-tight block truncate"
+            className="text-[13px] font-medium text-boult-fg-secondary tracking-tight block truncate"
             animate={{ opacity: [0.75, 1, 0.75] }}
             transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
           >
@@ -133,7 +133,7 @@ function StepPill({ step }: { step: AgentStep }) {
           <span
             className={cn(
               'text-[13px] font-medium tracking-tight block truncate',
-              isError ? 'text-red-400/60' : 'text-arcus-fg-muted',
+              isError ? 'text-red-400/60' : 'text-boult-fg-muted',
             )}
           >
             {step.label}
@@ -143,7 +143,7 @@ function StepPill({ step }: { step: AgentStep }) {
           <span
             className={cn(
               'block text-[11px] truncate mt-0.5',
-              isActive ? 'text-arcus-fg-muted italic' : 'text-arcus-fg-muted italic',
+              isActive ? 'text-boult-fg-muted italic' : 'text-boult-fg-muted italic',
             )}
           >
             {contextHint}
@@ -153,7 +153,7 @@ function StepPill({ step }: { step: AgentStep }) {
 
       {/* Duration */}
       {durationSec && !isActive && (
-        <span className="flex-shrink-0 text-[10px] text-arcus-fg-muted font-mono tabular-nums">
+        <span className="flex-shrink-0 text-[10px] text-boult-fg-muted font-mono tabular-nums">
           {durationSec}s
         </span>
       )}
@@ -164,7 +164,7 @@ function StepPill({ step }: { step: AgentStep }) {
           {[0, 0.25, 0.5].map((delay, i) => (
             <motion.span
               key={i}
-              className="w-1 h-1 rounded-full bg-arcus-fg-tertiary"
+              className="w-1 h-1 rounded-full bg-boult-fg-tertiary"
               animate={{ opacity: [0.3, 1, 0.3] }}
               transition={{ repeat: Infinity, duration: 1.2, delay, ease: 'easeInOut' }}
             />
@@ -183,7 +183,7 @@ function NarrativeParagraph({ text }: { text: string }) {
       initial={{ opacity: 0, y: 4 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: 'easeOut' }}
-      className="text-[13px] text-arcus-fg-tertiary leading-[1.7] py-1"
+      className="text-[13px] text-boult-fg-tertiary leading-[1.7] py-1"
     >
       {text}
     </motion.p>

@@ -4,9 +4,9 @@
  * The "While you were away" cards on HomeFeed are collapsed by default (fast,
  * clean). When a user expands one, the client hits this endpoint for the full
  * transparency stack of that single run:
- *   - plan   — what Arcus decided to do (Layer 1, arcus_agent_runs.plan)
- *   - tools  — what actually executed (arcus_audit_log, humanized + counted)
- *   - links  — direct links to the artifacts (arcus_agent_runs.artifact_links)
+ *   - plan   — what Boult decided to do (Layer 1, boult_agent_runs.plan)
+ *   - tools  — what actually executed (boult_audit_log, humanized + counted)
+ *   - links  — direct links to the artifacts (boult_agent_runs.artifact_links)
  *
  * Fetching on expand (not upfront) keeps the feed payload small and the list
  * snappy — most users never expand most runs.
@@ -16,7 +16,7 @@ import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth.js';
 // @ts-ignore
 import { getSupabaseAdmin } from '@/lib/supabase.js';
-import { summarizeToolUse, type ToolUseLine } from '@/lib/arcus/tool-labels';
+import { summarizeToolUse, type ToolUseLine } from '@/lib/boult/tool-labels';
 import { logEvent } from "@/lib/logsso";
 
 export const dynamic = 'force-dynamic';
@@ -51,7 +51,7 @@ export async function GET(req: Request) {
 
     // Fetch the run — scoped to this user so one user can't read another's run.
     const { data: run, error } = await supabase
-      .from('arcus_agent_runs')
+      .from('boult_agent_runs')
       .select('id, user_id, plan, artifact_links')
       .eq('id', runId)
       .maybeSingle();
@@ -65,7 +65,7 @@ export async function GET(req: Request) {
     let tools: ToolUseLine[] = [];
     try {
       const { data: audits } = await supabase
-        .from('arcus_audit_log')
+        .from('boult_audit_log')
         .select('tool_name, success, created_at')
         .eq('run_id', runId)
         .order('created_at', { ascending: true })

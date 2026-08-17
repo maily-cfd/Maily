@@ -1,9 +1,10 @@
 'use client';
+import { Mail } from "lucide-react";
 
 /**
- * Mailient onboarding — short path to value, then trial.
+ * Maily onboarding — short path to value, then trial.
  * Essential screens only: Welcome → Gmail → Scan → Results → Trial → Done.
- * Calendar, voice preview, Arcus theater, Notion/Slack, agent setup, and
+ * Calendar, voice preview, Boult theater, Notion/Slack, agent setup, and
  * briefing prefs are deferred to in-app nudges so people can try the product
  * before a long questionnaire.
  */
@@ -32,7 +33,7 @@ type Step = number; // 1..15
 /**
  * Skipped in the primary flow (still reachable via deep link briefly, then
  * bounced forward). Keeps setup to ~6 screens instead of 14+.
- * 3 Calendar · 6–9 voice/Arcus theater · 10–11 Notion/Slack · 12 agent · 14 briefing
+ * 3 Calendar · 6–9 voice/Boult theater · 10–11 Notion/Slack · 12 agent · 14 briefing
  */
 const SKIP_STEPS = new Set([3, 6, 7, 8, 9, 10, 11, 12, 14]);
 
@@ -229,7 +230,7 @@ export default function SiftOnboardingPage() {
     try {
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       if (timezone) {
-        fetch('/api/arcus/agents/timezone', {
+        fetch('/api/boult/agents/timezone', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ timezone }),
@@ -380,8 +381,8 @@ export default function SiftOnboardingPage() {
           // consent), not {url}-returning /auth endpoints. Point the popup
           // straight at them; everything else returns a { url } to load.
           const directRoutes: Record<string, string> = {
-            gmail: '/api/arcus/v3/oauth/gmail',
-            google_calendar: '/api/arcus/v3/oauth/gcal',
+            gmail: '/api/boult/v3/oauth/gmail',
+            google_calendar: '/api/boult/v3/oauth/gcal',
           };
           if (directRoutes[provider]) {
             popup.location.href = directRoutes[provider];
@@ -403,7 +404,7 @@ export default function SiftOnboardingPage() {
 
   // ── Complete onboarding (writes the durable record) ──
   const completeOnboarding = useCallback(async () => {
-    const username = slugifyHandle(session?.user?.email?.split('@')[0] || firstName || 'mailient_user');
+    const username = slugifyHandle(session?.user?.email?.split('@')[0] || firstName || 'maily_user');
     try {
       await fetch('/api/onboarding/complete', {
         method: 'POST',
@@ -444,7 +445,7 @@ export default function SiftOnboardingPage() {
       {showChrome && (
         <header className="sticky top-0 z-30 px-5 pt-4 pb-2">
           <div className="max-w-xl mx-auto flex items-center gap-4">
-            <span className="text-[13px] font-medium tracking-tight text-[#0A0A0A]/80 shrink-0">Mailient</span>
+            <span className="text-[13px] font-medium tracking-tight text-[#0A0A0A]/80 shrink-0">Maily</span>
             <ProgressCapsule step={step} />
             {/* Onboarding is otherwise a one-way corridor — without this, a user
                 who signed in with the wrong Google account has no way out but
@@ -490,8 +491,8 @@ export default function SiftOnboardingPage() {
                 : null)}
               {step === 6  && <S6BuildVoice done={voiceDone} setDone={setVoiceDone} onDone={() => next({ voiceDone: true })} />}
               {step === 7  && <S7VoicePreview onContinue={() => next()} />}
-              {step === 8  && <S8MeetArcus onContinue={() => next()} />}
-              {step === 9  && <S9Arcus scan={scan} firstName={firstName} onContinue={() => next()} reduce={!!reduce} />}
+              {step === 8  && <S8MeetBoult onContinue={() => next()} />}
+              {step === 9  && <S9Boult scan={scan} firstName={firstName} onContinue={() => next()} reduce={!!reduce} />}
               {step === 12 && <S12Agent spec={agentSpec} setSpec={setAgentSpec} created={createdAgent} setCreated={setCreatedAgent} onContinue={(c) => next(c ? { agent: c, agentSpec } : undefined)} onSkip={() => next()} />}
               {step === 13 && <S13Plan firstName={firstName} plan={planChoice} onChoose={(p) => { try { posthog.capture('paywall_plan_chosen', { plan: p }); } catch { /* analytics never blocks */ } setPlanChoice(p); next({ plan: p }); }} />}
               {step === 14 && <S14Notifications time={briefTime} setTime={setBriefTime} channel={briefChannel} setChannel={setBriefChannel} hasSlack={isConnected('slack')} agent={createdAgent} onUpdate={setCreatedAgent} onContinue={() => next({ briefTime, briefChannel })} />}
@@ -686,7 +687,7 @@ function S1Welcome({ onBegin }: { onBegin: () => void }) {
       <motion.div initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }} className="inline-block mb-10">
         <div className="w-16 h-16 rounded-[20px] lg-card flex items-center justify-center overflow-hidden mx-auto">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/mailient-logo-premium.png" alt="Mailient" className="w-9 h-9 object-cover" />
+          <Mail className="w-full h-full p-1 text-inherit" />
         </div>
       </motion.div>
 
@@ -696,7 +697,7 @@ function S1Welcome({ onBegin }: { onBegin: () => void }) {
       </Display>
 
       <Body className="text-[16px] max-w-md mx-auto mb-10">
-        Mailient removes email from your to-do list entirely — it works while you sleep. Connect Gmail, see your inbox in 60 seconds, then start a 3-day free trial.
+        Maily removes email from your to-do list entirely — it works while you sleep. Connect Gmail, see your inbox in 60 seconds, then start a 3-day free trial.
       </Body>
 
       <PrimaryButton onClick={onBegin} className="px-8 py-3.5 text-[15px]">
@@ -714,7 +715,7 @@ function S2Gmail({ isConnected, onConnect, onContinue }: { isConnected: boolean;
       <IconBadge><GmailMark size={24} /></IconBadge>
       <Display className="text-[28px] sm:text-[34px] mb-3">Connect your inbox</Display>
       <Body className="text-[15px] max-w-sm mx-auto mb-7">
-        Mailient reads everything — including the emails you&apos;d never have gotten to — and drafts in your voice. This is the one connection it can&apos;t work without.
+        Maily reads everything — including the emails you&apos;d never have gotten to — and drafts in your voice. This is the one connection it can&apos;t work without.
       </Body>
 
       <GlassCard className="text-left max-w-sm mx-auto mb-6">
@@ -758,7 +759,7 @@ function S3Calendar({ connected, onConnect, onContinue, onSkip }: { connected: b
       <IconBadge><GCalMark size={24} /></IconBadge>
       <Display className="text-[28px] sm:text-[34px] mb-3">Add your calendar</Display>
       <Body className="text-[15px] max-w-sm mx-auto mb-8">
-        So Mailient can book meetings without double-booking you.
+        So Maily can book meetings without double-booking you.
       </Body>
       {connected ? (
         <PrimaryButton onClick={onContinue}>Continue <ArrowRight className="w-4 h-4" /></PrimaryButton>
@@ -907,7 +908,7 @@ function S5ScanResults({ scan, onContinue }: { scan: ScanResult | null; onContin
       <div className="text-center mb-7">
         <IconBadge><Activity className="w-5 h-5 text-[#0A0A0A]" strokeWidth={1.75} /></IconBadge>
         <Display className="text-[26px] sm:text-[32px] mb-3">This is your month</Display>
-        <Body className="text-[15px] max-w-sm mx-auto">This is what Mailient is going to take off your plate.</Body>
+        <Body className="text-[15px] max-w-sm mx-auto">This is what Maily is going to take off your plate.</Body>
       </div>
       <GlassCard className="divide-y divide-black/[0.06] p-0">
         {rows.map((r) => (
@@ -964,7 +965,7 @@ function S6BuildVoice({ done, setDone, onDone }: { done: boolean; setDone: (b: b
       <IconBadge><PenLine className="w-5 h-5 text-[#0A0A0A]" strokeWidth={1.75} /></IconBadge>
       <Display className="text-[26px] sm:text-[32px] mb-3">Learning how you write</Display>
       <Body className="text-[15px] max-w-sm mx-auto mb-8">
-        Mailient is reading your last 90 days of sent mail to learn your voice — not a generic AI tone.
+        Maily is reading your last 90 days of sent mail to learn your voice — not a generic AI tone.
       </Body>
       <div className="flex items-center justify-center gap-2.5 text-[13.5px] font-medium text-[#0A0A0A]/55">
         {status === 'working' && <><Loader2 className="w-4 h-4 animate-spin" /> Analyzing your sent mail…</>}
@@ -1036,7 +1037,7 @@ function S7VoicePreview({ onContinue }: { onContinue: () => void }) {
       <div className="text-center mb-7">
         <IconBadge><PenLine className="w-5 h-5 text-[#0A0A0A]" strokeWidth={1.75} /></IconBadge>
         <Display className="text-[26px] sm:text-[32px] mb-3">This is how you sound</Display>
-        <Body className="text-[15px] max-w-sm mx-auto">Mailient drafts in this voice. You can adjust it any time.</Body>
+        <Body className="text-[15px] max-w-sm mx-auto">Maily drafts in this voice. You can adjust it any time.</Body>
       </div>
 
       <GlassCard className="mb-5">
@@ -1115,27 +1116,27 @@ function Trait({ label, value }: { label: string; value: string }) {
   );
 }
 
-/* ═══════════════════════════ 8 · MEET ARCUS ═══════════════════════════ */
+/* ═══════════════════════════ 8 · MEET BOULT ═══════════════════════════ */
 
-function S8MeetArcus({ onContinue }: { onContinue: () => void }) {
+function S8MeetBoult({ onContinue }: { onContinue: () => void }) {
   return (
     <div className="text-center">
       <IconBadge><Cpu className="w-5 h-5 text-[#0A0A0A]" strokeWidth={1.75} /></IconBadge>
-      <Display className="text-[34px] sm:text-[44px] mb-5">Meet Arcus.</Display>
+      <Display className="text-[34px] sm:text-[44px] mb-5">Meet Boult.</Display>
       <Body className="text-[16px] max-w-md mx-auto mb-9">
-        Arcus is your new employee — the one who runs your inbox. It reads, decides, drafts, schedules,
+        Boult is your new employee — the one who runs your inbox. It reads, decides, drafts, schedules,
         and reports — and shows you its reasoning every time, before anything is sent.
       </Body>
-      <PrimaryButton onClick={onContinue}>See Arcus work <ArrowRight className="w-4 h-4" /></PrimaryButton>
+      <PrimaryButton onClick={onContinue}>See Boult work <ArrowRight className="w-4 h-4" /></PrimaryButton>
     </div>
   );
 }
 
-/* ═══════════════════════════ 9 · ARCUS INTERACTION (real SSE → real drafts) ═══════════════════════════ */
+/* ═══════════════════════════ 9 · BOULT INTERACTION (real SSE → real drafts) ═══════════════════════════ */
 
 interface Moment { kind: 'reason' | 'decision' | 'action' | 'final'; text: string }
 
-function S9Arcus({ scan, firstName, onContinue, reduce }: { scan: ScanResult | null; firstName: string; onContinue: () => void; reduce: boolean }) {
+function S9Boult({ scan, firstName, onContinue, reduce }: { scan: ScanResult | null; firstName: string; onContinue: () => void; reduce: boolean }) {
   // Cap at 2 — reliable within function time; scan only informs the ask.
   const count = Math.max(1, Math.min(2, scan?.unanswered ?? 2));
   const [phase, setPhase] = useState<'idle' | 'working' | 'done' | 'error'>('idle');
@@ -1160,7 +1161,7 @@ function S9Arcus({ scan, firstName, onContinue, reduce }: { scan: ScanResult | n
     setFinalNote(null);
     setErrorDetail(null);
     try {
-      const res = await fetch('/api/onboarding/arcus-demo', {
+      const res = await fetch('/api/onboarding/boult-demo', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ count }),
@@ -1176,7 +1177,7 @@ function S9Arcus({ scan, firstName, onContinue, reduce }: { scan: ScanResult | n
         return;
       }
       if (!res.body) {
-        setErrorDetail('No response from Arcus. Try again.');
+        setErrorDetail('No response from Boult. Try again.');
         setPhase('error');
         return;
       }
@@ -1263,10 +1264,10 @@ function S9Arcus({ scan, firstName, onContinue, reduce }: { scan: ScanResult | n
     <div>
       <div className="text-center mb-6">
         <IconBadge><Cpu className="w-5 h-5 text-[#0A0A0A]" strokeWidth={1.75} /></IconBadge>
-        <Display className="text-[26px] sm:text-[32px] mb-3">Watch Arcus work</Display>
+        <Display className="text-[26px] sm:text-[32px] mb-3">Watch Boult work</Display>
         <Body className="text-[15px] max-w-sm mx-auto">
           {phase === 'idle'
-            ? <>Arcus will draft replies to your {count} oldest unanswered {count === 1 ? 'email' : 'emails'} — in your voice. Nothing sends.</>
+            ? <>Boult will draft replies to your {count} oldest unanswered {count === 1 ? 'email' : 'emails'} — in your voice. Nothing sends.</>
             : <>Every decision, in the open{firstName ? `, ${firstName}` : ''}.</>}
         </Body>
       </div>
@@ -1282,7 +1283,7 @@ function S9Arcus({ scan, firstName, onContinue, reduce }: { scan: ScanResult | n
               </div>
             </div>
           </GlassCard>
-          <PrimaryButton onClick={run}>Watch Arcus work <ArrowRight className="w-4 h-4" /></PrimaryButton>
+          <PrimaryButton onClick={run}>Watch Boult work <ArrowRight className="w-4 h-4" /></PrimaryButton>
         </div>
       )}
 
@@ -1431,14 +1432,14 @@ function S12Agent({ spec, setSpec, created, setCreated, onContinue, onSkip }: {
     } finally { setBusy(false); }
   };
 
-  // Approve → actually create the real arcus_agents row.
+  // Approve → actually create the real boult_agents row.
   const approve = async () => {
     if (!review) return;
     setBusy(true);
     try {
       let agent: any;
       if (review.kind === 'template') {
-        const res = await fetch('/api/arcus/agents/templates', {
+        const res = await fetch('/api/boult/agents/templates', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ templateId: review.template.id }),
         });
@@ -1447,7 +1448,7 @@ function S12Agent({ spec, setSpec, created, setCreated, onContinue, onSkip }: {
         agent = d.agent;
       } else {
         const s = review.spec;
-        const res = await fetch('/api/arcus/agents/create', {
+        const res = await fetch('/api/boult/agents/create', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             name: s.name, task_description: s.task_description,
@@ -1567,7 +1568,7 @@ function S12Agent({ spec, setSpec, created, setCreated, onContinue, onSkip }: {
 
 const PLAN_FEATURES = [
   'Full inbox triage & drafting in your voice',
-  'Arcus operator + scheduled agents',
+  'Boult operator + scheduled agents',
   'Live Notion, Calendar & Slack sync',
   'Approval queue — you sign off on every send',
 ];
@@ -1591,7 +1592,7 @@ function S13Plan({ firstName, plan, onChoose }: { firstName: string; plan: PlanC
   return (
     <div>
       <div className="text-center mb-8">
-        <Display className="text-[28px] sm:text-[36px] mb-3">{firstName ? `Activate Arcus, ${firstName}.` : 'Activate Arcus.'}</Display>
+        <Display className="text-[28px] sm:text-[36px] mb-3">{firstName ? `Activate Boult, ${firstName}.` : 'Activate Boult.'}</Display>
         <Body className="text-[15px] max-w-md mx-auto">Your first employee shouldn&apos;t cost $80,000 a year. This one costs $29 a month — and it starts tonight, running on its schedule the moment you&apos;re in.</Body>
       </div>
 
@@ -1694,7 +1695,7 @@ function S14Notifications({ time, setTime, channel, setChannel, hasSlack, agent,
     if (agent?.id) {
       const newCron = setCronTime(agent.cron, time);
       try {
-        const res = await fetch('/api/arcus/agents', {
+        const res = await fetch('/api/boult/agents', {
           method: 'PATCH', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ id: agent.id, cron_schedule: newCron, output_channel: channel }),
         });
@@ -1809,7 +1810,7 @@ function S15Done({ firstName, agent, scan, briefTime, briefChannel, plan, onFini
     // Do NOT call onFinish here — onboarding is only "complete" after payment.
     try {
       localStorage.setItem('pending_plan', plan);
-      localStorage.setItem('mailient_checkout_return', '/onboarding?step=15&paid=1');
+      localStorage.setItem('maily_checkout_return', '/onboarding?step=15&paid=1');
     } catch { /* */ }
     try { posthog.capture('checkout_started', { plan }); } catch { /* */ }
 
@@ -1845,7 +1846,7 @@ function S15Done({ firstName, agent, scan, briefTime, briefChannel, plan, onFini
         <IconBadge><Check className="w-5 h-5 text-[#0A0A0A]" strokeWidth={2} /></IconBadge>
       </motion.div>
 
-      <Display className="text-[32px] sm:text-[42px] mb-4">{paid ? 'Arcus is on duty.' : 'One step to go live.'}</Display>
+      <Display className="text-[32px] sm:text-[42px] mb-4">{paid ? 'Boult is on duty.' : 'One step to go live.'}</Display>
       <Body className="text-[15.5px] max-w-md mx-auto mb-8">
         {paid
           ? `${firstName ? `You're set, ${firstName}. ` : ''}Your agent runs on its schedule and everything waits for your approval before it sends. Go build — we'll handle the inbox.`
@@ -1886,10 +1887,10 @@ function S15Done({ firstName, agent, scan, briefTime, briefChannel, plan, onFini
         {busy
           ? <><Loader2 className="w-4 h-4 animate-spin" /> Opening…</>
           : paid
-            ? <>Go to Mailient <ArrowRight className="w-4 h-4" /></>
+            ? <>Go to Maily <ArrowRight className="w-4 h-4" /></>
             : !plan
               // Without a plan this button routes to the paywall — say so.
-              // "Go to Mailient" that lands on a pricing screen reads as a trick.
+              // "Go to Maily" that lands on a pricing screen reads as a trick.
               ? <>Choose your plan <ArrowRight className="w-4 h-4" /></>
               : plan === 'weekly'
                 ? <>Start Weekly <ArrowRight className="w-4 h-4" /></>

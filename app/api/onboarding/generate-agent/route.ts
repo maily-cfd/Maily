@@ -8,9 +8,9 @@ import { logEvent } from "@/lib/logsso";
  * POST /api/onboarding/generate-agent
  *
  * Turns a user's natural-language description into a REAL agent spec that maps
- * 1:1 onto the `arcus_agents` table (name, task_description, cron_schedule,
+ * 1:1 onto the `boult_agents` table (name, task_description, cron_schedule,
  * output_channel). Used during onboarding "Describe your agent" → the returned
- * spec is what /api/arcus/agents/create actually inserts. Nothing here is
+ * spec is what /api/boult/agents/create actually inserts. Nothing here is
  * decorative — every field is consumed downstream.
  */
 
@@ -30,7 +30,7 @@ interface AgentSpec {
 
 const DOW_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-/** Human label for a 5-field cron. Mirrors the helper in /api/arcus/agents/create. */
+/** Human label for a 5-field cron. Mirrors the helper in /api/boult/agents/create. */
 function cronToLabel(cron: string): string {
   const p = cron.trim().split(/\s+/);
   if (p.length !== 5) return `Schedule: ${cron}`;
@@ -56,7 +56,7 @@ const VALID_INTEGRATIONS: Integration[] = ['gmail', 'gcal', 'notion', 'slack'];
 /**
  * Deterministic fallback used when the AI is unavailable or returns something
  * unmappable. Derives a sensible, REAL spec from the prompt keywords + selected
- * goals. Always returns a valid 5-field cron and a name that fits arcus_agents.
+ * goals. Always returns a valid 5-field cron and a name that fits boult_agents.
  */
 function synthesizeSpec(prompt: string, goals: string[]): AgentSpec {
   const text = `${prompt} ${goals.join(' ')}`.toLowerCase();
@@ -233,7 +233,7 @@ export async function POST(request: Request) {
     try {
       const aiService = new AIConfig();
       if (aiService.hasAIConfigured()) {
-        const systemPrompt = `You are an agent planner for Mailient, an autonomous email operator.
+        const systemPrompt = `You are an agent planner for Maily, an autonomous email operator.
 Convert the user's description into ONE scheduled background agent and return ONLY valid JSON — no prose, no markdown fences — with EXACTLY this shape:
 
 {

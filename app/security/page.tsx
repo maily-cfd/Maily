@@ -63,7 +63,7 @@ const PILLARS = [
   {
     icon: UserCheck,
     title: "Google OAuth, revocable",
-    body: "Mailient connects to Gmail through Google's OAuth. We hold no password, we ask only for the scopes we use, and you can revoke access from your Google account in one click.",
+    body: "Maily connects to Gmail through Google's OAuth. We hold no password, we ask only for the scopes we use, and you can revoke access from your Google account in one click.",
     proof: "Isolated token, revoke anytime",
   },
 ];
@@ -102,7 +102,7 @@ const SCOPES = [
 const SECURITY_FAQS = [
   {
     icon: Eye,
-    q: "Can Mailient read my email?",
+    q: "Can Maily read my email?",
     // Privacy Policy §6 (encryption) + §6 (zero-knowledge) + §12 (no training).
     a: "Stored data is encrypted into blobs we cannot read — the keys live in your browser. To do a task you ask for, like drafting a reply, the AI reads the relevant message in memory for that task only. It is never warehoused and never used to train a model.",
   },
@@ -121,7 +121,7 @@ const SECURITY_FAQS = [
     icon: Trash2,
     q: "What happens if I delete my account?",
     // Privacy Policy §8 (retention).
-    a: "Your personal data is deleted or anonymised within 30 days, except where the law requires us to keep a record. Revoking Mailient's Google access takes one click in your Google account and cuts off inbox access immediately.",
+    a: "Your personal data is deleted or anonymised within 30 days, except where the law requires us to keep a record. Revoking Maily's Google access takes one click in your Google account and cuts off inbox access immediately.",
   },
   {
     icon: Server,
@@ -142,7 +142,7 @@ const RESOURCES = [
     icon: BookOpen,
     kind: "Deep dive",
     title: "Zero-knowledge encryption, explained",
-    desc: "Most AI email tools have to read your data to work. The architecture that lets Mailient not.",
+    desc: "Most AI email tools have to read your data to work. The architecture that lets Maily not.",
     href: "/blogs/zero-knowledge-encryption-email-privacy",
     external: false,
   },
@@ -158,7 +158,7 @@ const RESOURCES = [
     icon: Scale,
     kind: "Policy",
     title: "Terms of Service",
-    desc: "The agreement that governs your use of Mailient, in full.",
+    desc: "The agreement that governs your use of Maily, in full.",
     href: "/terms-of-service",
     external: false,
   },
@@ -166,7 +166,7 @@ const RESOURCES = [
     icon: KeyRound,
     kind: "Your control",
     title: "Manage Google access",
-    desc: "See and revoke Mailient's Google permissions any time, straight from your Google account.",
+    desc: "See and revoke Maily's Google permissions any time, straight from your Google account.",
     href: "https://myaccount.google.com/permissions",
     external: true,
   },
@@ -174,7 +174,7 @@ const RESOURCES = [
 
 export default function SecurityPage() {
   useEffect(() => {
-    document.title = "Security / Mailient";
+    document.title = "Security / Maily";
   }, []);
 
   return (
@@ -384,10 +384,10 @@ export default function SecurityPage() {
             <p className="mt-6 text-sm text-neutral-400 font-light leading-relaxed max-w-xl mx-auto font-sans relative z-10">
               Security questions? Email{" "}
               <Link
-                href="mailto:mailient.xyz@gmail.com"
+                href="mailto:support.maily@gmail.com"
                 className="text-white font-semibold hover:underline"
               >
-                mailient.xyz@gmail.com
+                support.maily@gmail.com
               </Link>{" "}
               — you&apos;ll get an answer from the person who wrote the code.
             </p>

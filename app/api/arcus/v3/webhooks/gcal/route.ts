@@ -1,6 +1,6 @@
 /**
- * Arcus V3 — Webhook: Google Calendar
- * POST /api/arcus/v3/webhooks/gcal
+ * Boult V3 — Webhook: Google Calendar
+ * POST /api/boult/v3/webhooks/gcal
  * 
  * Receives push notifications from Google Calendar Watch API.
  * Verifies channel token, then enqueues a job.
@@ -8,7 +8,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '../../../../../../lib/supabase.js';
-import { enqueueEvent } from '../../../../../../lib/arcus-v3/queue';
+import { enqueueEvent } from '../../../../../../lib/boult-v3/queue';
 import { logEvent } from "@/lib/logsso";
 
 export async function POST(request: NextRequest) {
@@ -27,14 +27,14 @@ export async function POST(request: NextRequest) {
     // 3. Verify channel token against stored token
     const supabase = getSupabaseAdmin();
     const { data: integration } = await supabase
-      .from('arcus_integrations')
+      .from('boult_integrations')
       .select('user_id, channel_id, channel_token')
       .eq('channel_id', channelId)
       .eq('provider', 'gcal')
       .maybeSingle();
 
     if (!integration || integration.channel_token !== channelToken) {
-      console.warn('[Arcus V3] GCal webhook: invalid channel token');
+      console.warn('[Boult V3] GCal webhook: invalid channel token');
       return NextResponse.json({ error: 'Invalid channel token' }, { status: 401 });
     }
 
@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     logEvent({ channel: "failures", event: "❌ API Error", description: String(error) });
-    console.error('[Arcus V3] GCal webhook error:', (error as Error).message);
+    console.error('[Boult V3] GCal webhook error:', (error as Error).message);
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }

@@ -12,7 +12,7 @@ function Bar({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        'relative overflow-hidden rounded-md bg-arcus-elevated',
+        'relative overflow-hidden rounded-md bg-boult-elevated',
         'before:absolute before:inset-0 before:-translate-x-full',
         'before:bg-gradient-to-r before:from-transparent before:via-white/[0.06] before:to-transparent',
         'before:animate-[shimmer_1.4s_infinite]',
@@ -44,7 +44,7 @@ export function ListSkeleton({ rows = 5 }: { rows?: number }) {
       {Array.from({ length: rows }).map((_, i) => (
         <div
           key={i}
-          className="flex items-center gap-3 p-3 rounded-xl border border-arcus-border bg-arcus-elevated/50"
+          className="flex items-center gap-3 p-3 rounded-xl border border-boult-border bg-boult-elevated/50"
         >
           <Bar className="w-9 h-9 rounded-lg shrink-0" />
           <div className="flex-1 flex flex-col gap-2">

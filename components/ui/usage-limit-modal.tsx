@@ -125,7 +125,7 @@ export function UsageLimitModal({
                                             <ul className="space-y-2 mb-4">
                                                 {[
                                                     'Unlimited Draft Replies',
-                                                    'Unlimited Arcus AI Access',
+                                                    'Unlimited Boult AI Access',
                                                     'Unlimited Schedule Calls',
                                                     'Full Sift email triage'
                                                 ].map((feature) => (

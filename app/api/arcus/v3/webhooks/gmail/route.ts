@@ -1,6 +1,6 @@
 /**
- * Arcus — Webhook: Gmail real-time push (Cloud Pub/Sub).
- * POST /api/arcus/v3/webhooks/gmail
+ * Boult — Webhook: Gmail real-time push (Cloud Pub/Sub).
+ * POST /api/boult/v3/webhooks/gmail
  *
  * The Pub/Sub push subscription on GMAIL_PUBSUB_TOPIC delivers a message whenever
  * a watched mailbox changes. Body shape (verified against Google docs):
@@ -17,7 +17,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '../../../../../../lib/supabase.js';
-import { isGmailPushEnabled } from '../../../../../../lib/arcus-v3/gmail-watch';
+import { isGmailPushEnabled } from '../../../../../../lib/boult-v3/gmail-watch';
 import { logEvent } from "@/lib/logsso";
 
 export const runtime = 'nodejs';
@@ -27,13 +27,13 @@ async function alreadyHandled(supabase: any, messageId: string): Promise<boolean
   if (!messageId) return false;
   const key = `dedupe:gmail-push:${messageId}`;
   const { data } = await supabase
-    .from('arcus_dedup_cache')
+    .from('boult_dedup_cache')
     .select('dedup_key')
     .eq('dedup_key', key)
     .gt('expires_at', new Date().toISOString())
     .maybeSingle();
   if (data) return true;
-  await supabase.from('arcus_dedup_cache').upsert({
+  await supabase.from('boult_dedup_cache').upsert({
     dedup_key: key,
     expires_at: new Date(Date.now() + 600_000).toISOString(),
   });
@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
     // Confirm this user actually has a registered watch (defends against spoofed
     // posts: only known gmail integrations are honored). Update the history pointer.
     const { data: integ } = await supabase
-      .from('arcus_integrations')
+      .from('boult_integrations')
       .select('user_id')
       .eq('provider', 'gmail')
       .eq('user_id', userId)
@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
 
     if (decoded.historyId) {
       await supabase
-        .from('arcus_integrations')
+        .from('boult_integrations')
         .update({ gmail_history_id: String(decoded.historyId), last_checked: new Date().toISOString() })
         .eq('provider', 'gmail')
         .eq('user_id', userId);
@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
 /** Set agent_state.force_poll on this user's event/condition agents. Returns count. */
 async function nudgeEventAgents(supabase: any, userId: string): Promise<number> {
   const { data: agents } = await supabase
-    .from('arcus_agents')
+    .from('boult_agents')
     .select('id, agent_state, trigger_type, status')
     .eq('user_id', userId)
     .in('trigger_type', ['event', 'condition'])
@@ -112,7 +112,7 @@ async function nudgeEventAgents(supabase: any, userId: string): Promise<number> 
   await Promise.all(
     agents.map((a: any) =>
       supabase
-        .from('arcus_agents')
+        .from('boult_agents')
         .update({ agent_state: { ...(a.agent_state || {}), force_poll: true } })
         .eq('id', a.id),
     ),

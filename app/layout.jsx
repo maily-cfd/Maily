@@ -12,10 +12,10 @@ export const metadata = {
   robots: { index: true, follow: true },
   icons: {
     icon: [
-      { url: "/favicon.png?v=10", type: "image/png" },
+      { url: "/favicon.ico?v=10", type: "image/png" },
     ],
-    shortcut: "/favicon.png?v=10",
-    apple: "/apple-touch-icon.png?v=10",
+    shortcut: "/favicon.ico?v=10",
+    apple: "/favicon.ico?v=10",
   },
   openGraph: {
     title: "Mailient — Runs your inbox while you build your company",
@@ -25,7 +25,7 @@ export const metadata = {
     siteName: "Mailient",
     images: [
       {
-        url: "/og-image.png",
+        url: "/logo-maily.png",
         width: 1200,
         height: 630,
         alt: "Mailient — runs your inbox while you build your company.",
@@ -39,7 +39,7 @@ export const metadata = {
     title: "Mailient — Runs your inbox while you build your company",
     description:
       "AI inbox employee for solo founders. Reads, prioritizes, drafts in your voice, books meetings — wake up to one morning briefing. 3-day free trial.",
-    images: ["/og-image.png"],
+    images: ["/logo-maily.png"],
   },
 };
 
@@ -53,13 +53,13 @@ const organizationJsonLd = {
   name: "Mailient",
   url: "https://mailient.xyz",
   logo: "https://mailient.xyz/mailient-logo-v3.png",
-  founder: { "@type": "Person", name: "Maulik", url: "https://x.com/maulik_5" },
+  founder: { "@type": "Organization", name: "Maily", url: "https://x.com/Mailycfd" },
   contactPoint: {
     "@type": "ContactPoint",
-    email: "mailient.xyz@gmail.com",
+    email: "support.maily@gmail.com",
     contactType: "customer support",
   },
-  sameAs: ["https://x.com/maulik_5", "https://github.com/Maulik-gpt"],
+  sameAs: ["https://x.com/Mailycfd", "https://github.com/maily-cfd/Maily"],
 };
 
 const softwareJsonLd = {
@@ -88,52 +88,62 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <script
+        <Script
+          id="org-jsonld"
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
         />
-        <script
+        <Script
+          id="software-jsonld"
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }}
         />
-        <script dangerouslySetInnerHTML={{ __html: `
-          (function() {
-            try {
-              var theme = localStorage.getItem('theme') || 'dark';
-              var isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-              if (isDark) {
-                document.documentElement.classList.add('dark');
-                document.documentElement.style.colorScheme = 'dark';
-                document.documentElement.style.backgroundColor = '#000000';
-              } else {
-                document.documentElement.classList.remove('dark');
-                document.documentElement.style.colorScheme = 'light';
-                document.documentElement.style.backgroundColor = '#f7f8f8';
-              }
-            } catch(e) {}
-          })();
-        ` }} />
-        <script dangerouslySetInnerHTML={{ __html: `
-          (function() {
-            window.addEventListener('error', function(e) {
-              const target = e.target;
-              if (target && target.tagName === 'SCRIPT' && target.src && (target.src.indexOf('/_next/static/') !== -1 || target.src.indexOf('/chunks/') !== -1)) {
-                console.warn('Chunk loading failed:', target.src);
-                window.location.reload();
-              }
-              if (e.message && (e.message.indexOf('ChunkLoadError') !== -1 || e.message.indexOf('loading chunk') !== -1)) {
-                console.warn('ChunkLoadError caught:', e.message);
-                window.location.reload();
-              }
-            }, true);
-            window.addEventListener('unhandledrejection', function(e) {
-              if (e.reason && (e.reason.name === 'ChunkLoadError' || (e.reason.message && (e.reason.message.indexOf('ChunkLoadError') !== -1 || e.reason.message.indexOf('loading chunk') !== -1)))) {
-                console.warn('Unhandled ChunkLoadError caught:', e.reason);
-                window.location.reload();
-              }
-            });
-          })();
-        ` }} />
+        <Script
+          id="theme-init-script"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{ __html: `
+            (function() {
+              try {
+                var theme = localStorage.getItem('theme') || 'dark';
+                var isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+                if (isDark) {
+                  document.documentElement.classList.add('dark');
+                  document.documentElement.style.colorScheme = 'dark';
+                  document.documentElement.style.backgroundColor = '#000000';
+                } else {
+                  document.documentElement.classList.remove('dark');
+                  document.documentElement.style.colorScheme = 'light';
+                  document.documentElement.style.backgroundColor = '#f7f8f8';
+                }
+              } catch(e) {}
+            })();
+          ` }}
+        />
+        <Script
+          id="chunk-error-handler"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{ __html: `
+            (function() {
+              window.addEventListener('error', function(e) {
+                const target = e.target;
+                if (target && target.tagName === 'SCRIPT' && target.src && (target.src.indexOf('/_next/static/') !== -1 || target.src.indexOf('/chunks/') !== -1)) {
+                  console.warn('Chunk loading failed:', target.src);
+                  window.location.reload();
+                }
+                if (e.message && (e.message.indexOf('ChunkLoadError') !== -1 || e.message.indexOf('loading chunk') !== -1)) {
+                  console.warn('ChunkLoadError caught:', e.message);
+                  window.location.reload();
+                }
+              }, true);
+              window.addEventListener('unhandledrejection', function(e) {
+                if (e.reason && (e.reason.name === 'ChunkLoadError' || (e.reason.message && (e.reason.message.indexOf('ChunkLoadError') !== -1 || e.reason.message.indexOf('loading chunk') !== -1)))) {
+                  console.warn('Unhandled ChunkLoadError caught:', e.reason);
+                  window.location.reload();
+                }
+              });
+            })();
+          ` }}
+        />
         <Script
           async
           src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID || 'G-M03D6M49N8'}`}

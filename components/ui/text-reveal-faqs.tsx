@@ -9,8 +9,8 @@ export default function FAQs() {
   const faqItems = [
     {
       id: 'item-1',
-      question: 'What exactly is Mailient?',
-      answer: 'Mailient is an AI-first email intelligence platform that works directly within your Gmail. It scans your inbox in real-time to identify high-value opportunities, pending tasks, and critical shifts in your business conversations.',
+      question: 'What exactly is Maily?',
+      answer: 'Maily is an AI-first email intelligence platform that works directly within your Gmail. It scans your inbox in real-time to identify high-value opportunities, pending tasks, and critical shifts in your business conversations.',
     },
     {
       id: 'item-2',
@@ -19,13 +19,13 @@ export default function FAQs() {
     },
     {
       id: 'item-3',
-      question: 'What is Arcus AI?',
-      answer: 'Arcus is your deep-thinking assistant. It can summarize complex threads, draft responses in your specific voice, and even coordinate your calendar to find open slots for meetings.',
+      question: 'What is Boult AI?',
+      answer: 'Boult is your deep-thinking assistant. It can summarize complex threads, draft responses in your specific voice, and even coordinate your calendar to find open slots for meetings.',
     },
     {
       id: 'item-4',
       question: 'Is my email data secure?',
-      answer: 'Security is a core priority. Mailient connects to Gmail with scoped access you grant — and can revoke anytime. Email content is processed only when you trigger an AI action or run an agent, and your emails are never used to train models.',
+      answer: 'Security is a core priority. Maily connects to Gmail with scoped access you grant — and can revoke anytime. Email content is processed only when you trigger an AI action or run an agent, and your emails are never used to train models.',
     },
     {
       id: 'item-5',
@@ -34,34 +34,34 @@ export default function FAQs() {
     },
     {
       id: 'item-6',
-      question: 'How do I get Arcus to schedule a meeting?',
-      answer: 'Connect your Google Calendar, then just ask Arcus in chat (e.g. “find a 30-min slot next week and draft a reply proposing times”). It reads your calendar and writes the reply for your approval — it never sends without you.',
+      question: 'How do I get Boult to schedule a meeting?',
+      answer: 'Connect your Google Calendar, then just ask Boult in chat (e.g. “find a 30-min slot next week and draft a reply proposing times”). It reads your calendar and writes the reply for your approval — it never sends without you.',
     },
 
     {
       id: 'item-8',
       question: 'How much can I use on a paid plan?',
-      answer: 'Paid plans (Monthly, Annual, and Lifetime) are unlimited — unlimited Arcus runs, drafts, Sift analysis, summaries, and scheduled agents. There are no per-task credits to track.',
+      answer: 'Paid plans (Monthly, Annual, and Lifetime) are unlimited — unlimited Boult runs, drafts, Sift analysis, summaries, and scheduled agents. There are no per-task credits to track.',
     },
     {
       id: 'item-9',
-      question: 'Where do the replies Arcus writes go?',
-      answer: 'Every reply is saved straight to your Gmail “Drafts” folder for you to review, edit, and send. Mailient never sends mail on your behalf without your approval.',
+      question: 'Where do the replies Boult writes go?',
+      answer: 'Every reply is saved straight to your Gmail “Drafts” folder for you to review, edit, and send. Maily never sends mail on your behalf without your approval.',
     },
     {
       id: 'item-10',
-      question: 'Can I control Arcus’s tone and length?',
-      answer: 'Yes. In Arcus Settings you can set the tone (Direct, Balanced, or Warm) and the length (Brief, Normal, or Detailed), and add standing custom instructions Arcus follows on every task.',
+      question: 'Can I control Boult’s tone and length?',
+      answer: 'Yes. In Boult Settings you can set the tone (Direct, Balanced, or Warm) and the length (Brief, Normal, or Detailed), and add standing custom instructions Boult follows on every task.',
     },
     {
       id: 'item-11',
       question: 'What do I get without a plan?',
-      answer: 'Without an active plan, AI features (Arcus, drafting, Sift, summaries, agents) are paused — you can still read and reply manually. Subscribe to unlock everything, unlimited.',
+      answer: 'Without an active plan, AI features (Boult, drafting, Sift, summaries, agents) are paused — you can still read and reply manually. Subscribe to unlock everything, unlimited.',
     },
     {
       id: 'item-12',
-      question: 'Does Mailient replace my Gmail app?',
-      answer: "No, Mailient enhances it. We provide a powerful overlay and intelligence layer, but your emails always live in Gmail. Any draft we create appears in your Gmail 'Drafts' folder.",
+      question: 'Does Maily replace my Gmail app?',
+      answer: "No, Maily enhances it. We provide a powerful overlay and intelligence layer, but your emails always live in Gmail. Any draft we create appears in your Gmail 'Drafts' folder.",
     },
     {
       id: 'item-13',
@@ -76,7 +76,7 @@ export default function FAQs() {
     {
       id: 'item-15',
       question: 'How can I get faster support?',
-      answer: 'Pro users get priority access. For any issues, use the Feedback tab in this Help card or email our founder directly at mailient.xyz@gmail.com.',
+      answer: 'Pro users get priority access. For any issues, use the Feedback tab in this Help card or email our founder directly at support.maily@gmail.com.',
     },
   ];
 
@@ -87,7 +87,7 @@ export default function FAQs() {
           <div className="md:col-span-2">
             <h2 className="text-foreground text-3xl font-bold dark:text-white">Product Help</h2>
             <p className="text-muted-foreground mt-4 text-balance text-sm leading-relaxed">
-              Everything you need to know about navigating the Mailient ecosystem.
+              Everything you need to know about navigating the Maily ecosystem.
             </p>
             <p className="text-neutral-600 dark:text-neutral-500 mt-6 hidden md:block text-xs uppercase tracking-widest font-bold">
                Expert Guidance

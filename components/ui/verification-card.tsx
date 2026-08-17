@@ -1,4 +1,5 @@
 "use client";
+import { Mail } from "lucide-react";
 
 import * as React from "react";
 import { motion } from "framer-motion";
@@ -70,10 +71,10 @@ export function VerificationCard({
       <div className="relative z-10 flex justify-between items-start">
         <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-black/10 dark:bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center overflow-hidden">
-                <img src="/mailient-logo-premium.png" alt="" className="w-7 h-7 dark:invert pr-0.5" />
+                <Mail className="w-full h-full p-1 text-inherit" />
             </div>
             <div className="flex flex-col">
-                <span className="text-lg font-bold tracking-tight leading-none">Mailient</span>
+                <span className="text-lg font-bold tracking-tight leading-none">Maily</span>
                 <span className="text-[10px] text-black dark:text-white/40 font-medium tracking-widest uppercase mt-1">
                     {isFree ? "Free Tier" : "Pro Pass"}
                 </span>

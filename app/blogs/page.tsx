@@ -16,7 +16,7 @@ const BLOG_POSTS = [
   {
     slug: "best-ai-email-assistant-solo-founders",
     title: "Best AI Email Tools for Solo Founders in 2026 — An Honest Comparison",
-    excerpt: "Superhuman, Fyxer, Shortwave, Notion Mail, Gmail's Gemini, and Mailient — what each is best at, who should skip us, and how to choose by the job you're hiring for.",
+    excerpt: "Superhuman, Fyxer, Shortwave, Notion Mail, Gmail's Gemini, and Maily — what each is best at, who should skip us, and how to choose by the job you're hiring for.",
     category: "Comparisons",
     date: "July 2, 2026",
     readTime: "9 min read",
@@ -32,18 +32,18 @@ const BLOG_POSTS = [
     featured: false,
   },
   {
-    slug: "mailient-vs-superhuman",
-    title: "Mailient vs Superhuman: Speed vs Autonomy (Honest 2026 Comparison)",
-    excerpt: "Superhuman makes you faster at email. Mailient does the email for you. Two opposite philosophies, honestly compared — including who should pick Superhuman.",
+    slug: "maily-vs-superhuman",
+    title: "Maily vs Superhuman: Speed vs Autonomy (Honest 2026 Comparison)",
+    excerpt: "Superhuman makes you faster at email. Maily does the email for you. Two opposite philosophies, honestly compared — including who should pick Superhuman.",
     category: "Comparisons",
     date: "July 2, 2026",
     readTime: "8 min read",
     featured: false,
   },
   {
-    slug: "mailient-vs-fyxer",
-    title: "Mailient vs Fyxer: Great Drafts vs a Whole Inbox Employee",
-    excerpt: "Fyxer drafts your replies and organizes your inbox. Mailient runs the whole job — triage, booking, follow-ups, and a morning briefing. The honest head-to-head.",
+    slug: "maily-vs-fyxer",
+    title: "Maily vs Fyxer: Great Drafts vs a Whole Inbox Employee",
+    excerpt: "Fyxer drafts your replies and organizes your inbox. Maily runs the whole job — triage, booking, follow-ups, and a morning briefing. The honest head-to-head.",
     category: "Comparisons",
     date: "July 2, 2026",
     readTime: "7 min read",
@@ -60,8 +60,8 @@ const BLOG_POSTS = [
   },
   {
     slug: "zero-knowledge-encryption-email-privacy",
-    title: "Zero-Knowledge Encryption Explained: How Mailient Protects Your Email Without Reading It",
-    excerpt: "Most AI email tools need to read your data to work. Mailient doesn't. A deep dive into the architecture that keeps your inbox private.",
+    title: "Zero-Knowledge Encryption Explained: How Maily Protects Your Email Without Reading It",
+    excerpt: "Most AI email tools need to read your data to work. Maily doesn't. A deep dive into the architecture that keeps your inbox private.",
     category: "Security",
     date: "May 23, 2026",
     readTime: "8 min read",
@@ -69,8 +69,8 @@ const BLOG_POSTS = [
   },
   {
     slug: "ai-learns-your-writing-style",
-    title: "How AI Learns to Write Exactly Like You: Inside Mailient's Neural Voice Profile",
-    excerpt: "Generic AI drafts damage relationships. Learn how Mailient's 90-day voice analysis builds a writing profile that mirrors your tone, sign-offs, and sentence patterns.",
+    title: "How AI Learns to Write Exactly Like You: Inside Maily's Neural Voice Profile",
+    excerpt: "Generic AI drafts damage relationships. Learn how Maily's 90-day voice analysis builds a writing profile that mirrors your tone, sign-offs, and sentence patterns.",
     category: "Engineering",
     date: "May 22, 2026",
     readTime: "7 min read",
@@ -105,7 +105,7 @@ export default function BlogsPage() {
 
   useEffect(() => {
     setMounted(true);
-    document.title = "Platform Insights // Mailient Blog";
+    document.title = "Platform Insights // Maily Blog";
   }, []);
 
   const isDark = mounted && (resolvedTheme === "dark" || theme === "dark");
@@ -158,14 +158,14 @@ export default function BlogsPage() {
 
         <BlurFade delay={0.15} duration={0.8} yOffset={15} inView>
           <h1 className="text-4xl md:text-7xl font-light tracking-[-0.04em] text-black dark:text-white leading-tight">
-            Engineering Mailient. <br />
+            Engineering Maily. <br />
             <span className="font-medium italic text-neutral-300 bg-gradient-to-r from-neutral-200 via-neutral-400 to-neutral-500 bg-clip-text text-transparent">Deep Dives & Essays.</span>
           </h1>
         </BlurFade>
 
         <BlurFade delay={0.28} duration={0.8} yOffset={12} inView>
           <p className="text-neutral-600 dark:text-neutral-400 text-sm md:text-base max-w-xl mx-auto font-light leading-relaxed tracking-tight">
-            Explore articles on AI email automation, inbox security, voice profiling, and the future of productivity — written by the team building Mailient.
+            Explore articles on AI email automation, inbox security, voice profiling, and the future of productivity — written by the team building Maily.
           </p>
         </BlurFade>
       </section>

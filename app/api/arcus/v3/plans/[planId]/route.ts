@@ -1,6 +1,6 @@
 /**
- * Arcus V3 — Single Plan API
- * GET /api/arcus/v3/plans/[planId] — Get single plan with steps
+ * Boult V3 — Single Plan API
+ * GET /api/boult/v3/plans/[planId] — Get single plan with steps
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -24,7 +24,7 @@ export async function GET(
 
     // ALWAYS scope to userId — never fetch by ID alone
     const { data: plan, error } = await supabase
-      .from('arcus_plans')
+      .from('boult_plans')
       .select('*')
       .eq('id', planId)
       .eq('user_id', userId)
@@ -36,7 +36,7 @@ export async function GET(
 
     // Fetch steps
     const { data: steps } = await supabase
-      .from('arcus_plan_steps')
+      .from('boult_plan_steps')
       .select('*')
       .eq('plan_id', planId)
       .order('position', { ascending: true });
@@ -45,7 +45,7 @@ export async function GET(
     let brief = null;
     if (plan.mode === 'plan_mode') {
       const { data: briefData } = await supabase
-        .from('arcus_briefs')
+        .from('boult_briefs')
         .select('brief_data, generated_at')
         .eq('plan_id', planId)
         .maybeSingle();
@@ -60,7 +60,7 @@ export async function GET(
 
   } catch (error) {
     logEvent({ channel: "failures", event: "❌ API Error", description: String(error) });
-    console.error('[Arcus V3] Plan detail error:', (error as Error).message);
+    console.error('[Boult V3] Plan detail error:', (error as Error).message);
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }

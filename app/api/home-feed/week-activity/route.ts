@@ -3,8 +3,8 @@
  *
  * Real 7-day activity series for the Command Center "Your week" chart.
  *
- * SOURCE OF TRUTH, AND WHY: every bar is counted from arcus_agent_runs — the
- * actual work Arcus did (tool calls + the Gmail/Calendar/Notion/Slack artifacts
+ * SOURCE OF TRUTH, AND WHY: every bar is counted from boult_agent_runs — the
+ * actual work Boult did (tool calls + the Gmail/Calendar/Notion/Slack artifacts
  * each run produced). Nothing here is illustrative or padded. If the user has no
  * agent activity this week the endpoint says so (hasData:false) and the UI shows
  * an honest empty state rather than a fake trend — this codebase has been burned
@@ -79,7 +79,7 @@ export async function GET() {
     const sinceIso = new Date(now.getTime() - 7 * DAY_MS).toISOString();
 
     const { data: runs, error } = await supabase
-      .from('arcus_agent_runs')
+      .from('boult_agent_runs')
       .select('status, tool_calls, artifact_links, completed_at, started_at')
       .eq('user_id', userEmail)
       .gte('started_at', sinceIso)

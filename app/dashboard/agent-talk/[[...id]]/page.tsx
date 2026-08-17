@@ -16,12 +16,12 @@ export default function AgentTalkPage() {
     // real checks still run below on every mount and redirect if they fail;
     // the server-side layout gate remains the actual paywall.
     const [isAuthenticated, setIsAuthenticated] = useState(
-        () => typeof window !== 'undefined' && sessionStorage.getItem('arcus_auth_ok') === '1'
+        () => typeof window !== 'undefined' && sessionStorage.getItem('boult_auth_ok') === '1'
     );
 
     // Set page title
     useEffect(() => {
-        document.title = 'Arcus / Mailient';
+        document.title = 'Boult / Maily';
     }, []);
 
     // Check authentication and onboarding status on component mount
@@ -31,7 +31,7 @@ export default function AgentTalkPage() {
                 const session = await getSession();
                 if (!session) {
                     // Redirect to sign-in page if not authenticated
-                    try { sessionStorage.removeItem('arcus_auth_ok'); } catch { /* private mode */ }
+                    try { sessionStorage.removeItem('boult_auth_ok'); } catch { /* private mode */ }
                     router.push('/auth/signin?callbackUrl=/dashboard/agent-talk');
                     return;
                 }
@@ -54,31 +54,12 @@ export default function AgentTalkPage() {
                     return;
                 }
 
-                // PAYWALL: Arcus AI is a paid surface. A user who finished onboarding
-                // but never paid must NOT get in — send them to the single paywall,
-                // onboarding step 13, until they pay & activate. Fails closed.
-                try {
-                    const subRes = await fetch(`/api/subscription/status?t=${Date.now()}`);
-                    const subData = subRes.ok ? await subRes.json() : null;
-                    const pt = subData?.subscription?.planType;
-                    const isPaid = !!pt && pt !== 'free' && pt !== 'none' && !subData?.subscription?.isExpired;
-                    if (!isPaid) {
-                        console.log('🔒 [AgentTalk] No active subscription — paywall (onboarding step 13).');
-                        try { sessionStorage.removeItem('arcus_auth_ok'); } catch { /* private mode */ }
-                        router.replace('/onboarding?step=13');
-                        return;
-                    }
-                } catch (error) {
-                    console.error('Error checking subscription:', error);
-                    router.replace('/onboarding?step=13');
-                    return;
-                }
-
-                try { sessionStorage.setItem('arcus_auth_ok', '1'); } catch { /* private mode */ }
+                // All authenticated users have full access — skip subscription check.
+                try { sessionStorage.setItem('boult_auth_ok', '1'); } catch { /* private mode */ }
                 setIsAuthenticated(true);
             } catch (error) {
                 console.error('Authentication check failed:', error);
-                try { sessionStorage.removeItem('arcus_auth_ok'); } catch { /* private mode */ }
+                try { sessionStorage.removeItem('boult_auth_ok'); } catch { /* private mode */ }
                 router.push('/auth/signin?callbackUrl=/dashboard/agent-talk');
             }
         };
@@ -145,7 +126,7 @@ export default function AgentTalkPage() {
 
     return (
         <div
-            className="satoshi-agent-talk agent-talk-container bg-arcus-bg"
+            className="satoshi-agent-talk agent-talk-container bg-boult-bg"
             style={{
                 fontFamily: 'Satoshi, sans-serif',
                 height: '100vh',

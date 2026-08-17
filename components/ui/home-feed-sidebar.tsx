@@ -1,4 +1,5 @@
 "use client";
+import { Mail } from "lucide-react";
 
 import { useState, useEffect, useRef } from 'react';
 import { useSession, signOut } from 'next-auth/react';
@@ -114,7 +115,7 @@ export function HomeFeedSidebar({
 
     const mainNavItems = [
         { id: 'home', icon: LayoutGrid, label: 'Home', route: '/home-feed' },
-        { id: 'arcus', icon: Sparkles, label: 'Arcus', route: '/dashboard/agent-talk' },
+        { id: 'boult', icon: Sparkles, label: 'Boult', route: '/dashboard/agent-talk' },
     ];
 
     const bottomNavItems = [
@@ -146,7 +147,7 @@ export function HomeFeedSidebar({
                             >
                                 <button 
                                     onClick={onClose}
-                                    className="p-2 hover:bg-black/5 dark:hover:bg-white/[0.05] rounded-full transition-colors text-neutral-600 dark:text-arcus-fg-tertiary"
+                                    className="p-2 hover:bg-black/5 dark:hover:bg-white/[0.05] rounded-full transition-colors text-neutral-600 dark:text-boult-fg-tertiary"
                                 >
                                     <X className="w-5 h-5" />
                                 </button>
@@ -175,11 +176,7 @@ export function HomeFeedSidebar({
                                 {/* Brand logo. When collapsed it simply fades out on hover to
                                     reveal the three-bars menu beneath — a clean crossfade,
                                     no scaling. When expanded it stays put. */}
-                                <img
-                                    src="/mailient-logo-v3.png"
-                                    alt="Mailient"
-                                    className={`w-full h-full object-cover transition-opacity duration-200 ${isCollapsed ? 'group-hover:opacity-0' : ''}`}
-                                />
+                                <Mail className="w-full h-full p-1 text-inherit" />
                                 {isCollapsed && (
                                     <span className="absolute inset-0 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                                         <HugeiconsIcon icon={Menu01Icon} size={22} strokeWidth={2} />
@@ -196,7 +193,7 @@ export function HomeFeedSidebar({
                                         transition={{ duration: 0.15 }}
                                         className="text-xl font-bold tracking-tight text-[#1A1A1A] dark:text-white whitespace-nowrap"
                                     >
-                                        Mailient
+                                        Maily
                                     </motion.span>
                                 )}
                             </AnimatePresence>
@@ -212,7 +209,7 @@ export function HomeFeedSidebar({
                                 transition={{ delay: 0.1 }}
                                 onClick={() => setIsCollapsed(true)}
                                 aria-label="Collapse sidebar"
-                                className="p-1.5 hover:bg-black/5 dark:hover:bg-arcus-surface rounded-lg transition-colors text-neutral-600 dark:text-arcus-fg-tertiary hover:text-neutral-900 dark:hover:text-white border border-transparent hover:border-[#EBE9E2] dark:hover:border-arcus-divider"
+                                className="p-1.5 hover:bg-black/5 dark:hover:bg-boult-surface rounded-lg transition-colors text-neutral-600 dark:text-boult-fg-tertiary hover:text-neutral-900 dark:hover:text-white border border-transparent hover:border-[#EBE9E2] dark:hover:border-boult-divider"
                             >
                                 <HugeiconsIcon icon={Menu01Icon} size={20} strokeWidth={2} />
                             </motion.button>
@@ -235,11 +232,11 @@ export function HomeFeedSidebar({
                                                 className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors duration-200 group relative ${
                                                     isActive
                                                     ? 'bg-black/5 dark:bg-white/[0.08] text-[#1A1A1A] dark:text-white font-semibold border border-[#EBE9E2] dark:border-white/[0.1]'
-                                                    : 'text-[#666666] dark:text-arcus-fg-tertiary hover:text-[#1A1A1A] dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/[0.05]'
+                                                    : 'text-[#666666] dark:text-boult-fg-tertiary hover:text-[#1A1A1A] dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/[0.05]'
                                                 }`}
                                             >
                                                 <span className="w-6 flex justify-center shrink-0">
-                                                    <Icon size={20} className={`transition-colors duration-300 ${isActive ? 'text-amber-500' : 'text-[#666666] dark:text-arcus-fg-tertiary group-hover:text-black dark:group-hover:text-white'}`} strokeWidth={ isActive ? 2 : 1.5} />
+                                                    <Icon size={20} className={`transition-colors duration-300 ${isActive ? 'text-amber-500' : 'text-[#666666] dark:text-boult-fg-tertiary group-hover:text-black dark:group-hover:text-white'}`} strokeWidth={ isActive ? 2 : 1.5} />
                                                 </span>
 
                                                 <AnimatePresence initial={false}>
@@ -290,12 +287,12 @@ export function HomeFeedSidebar({
                                             }}
                                             className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors duration-200 group ${
                                                 isActive
-                                                ? 'bg-black/5 dark:bg-arcus-raised text-[#1A1A1A] dark:text-white font-semibold border border-[#EBE9E2] dark:border-arcus-divider'
-                                                : 'text-[#666666] dark:text-arcus-fg-tertiary hover:text-[#1A1A1A] dark:hover:text-white hover:bg-black/5 dark:hover:bg-arcus-elevated'
+                                                ? 'bg-black/5 dark:bg-boult-raised text-[#1A1A1A] dark:text-white font-semibold border border-[#EBE9E2] dark:border-boult-divider'
+                                                : 'text-[#666666] dark:text-boult-fg-tertiary hover:text-[#1A1A1A] dark:hover:text-white hover:bg-black/5 dark:hover:bg-boult-elevated'
                                             }`}
                                         >
                                             <span className="w-6 flex justify-center shrink-0">
-                                                <Icon size={20} className={`transition-colors duration-300 ${isActive ? 'text-[#1A1A1A] dark:text-white' : 'text-[#666666] dark:text-arcus-fg-tertiary group-hover:text-black dark:group-hover:text-white'}`} strokeWidth={1.5} />
+                                                <Icon size={20} className={`transition-colors duration-300 ${isActive ? 'text-[#1A1A1A] dark:text-white' : 'text-[#666666] dark:text-boult-fg-tertiary group-hover:text-black dark:group-hover:text-white'}`} strokeWidth={1.5} />
                                             </span>
 
                                             <AnimatePresence initial={false}>
@@ -337,7 +334,7 @@ export function HomeFeedSidebar({
                                     >
                                         <motion.div 
                                             layout
-                                            className="w-7 h-7 rounded-full overflow-hidden border border-[#EBE9E2] dark:border-arcus-divider bg-white dark:bg-black shrink-0"
+                                            className="w-7 h-7 rounded-full overflow-hidden border border-[#EBE9E2] dark:border-boult-divider bg-white dark:bg-black shrink-0"
                                         >
                                             <img
                                                 src={(session?.user?.image?.startsWith('http') || session?.user?.image?.startsWith('/')) ? session.user.image : "/user-avatar.png?v=2"}
@@ -349,11 +346,11 @@ export function HomeFeedSidebar({
                                             <span className="text-[13px] font-medium text-[#1A1A1A] dark:text-white truncate w-full">
                                                 {session?.user?.name || 'Account'}
                                             </span>
-                                            <span className="text-[10px] text-[#666666] dark:text-arcus-fg-tertiary truncate w-full">
+                                            <span className="text-[10px] text-[#666666] dark:text-boult-fg-tertiary truncate w-full">
                                                 Manage Profile
                                             </span>
                                         </div>
-                                        <ChevronRight className={`ml-auto w-4 h-4 text-[#666666] dark:text-arcus-fg-tertiary transition-transform ${isMoreOptionsOpen ? 'rotate-90' : ''}`} />
+                                        <ChevronRight className={`ml-auto w-4 h-4 text-[#666666] dark:text-boult-fg-tertiary transition-transform ${isMoreOptionsOpen ? 'rotate-90' : ''}`} />
                                     </button>
                                     
                                     <AnimatePresence>
@@ -369,9 +366,9 @@ export function HomeFeedSidebar({
                                                         setIsFeedbackOpen(true);
                                                         setIsMoreOptionsOpen(false);
                                                     }}
-                                                    className="w-full flex items-center gap-3 px-3 py-2 text-neutral-600 dark:text-arcus-fg-tertiary hover:text-black dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/[0.05] rounded-lg transition-all text-sm group"
+                                                    className="w-full flex items-center gap-3 px-3 py-2 text-neutral-600 dark:text-boult-fg-tertiary hover:text-black dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/[0.05] rounded-lg transition-all text-sm group"
                                                 >
-                                                    <MessageCircle size={16} className="text-neutral-600 dark:text-arcus-fg-tertiary group-hover:text-black dark:group-hover:text-white transition-colors" />
+                                                    <MessageCircle size={16} className="text-neutral-600 dark:text-boult-fg-tertiary group-hover:text-black dark:group-hover:text-white transition-colors" />
                                                     <span>Feedback</span>
                                                 </button>
                                                 <div className="h-px w-full bg-black/5 dark:bg-white/[0.06] my-1" />
@@ -397,7 +394,7 @@ export function HomeFeedSidebar({
                                      <motion.div 
                                         whileHover={{ scale: 1.1 }}
                                         whileTap={{ scale: 0.9 }}
-                                        className="w-8 h-8 rounded-full overflow-hidden border border-[#EBE9E2] dark:border-arcus-divider bg-white dark:bg-black cursor-pointer"
+                                        className="w-8 h-8 rounded-full overflow-hidden border border-[#EBE9E2] dark:border-boult-divider bg-white dark:bg-black cursor-pointer"
                                         onClick={() => setIsCollapsed(false)}
                                     >
                                         <img

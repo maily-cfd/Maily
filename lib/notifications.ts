@@ -19,7 +19,7 @@ export interface Notification {
   };
 }
 
-const NOTIFICATIONS_KEY = 'mailient_notifications';
+const NOTIFICATIONS_KEY = 'maily_notifications';
 
 export const getNotifications = (): Notification[] => {
   if (typeof window === 'undefined') return [];

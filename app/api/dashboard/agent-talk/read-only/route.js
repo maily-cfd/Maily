@@ -4,7 +4,7 @@ import { DatabaseService } from '@/lib/supabase.js';
 import { decrypt } from '@/lib/crypto.js';
 import { logEvent } from "@/lib/logsso";
 
-// Read-only email fetcher for Arcus dashboard actions
+// Read-only email fetcher for Boult dashboard actions
 export async function POST(request) {
   try {
     const session = await auth();

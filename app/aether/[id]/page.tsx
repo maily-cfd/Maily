@@ -40,11 +40,11 @@ export default function AetherProfilePage() {
   const [isFollowingYou, setIsFollowingYou] = useState<boolean>(false);
 
   useEffect(() => {
-    document.title = `@${userId} / Mailient`;
+    document.title = `@${userId} / Maily`;
 
     // Load following state
     if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem('mailient_following');
+      const stored = localStorage.getItem('maily_following');
       if (stored) {
         try {
           const followingSet = new Set(JSON.parse(stored));
@@ -113,7 +113,7 @@ export default function AetherProfilePage() {
 
     // Update localStorage
     if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem('mailient_following');
+      const stored = localStorage.getItem('maily_following');
       let followingSet = new Set<string>();
       if (stored) {
         try {
@@ -129,7 +129,7 @@ export default function AetherProfilePage() {
         followingSet.add(userId);
       }
 
-      localStorage.setItem('mailient_following', JSON.stringify(Array.from(followingSet)));
+      localStorage.setItem('maily_following', JSON.stringify(Array.from(followingSet)));
     }
   };
 

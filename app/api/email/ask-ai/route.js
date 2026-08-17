@@ -74,9 +74,9 @@ export async function POST(request) {
             return NextResponse.json({ error: 'AI service not configured' }, { status: 500 });
         }
 
-        const canUse = await subscriptionService.canUseFeature(userId, FEATURE_TYPES.ARCUS_AI);
+        const canUse = await subscriptionService.canUseFeature(userId, FEATURE_TYPES.BOULT_AI);
         if (!canUse) {
-            const usage = await subscriptionService.getFeatureUsage(userId, FEATURE_TYPES.ARCUS_AI);
+            const usage = await subscriptionService.getFeatureUsage(userId, FEATURE_TYPES.BOULT_AI);
             return NextResponse.json({
                 error: 'limit_reached',
                 message: `Sorry, but you've exhausted all the credits of ${usage.period === 'daily' ? 'the day' : 'the month'}.`,
@@ -96,7 +96,7 @@ export async function POST(request) {
         );
 
         if (typeof response === 'string' && response.trim().length > 0) {
-            await subscriptionService.incrementFeatureUsage(userId, FEATURE_TYPES.ARCUS_AI);
+            await subscriptionService.incrementFeatureUsage(userId, FEATURE_TYPES.BOULT_AI);
         }
 
         return NextResponse.json({ response });

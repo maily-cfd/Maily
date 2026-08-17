@@ -105,24 +105,24 @@ export function AskUserCard({ questions, onSubmit, onDismiss }: AskUserCardProps
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-200 dark:border-white/[0.07]">
         <div className="flex items-center gap-2">
-          <MessageCircleQuestion className="w-4 h-4 text-arcus-fg-tertiary" />
-          <span className="text-[12px] font-bold text-arcus-fg-secondary uppercase tracking-widest">Question</span>
+          <MessageCircleQuestion className="w-4 h-4 text-boult-fg-tertiary" />
+          <span className="text-[12px] font-bold text-boult-fg-secondary uppercase tracking-widest">Question</span>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={handleBack}
             disabled={currentIndex === 0}
-            className="p-1 rounded-lg text-arcus-fg-muted hover:text-arcus-fg disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            className="p-1 rounded-lg text-boult-fg-muted hover:text-boult-fg disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
           >
             <ChevronLeft className="w-3.5 h-3.5" />
           </button>
-          <span className="text-[11px] font-bold text-arcus-fg-tertiary tabular-nums">
+          <span className="text-[11px] font-bold text-boult-fg-tertiary tabular-nums">
             {currentIndex + 1} of {questions.length}
           </span>
           <button
             onClick={handleNext}
             disabled={currentIndex === questions.length - 1}
-            className="p-1 rounded-lg text-arcus-fg-muted hover:text-arcus-fg disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            className="p-1 rounded-lg text-boult-fg-muted hover:text-boult-fg disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
           >
             <ChevronRight className="w-3.5 h-3.5" />
           </button>
@@ -144,7 +144,7 @@ export function AskUserCard({ questions, onSubmit, onDismiss }: AskUserCardProps
             <span className="text-[13px] font-bold text-black/60 dark:text-white/60 tabular-nums mt-0.5 shrink-0">
               {currentIndex + 1}
             </span>
-            <p className="text-[14px] font-semibold text-arcus-fg leading-snug">{current.text}</p>
+            <p className="text-[14px] font-semibold text-boult-fg leading-snug">{current.text}</p>
           </div>
 
           {/* Options — first one is the AI's best guess, preselected */}
@@ -156,15 +156,15 @@ export function AskUserCard({ questions, onSubmit, onDismiss }: AskUserCardProps
                 className={cn(
                   "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all duration-150",
                   currentAnswer === opt && !customInputs[currentIndex]
-                    ? "bg-black/[0.07] dark:bg-white/[0.10] border border-black/40 dark:border-white/40 text-arcus-fg"
-                    : "bg-zinc-100 dark:bg-white/[0.03] border border-zinc-200 dark:border-white/[0.06] text-arcus-fg-secondary hover:bg-zinc-200 dark:hover:bg-white/[0.06] hover:text-arcus-fg"
+                    ? "bg-black/[0.07] dark:bg-white/[0.10] border border-black/40 dark:border-white/40 text-boult-fg"
+                    : "bg-zinc-100 dark:bg-white/[0.03] border border-zinc-200 dark:border-white/[0.06] text-boult-fg-secondary hover:bg-zinc-200 dark:hover:bg-white/[0.06] hover:text-boult-fg"
                 )}
               >
                 <span className={cn(
                   "w-6 h-6 rounded-lg text-[11px] font-black flex items-center justify-center shrink-0 transition-colors",
                   currentAnswer === opt && !customInputs[currentIndex]
                     ? "bg-black text-white dark:bg-white dark:text-black"
-                    : "bg-zinc-200 dark:bg-white/[0.07] text-arcus-fg-muted"
+                    : "bg-zinc-200 dark:bg-white/[0.07] text-boult-fg-muted"
                 )}>
                   {OPTION_LABELS[i]}
                 </span>
@@ -192,7 +192,7 @@ export function AskUserCard({ questions, onSubmit, onDismiss }: AskUserCardProps
                   "w-6 h-6 rounded-lg text-[11px] font-black flex items-center justify-center shrink-0 ml-3 my-2.5 cursor-pointer transition-colors",
                   customInputs[currentIndex]
                     ? "bg-black text-white dark:bg-white dark:text-black"
-                    : "bg-zinc-200 dark:bg-white/[0.07] text-arcus-fg-muted"
+                    : "bg-zinc-200 dark:bg-white/[0.07] text-boult-fg-muted"
                 )}
               >
                 {OPTION_LABELS[(current.options?.length ?? 0)]}
@@ -208,7 +208,7 @@ export function AskUserCard({ questions, onSubmit, onDismiss }: AskUserCardProps
                   next[currentIndex] = e.target.value;
                   setAnswers(next);
                 }}
-                className="flex-1 bg-transparent text-[13px] text-arcus-fg placeholder:text-arcus-fg-muted py-2.5 pr-3 focus:outline-none"
+                className="flex-1 bg-transparent text-[13px] text-boult-fg placeholder:text-boult-fg-muted py-2.5 pr-3 focus:outline-none"
               />
             </div>
           </div>
@@ -219,7 +219,7 @@ export function AskUserCard({ questions, onSubmit, onDismiss }: AskUserCardProps
       <div className="flex items-center justify-end gap-2 px-4 py-3 border-t border-zinc-200 dark:border-white/[0.06]">
         <button
           onClick={onDismiss}
-          className="px-3 py-1.5 text-[12px] font-medium text-arcus-fg-muted hover:text-arcus-fg-secondary transition-colors"
+          className="px-3 py-1.5 text-[12px] font-medium text-boult-fg-muted hover:text-boult-fg-secondary transition-colors"
         >
           Skip
         </button>
@@ -231,7 +231,7 @@ export function AskUserCard({ questions, onSubmit, onDismiss }: AskUserCardProps
               "px-4 py-1.5 rounded-xl text-[12px] font-bold transition-all",
               isAnswered
                 ? "bg-black text-white hover:bg-black/85 dark:bg-white dark:text-black dark:hover:bg-white/85"
-                : "bg-zinc-200 dark:bg-white/[0.05] text-arcus-fg-muted cursor-not-allowed"
+                : "bg-zinc-200 dark:bg-white/[0.05] text-boult-fg-muted cursor-not-allowed"
             )}
           >
             Next

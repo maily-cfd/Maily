@@ -130,12 +130,12 @@ export function SettingsCard({ onClose, onOpenHelp }: SettingsCardProps) {
         try {
             // PART 25: route through the unified disconnect endpoint built in
             // PART 24 so all three token stores are cleared in one call
-            // (arcus_integrations + integration_credentials + user_tokens).
+            // (boult_integrations + integration_credentials + user_tokens).
             // The legacy DELETE /api/integrations only cleared
-            // integration_credentials, leaving the newer arcus_integrations
+            // integration_credentials, leaving the newer boult_integrations
             // row orphaned — chat would keep seeing the connector as
             // connected after the user clicked Disconnect.
-            const res = await fetch('/api/arcus/connectors/disconnect', {
+            const res = await fetch('/api/boult/connectors/disconnect', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ provider: appId }),
@@ -197,7 +197,7 @@ export function SettingsCard({ onClose, onOpenHelp }: SettingsCardProps) {
         lastName: '',
         email: '',
         username: '',
-        picture: '/arcus-ai-icon.jpg',
+        picture: '/boult-ai-icon.jpg',
         banner: '',
         occupation: 'Founder',
         bio: '',
@@ -216,7 +216,7 @@ export function SettingsCard({ onClose, onOpenHelp }: SettingsCardProps) {
                         lastName: data.name?.split(' ').slice(1).join(' ') || '',
                         email: data.email || '',
                         username: data.username || '',
-                        picture: data.avatar_url || data.picture || '/arcus-ai-icon.jpg',
+                        picture: data.avatar_url || data.picture || '/boult-ai-icon.jpg',
                         banner: data.banner_url || '',
                         occupation: data.work_status || 'Founder',
                         bio: data.bio || '',
@@ -416,7 +416,7 @@ export function SettingsCard({ onClose, onOpenHelp }: SettingsCardProps) {
 
                     {/* Footer Info - Hidden on mobile */}
                     <div className="hidden md:flex px-4 py-4 items-center justify-between mt-auto">
-                        <span className="text-[11px] text-neutral-500 dark:text-neutral-400 font-medium">Mailient v1.0.1</span>
+                        <span className="text-[11px] text-neutral-500 dark:text-neutral-400 font-medium">Maily v1.0.1</span>
                         <div className="w-4 h-4 rounded-full bg-neutral-200 dark:bg-white/5 flex items-center justify-center">
                             <Cloud className="w-2.5 h-2.5 text-neutral-500 dark:text-neutral-400" />
                         </div>
@@ -523,7 +523,7 @@ export function SettingsCard({ onClose, onOpenHelp }: SettingsCardProps) {
                                                 <p className="text-[13px] text-black dark:text-white/90 leading-relaxed">
                                                     <Sparkles className="w-3.5 h-3.5 inline mr-1.5 mb-0.5 text-amber-400" />
                                                     <strong className="text-black dark:text-white font-semibold">AI Voice Cloning:</strong>{' '}
-                                                    <span className="text-neutral-900 dark:text-neutral-300">Mailient will analyze your sent emails to perfectly replicate your writing style. This process happens automatically when drafting.</span>
+                                                    <span className="text-neutral-900 dark:text-neutral-300">Maily will analyze your sent emails to perfectly replicate your writing style. This process happens automatically when drafting.</span>
                                                 </p>
                                             </div>
                                         )}
@@ -555,7 +555,7 @@ export function SettingsCard({ onClose, onOpenHelp }: SettingsCardProps) {
                                         <div className="bg-neutral-50 dark:bg-white/5 rounded-[2.5rem] p-6 border border-neutral-200 dark:border-white/5">
                                             <div className="flex items-center gap-2 mb-5">
                                                 <Keyboard className="w-4 h-4 text-blue-500" />
-                                                <span className="text-[14px] font-semibold text-black dark:text-white">Arcus Shortcuts</span>
+                                                <span className="text-[14px] font-semibold text-black dark:text-white">Boult Shortcuts</span>
                                                 <span className="ml-auto text-[10px] font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500 bg-neutral-100 dark:bg-white/5 px-2 py-0.5 rounded-full border border-neutral-200 dark:border-white/10">macOS / Windows</span>
                                             </div>
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-0.5">
@@ -889,15 +889,15 @@ export function SettingsCard({ onClose, onOpenHelp }: SettingsCardProps) {
                                 </motion.div>
                             )}
 {activeSection === 'subscription' && (() => {
-                                const arcus = subscriptionData?.features?.arcus_ai;
+                                const boult = subscriptionData?.features?.boult_ai;
                                 const sift = subscriptionData?.features?.sift_analysis;
                                 const summary = subscriptionData?.features?.email_summary;
                                 const tokens = subscriptionData?.features?.openai_tokens;
-                                const isUnlimited = arcus?.isUnlimited || isPro;
+                                const isUnlimited = boult?.isUnlimited || isPro;
 
-                                const arcusUsed = arcus?.usage ?? 0;
-                                const arcusLimit = arcus?.limit ?? 50;
-                                const arcusRemaining = isUnlimited ? null : (arcus?.remaining ?? arcusLimit);
+                                const boultUsed = boult?.usage ?? 0;
+                                const boultLimit = boult?.limit ?? 50;
+                                const boultRemaining = isUnlimited ? null : (boult?.remaining ?? boultLimit);
 
                                 const tokenUsed = tokens?.usage ?? 0;
                                 const tokenLimit = tokens?.limit ?? 50000;
@@ -918,7 +918,7 @@ export function SettingsCard({ onClose, onOpenHelp }: SettingsCardProps) {
 
                                 const STARTER_URL = 'https://buy.polar.sh/polar_cl_I2DWGQPxxX0lvNGzbAeSRbkdCP6TgU9Ybsy7O3pkReC';
                                 const PRO_URL = 'https://buy.polar.sh/polar_cl_iFCJ2Mq7UbVBQTIiMGwI3STQZTvGfT1EBLyiM1HM5ca';
-                                const PORTAL_URL = 'https://polar.sh/mailient/portal';
+                                const PORTAL_URL = 'https://polar.sh/maily/portal';
                                 const userEmail = session?.user?.email || '';
 
                                 return (
@@ -997,21 +997,21 @@ export function SettingsCard({ onClose, onOpenHelp }: SettingsCardProps) {
                                                 )}
                                             </div>
 
-                                            {/* Arcus AI */}
+                                            {/* Boult AI */}
                                             <div className="space-y-3">
                                                 <div className="flex items-center justify-between">
                                                     <div className="flex items-center gap-3">
                                                         <Sparkles className="w-4 h-4 text-neutral-500 dark:text-neutral-400" strokeWidth={1.5} />
-                                                        <span className="text-[15px] font-medium text-black dark:text-white">Arcus AI</span>
+                                                        <span className="text-[15px] font-medium text-black dark:text-white">Boult AI</span>
                                                     </div>
                                                     <span className="text-[15px] font-medium text-black dark:text-white font-mono">
                                                         {isUnlimited ? (
                                                             <span className="flex items-center gap-1.5">
                                                                 <span className="text-emerald-500">∞</span>
-                                                                <span className="text-neutral-500 text-[13px]">({fmt(arcusUsed)} used today)</span>
+                                                                <span className="text-neutral-500 text-[13px]">({fmt(boultUsed)} used today)</span>
                                                             </span>
                                                         ) : (
-                                                            <span>{fmt(arcusRemaining ?? 0)} <span className="text-neutral-400 text-[13px]">/ {fmt(arcusLimit)} remaining</span></span>
+                                                            <span>{fmt(boultRemaining ?? 0)} <span className="text-neutral-400 text-[13px]">/ {fmt(boultLimit)} remaining</span></span>
                                                         )}
                                                     </span>
                                                 </div>
@@ -1020,11 +1020,11 @@ export function SettingsCard({ onClose, onOpenHelp }: SettingsCardProps) {
                                                         <div className="h-1.5 w-full bg-neutral-200 dark:bg-white/5 rounded-full overflow-hidden">
                                                             <motion.div
                                                                 initial={{ width: 0 }}
-                                                                animate={{ width: `${Math.min(100, (arcusUsed / arcusLimit) * 100)}%` }}
+                                                                animate={{ width: `${Math.min(100, (boultUsed / boultLimit) * 100)}%` }}
                                                                 className="h-full bg-black dark:bg-white rounded-full"
                                                             />
                                                         </div>
-                                                        <p className="text-[11px] text-neutral-500 pl-7">Resets to {fmt(arcusLimit)} at 00:00 every day</p>
+                                                        <p className="text-[11px] text-neutral-500 pl-7">Resets to {fmt(boultLimit)} at 00:00 every day</p>
                                                     </>
                                                 )}
                                             </div>
@@ -1161,7 +1161,7 @@ export function SettingsCard({ onClose, onOpenHelp }: SettingsCardProps) {
                                             <div className="space-y-1 max-w-[480px]">
                                                 <h3 className="text-[17px] font-bold text-black dark:text-white">Enhanced Privacy Mode</h3>
                                                 <p className="text-sm text-neutral-500 dark:text-neutral-400 leading-relaxed">
-                                                    When active, Mailient does not store your conversation history on our cloud. Everything stays local to your browser.
+                                                    When active, Maily does not store your conversation history on our cloud. Everything stays local to your browser.
                                                 </p>
                                             </div>
                                             <ToggleSwitch checked={settings.privacyMode} onChange={(v) => updateSetting('privacyMode', v)} />
@@ -1197,7 +1197,7 @@ export function SettingsCard({ onClose, onOpenHelp }: SettingsCardProps) {
                                             <div className="space-y-1 max-w-[480px]">
                                                 <h3 className="text-[17px] font-bold text-black dark:text-white">Training Contribution</h3>
                                                 <p className="text-sm text-neutral-500 dark:text-neutral-400 leading-relaxed">
-                                                    Allow Mailient to use anonymized feedback to improve its email composition models.
+                                                    Allow Maily to use anonymized feedback to improve its email composition models.
                                                 </p>
                                             </div>
                                             <ToggleSwitch checked={settings.trainingData} onChange={(v) => updateSetting('trainingData', v)} />
@@ -1210,7 +1210,7 @@ export function SettingsCard({ onClose, onOpenHelp }: SettingsCardProps) {
                                             <ShieldCheck className="w-8 h-8 text-emerald-500" />
                                         </div>
                                         <div className="text-center relative z-10">
-                                            <h4 className="text-black dark:text-white text-lg font-bold mb-1 tracking-tight">Mailient Shield Active</h4>
+                                            <h4 className="text-black dark:text-white text-lg font-bold mb-1 tracking-tight">Maily Shield Active</h4>
                                             <p className="text-neutral-600 dark:text-neutral-500 text-sm max-w-[320px] mx-auto">Your identity and inbox are protected by state-of-the-art encryption.</p>
                                         </div>
                                     </div>
@@ -1240,7 +1240,7 @@ export function SettingsCard({ onClose, onOpenHelp }: SettingsCardProps) {
                                     <div className="bg-neutral-50 dark:bg-white/5 rounded-[2.5rem] p-8 md:p-10 border border-neutral-200 dark:border-white/5 space-y-6">
                                         <div className="mb-4">
                                             <h3 className="text-[15px] font-semibold text-black dark:text-white mb-1">Connected Apps</h3>
-                                            <p className="text-sm text-neutral-500 dark:text-neutral-400">Manage your integrations to extend Mailient's capabilities.</p>
+                                            <p className="text-sm text-neutral-500 dark:text-neutral-400">Manage your integrations to extend Maily's capabilities.</p>
                                         </div>
                                         <div className="space-y-4">
                                             {SUPPORTED_APPS.map((app) => {

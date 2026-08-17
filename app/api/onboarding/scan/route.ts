@@ -3,15 +3,15 @@ import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 // @ts-ignore
 import { GmailService } from '@/lib/gmail';
-import { getGmailToken } from '@/lib/arcus/tools/http-tokens';
+import { getGmailToken } from '@/lib/boult/tools/http-tokens';
 import { logEvent } from "@/lib/logsso";
 
 /**
  * POST /api/onboarding/scan
  *
  * Reads the user's REAL inbox and returns EXACT counts for the First Scan /
- * Scan Results screens. Uses the same Gmail token resolution as Arcus
- * (arcus_integrations / Composio / user_tokens) — not session-only tokens.
+ * Scan Results screens. Uses the same Gmail token resolution as Boult
+ * (boult_integrations / Composio / user_tokens) — not session-only tokens.
  */
 
 export const dynamic = 'force-dynamic';

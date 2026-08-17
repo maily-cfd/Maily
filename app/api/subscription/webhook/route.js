@@ -194,7 +194,7 @@ export async function POST(request) {
                 // closed it (no card) ends up with an active Pro trial. We only grant a
                 // 'trialing' subscription when a payment method is on file. (Configure
                 // the Polar product to REQUIRE a payment method for the trial so every
-                // legitimate trial carries one — see docs/arcus-calcom-auth.md style note.)
+                // legitimate trial carries one — see docs/boult-calcom-auth.md style note.)
                 const hasPaymentMethod = !!(
                     paymentMethodLast4 ||
                     paymentMethod ||
@@ -287,7 +287,7 @@ export async function POST(request) {
                         user_id: userEmail,
                         tags: { amount_minor: chargedMinor, orderId }
                     });
-                    const planLabel = (PLANS[planType] && PLANS[planType].name) || 'Mailient';
+                    const planLabel = (PLANS[planType] && PLANS[planType].name) || 'Maily';
                     const dateLabel = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
                     // Generate + fetch the invoice PDF (best-effort), then email the
                     // receipt. Done inline so the webhook stays warm long enough for

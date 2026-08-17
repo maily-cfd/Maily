@@ -24,7 +24,7 @@ export default function Contact() {
           <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
         </svg>
       ),
-      contact: "mailient.xyz@gmail.com"
+      contact: "support.maily@gmail.com"
     }
   ]
 
@@ -40,7 +40,7 @@ export default function Contact() {
           <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
         </svg>
       ),
-      link: 'https://www.youtube.com/@maulik-5'
+      link: 'https://github.com/maily-cfd/Maily'
     },
     {
       type: 'social',
@@ -49,7 +49,7 @@ export default function Contact() {
           <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
         </svg>
       ),
-      link: 'https://x.com/maulik_5'
+      link: 'https://x.com/Mailycfd'
     }
   ]
 
@@ -87,7 +87,7 @@ export default function Contact() {
               Let us know how we can help
             </p>
             <p className="text-neutral-900 dark:text-gray-300">
-              We're here to help and answer any question you might have about Mailient's email management platform. We look forward to hearing from you! Please fill out the form, or use the contact information below.
+              We're here to help and answer any question you might have about Maily's email management platform. We look forward to hearing from you! Please fill out the form, or use the contact information below.
             </p>
             <div>
               <ul className="mt-6 flex flex-wrap gap-x-10 gap-y-6 items-center">
