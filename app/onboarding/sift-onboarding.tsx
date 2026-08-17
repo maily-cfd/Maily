@@ -1,5 +1,4 @@
 'use client';
-import { Mail } from "lucide-react";
 
 /**
  * Maily onboarding — short path to value, then trial.
